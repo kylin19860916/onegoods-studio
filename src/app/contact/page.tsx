@@ -1,3 +1,5 @@
+import { SubscribeForm } from "@/components/SubscribeForm";
+
 export const metadata = {
   title: "联系",
   description: "OneGoods Studio · 玩物工坊 联系方式",
@@ -18,20 +20,7 @@ export default function ContactPage() {
           <p className="text-[color:var(--color-fg-muted)] mb-6 leading-relaxed">
             新品 · Maker 实践 · 工作流分享 — 每月 1-2 封，没废话。
           </p>
-          <form className="flex flex-col gap-3">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              className="px-4 py-3 bg-[color:var(--color-bg-elevated)] border border-[color:var(--color-border)] rounded-full focus:outline-none focus:border-[color:var(--color-accent)] transition-colors"
-            />
-            <button
-              type="submit"
-              disabled
-              className="px-6 py-3 bg-[color:var(--color-accent)] text-[color:var(--color-bg)] font-medium rounded-full hover:opacity-90 transition-opacity disabled:opacity-50"
-            >
-              订阅 (Resend 接入待实现)
-            </button>
-          </form>
+          <SubscribeForm />
         </div>
 
         {/* Direct contact */}
