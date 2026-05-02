@@ -1,26 +1,102 @@
 @import "tailwindcss";
 
+/* ============================================================
+   OneGoods Studio · 玩物工坊
+   Brand Visual Tokens
+   Visual North Star: Dark moody industrial premium
+   Single warm amber light + matte black + brushed metal + organic touch
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* === Core colors === */
+  --color-bg: #0A0A0A;          /* deep charcoal / near-black */
+  --color-bg-elevated: #14141A; /* slight elevated surface */
+  --color-fg: #ECEAE5;          /* warm off-white text */
+  --color-fg-muted: #8B857A;    /* muted text */
+
+  /* === Accent (warm amber LED) === */
+  --color-accent: #F2A93B;      /* warm amber */
+  --color-accent-soft: #5C3A1A; /* dim amber for hover/subtle */
+
+  /* === Material tones === */
+  --color-metal: #2E2E33;       /* matte gunmetal */
+  --color-metal-bright: #595961;/* brushed steel highlight */
+  --color-organic: #6B5C4A;     /* dried plant / wood warmth */
+
+  /* === Border / divider === */
+  --color-border: #1F1F25;
+  --color-border-subtle: #18181C;
+
+  /* === Light variant (rare use) === */
+  --color-bg-light: #F4F1EC;
+  --color-fg-light: #18181C;
+
+  /* === Typography === */
+  --font-sans: var(--font-inter), "PingFang SC", "Helvetica Neue", system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), "SF Mono", "Menlo", monospace;
+
+  /* === Spacing / rhythm === */
+  --section-padding-y: 6rem;    /* 96px section vertical padding */
+  --container-max: 1200px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-fg);
+  --color-muted: var(--color-fg-muted);
+  --color-accent: var(--color-accent);
+  --color-metal: var(--color-metal);
+  --color-border: var(--color-border);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* === Body & global === */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
+
+/* === Typography defaults === */
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+h1 { font-size: clamp(2.5rem, 6vw, 5rem); }
+h2 { font-size: clamp(2rem, 4vw, 3.5rem); }
+h3 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
+
+/* === Selection === */
+::selection {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* === Subtle warm glow utility (mimics the amber LED feel) === */
+.glow-amber {
+  box-shadow:
+    0 0 40px rgba(242, 169, 59, 0.15),
+    0 0 100px rgba(242, 169, 59, 0.05);
+}
+
+/* === Subtle grain texture (industrial feel) === */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+  background-size: 4px 4px;
+  mix-blend-mode: overlay;
+}
+
