@@ -2,6 +2,12 @@
 
 import { useState } from "react";
 
+declare global {
+  interface Window {
+    gtag?: (cmd: string, eventName: string, params?: Record<string, unknown>) => void;
+  }
+}
+
 export function CheckoutButton({
   slug,
   priceUSD,
@@ -17,6 +23,15 @@ export function CheckoutButton({
   async function handleCheckout() {
     setLoading(true);
     setError(null);
+
+    if (typeof window.gtag === "function") {
+      window.gtag("event", "begin_checkout", {
+        currency: "USD",
+        value: priceUSD,
+        items: [{ item_id: slug, item_name: name, price: priceUSD, quantity: 1 }],
+      });
+    }
+
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",

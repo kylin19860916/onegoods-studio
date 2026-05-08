@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductBySlug, getAllProducts } from "@/lib/content";
 import { CheckoutButton } from "@/components/CheckoutButton";
+import { PurchaseTracker } from "@/components/PurchaseTracker";
 
 export async function generateStaticParams() {
   return getAllProducts({ includeDraft: true }).map((p) => ({ slug: p.slug }));
@@ -71,6 +72,7 @@ export default async function ProductDetailPage({
           )}
 
           <CheckoutButton slug={product.slug} priceUSD={product.priceUSD} name={product.name} />
+          <PurchaseTracker slug={product.slug} priceUSD={product.priceUSD} name={product.name} />
 
           <div className="mt-12 space-y-4 text-sm">
             {product.materials && (
