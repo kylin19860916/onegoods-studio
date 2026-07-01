@@ -9,21 +9,21 @@ const navLinks = [
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-[color:var(--color-bg)]/70 border-b border-[color:var(--color-border-subtle)]">
-      <div className="mx-auto max-w-[1200px] px-6 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-50 border-b border-[color:var(--color-border-subtle)] bg-[color:var(--color-bg)]/86 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
         <Link
           href="/"
-          className="font-display text-lg tracking-tight hover:text-[color:var(--color-accent)] transition-colors"
+          className="font-display text-lg tracking-tight transition-colors hover:text-[color:var(--color-accent)]"
         >
           OneGoods<span className="text-[color:var(--color-fg-muted)]">·</span>Studio
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8 text-sm">
+        <nav className="hidden items-center gap-8 text-sm md:flex">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-fg)] transition-colors"
+              className="text-[color:var(--color-fg-muted)] transition-colors hover:text-[color:var(--color-fg)]"
             >
               {link.label}
             </Link>
@@ -32,7 +32,7 @@ export function Header() {
 
         <Link
           href="/shop"
-          className="text-sm font-medium px-4 py-2 rounded-full border border-[color:var(--color-border)] hover:border-[color:var(--color-accent)] hover:text-[color:var(--color-accent)] transition-colors"
+          className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-bg-elevated)] px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:border-[color:var(--color-accent)] hover:text-[color:var(--color-accent)]"
         >
           Shop
         </Link>
@@ -40,4 +40,3 @@ export function Header() {
     </header>
   );
 }
-

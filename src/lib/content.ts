@@ -12,6 +12,9 @@ export type Product = {
   slug: string;
   name: string;
   category: string;
+  family?: string;
+  sourceType?: string;
+  badges?: string[];
   priceUSD: number;
   shortDesc: string;
   materials?: string;
@@ -25,6 +28,12 @@ export type Product = {
   body: string;
 };
 
+function toStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map(String);
+  if (typeof value === "string" && value.trim()) return value.split(",").map((item) => item.trim());
+  return [];
+}
+
 export function getAllProducts(opts?: { includeDraft?: boolean }): Product[] {
   const dir = path.join(CONTENT_ROOT, "products");
   if (!fs.existsSync(dir)) return [];
@@ -36,6 +45,9 @@ export function getAllProducts(opts?: { includeDraft?: boolean }): Product[] {
       slug: data.slug ?? file.replace(/\.mdx$/, ""),
       name: data.name ?? "Untitled",
       category: data.category ?? "Misc",
+      family: data.family,
+      sourceType: data.sourceType,
+      badges: toStringArray(data.badges),
       priceUSD: Number(data.priceUSD ?? 0),
       shortDesc: data.shortDesc ?? "",
       materials: data.materials,

@@ -22,6 +22,14 @@ export async function generateMetadata({
   };
 }
 
+function familyLabel(family?: string, category?: string) {
+  if (family === "fruit") return "水果系列";
+  if (family === "food") return "美食系列";
+  if (family === "nature") return "自然系列";
+  if (family === "studio" || category === "MagBlock" || category === "Modular System") return "工坊系列";
+  return "水果系列";
+}
+
 export default async function ProductDetailPage({
   params,
 }: {
@@ -31,42 +39,48 @@ export default async function ProductDetailPage({
   const product = getProductBySlug(slug);
   if (!product) notFound();
 
+  const badges = Array.from(new Set([product.sourceType, ...(product.badges ?? []), product.priceUSD === 0 ? "即将上架" : undefined].filter(Boolean))) as string[];
+
   return (
-    <article className="mx-auto max-w-[1200px] px-6 py-24">
+    <article className="mx-auto max-w-[1200px] px-6 py-20">
       <Link
         href="/shop"
-        className="text-sm text-[color:var(--color-fg-muted)] hover:text-[color:var(--color-accent)] transition-colors mb-8 inline-block"
+        className="mb-8 inline-block text-sm text-[color:var(--color-fg-muted)] transition-colors hover:text-[color:var(--color-accent)]"
       >
         ← 返回 Shop
       </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Image gallery */}
-        <div className="aspect-square bg-[color:var(--color-bg-elevated)] rounded-2xl border border-[color:var(--color-border)] flex items-center justify-center text-sm text-[color:var(--color-fg-muted)] overflow-hidden">
-          {product.images && product.images[0] ? (
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+        <div className="studio-card flex aspect-square items-center justify-center overflow-hidden text-sm text-[color:var(--color-fg-muted)]">
+          {product.images && product.images[0]?.startsWith("http") ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={product.images[0]}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
+            <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
           ) : (
-            <span>[产品主图 — 等真实产品照]</span>
+            <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-[linear-gradient(135deg,var(--color-butter),var(--color-mint),#fffaf2)] px-8 text-center">
+              <span className="sticker-icon h-16 w-16 bg-white/78 text-3xl">✦</span>
+              <span>产品主图准备中</span>
+            </div>
           )}
         </div>
 
-        {/* Product info */}
         <div>
-          <p className="font-mono text-xs uppercase tracking-widest text-[color:var(--color-fg-muted)] mb-3">
-            {product.category}
+          <p className="mb-3 font-mono text-xs uppercase tracking-widest text-[color:var(--color-fg-muted)]">
+            {familyLabel(product.family, product.category)}
           </p>
-          <h1 className="font-display mb-6">{product.name}</h1>
-          <p className="text-2xl mb-8">
-            {product.priceUSD ? `$${product.priceUSD} USD` : "TBD"}
+          <h1 className="font-display mb-5">{product.name}</h1>
+          <div className="mb-6 flex flex-wrap gap-2">
+            {badges.map((badge) => (
+              <span key={badge} className="pill-badge">
+                {badge}
+              </span>
+            ))}
+          </div>
+          <p className="mb-8 text-2xl">
+            {product.priceUSD ? `$${product.priceUSD} USD` : "即将上架"}
           </p>
 
           {product.shortDesc && (
-            <p className="text-[color:var(--color-fg-muted)] leading-relaxed mb-8">
+            <p className="mb-8 text-lg leading-relaxed text-[color:var(--color-fg-muted)]">
               {product.shortDesc}
             </p>
           )}
@@ -75,28 +89,34 @@ export default async function ProductDetailPage({
           <PurchaseTracker slug={product.slug} priceUSD={product.priceUSD} name={product.name} />
 
           <div className="mt-12 space-y-4 text-sm">
+            {product.sourceType && (
+              <div className="flex justify-between gap-6 border-t border-[color:var(--color-border-subtle)] pt-4">
+                <span className="text-[color:var(--color-fg-muted)]">商品来源</span>
+                <span className="text-right">{product.sourceType}</span>
+              </div>
+            )}
             {product.materials && (
-              <div className="flex justify-between border-t border-[color:var(--color-border-subtle)] pt-4">
+              <div className="flex justify-between gap-6 border-t border-[color:var(--color-border-subtle)] pt-4">
                 <span className="text-[color:var(--color-fg-muted)]">材质</span>
-                <span>{product.materials}</span>
+                <span className="text-right">{product.materials}</span>
               </div>
             )}
             {product.dimensions && (
-              <div className="flex justify-between border-t border-[color:var(--color-border-subtle)] pt-4">
+              <div className="flex justify-between gap-6 border-t border-[color:var(--color-border-subtle)] pt-4">
                 <span className="text-[color:var(--color-fg-muted)]">尺寸</span>
-                <span>{product.dimensions}</span>
+                <span className="text-right">{product.dimensions}</span>
               </div>
             )}
             {product.shipFrom && (
-              <div className="flex justify-between border-t border-[color:var(--color-border-subtle)] pt-4">
+              <div className="flex justify-between gap-6 border-t border-[color:var(--color-border-subtle)] pt-4">
                 <span className="text-[color:var(--color-fg-muted)]">发货地</span>
                 <span>{product.shipFrom}</span>
               </div>
             )}
             {product.shipTo && (
-              <div className="flex justify-between border-t border-[color:var(--color-border-subtle)] pt-4">
+              <div className="flex justify-between gap-6 border-t border-[color:var(--color-border-subtle)] pt-4">
                 <span className="text-[color:var(--color-fg-muted)]">配送地区</span>
-                <span>{product.shipTo.join(" · ")}</span>
+                <span className="text-right">{product.shipTo.join(" · ")}</span>
               </div>
             )}
           </div>
@@ -105,4 +125,3 @@ export default async function ProductDetailPage({
     </article>
   );
 }
-

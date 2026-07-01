@@ -2,42 +2,47 @@
 
 /* ============================================================
    OneGoods Studio · 玩物工坊
-   Brand Visual Tokens
-   Visual North Star: Dark moody industrial premium
-   Single warm amber light + matte black + brushed metal + organic touch
+   UI Design Guide v0.4 Inclusive
+   Playful everyday objects: cute/healing, useful, maker-friendly
    ============================================================ */
 
 :root {
   /* === Core colors === */
-  --color-bg: #0A0A0A;          /* deep charcoal / near-black */
-  --color-bg-elevated: #14141A; /* slight elevated surface */
-  --color-fg: #ECEAE5;          /* warm off-white text */
-  --color-fg-muted: #8B857A;    /* muted text */
+  --color-bg: #FFF8EF;          /* warm cream canvas */
+  --color-bg-elevated: #FFFFFF; /* product card surface */
+  --color-fg: #2B211C;          /* warm charcoal */
+  --color-fg-muted: #756A60;    /* warm muted brown */
 
-  /* === Accent (warm amber LED) === */
-  --color-accent: #F2A93B;      /* warm amber */
-  --color-accent-soft: #5C3A1A; /* dim amber for hover/subtle */
+  /* === Inclusive playful accents === */
+  --color-coral: #FF8A68;       /* primary playful CTA */
+  --color-peach: #FFD3B8;       /* warm soft accent */
+  --color-butter: #FFE28A;      /* playful / fidget */
+  --color-mint: #BFE8D4;        /* calm / utility */
+  --color-sky: #BFDDF6;         /* useful / desk / tool */
+  --color-lavender: #D8D0FF;    /* charm / collectible */
+  --color-clay: #D8A878;        /* maker / material warmth */
+  --color-pink: #FFD3E1;        /* limited accent only */
 
-  /* === Material tones === */
-  --color-metal: #2E2E33;       /* matte gunmetal */
-  --color-metal-bright: #595961;/* brushed steel highlight */
-  --color-organic: #6B5C4A;     /* dried plant / wood warmth */
+  --color-accent: #FF7F5C;
+  --color-accent-soft: #FFE5D8;
+  --color-border: #F0DDD0;
+  --color-border-subtle: #F8EDE5;
+  --color-bg-dark: #2B211C;
+  --color-fg-dark: #FFF8EF;
 
-  /* === Border / divider === */
-  --color-border: #1F1F25;
-  --color-border-subtle: #18181C;
-
-  /* === Light variant (rare use) === */
-  --color-bg-light: #F4F1EC;
-  --color-fg-light: #18181C;
+  /* === Shape / depth === */
+  --radius-card: 28px;
+  --radius-soft: 20px;
+  --radius-pill: 999px;
+  --shadow-card: 0 18px 50px rgba(86, 55, 34, 0.10);
+  --shadow-float: 0 24px 70px rgba(86, 55, 34, 0.14);
 
   /* === Typography === */
   --font-sans: var(--font-inter), "PingFang SC", "Helvetica Neue", system-ui, sans-serif;
   --font-display: var(--font-space-grotesk), var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), "SF Mono", "Menlo", monospace;
 
-  /* === Spacing / rhythm === */
-  --section-padding-y: 6rem;    /* 96px section vertical padding */
+  --section-padding-y: 6rem;
   --container-max: 1200px;
 }
 
@@ -46,57 +51,85 @@
   --color-foreground: var(--color-fg);
   --color-muted: var(--color-fg-muted);
   --color-accent: var(--color-accent);
-  --color-metal: var(--color-metal);
+  --color-metal: var(--color-bg-dark);
   --color-border: var(--color-border);
   --font-sans: var(--font-sans);
   --font-display: var(--font-display);
   --font-mono: var(--font-mono);
 }
 
-/* === Body & global === */
 body {
-  background: var(--color-bg);
+  background:
+    radial-gradient(circle at 14% -4%, rgba(255, 226, 138, 0.58), transparent 26rem),
+    radial-gradient(circle at 92% 7%, rgba(191, 232, 212, 0.58), transparent 26rem),
+    radial-gradient(circle at 76% 44%, rgba(191, 221, 246, 0.32), transparent 24rem),
+    var(--color-bg);
   color: var(--color-fg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* === Typography defaults === */
 h1, h2, h3, h4, h5 {
   font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1.04;
 }
 
-h1 { font-size: clamp(2.5rem, 6vw, 5rem); }
-h2 { font-size: clamp(2rem, 4vw, 3.5rem); }
-h3 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
+h1 { font-size: clamp(2.8rem, 7vw, 6.4rem); }
+h2 { font-size: clamp(2rem, 4.4vw, 3.8rem); }
+h3 { font-size: clamp(1.35rem, 3vw, 2.2rem); }
 
-/* === Selection === */
 ::selection {
-  background: var(--color-accent);
-  color: var(--color-bg);
+  background: var(--color-coral);
+  color: #fffaf0;
 }
 
-/* === Subtle warm glow utility (mimics the amber LED feel) === */
-.glow-amber {
-  box-shadow:
-    0 0 40px rgba(242, 169, 59, 0.15),
-    0 0 100px rgba(242, 169, 59, 0.05);
+.studio-card {
+  background: color-mix(in srgb, var(--color-bg-elevated) 92%, white 8%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
 }
 
-/* === Subtle grain texture (industrial feel) === */
+.sticker-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(86, 55, 34, 0.10);
+}
+
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.68);
+  padding: 0.38rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: var(--color-fg-muted);
+}
+
+.dark-panel {
+  background:
+    radial-gradient(circle at 10% 10%, rgba(255, 138, 104, 0.20), transparent 22rem),
+    radial-gradient(circle at 90% 30%, rgba(191, 232, 212, 0.14), transparent 22rem),
+    var(--color-bg-dark);
+  color: var(--color-fg-dark);
+}
+
 .grain::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   opacity: 0.04;
-  background-image:
-    radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px);
-  background-size: 4px 4px;
-  mix-blend-mode: overlay;
+  background-image: radial-gradient(rgba(43, 33, 28, 0.35) 1px, transparent 1px);
+  background-size: 5px 5px;
+  mix-blend-mode: multiply;
 }
-

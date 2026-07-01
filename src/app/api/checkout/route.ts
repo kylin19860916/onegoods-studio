@@ -3,7 +3,15 @@ import Stripe from "stripe";
 import { getProductBySlug } from "@/lib/content";
 
 // 配送范围：澳洲 + 中国大陆 + 港澳台
-const ALLOWED_COUNTRIES = ["AU", "CN", "HK", "MO", "TW"] as const;
+const ALLOWED_COUNTRIES: NonNullable<
+  Stripe.Checkout.Session["shipping_address_collection"]
+>["allowed_countries"] = [
+  "AU",
+  "CN",
+  "HK",
+  "MO",
+  "TW",
+];
 
 export async function POST(req: Request) {
   const stripeSecret = process.env.STRIPE_SECRET_KEY;
@@ -57,9 +65,8 @@ export async function POST(req: Request) {
         },
       ],
       // 配送地址收集（限制国家）
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       shipping_address_collection: {
-        allowed_countries: [...ALLOWED_COUNTRIES] as any,
+        allowed_countries: ALLOWED_COUNTRIES,
       },
       // 支持多语言
       locale: "auto",
