@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       });
     } else {
       console.warn(
-        "[subscribe] RESEND_AUDIENCE_ID not set — saving locally not implemented yet"
+        "[subscribe] RESEND_AUDIENCE_ID not set - saving locally not implemented yet"
       );
     }
 
@@ -44,4 +44,3 @@ export async function POST(req: Request) {
     );
   }
 }
-

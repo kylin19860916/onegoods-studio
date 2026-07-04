@@ -3,32 +3,58 @@ export const metadata = {
   description: "OneGoods Studio 的选品与小批量 3D 打印方式",
 };
 
+const principles = [
+  {
+    title: "先让手想碰",
+    desc: "一个款式能不能留下来，先看动作是否直觉、手感是否反复、视频里是否一眼看懂。",
+  },
+  {
+    title: "少量测试，不急着铺货",
+    desc: "首批商品会先打样、拍摄、上架，再根据真实询问和成交决定是否放大。",
+  },
+  {
+    title: "把制作特征说清楚",
+    desc: "3D 打印会有层纹和批次差异。我们会把材质、尺寸、出货状态和注意事项写清楚。",
+  },
+];
+
 export default function BrandStoryPage() {
   return (
-    <article className="mx-auto max-w-[800px] px-6 py-24">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-[color:var(--color-accent)] mb-6">
-        Brand Story
-      </p>
-      <h1 className="font-display mb-12">小而快的解压小物实验室。</h1>
-
-      <div className="prose prose-invert max-w-none text-[color:var(--color-fg-muted)] space-y-6 leading-relaxed">
-        <p className="text-xl text-[color:var(--color-fg)] leading-relaxed">
-          OneGoods Studio 挑选、打印并测试那些可爱、有触感、适合日常把玩的 3D 打印小物。
+    <article className="mx-auto max-w-[1000px] px-6 py-24">
+      <div className="mb-14 max-w-3xl">
+        <p className="mb-5 text-sm font-semibold text-[color:var(--color-accent)]">
+          About OneGoods
         </p>
-        <p>
-          我们不急着做大而全的商城，也不一开始堆很多复杂产品。现阶段更像一个选品实验室：先从解压感、可爱度、打印稳定度、内容表现和电商成交潜力判断小物是否值得打样。
+        <h1 className="font-display mb-6">我们做小小的解压物，也做清楚的选品。</h1>
+        <p className="text-lg leading-relaxed text-[color:var(--color-fg-muted)]">
+          OneGoods Studio 是一个专注解压和情绪价值 3D 打印小物的选品型品牌。我们把好玩、可爱、有触感的小东西做成少量测试款，再用内容和电商反馈决定下一步。
         </p>
-        <p>
-          每个候选款都会经历一个很直接的流程：选品、打印、拍内容、上架、看反馈，再决定是否继续放大。真正重要的不是“看起来有很多 SKU”，而是找到那些 3 秒内能被看懂、拿在手里有爽感、放在桌面也愿意留下的小东西。
-        </p>
-        <p>
-          OneGoods 与创作者账号的关系会留在幕后。对消费者来说，OneGoods Studio 就是一个专注解压和情绪价值小物的品牌。
-        </p>
-
-        <div className="my-12 aspect-video bg-[color:var(--color-bg-elevated)] rounded-2xl border border-[color:var(--color-border)] flex items-center justify-center text-sm">
-          首批商品实拍准备中
-        </div>
       </div>
+
+      <div className="grid gap-6 md:grid-cols-3">
+        {principles.map((item) => (
+          <div key={item.title} className="soft-panel p-6">
+            <h2 className="mb-4 text-2xl">{item.title}</h2>
+            <p className="leading-relaxed text-[color:var(--color-fg-muted)]">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <section className="mt-14 grid gap-8 rounded-[2rem] bg-[color:var(--color-bg-dark)] p-6 text-[color:var(--color-fg-dark)] md:grid-cols-[0.9fr_1.1fr] md:p-10">
+        <div>
+          <h2 className="font-display mb-4">品牌不是个人副业页。</h2>
+          <p className="leading-relaxed text-white/72">
+            创作者和工坊经验会留在幕后。消费者看到的 OneGoods，应该是一个有审美、有说明、有购买路径的小物品牌。
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {["解压手感", "可爱造型", "小批量 3D 打印", "多渠道购买"].map((item) => (
+            <div key={item} className="rounded-[1rem] border border-white/10 bg-white/6 p-4 font-semibold">
+              {item}
+            </div>
+          ))}
+        </div>
+      </section>
     </article>
   );
 }

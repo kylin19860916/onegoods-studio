@@ -36,12 +36,12 @@ export function SubscribeForm() {
 
   if (state === "success") {
     return (
-      <div className="px-4 py-6 bg-[color:var(--color-bg-elevated)] border border-[color:var(--color-accent)] rounded-2xl text-center">
-        <p className="text-[color:var(--color-accent)] text-sm font-medium mb-1">
-          ✓ 订阅成功
+      <div className="rounded-[1.25rem] border border-[color:var(--color-accent)] bg-white px-4 py-6 text-center">
+        <p className="mb-1 text-sm font-semibold text-[color:var(--color-accent)]">
+          订阅成功
         </p>
         <p className="text-xs text-[color:var(--color-fg-muted)]">
-          下一封邮件见。
+          首批购买入口开放时会通知你。
         </p>
       </div>
     );
@@ -49,26 +49,30 @@ export function SubscribeForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <input
-        type="email"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="your@email.com"
-        disabled={state === "loading"}
-        className="px-4 py-3 bg-[color:var(--color-bg-elevated)] border border-[color:var(--color-border)] rounded-full focus:outline-none focus:border-[color:var(--color-accent)] transition-colors disabled:opacity-50"
-      />
+      <label className="flex flex-col gap-2 text-sm font-semibold">
+        邮箱
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="name@example.com"
+          disabled={state === "loading"}
+          className="min-h-12 rounded-full border border-[color:var(--color-border)] bg-white px-4 py-3 font-normal transition-colors placeholder:text-[color:var(--color-fg-muted)] focus:border-[color:var(--color-accent)] focus:outline-none disabled:opacity-50"
+        />
+      </label>
       <button
         type="submit"
         disabled={state === "loading"}
-        className="px-6 py-3 bg-[color:var(--color-accent)] text-[color:var(--color-bg)] font-medium rounded-full hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait"
+        className="primary-cta disabled:cursor-wait disabled:opacity-50"
       >
-        {state === "loading" ? "提交中..." : "订阅"}
+        {state === "loading" ? "正在订阅" : "通知我上新"}
       </button>
       {state === "error" && (
-        <p className="text-red-400 text-xs">{errorMsg}</p>
+        <p className="text-xs font-semibold text-red-700">
+          {errorMsg ?? "订阅失败，请稍后再试。"}
+        </p>
       )}
     </form>
   );
 }
-
