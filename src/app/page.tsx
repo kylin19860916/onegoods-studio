@@ -22,24 +22,28 @@ const collections = [
     desc: "草莓、甜点、饮料这类一眼可爱的造型，适合冲动收藏和送朋友。",
     href: "/shop",
     color: "var(--color-peach)",
+    image: "/images/products/strawberry-button-fidget.png",
   },
   {
     name: "桌面陪伴",
     desc: "放在屏幕旁边、键盘边或床头，工作间隙可以摸一下、转一下。",
     href: "/shop",
     color: "var(--color-mint)",
+    image: "/images/products/mushroom-spinner-desk-buddy.png",
   },
   {
     name: "小收纳与挂件",
     desc: "把解压动作和日常用途结合起来，适合耳塞、戒指、钥匙和包包。",
     href: "/shop",
     color: "var(--color-sky)",
+    image: "/images/products/cloud-slide-mini-case.png",
   },
   {
     name: "首批测试款",
     desc: "先少量打样、拍内容、上架测反馈，稳定后再补色和补货。",
     href: "/shop",
     color: "var(--color-butter)",
+    image: "/images/products/onegoods-stress-relief-goods.png",
   },
 ];
 
@@ -267,11 +271,16 @@ export default function Home() {
             <Link
               key={item.name}
               href={item.href}
-              className="group rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white/78 p-6 shadow-[var(--shadow-card)] transition-transform hover:-translate-y-1"
+              className="group overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white/78 shadow-[var(--shadow-card)] transition-transform hover:-translate-y-1"
             >
-              <div className="mb-6 h-24 rounded-[1.25rem]" style={{ background: item.color }} />
-              <h3 className="mb-3 text-2xl group-hover:text-[color:var(--color-accent)]">{item.name}</h3>
-              <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{item.desc}</p>
+              <div className="relative aspect-[4/3] overflow-hidden" style={{ background: item.color }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={item.image} alt={item.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]" />
+              </div>
+              <div className="p-5">
+                <h3 className="mb-3 text-2xl group-hover:text-[color:var(--color-accent)]">{item.name}</h3>
+                <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{item.desc}</p>
+              </div>
             </Link>
           ))}
         </div>
