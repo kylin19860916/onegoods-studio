@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductBySlug, getAllProducts } from "@/lib/content";
-import { CheckoutButton } from "@/components/CheckoutButton";
-import { PurchaseTracker } from "@/components/PurchaseTracker";
+import { MarkdownBody } from "@/components/MarkdownBody";
+import { PurchaseLinks } from "@/components/PurchaseLinks";
 
 export async function generateStaticParams() {
   return getAllProducts({ includeDraft: true }).map((p) => ({ slug: p.slug }));
@@ -30,6 +30,15 @@ function familyLabel(family?: string, category?: string) {
   return "水果系列";
 }
 
+function statusLabel(status?: string) {
+  if (status === "listed") return "已上架";
+  if (status === "sample-ready") return "样品完成";
+  if (status === "sold-out") return "补货中";
+  if (status === "idea") return "候选中";
+  if (status === "retired") return "已下架";
+  return "测试中";
+}
+
 export default async function ProductDetailPage({
   params,
 }: {
@@ -39,7 +48,15 @@ export default async function ProductDetailPage({
   const product = getProductBySlug(slug);
   if (!product) notFound();
 
-  const badges = Array.from(new Set([product.sourceType, ...(product.badges ?? []), product.priceUSD === 0 ? "即将上架" : undefined].filter(Boolean))) as string[];
+  const badges = Array.from(
+    new Set([
+      statusLabel(product.salesStatus),
+      ...(product.motion ?? []),
+      ...(product.mood ?? []),
+      product.sourceType,
+      ...(product.badges ?? []),
+    ].filter(Boolean)),
+  ) as string[];
 
   return (
     <article className="mx-auto max-w-[1200px] px-6 py-20">
@@ -52,12 +69,15 @@ export default async function ProductDetailPage({
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
         <div className="studio-card flex aspect-square items-center justify-center overflow-hidden text-sm text-[color:var(--color-fg-muted)]">
-          {product.images && product.images[0]?.startsWith("http") ? (
+          {product.images?.[0] ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-[linear-gradient(135deg,var(--color-butter),var(--color-mint),#fffaf2)] px-8 text-center">
-              <span className="sticker-icon h-16 w-16 bg-white/78 text-3xl">✦</span>
+              <span className="sticker-icon h-16 w-16 bg-white/78">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/icons/v4-clean/fidget-puck.png" alt="" className="h-12 w-12 object-contain" />
+              </span>
               <span>产品主图准备中</span>
             </div>
           )}
@@ -76,7 +96,7 @@ export default async function ProductDetailPage({
             ))}
           </div>
           <p className="mb-8 text-2xl">
-            {product.priceUSD ? `$${product.priceUSD} USD` : "即将上架"}
+            {product.priceUSD ? `$${product.priceUSD} USD` : "价格测试中"}
           </p>
 
           {product.shortDesc && (
@@ -85,8 +105,7 @@ export default async function ProductDetailPage({
             </p>
           )}
 
-          <CheckoutButton slug={product.slug} priceUSD={product.priceUSD} name={product.name} />
-          <PurchaseTracker slug={product.slug} priceUSD={product.priceUSD} name={product.name} />
+          <PurchaseLinks product={product} />
 
           <div className="mt-12 space-y-4 text-sm">
             {product.sourceType && (
@@ -122,6 +141,12 @@ export default async function ProductDetailPage({
           </div>
         </div>
       </div>
+
+      {product.body && (
+        <section className="mx-auto mt-16 max-w-[820px] rounded-[2rem] border border-[color:var(--color-border)] bg-white/70 p-6 md:p-10">
+          <MarkdownBody body={product.body} />
+        </section>
+      )}
     </article>
   );
 }

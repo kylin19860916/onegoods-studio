@@ -1,61 +1,88 @@
 import Link from "next/link";
+import { getAllProducts, type Product } from "@/lib/content";
 
-const series = [
-  {
-    name: "水果系列",
-    label: "Fruit Friends",
-    desc: "草莓、蜜桃、葡萄、柑橘这些有记忆点的造型，可以做成按压、挂件、桌面小物或小工具。",
-    examples: "草莓 · 蜜桃 · 葡萄 · 柑橘",
-    iconSrc: "/images/icons/v4-series-clean/fruit-squishy.png",
-    color: "var(--color-butter)",
-  },
-  {
-    name: "美食系列",
-    label: "Snack & Food",
-    desc: "甜甜圈、布丁、饭团、面包、奶茶杯，把日常食物变成可爱、疗愈、好玩的随身小物。",
-    examples: "甜点 · 饮料 · 面包 · 小吃",
-    iconSrc: "/images/icons/v4-series-clean/food-smile.png",
-    color: "var(--color-peach)",
-  },
-  {
-    name: "自然系列",
-    label: "Nature Mood",
-    desc: "云朵、蘑菇、花朵、海浪、星星，适合做成更轻柔、更治愈的视觉主题。",
-    examples: "云朵 · 蘑菇 · 花朵 · 星星",
-    iconSrc: "/images/icons/v4-series-clean/nature-sparkle.png",
-    color: "var(--color-mint)",
-  },
-  {
-    name: "工坊系列",
-    label: "Studio Maker",
-    desc: "MagBlock、磁吸结构、模块化桌面小物，以及被重新调整过的实用玩物。",
-    examples: "MagBlock · 磁吸 · 模块化 · 改造款",
-    iconSrc: "/images/icons/v4-series-clean/studio-block.png",
-    color: "var(--color-sky)",
-  },
+const motions = [
+  { label: "想捏一下", desc: "按压、回弹、掌心小动作", color: "var(--color-butter)" },
+  { label: "想转一下", desc: "旋钮、转盘、循环把玩", color: "var(--color-mint)" },
+  { label: "想推一下", desc: "滑盖、滑块、咔哒反馈", color: "var(--color-sky)" },
+  { label: "想摆桌上", desc: "陪伴、装饰、工作间隙看一眼", color: "var(--color-peach)" },
+  { label: "想送朋友", desc: "不贵，但有一点被惦记的感觉", color: "var(--color-lavender)" },
 ];
 
-const valueBadges = ["解压", "疗愈", "好玩", "好看", "可爱"];
+const steps = ["选品", "打印", "拍内容", "上架", "看反馈", "放大爆款"];
+
+function statusLabel(status?: Product["salesStatus"]) {
+  if (status === "listed") return "已上架";
+  if (status === "sample-ready") return "样品完成";
+  if (status === "sold-out") return "补货中";
+  if (status === "idea") return "候选中";
+  return "测试中";
+}
+
+function ProductMiniCard({ product }: { product: Product }) {
+  const tags = [...(product.motion ?? []), ...(product.mood ?? [])].slice(0, 4);
+
+  return (
+    <Link href={`/shop/${product.slug}`} className="studio-card group block overflow-hidden transition-transform hover:-translate-y-1">
+      <div className="flex aspect-[4/3] items-center justify-center bg-[linear-gradient(135deg,var(--color-butter),var(--color-mint),#fffaf2)] p-6 text-center">
+        {product.images?.[0] ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
+        ) : (
+          <div>
+            <div className="sticker-icon mx-auto mb-3 h-16 w-16 bg-white/76">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/icons/v4-clean/squishy-blob.png" alt="" className="h-12 w-12 object-contain" />
+            </div>
+            <p className="text-xs font-semibold text-[color:var(--color-fg-muted)]">实拍素材准备中</p>
+          </div>
+        )}
+      </div>
+      <div className="p-5">
+        <div className="mb-3 flex flex-wrap gap-2">
+          <span className="pill-badge">{statusLabel(product.salesStatus)}</span>
+          {tags.map((tag) => (
+            <span key={tag} className="pill-badge">
+              {tag}
+            </span>
+          ))}
+        </div>
+        <h3 className="mb-2 text-xl transition-colors group-hover:text-[color:var(--color-accent)]">
+          {product.name}
+        </h3>
+        <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{product.shortDesc}</p>
+      </div>
+    </Link>
+  );
+}
 
 export default function Home() {
+  const products = getAllProducts()
+    .sort((a, b) => {
+      if (a.salesStatus === "testing" && b.salesStatus !== "testing") return -1;
+      if (a.salesStatus !== "testing" && b.salesStatus === "testing") return 1;
+      return a.order - b.order;
+    })
+    .slice(0, 3);
+
   return (
     <>
       <section className="relative -mt-16 overflow-hidden pt-16 grain">
-        <div className="mx-auto grid min-h-[760px] max-w-[1200px] grid-cols-1 items-center gap-12 px-6 py-24 lg:grid-cols-[1fr_0.95fr]">
+        <div className="mx-auto grid min-h-[720px] max-w-[1200px] grid-cols-1 items-center gap-12 px-6 py-20 lg:grid-cols-[1fr_0.9fr]">
           <div className="relative z-10 max-w-2xl">
-            <p className="mb-6 font-mono text-xs uppercase tracking-[0.22em] text-[color:var(--color-accent)]">
-              OneGoods Studio · 玩物工坊
+            <p className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-[color:var(--color-accent)]">
+              OneGoods Studio
             </p>
             <h1 className="font-display mb-8">
-              一系列好看、
+              给手一点
               <br />
-              <span className="text-[color:var(--color-fg-muted)]">好玩、可爱的日常小物。</span>
+              <span className="text-[color:var(--color-fg-muted)]">小小的解压。</span>
             </h1>
             <p className="mb-8 max-w-xl text-lg leading-relaxed text-[color:var(--color-fg-muted)]">
-              不按功能把商品切碎，而是按「系列」来逛：水果、美食、自然、工坊。每个系列都可以同时承载解压、疗愈、好玩、好看、可爱这些选品核心。
+              我们挑选、打印并测试那些可爱、有触感、适合日常把玩的 3D 打印小物。先小批量上架，看真实反馈，再放大真正好玩的款。
             </p>
             <div className="mb-10 flex flex-wrap gap-2">
-              {valueBadges.map((badge) => (
+              {["解压 3D 打印小物", "情绪价值", "小批量测试", "桌面陪伴"].map((badge) => (
                 <span key={badge} className="pill-badge">
                   {badge}
                 </span>
@@ -66,55 +93,43 @@ export default function Home() {
                 href="/shop"
                 className="rounded-full bg-[color:var(--color-accent)] px-6 py-3 text-center font-semibold text-white shadow-[0_18px_40px_rgba(255,127,92,0.24)] transition-transform hover:-translate-y-0.5"
               >
-                逛逛系列 →
+                看本周测试款
               </Link>
               <Link
-                href="/brand-story"
+                href="/contact"
                 className="rounded-full border border-[color:var(--color-border)] bg-white/72 px-6 py-3 text-center font-semibold transition-colors hover:border-[color:var(--color-accent)] hover:text-[color:var(--color-accent)]"
               >
-                了解工坊
+                加入上新提醒
               </Link>
             </div>
           </div>
 
-          <div className="relative">
-            <div className="studio-card relative aspect-[4/5] overflow-hidden p-6">
-              <div className="absolute left-6 top-6 rounded-full bg-[color:var(--color-accent-soft)] px-4 py-2 text-xs font-bold text-[color:var(--color-accent)]">
-                series-first product world
+          <div className="studio-card relative overflow-hidden p-6">
+            <div className="mb-6 flex items-center justify-between gap-4">
+              <div>
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-[color:var(--color-fg-muted)]">
+                  Tiny mood loop
+                </p>
+                <h2 className="mt-2 text-3xl">选品实验室</h2>
               </div>
-
-              <div className="absolute inset-x-8 top-24 grid grid-cols-2 gap-4">
-                {series.map((item, idx) => (
-                  <div
-                    key={item.name}
-                    className="rounded-[1.4rem] border border-[color:var(--color-border)] bg-white/78 p-4 shadow-sm"
-                  >
-                    <div
-                      className="sticker-icon mb-3 h-12 w-12 text-2xl"
-                      style={{ background: item.color }}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={item.iconSrc} alt="" className="h-10 w-10 object-contain" />
-                    </div>
-                    <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-fg-muted)]">
-                      0{idx + 1} · {item.label}
-                    </p>
-                    <h3 className="mt-1 text-xl">{item.name}</h3>
-                  </div>
-                ))}
-              </div>
-
-              <div className="absolute bottom-8 left-8 right-8 rounded-[1.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-bg)]/82 p-5 backdrop-blur">
-                <p className="mb-3 text-sm font-semibold">选品核心</p>
-                <div className="flex flex-wrap gap-2">
-                  {valueBadges.map((badge) => (
-                    <span key={badge} className="rounded-full bg-white/72 px-3 py-1 text-xs font-semibold text-[color:var(--color-fg-muted)]">
-                      {badge}
-                    </span>
-                  ))}
-                </div>
+              <div className="sticker-icon h-16 w-16 bg-[color:var(--color-butter)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/icons/v4-clean/fidget-puck.png" alt="" className="h-12 w-12 object-contain" />
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              {steps.map((step, index) => (
+                <div key={step} className="rounded-[1.25rem] border border-[color:var(--color-border)] bg-white/70 p-4">
+                  <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-[color:var(--color-fg-muted)]">
+                    0{index + 1}
+                  </p>
+                  <p className="text-lg font-semibold">{step}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-6 rounded-[1.25rem] bg-[color:var(--color-accent-soft)] p-4 text-sm leading-relaxed text-[color:var(--color-fg-muted)]">
+              核心不是一次做很多 SKU，而是找到那些 3 秒内看懂、拿在手里有爽感、适合拍内容也适合成交的小东西。
+            </p>
           </div>
         </div>
       </section>
@@ -123,58 +138,60 @@ export default function Home() {
         <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
             <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-[color:var(--color-accent)]">
-              Browse by series
+              This week picks
             </p>
-            <h2 className="font-display">从系列出发，而不是从功能出发。</h2>
+            <h2 className="font-display">本周测试款</h2>
           </div>
           <p className="max-w-md text-[color:var(--color-fg-muted)]">
-            同一个按压玩具可以是水果系列，也可以是挂件；所以 OneGoods 用视觉主题建立系列，用选品维度控制质感。
+            先从少量小物开始，看看哪些真的让人想一直摸、一直玩、一直放在桌上。
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
-          {series.map((item) => (
-            <Link href="/shop" key={item.name} className="studio-card group p-6 transition-transform hover:-translate-y-1">
-              <div className="sticker-icon mb-5 h-14 w-14 text-2xl" style={{ background: item.color }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.iconSrc} alt="" className="h-12 w-12 object-contain" />
-              </div>
-              <p className="mb-3 font-mono text-xs uppercase tracking-widest text-[color:var(--color-fg-muted)]">
-                {item.label}
-              </p>
-              <h3 className="mb-4 text-2xl group-hover:text-[color:var(--color-accent)]">{item.name}</h3>
-              <p className="mb-4 min-h-[5.8rem] leading-relaxed text-[color:var(--color-fg-muted)]">{item.desc}</p>
-              <p className="text-sm font-semibold text-[color:var(--color-fg)]">{item.examples}</p>
+        <div className="grid grid-cols-1 gap-7 md:grid-cols-3">
+          {products.map((product) => (
+            <ProductMiniCard key={product.slug} product={product} />
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1200px] px-6 py-20">
+        <div className="mb-10">
+          <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-[color:var(--color-accent)]">
+            Shop by mood
+          </p>
+          <h2 className="font-display">按今天的心情逛。</h2>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {motions.map((item) => (
+            <Link
+              href="/shop"
+              key={item.label}
+              className="rounded-[1.5rem] border border-[color:var(--color-border)] bg-white/72 p-5 transition-transform hover:-translate-y-1"
+            >
+              <div className="mb-4 h-2 w-16 rounded-full" style={{ background: item.color }} />
+              <h3 className="mb-3 text-2xl">{item.label}</h3>
+              <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{item.desc}</p>
             </Link>
           ))}
         </div>
       </section>
 
       <section className="mx-auto max-w-[1200px] px-6 py-20">
-        <div className="dark-panel grid grid-cols-1 gap-12 rounded-[2rem] p-8 md:grid-cols-2 md:p-12">
+        <div className="dark-panel grid grid-cols-1 gap-10 rounded-[2rem] p-8 md:grid-cols-[0.85fr_1fr] md:p-12">
           <div>
             <p className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-[color:var(--color-butter)]">
-              Curation rule
+              Where to buy
             </p>
-            <h2 className="font-display mb-6">
-              系列负责记忆点，
-              <br />
-              选品负责情绪价值。
-            </h2>
+            <h2 className="font-display mb-4">喜欢就带走。</h2>
+            <p className="leading-relaxed text-white/72">
+              独立站负责承接品牌和商品页；真实成交先从虾皮、小红书店和 Instagram 内容入口开始跑。
+            </p>
           </div>
-          <div className="space-y-6 leading-relaxed text-white/74">
-            <p>
-              OneGoods 不把商品固定成“解压类 / 挂件类 / 工具类”。我们先建立水果、美食、自然、工坊这些容易被记住的系列，再选择符合解压、疗愈、好玩、好看、可爱的单品形态。
-            </p>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {valueBadges.map((value) => (
-                <div key={value} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/84">
-                  {value}
-                </div>
-              ))}
-            </div>
-            <Link href="/brand-story" className="inline-block text-[color:var(--color-butter)] hover:underline">
-              了解我们的故事 →
-            </Link>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {["Shopee 台湾 / 东南亚", "小红书店", "Instagram 实拍内容", "OneGoods.studio 商品页"].map((channel) => (
+              <div key={channel} className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-white/84">
+                {channel}
+              </div>
+            ))}
           </div>
         </div>
       </section>

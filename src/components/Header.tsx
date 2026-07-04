@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 const navLinks = [
-  { href: "/brand-story", label: "品牌故事" },
   { href: "/shop", label: "Shop" },
-  { href: "/journal", label: "工坊日记" },
+  { href: "/journal", label: "选品日记" },
+  { href: "/brand-story", label: "关于" },
   { href: "/contact", label: "联系" },
 ];
 
@@ -34,7 +34,7 @@ export function Header() {
           href="/shop"
           className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-bg-elevated)] px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:border-[color:var(--color-accent)] hover:text-[color:var(--color-accent)]"
         >
-          Shop
+          看测试款
         </Link>
       </div>
     </header>

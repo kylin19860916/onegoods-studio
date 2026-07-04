@@ -15,6 +15,15 @@ export type Product = {
   family?: string;
   sourceType?: string;
   badges?: string[];
+  mood?: string[];
+  motion?: string[];
+  salesStatus?: "idea" | "testing" | "sample-ready" | "listed" | "sold-out" | "retired";
+  purchaseLinks?: {
+    shopee?: string;
+    xiaohongshu?: string;
+    instagram?: string;
+    direct?: string;
+  };
   priceUSD: number;
   shortDesc: string;
   materials?: string;
@@ -34,6 +43,25 @@ function toStringArray(value: unknown): string[] {
   return [];
 }
 
+function normalizeImages(value: unknown): string[] {
+  return toStringArray(value).filter((src) => {
+    if (src.startsWith("http")) return true;
+    if (!src.startsWith("/")) return false;
+    return fs.existsSync(path.join(process.cwd(), "public", src));
+  });
+}
+
+function toPurchaseLinks(value: unknown): Product["purchaseLinks"] {
+  if (!value || typeof value !== "object") return {};
+  const raw = value as Record<string, unknown>;
+  return {
+    shopee: typeof raw.shopee === "string" ? raw.shopee : undefined,
+    xiaohongshu: typeof raw.xiaohongshu === "string" ? raw.xiaohongshu : undefined,
+    instagram: typeof raw.instagram === "string" ? raw.instagram : undefined,
+    direct: typeof raw.direct === "string" ? raw.direct : undefined,
+  };
+}
+
 export function getAllProducts(opts?: { includeDraft?: boolean }): Product[] {
   const dir = path.join(CONTENT_ROOT, "products");
   if (!fs.existsSync(dir)) return [];
@@ -48,6 +76,10 @@ export function getAllProducts(opts?: { includeDraft?: boolean }): Product[] {
       family: data.family,
       sourceType: data.sourceType,
       badges: toStringArray(data.badges),
+      mood: toStringArray(data.mood),
+      motion: toStringArray(data.motion),
+      salesStatus: data.salesStatus ?? "testing",
+      purchaseLinks: toPurchaseLinks(data.purchaseLinks),
       priceUSD: Number(data.priceUSD ?? 0),
       shortDesc: data.shortDesc ?? "",
       materials: data.materials,
@@ -55,14 +87,14 @@ export function getAllProducts(opts?: { includeDraft?: boolean }): Product[] {
       weight: data.weight,
       shipFrom: data.shipFrom ?? "AU",
       shipTo: data.shipTo ?? ["CN", "AU", "HK", "MO", "TW"],
-      images: data.images ?? [],
+      images: normalizeImages(data.images),
       status: (data.status ?? "draft") as "draft" | "published",
       order: Number(data.order ?? 999),
       body: content,
     };
   });
   return products
-    .filter((p) => opts?.includeDraft || p.status === "published" || true) // include draft for now (early stage)
+    .filter((p) => opts?.includeDraft || p.status === "published")
     .sort((a, b) => a.order - b.order);
 }
 
