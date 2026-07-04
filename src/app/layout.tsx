@@ -25,15 +25,15 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "OneGoods Studio · 玩物工坊",
+    default: "OneGoods Studio · 解压 3D 打印小物",
     template: "%s · OneGoods Studio",
   },
   description:
-    "OneGoods Studio · 玩物工坊 — 由数码科技博主延伸的产品母品牌。Maker 实践 + 工业美学 + 可玩好物。",
+    "OneGoods Studio 挑选、打印并测试可爱、有触感、适合日常把玩的 3D 打印解压小物。",
   metadataBase: new URL("https://onegoods.studio"),
   openGraph: {
-    title: "OneGoods Studio · 玩物工坊",
-    description: "Maker 实践 + 工业美学 + 可玩好物",
+    title: "OneGoods Studio · 解压 3D 打印小物",
+    description: "3D printed stress-relief goods for tiny daily moods.",
     type: "website",
     locale: "zh_CN",
     siteName: "OneGoods Studio",
@@ -59,4 +59,3 @@ export default function RootLayout({
     </html>
   );
 }
-
