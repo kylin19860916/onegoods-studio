@@ -22,6 +22,13 @@ const statusLabels: Record<NonNullable<Product["salesStatus"]>, string> = {
   retired: "已下架",
 };
 
+const collectionLinks = [
+  { title: "Best Sellers", desc: "首批主推", tone: "var(--color-peach)" },
+  { title: "New Arrivals", desc: "新加入测试", tone: "var(--color-butter)" },
+  { title: "Desk Buddies", desc: "桌面陪伴", tone: "var(--color-mint)" },
+  { title: "Mini Cases", desc: "小收纳", tone: "var(--color-sky)" },
+];
+
 function familyLabel(product: Product) {
   if (product.family && familyLabels[product.family]) return familyLabels[product.family];
   return product.category;
@@ -92,8 +99,22 @@ export default function ShopPage() {
         <p className="mb-5 text-sm font-semibold text-[color:var(--color-accent)]">Shop</p>
         <h1 className="font-display mb-6">选一个手边的小暂停。</h1>
         <p className="max-w-[66ch] text-lg leading-relaxed text-[color:var(--color-fg-muted)]">
-          这里放的是 OneGoods 正在测试和准备上架的解压 3D 打印小物。先看手感和用途，再选择购买渠道或订阅上新提醒。
+          解压 3D 打印小物目录。先按系列、动作或情绪价值逛，再进入商品页查看购买状态。
         </p>
+      </div>
+
+      <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {collectionLinks.map((item) => (
+          <a
+            href="#products"
+            key={item.title}
+            className="rounded-[1.25rem] border border-[color:var(--color-border)] bg-white/78 p-4 transition-transform hover:-translate-y-1"
+          >
+            <div className="mb-4 h-2 w-16 rounded-full" style={{ background: item.tone }} />
+            <p className="font-display text-xl">{item.title}</p>
+            <p className="mt-1 text-sm text-[color:var(--color-fg-muted)]">{item.desc}</p>
+          </a>
+        ))}
       </div>
 
       <div className="mb-12 grid grid-cols-1 gap-4 md:grid-cols-[0.9fr_1.1fr]">
@@ -125,7 +146,7 @@ export default function ShopPage() {
           <p className="text-[color:var(--color-fg-muted)]">首批测试款上架后会出现在这里。</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+        <div id="products" className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((sku) => (
             <ProductCard key={sku.slug} sku={sku} />
           ))}
