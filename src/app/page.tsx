@@ -89,6 +89,33 @@ const feelStories = [
   },
 ];
 
+const tinyMoods = [
+  {
+    name: "草莓钮",
+    role: "负责把紧绷按小一点",
+    line: "手停不下来时，按它一下就好。",
+    image: "/images/products/strawberry-button-fidget.png",
+    href: "/shop/strawberry-button-fidget",
+    bg: "var(--color-peach)",
+  },
+  {
+    name: "蘑菇转转",
+    role: "负责陪你等灵感回来",
+    line: "卡住的时候，转一圈再继续。",
+    image: "/images/products/mushroom-spinner-desk-buddy.png",
+    href: "/shop/mushroom-spinner-desk-buddy",
+    bg: "var(--color-mint)",
+  },
+  {
+    name: "云朵盒",
+    role: "负责收起一点小混乱",
+    line: "把耳塞、戒指、小纸条都暂时放进去。",
+    image: "/images/products/cloud-slide-mini-case.png",
+    href: "/shop/cloud-slide-mini-case",
+    bg: "var(--color-sky)",
+  },
+];
+
 const faqs = [
   {
     q: "这些是现货吗？",
@@ -306,6 +333,38 @@ export default function Home() {
               </div>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1200px] px-6 py-20">
+        <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-white/78 p-6 shadow-[var(--shadow-card)] md:p-10">
+          <div className="mb-10 grid gap-6 md:grid-cols-[0.78fr_1.22fr] md:items-end">
+            <div>
+              <h2 className="font-display mb-4">认识这些小情绪搭子。</h2>
+            </div>
+            <p className="max-w-[64ch] leading-relaxed text-[color:var(--color-fg-muted)]">
+              OneGoods 不只是摆商品图，也会给每个小物一点好记的性格。你可以先记住它的动作，再决定要不要带回桌上。
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-3">
+            {tinyMoods.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="group overflow-hidden rounded-[1.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-bg)] transition-transform hover:-translate-y-1"
+              >
+                <div className="aspect-[5/4] overflow-hidden" style={{ background: item.bg }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={item.image} alt={item.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]" />
+                </div>
+                <div className="p-5">
+                  <p className="mb-2 text-sm font-semibold text-[color:var(--color-accent)]">{item.role}</p>
+                  <h3 className="mb-3 text-2xl">{item.name}</h3>
+                  <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{item.line}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
