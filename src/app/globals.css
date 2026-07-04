@@ -1,10 +1,6 @@
 @import "tailwindcss";
 
-/* ============================================================
-   OneGoods Studio · 玩物工坊
-   UI Design Guide v0.4 Inclusive
-   Playful everyday objects: cute/healing, useful, maker-friendly
-   ============================================================ */
+/* OneGoods Studio base visual system */
 
 :root {
   /* === Core colors === */
@@ -60,9 +56,8 @@
 
 body {
   background:
-    radial-gradient(circle at 14% -4%, rgba(255, 226, 138, 0.58), transparent 26rem),
-    radial-gradient(circle at 92% 7%, rgba(191, 232, 212, 0.58), transparent 26rem),
-    radial-gradient(circle at 76% 44%, rgba(191, 221, 246, 0.32), transparent 24rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 248, 239, 0) 18rem),
+    linear-gradient(90deg, rgba(255, 211, 184, 0.24), rgba(191, 232, 212, 0.18) 54%, rgba(191, 221, 246, 0.20)),
     var(--color-bg);
   color: var(--color-fg);
   font-family: var(--font-sans);
@@ -73,7 +68,7 @@ body {
 h1, h2, h3, h4, h5 {
   font-family: var(--font-display);
   font-weight: 650;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
   line-height: 1.04;
   text-wrap: balance;
 }

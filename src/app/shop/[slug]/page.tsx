@@ -52,7 +52,8 @@ export default async function ProductDetailPage({
   const product = getProductBySlug(slug);
   if (!product) notFound();
 
-  const image = product.images?.[0] ?? "/images/products/onegoods-stress-relief-goods.png";
+  const images = product.images?.length ? product.images : ["/images/products/onegoods-stress-relief-goods.png"];
+  const image = images[0];
   const tags = uniqueTags([
     statusLabel(product.salesStatus),
     ...(product.motion ?? []),
@@ -84,10 +85,11 @@ export default async function ProductDetailPage({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={image} alt={product.name} className="aspect-square h-full w-full object-cover" />
           </div>
-          <div className="mt-4 grid grid-cols-3 gap-3">
-            {(product.motion ?? []).slice(0, 3).map((motion) => (
-              <div key={motion} className="rounded-[1rem] border border-[color:var(--color-border)] bg-white/72 px-4 py-3 text-center text-sm font-semibold">
-                {motion}
+          <div className="mt-4 grid grid-cols-4 gap-3">
+            {images.slice(0, 4).map((src, index) => (
+              <div key={src} className="aspect-square overflow-hidden rounded-[1rem] border border-[color:var(--color-border)] bg-white">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt={`${product.name} 图片 ${index + 1}`} className="h-full w-full object-cover" />
               </div>
             ))}
           </div>
@@ -107,7 +109,7 @@ export default async function ProductDetailPage({
           </div>
 
           <p className="mb-6 text-2xl font-semibold">
-            {product.priceUSD ? `$${product.priceUSD} USD` : "首批价格准备中"}
+            {product.priceLabel ?? (product.priceUSD ? `$${product.priceUSD} USD` : "首批价格准备中")}
           </p>
 
           {product.shortDesc && (
@@ -129,6 +131,12 @@ export default async function ProductDetailPage({
               <p className="mb-1 font-semibold">制作方式</p>
               <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">
                 小批量 3D 打印，表面会有轻微层纹。
+              </p>
+            </div>
+            <div className="rounded-[1.25rem] bg-white/72 p-4">
+              <p className="mb-1 font-semibold">包装状态</p>
+              <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">
+                首批会先用保护包装出货，正式包装会跟随稳定款更新。
               </p>
             </div>
           </div>

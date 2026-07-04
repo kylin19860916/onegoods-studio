@@ -68,7 +68,7 @@ function ProductCard({ sku }: { sku: Product }) {
             {sku.shortDesc}
           </p>
           <div className="flex items-center justify-between gap-4 border-t border-[color:var(--color-border-subtle)] pt-4 text-sm font-semibold">
-            <span>{sku.priceUSD ? `$${sku.priceUSD} USD` : "价格准备中"}</span>
+            <span>{sku.priceLabel ?? (sku.priceUSD ? `$${sku.priceUSD} USD` : "价格准备中")}</span>
             <span className="text-[color:var(--color-accent)]">查看详情</span>
           </div>
         </div>
@@ -78,7 +78,7 @@ function ProductCard({ sku }: { sku: Product }) {
 }
 
 export default function ShopPage() {
-  const products = getAllProducts().sort((a, b) => {
+  const products = getAllProducts().filter((product) => product.salesStatus !== "idea").sort((a, b) => {
     if (a.salesStatus === "testing" && b.salesStatus !== "testing") return -1;
     if (a.salesStatus !== "testing" && b.salesStatus === "testing") return 1;
     return a.order - b.order;

@@ -25,6 +25,7 @@ export type Product = {
     direct?: string;
   };
   priceUSD: number;
+  priceLabel?: string;
   shortDesc: string;
   materials?: string;
   dimensions?: string;
@@ -81,6 +82,7 @@ export function getAllProducts(opts?: { includeDraft?: boolean }): Product[] {
       salesStatus: data.salesStatus ?? "testing",
       purchaseLinks: toPurchaseLinks(data.purchaseLinks),
       priceUSD: Number(data.priceUSD ?? 0),
+      priceLabel: data.priceLabel,
       shortDesc: data.shortDesc ?? "",
       materials: data.materials,
       dimensions: data.dimensions,

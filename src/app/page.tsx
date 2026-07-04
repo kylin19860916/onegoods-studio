@@ -16,6 +16,33 @@ const channels = [
   { name: "OneGoods.studio", desc: "品牌中枢，集中展示商品故事、系列和购买入口。" },
 ];
 
+const collections = [
+  {
+    name: "水果与食物",
+    desc: "草莓、甜点、饮料这类一眼可爱的造型，适合冲动收藏和送朋友。",
+    href: "/shop",
+    color: "var(--color-peach)",
+  },
+  {
+    name: "桌面陪伴",
+    desc: "放在屏幕旁边、键盘边或床头，工作间隙可以摸一下、转一下。",
+    href: "/shop",
+    color: "var(--color-mint)",
+  },
+  {
+    name: "小收纳与挂件",
+    desc: "把解压动作和日常用途结合起来，适合耳塞、戒指、钥匙和包包。",
+    href: "/shop",
+    color: "var(--color-sky)",
+  },
+  {
+    name: "首批测试款",
+    desc: "先少量打样、拍内容、上架测反馈，稳定后再补色和补货。",
+    href: "/shop",
+    color: "var(--color-butter)",
+  },
+];
+
 const reasons = [
   {
     title: "手感先行",
@@ -31,6 +58,67 @@ const reasons = [
   },
 ];
 
+const heroNotes = [
+  { label: "首批方向", value: "按压、旋转、滑盖" },
+  { label: "购买路径", value: "Shopee / 小红书店 / IG" },
+  { label: "制作方式", value: "小批量 3D 打印" },
+];
+
+const feelStories = [
+  {
+    title: "草莓按压解压钮",
+    desc: "适合工作间隙轻轻按一下。它不解决所有压力，但能让手有一个可爱的落点。",
+    image: "/images/products/strawberry-button-fidget.png",
+    href: "/shop/strawberry-button-fidget",
+  },
+  {
+    title: "小蘑菇旋转摆件",
+    desc: "适合放在屏幕旁边。转一下，等思路回来一点，再继续做事。",
+    image: "/images/products/mushroom-spinner-desk-buddy.png",
+    href: "/shop/mushroom-spinner-desk-buddy",
+  },
+  {
+    title: "云朵滑盖小物盒",
+    desc: "适合收耳塞、戒指或小纸条。推开它的时候，桌面也跟着变轻一点。",
+    image: "/images/products/cloud-slide-mini-case.png",
+    href: "/shop/cloud-slide-mini-case",
+  },
+];
+
+const faqs = [
+  {
+    q: "这些是现货吗？",
+    a: "首批会以少量测试款为主。商品页会标明是否已上架、准备中或补货中。",
+  },
+  {
+    q: "3D 打印会不会有纹路？",
+    a: "会有轻微层纹，这是制作特征。我们会尽量控制表面质量，并在商品页说明材料和注意事项。",
+  },
+  {
+    q: "哪里可以购买？",
+    a: "台湾和东南亚优先走 Shopee，小红书用户可看小红书店，海外内容会先从 Instagram 导回官网。",
+  },
+  {
+    q: "可以客制颜色吗？",
+    a: "第一阶段先测试固定颜色。若某款反馈稳定，会再开放颜色选择或小批量客制。",
+  },
+];
+
+const reviews = [
+  {
+    quote: "想买它不是因为缺一个东西，是因为看到就想按一下。",
+    name: "内容测试反馈",
+  },
+  {
+    quote: "桌面上多一个可爱的小停靠点，工作空档会没那么硬。",
+    name: "样品试用反馈",
+  },
+  {
+    quote: "价格带如果控制在小礼物范围，会很适合顺手带一颗。",
+    name: "选品判断",
+  },
+];
+
 function statusLabel(status?: Product["salesStatus"]) {
   if (status === "listed") return "已上架";
   if (status === "sample-ready") return "样品完成";
@@ -40,7 +128,7 @@ function statusLabel(status?: Product["salesStatus"]) {
 }
 
 function sortedProducts() {
-  return getAllProducts().sort((a, b) => {
+  return getAllProducts().filter((product) => product.salesStatus !== "idea").sort((a, b) => {
     if (a.salesStatus === "testing" && b.salesStatus !== "testing") return -1;
     if (a.salesStatus !== "testing" && b.salesStatus === "testing") return 1;
     return a.order - b.order;
@@ -77,7 +165,7 @@ function ProductCard({ product, featured = false }: { product: Product; featured
             <p className="leading-relaxed text-[color:var(--color-fg-muted)]">{product.shortDesc}</p>
           </div>
           <div className="mt-6 flex items-center justify-between gap-4 text-sm font-semibold">
-            <span>{product.priceUSD ? `$${product.priceUSD} USD` : "开放购买前通知"}</span>
+            <span>{product.priceLabel ?? (product.priceUSD ? `$${product.priceUSD} USD` : "开放购买前通知")}</span>
             <span className="text-[color:var(--color-accent)]">查看商品</span>
           </div>
         </div>
@@ -92,8 +180,12 @@ export default function Home() {
 
   return (
     <>
-      <section className="relative -mt-16 overflow-hidden pt-16">
-        <div className="mx-auto grid min-h-[100dvh] max-w-[1200px] grid-cols-1 items-center gap-10 px-6 py-16 lg:grid-cols-[0.82fr_1.18fr]">
+      <div className="bg-[color:var(--color-bg-dark)] px-6 py-2 text-center text-sm font-semibold text-white">
+        首批测试款准备上架中。适合桌面、包包和小礼物的 3D 打印解压小物。
+      </div>
+
+      <section className="relative overflow-hidden">
+        <div className="mx-auto grid min-h-[calc(100dvh-96px)] max-w-[1200px] grid-cols-1 items-center gap-10 px-6 py-16 lg:grid-cols-[0.82fr_1.18fr]">
           <div className="relative z-10 max-w-xl">
             <p className="mb-5 text-sm font-semibold text-[color:var(--color-accent)]">
               OneGoods Studio
@@ -113,6 +205,14 @@ export default function Home() {
                 订阅上新提醒
               </Link>
             </div>
+            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {heroNotes.map((item) => (
+                <div key={item.label} className="rounded-[1rem] border border-[color:var(--color-border)] bg-white/72 p-4">
+                  <p className="mb-1 text-xs font-semibold text-[color:var(--color-fg-muted)]">{item.label}</p>
+                  <p className="text-sm font-bold">{item.value}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="relative">
@@ -121,6 +221,10 @@ export default function Home() {
             </div>
             <div className="absolute -right-2 bottom-10 hidden rounded-full bg-white px-5 py-3 text-sm font-bold shadow-[var(--shadow-card)] md:block">
               3D printed in small batches
+            </div>
+            <div className="absolute left-6 bottom-6 z-10 rounded-[1rem] bg-[color:var(--color-bg-dark)] px-5 py-4 text-white shadow-[var(--shadow-card)]">
+              <p className="text-xs font-semibold text-white/60">今日主推</p>
+              <p className="font-bold">草莓按压解压钮</p>
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -142,6 +246,56 @@ export default function Home() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {featuredProducts.map((product, index) => (
             <ProductCard key={product.slug} product={product} featured={index === 0} />
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1200px] px-6 py-20">
+        <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          <div className="max-w-2xl">
+            <h2 className="font-display mb-4">按系列逛小物。</h2>
+            <p className="leading-relaxed text-[color:var(--color-fg-muted)]">
+              先从直觉的分类开始：想要可爱造型、桌面陪伴、小收纳，或者只想看看首批测试款，都能快速找到入口。
+            </p>
+          </div>
+          <Link href="/shop" className="secondary-cta self-start md:self-auto">
+            查看全部
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {collections.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className="group rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white/78 p-6 shadow-[var(--shadow-card)] transition-transform hover:-translate-y-1"
+            >
+              <div className="mb-6 h-24 rounded-[1.25rem]" style={{ background: item.color }} />
+              <h3 className="mb-3 text-2xl group-hover:text-[color:var(--color-accent)]">{item.name}</h3>
+              <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{item.desc}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1200px] px-6 py-20">
+        <div className="mb-10 max-w-2xl">
+          <h2 className="font-display mb-4">不是摆设，是给手的情绪出口。</h2>
+          <p className="leading-relaxed text-[color:var(--color-fg-muted)]">
+            OneGoods 的小物先从动作出发：按、转、推。每个动作都要足够直觉，才值得进入首批测试。
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {feelStories.map((item) => (
+            <Link key={item.title} href={item.href} className="group overflow-hidden rounded-[var(--radius-card)] bg-white shadow-[var(--shadow-card)]">
+              <div className="aspect-square overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={item.image} alt={item.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+              </div>
+              <div className="p-6">
+                <h3 className="mb-3 text-2xl group-hover:text-[color:var(--color-accent)]">{item.title}</h3>
+                <p className="leading-relaxed text-[color:var(--color-fg-muted)]">{item.desc}</p>
+              </div>
+            </Link>
           ))}
         </div>
       </section>
@@ -180,6 +334,42 @@ export default function Home() {
               <p className="leading-relaxed text-[color:var(--color-fg-muted)]">{item.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1200px] px-6 py-20">
+        <div className="mb-10 max-w-2xl">
+          <h2 className="font-display mb-4">先用反馈决定下一批。</h2>
+          <p className="leading-relaxed text-[color:var(--color-fg-muted)]">
+            真正的销量要等上架后验证。现在先把每一款做成容易理解、容易分享、容易下单的商品。
+          </p>
+        </div>
+        <div className="grid gap-5 md:grid-cols-3">
+          {reviews.map((item) => (
+            <div key={item.quote} className="rounded-[1.5rem] border border-[color:var(--color-border)] bg-white/74 p-6">
+              <p className="mb-6 text-lg leading-relaxed">{item.quote}</p>
+              <p className="text-sm font-semibold text-[color:var(--color-fg-muted)]">{item.name}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1200px] px-6 py-20">
+        <div className="grid gap-8 rounded-[2rem] border border-[color:var(--color-border)] bg-white/78 p-6 shadow-[var(--shadow-card)] md:grid-cols-[0.85fr_1.15fr] md:p-10">
+          <div>
+            <h2 className="font-display mb-5">买之前，先知道这些。</h2>
+            <p className="leading-relaxed text-[color:var(--color-fg-muted)]">
+              小批量 3D 打印和一般量产商品不太一样。我们把差异讲清楚，你再决定要不要带走。
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {faqs.map((item) => (
+              <div key={item.q} className="rounded-[1.25rem] bg-[color:var(--color-bg)] p-5">
+                <h3 className="mb-2 text-xl">{item.q}</h3>
+                <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{item.a}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

@@ -39,7 +39,7 @@ export default async function JournalDetailPage({
         ← 返回选品日记
       </Link>
 
-      <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-[color:var(--color-accent)]">
+      <p className="mb-4 text-sm font-semibold text-[color:var(--color-accent)]">
         {post.category} · {post.date}
       </p>
       <h1 className="font-display mb-6">{post.title}</h1>

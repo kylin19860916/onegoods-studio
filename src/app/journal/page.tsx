@@ -11,7 +11,7 @@ export default function JournalPage() {
 
   return (
     <section className="mx-auto max-w-[800px] px-6 py-24">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-[color:var(--color-accent)] mb-6">
+      <p className="mb-6 text-sm font-semibold text-[color:var(--color-accent)]">
         Journal
       </p>
       <h1 className="font-display mb-4">选品日记</h1>
@@ -31,7 +31,7 @@ export default function JournalPage() {
               <Link href={`/journal/${post.slug}`} className="block">
                 <div className="flex justify-between items-start gap-6">
                   <div className="flex-1">
-                    <p className="font-mono text-xs uppercase tracking-widest text-[color:var(--color-fg-muted)] mb-2">
+                    <p className="mb-2 text-xs font-semibold text-[color:var(--color-fg-muted)]">
                       {post.category} · {post.date}
                     </p>
                     <h2 className="text-2xl group-hover:text-[color:var(--color-accent)] transition-colors mb-2">

@@ -42,9 +42,9 @@ export default function BrandStoryPage() {
 
       <section className="mt-14 grid gap-8 rounded-[2rem] bg-[color:var(--color-bg-dark)] p-6 text-[color:var(--color-fg-dark)] md:grid-cols-[0.9fr_1.1fr] md:p-10">
         <div>
-          <h2 className="font-display mb-4">品牌不是个人副业页。</h2>
+          <h2 className="font-display mb-4">小批量，也要像正式商品一样清楚。</h2>
           <p className="leading-relaxed text-white/72">
-            创作者和工坊经验会留在幕后。消费者看到的 OneGoods，应该是一个有审美、有说明、有购买路径的小物品牌。
+            消费者看到的 OneGoods，应该是一个有审美、有说明、有购买路径的小物品牌。每个测试款都要讲清楚手感、材质、状态和购买方式。
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
