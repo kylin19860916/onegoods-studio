@@ -2,7 +2,51 @@
 
 这个网站的商品由 `content/products/*.mdx` 管理。每个 `.mdx` 文件就是一个商品页，首页和 Shop 会自动读取这些商品。
 
+现在有一个 OneGoods CMS 后台：
+
+- `/admin`
+- `/admin/products`
+
+打开后台中心后，可以进入商品库新增或编辑商品。保存后，它会在 `content/products/` 写入对应的 `.mdx` 商品文件。
+
+注意：Vercel 线上环境不能像 Shopify 那样直接保存仓库文件。要做完整线上 CMS，需要继续接数据库、GitHub 写入或第三方 CMS。当前 CMS 已经可以承担商品资料管理、商品页生成和发布前内容整理。
+
+## 登录
+
+CMS 使用单管理员登录，不开放公众注册。
+
+本地登录配置在 `.env.local`，不会提交到 GitHub：
+
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+- `ADMIN_SESSION_SECRET`
+
+线上启用 CMS 登录时，需要在 Vercel 环境变量里配置同样三项。
+
 ## 上新步骤
+
+### 方式 A：用商品管理台
+
+1. 启动本地网站
+   - `npm run dev`
+
+2. 打开商品管理台
+   - `http://127.0.0.1:3000/admin/products`
+
+3. 点击“新建”
+   - 填商品名、slug、分类、标签、价格、描述、图片路径和正文
+
+4. 点击“保存商品”
+   - 系统会生成 `content/products/<slug>.mdx`
+
+5. 检查前台页面
+   - `/shop`
+   - `/shop/<slug>`
+
+6. 提交并推到 main
+   - Vercel 自动上线
+
+### 方式 B：手动编辑文件
 
 1. 准备商品图片
    - 放到 `public/images/products/`

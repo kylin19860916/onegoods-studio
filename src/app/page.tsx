@@ -132,28 +132,9 @@ function ProductCard({ product, featured = false }: { product: Product; featured
   );
 }
 
-function ProductRow({ product }: { product: Product }) {
-  const image = product.images?.[0] ?? "/images/products/onegoods-stress-relief-goods.png";
-
-  return (
-    <Link href={`/shop/${product.slug}`} className="group grid grid-cols-[88px_1fr] gap-4 rounded-[1.25rem] border border-[color:var(--color-border)] bg-white p-3 transition-transform hover:-translate-y-1">
-      <div className="aspect-square overflow-hidden rounded-[1rem]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={image} alt={product.name} className="h-full w-full object-cover" />
-      </div>
-      <div className="flex flex-col justify-center">
-        <p className="mb-1 text-sm font-semibold text-[color:var(--color-accent)]">{statusLabel(product.salesStatus)}</p>
-        <h3 className="mb-2 text-xl group-hover:text-[color:var(--color-accent)]">{product.name}</h3>
-        <p className="text-sm font-semibold">{priceText(product)}</p>
-      </div>
-    </Link>
-  );
-}
-
 export default function Home() {
   const products = sortedProducts();
   const featuredProducts = products.slice(0, 3);
-  const newArrivals = [...products].reverse().slice(0, 3);
 
   return (
     <>
@@ -248,23 +229,6 @@ export default function Home() {
                 <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{item.desc}</p>
               </div>
             </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto grid max-w-[1200px] grid-cols-1 gap-8 px-6 py-16 lg:grid-cols-[0.82fr_1.18fr]">
-        <div>
-          <h2 className="font-display mb-4">New Arrivals</h2>
-          <p className="mb-6 max-w-[52ch] leading-relaxed text-[color:var(--color-fg-muted)]">
-            新加入测试的小物会先放在这里。每款都标清状态、动作和预计价格。
-          </p>
-          <Link href="/shop" className="primary-cta">
-            Browse shop
-          </Link>
-        </div>
-        <div className="grid gap-4">
-          {newArrivals.map((product) => (
-            <ProductRow key={product.slug} product={product} />
           ))}
         </div>
       </section>
