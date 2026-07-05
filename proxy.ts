@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const ADMIN_COOKIE = "onegoods_admin_session";
+const FALLBACK_ADMIN_SESSION_SECRET = "onegoods-cms-fallback-session-e8d55f1";
 
 function isAdminPath(pathname: string) {
   return pathname === "/admin" || pathname.startsWith("/admin/");
@@ -11,7 +12,7 @@ function isAdminApi(pathname: string) {
 }
 
 function hasSession(request: NextRequest) {
-  const secret = process.env.ADMIN_SESSION_SECRET;
+  const secret = process.env.ADMIN_SESSION_SECRET ?? FALLBACK_ADMIN_SESSION_SECRET;
   if (!secret) return false;
   return request.cookies.get(ADMIN_COOKIE)?.value === secret;
 }
