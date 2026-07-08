@@ -1,60 +1,54 @@
 import Link from "next/link";
 import { getAllProducts, type Product } from "@/lib/content";
 
-const collectionTiles = [
-  {
-    name: "Best Sellers",
-    desc: "最适合先上架测款的解压小物。",
-    href: "/shop",
-    image: "/images/products/strawberry-button-fidget.png",
-    color: "var(--color-peach)",
-  },
-  {
-    name: "New Arrivals",
-    desc: "刚加入首批测试的桌面小东西。",
-    href: "/shop",
-    image: "/images/products/onegoods-stress-relief-goods.png",
-    color: "var(--color-butter)",
-  },
-  {
-    name: "Desk Buddies",
-    desc: "放在屏幕旁边，工作空档摸一下。",
-    href: "/shop",
-    image: "/images/products/mushroom-spinner-desk-buddy.png",
-    color: "var(--color-mint)",
-  },
-  {
-    name: "Mini Cases",
-    desc: "带一点解压动作的小收纳。",
-    href: "/shop",
-    image: "/images/products/cloud-slide-mini-case.png",
-    color: "var(--color-sky)",
-  },
-];
-
-const shopShortcuts = ["按一下", "转一下", "推一下", "摆桌上", "送朋友"];
-
-const tinyMoods = [
-  {
-    name: "草莓钮",
+// Curated homepage copy keyed by slug; products missing from this map fall
+// back to their MDX frontmatter so renamed/unpublished SKUs never break links.
+const personalities: Record<string, { role: string; line: string }> = {
+  "strawberry-button-fidget": {
     role: "负责把紧绷按小一点",
     line: "手停不下来时，按它一下就好。",
-    image: "/images/products/strawberry-button-fidget.png",
-    href: "/shop/strawberry-button-fidget",
   },
-  {
-    name: "蘑菇转转",
+  "mushroom-spinner-desk-buddy": {
     role: "负责陪你等灵感回来",
     line: "卡住的时候，转一圈再继续。",
-    image: "/images/products/mushroom-spinner-desk-buddy.png",
-    href: "/shop/mushroom-spinner-desk-buddy",
   },
-  {
-    name: "云朵盒",
+  "cloud-slide-mini-case": {
     role: "负责收起一点小混乱",
     line: "把耳塞、戒指、小纸条都暂时放进去。",
-    image: "/images/products/cloud-slide-mini-case.png",
-    href: "/shop/cloud-slide-mini-case",
+  },
+};
+
+const motionCopy: Record<string, string> = {
+  按一下: "紧绷的时候，给手一个轻轻的出口。",
+  转一下: "卡住的时候，转一圈再继续。",
+  推一下: "带一点解压动作的小收纳。",
+  摆桌上: "放在屏幕旁边，工作空档看一眼。",
+};
+
+const motionTones = [
+  "var(--color-peach)",
+  "var(--color-butter)",
+  "var(--color-mint)",
+  "var(--color-sky)",
+  "var(--color-lavender)",
+];
+
+const channels = [
+  {
+    name: "Shopee 虾皮",
+    desc: "台湾与东南亚下单主渠道，负责物流和售后。",
+  },
+  {
+    name: "小红书店",
+    desc: "看内容种草，直接在小红书里下单。",
+  },
+  {
+    name: "Instagram",
+    desc: "海外实拍、Reels 和上新动态。",
+  },
+  {
+    name: "独立站直购",
+    desc: "本站直接结账，正在准备中。",
   },
 ];
 
@@ -72,6 +66,8 @@ const buyingNotes = [
     desc: "开放购买后，Shopee、小红书店或独立站按钮会放在对应商品详情里。",
   },
 ];
+
+const FALLBACK_IMAGE = "/images/products/onegoods-stress-relief-goods.png";
 
 function statusLabel(status?: Product["salesStatus"]) {
   if (status === "listed") return "已上架";
@@ -93,9 +89,12 @@ function priceText(product: Product) {
   return product.priceLabel ?? (product.priceUSD ? `$${product.priceUSD} USD` : "开放购买前通知");
 }
 
+function productImage(product: Product) {
+  return product.images?.[0] ?? FALLBACK_IMAGE;
+}
+
 function ProductCard({ product, featured = false }: { product: Product; featured?: boolean }) {
   const tags = [...(product.motion ?? []), ...(product.mood ?? [])].slice(0, featured ? 5 : 3);
-  const image = product.images?.[0] ?? "/images/products/onegoods-stress-relief-goods.png";
 
   return (
     <Link
@@ -105,7 +104,7 @@ function ProductCard({ product, featured = false }: { product: Product; featured
       <div className={featured ? "grid gap-0 md:grid-cols-[1.08fr_0.92fr]" : ""}>
         <div className={featured ? "aspect-[4/3] md:aspect-auto" : "aspect-[4/3]"}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image} alt={product.name} className="h-full w-full object-cover" />
+          <img src={productImage(product)} alt={product.name} className="h-full w-full object-cover" />
         </div>
         <div className="flex flex-col justify-between p-5 md:p-6">
           <div>
@@ -135,6 +134,13 @@ function ProductCard({ product, featured = false }: { product: Product; featured
 export default function Home() {
   const products = sortedProducts();
   const featuredProducts = products.slice(0, 3);
+  const heroProduct = featuredProducts[0];
+  const motionTags = Array.from(new Set(products.flatMap((product) => product.motion ?? [])));
+  const moodFriends = featuredProducts.map((product) => ({
+    product,
+    role: personalities[product.slug]?.role ?? (product.mood?.[0] ? `负责${product.mood[0]}` : "桌面小陪伴"),
+    line: personalities[product.slug]?.line ?? product.shortDesc,
+  }));
 
   return (
     <>
@@ -164,8 +170,12 @@ export default function Home() {
               </Link>
             </div>
             <div className="mt-7 flex flex-wrap gap-2">
-              {shopShortcuts.map((item) => (
-                <Link key={item} href="/shop" className="pill-badge">
+              {motionTags.map((item) => (
+                <Link
+                  key={item}
+                  href={{ pathname: "/shop", query: { tag: item }, hash: "products" }}
+                  className="pill-badge transition-colors hover:!border-[color:var(--color-accent)] hover:!text-[color:var(--color-accent)]"
+                >
                   {item}
                 </Link>
               ))}
@@ -173,13 +183,18 @@ export default function Home() {
           </div>
 
           <div className="order-1 relative lg:order-none">
-            <div className="absolute left-6 bottom-6 z-10 rounded-[1rem] bg-[color:var(--color-bg-dark)] px-5 py-4 text-white shadow-[var(--shadow-card)]">
-              <p className="text-xs font-semibold text-white/60">首批主推</p>
-              <p className="font-bold">草莓按压解压钮</p>
-            </div>
+            {heroProduct && (
+              <Link
+                href={`/shop/${heroProduct.slug}`}
+                className="absolute left-6 bottom-6 z-10 rounded-[1rem] bg-[color:var(--color-bg-dark)] px-5 py-4 text-white shadow-[var(--shadow-card)] transition-transform hover:-translate-y-0.5"
+              >
+                <p className="text-xs font-semibold text-white/60">首批主推 · {statusLabel(heroProduct.salesStatus)}</p>
+                <p className="font-bold">{heroProduct.name}</p>
+              </Link>
+            )}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/products/onegoods-stress-relief-goods.png"
+              src={FALLBACK_IMAGE}
               alt="草莓按压钮、蘑菇旋转摆件和云朵滑盖小物盒"
               className="product-photo aspect-[4/3] w-full"
             />
@@ -190,7 +205,7 @@ export default function Home() {
       <section className="mx-auto max-w-[1200px] px-6 py-16">
         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <h2 className="font-display mb-3">Best Sellers</h2>
+            <h2 className="font-display mb-3">首批小物</h2>
             <p className="max-w-[56ch] leading-relaxed text-[color:var(--color-fg-muted)]">
               从最适合首批测试的几款开始。看图、看动作、看价格，喜欢就进商品页等开放购买。
             </p>
@@ -208,28 +223,40 @@ export default function Home() {
 
       <section className="mx-auto max-w-[1200px] px-6 py-16">
         <div className="mb-8">
-          <h2 className="font-display mb-3">Shop by Collection</h2>
+          <h2 className="font-display mb-3">想怎么解压？</h2>
           <p className="max-w-[56ch] leading-relaxed text-[color:var(--color-fg-muted)]">
-            按你想要的用途来逛：热卖款、新到款、桌面陪伴，或者带一点功能的小收纳。
+            按你想要的动作来逛：按一下、转一下、推一下，或者单纯摆在桌上看着。
           </p>
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {collectionTiles.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="group overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white shadow-[var(--shadow-card)] transition-transform hover:-translate-y-1"
-            >
-              <div className="relative aspect-[4/3] overflow-hidden" style={{ background: item.color }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.image} alt={item.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]" />
-              </div>
-              <div className="p-5">
-                <h3 className="mb-2 text-2xl group-hover:text-[color:var(--color-accent)]">{item.name}</h3>
-                <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{item.desc}</p>
-              </div>
-            </Link>
-          ))}
+          {motionTags.map((motion, index) => {
+            const sample = products.find((product) => product.motion?.includes(motion));
+            return (
+              <Link
+                key={motion}
+                href={{ pathname: "/shop", query: { tag: motion }, hash: "products" }}
+                className="group overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white shadow-[var(--shadow-card)] transition-transform hover:-translate-y-1"
+              >
+                <div
+                  className="relative aspect-[4/3] overflow-hidden"
+                  style={{ background: motionTones[index % motionTones.length] }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={sample ? productImage(sample) : FALLBACK_IMAGE}
+                    alt={motion}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="mb-2 text-2xl group-hover:text-[color:var(--color-accent)]">{motion}</h3>
+                  <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">
+                    {motionCopy[motion] ?? "进 Shop 看有这个动作的小物。"}
+                  </p>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
@@ -247,20 +274,20 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid gap-5 md:grid-cols-3">
-            {tinyMoods.map((item) => (
+            {moodFriends.map(({ product, role, line }) => (
               <Link
-                key={item.name}
-                href={item.href}
+                key={product.slug}
+                href={`/shop/${product.slug}`}
                 className="group overflow-hidden rounded-[1.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-bg)] transition-transform hover:-translate-y-1"
               >
                 <div className="aspect-[5/4] overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.image} alt={item.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]" />
+                  <img src={productImage(product)} alt={product.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]" />
                 </div>
                 <div className="p-5">
-                  <p className="mb-2 text-sm font-semibold text-[color:var(--color-accent)]">{item.role}</p>
-                  <h3 className="mb-3 text-2xl">{item.name}</h3>
-                  <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{item.line}</p>
+                  <p className="mb-2 text-sm font-semibold text-[color:var(--color-accent)]">{role}</p>
+                  <h3 className="mb-3 text-2xl">{product.name}</h3>
+                  <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{line}</p>
                 </div>
               </Link>
             ))}
@@ -276,6 +303,30 @@ export default function Home() {
               <p className="leading-relaxed text-[color:var(--color-fg-muted)]">{item.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1200px] px-6 pb-20">
+        <div className="dark-panel relative overflow-hidden rounded-[2rem] p-6 md:p-10">
+          <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <h2 className="font-display mb-3">去哪里买</h2>
+              <p className="max-w-[60ch] leading-relaxed text-white/70">
+                首批开放购买后，每个商品页会放上对应渠道的购买按钮。现在可以先订阅，开放时第一时间通知你。
+              </p>
+            </div>
+            <Link href="/contact" className="primary-cta self-start md:self-auto">
+              开放购买前通知
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {channels.map((channel) => (
+              <div key={channel.name} className="rounded-[1.25rem] border border-white/12 bg-white/6 p-5">
+                <p className="mb-2 font-display text-lg">{channel.name}</p>
+                <p className="text-sm leading-relaxed text-white/70">{channel.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </>

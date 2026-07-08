@@ -22,16 +22,23 @@ const statusLabels: Record<NonNullable<Product["salesStatus"]>, string> = {
   retired: "已下架",
 };
 
-const collectionLinks = [
-  { title: "Best Sellers", desc: "首批主推", tone: "var(--color-peach)" },
-  { title: "New Arrivals", desc: "新加入测试", tone: "var(--color-butter)" },
-  { title: "Desk Buddies", desc: "桌面陪伴", tone: "var(--color-mint)" },
-  { title: "Mini Cases", desc: "小收纳", tone: "var(--color-sky)" },
+const categoryLabels: Record<string, string> = {
+  "Stress Relief": "解压小物",
+  "Mini Case": "小收纳",
+  "Modular System": "工坊候选",
+};
+
+const categoryTones = [
+  "var(--color-peach)",
+  "var(--color-butter)",
+  "var(--color-mint)",
+  "var(--color-sky)",
+  "var(--color-lavender)",
 ];
 
 function familyLabel(product: Product) {
   if (product.family && familyLabels[product.family]) return familyLabels[product.family];
-  return product.category;
+  return categoryLabels[product.category] ?? product.category;
 }
 
 function productTags(product: Product) {
@@ -42,6 +49,34 @@ function productTags(product: Product) {
       ...(product.badges ?? []),
     ]),
   ).slice(0, 5);
+}
+
+function shopHref(query: { tag?: string; category?: string }) {
+  return { pathname: "/shop", query, hash: "products" } as const;
+}
+
+function FilterPill({
+  label,
+  active,
+  href,
+}: {
+  label: string;
+  active: boolean;
+  href: ReturnType<typeof shopHref>;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-pressed={active}
+      className={`pill-badge transition-colors ${
+        active
+          ? "!border-[color:var(--color-accent)] !bg-[color:var(--color-accent)] !text-white"
+          : "hover:!border-[color:var(--color-accent)] hover:!text-[color:var(--color-accent)]"
+      }`}
+    >
+      {label}
+    </Link>
+  );
 }
 
 function ProductCard({ sku }: { sku: Product }) {
@@ -84,14 +119,41 @@ function ProductCard({ sku }: { sku: Product }) {
   );
 }
 
-export default function ShopPage() {
+function firstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function ShopPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const params = await searchParams;
   const products = getAllProducts().filter((product) => product.salesStatus !== "idea").sort((a, b) => {
     if (a.salesStatus === "testing" && b.salesStatus !== "testing") return -1;
     if (a.salesStatus !== "testing" && b.salesStatus === "testing") return 1;
     return a.order - b.order;
   });
+
+  const categories = Array.from(new Set(products.map((product) => product.category)));
   const motionTags = Array.from(new Set(products.flatMap((product) => product.motion ?? [])));
   const moodTags = Array.from(new Set(products.flatMap((product) => product.mood ?? [])));
+
+  const rawCategory = firstParam(params.category);
+  const rawTag = firstParam(params.tag);
+  const activeCategory = categories.includes(rawCategory ?? "") ? rawCategory : undefined;
+  const activeTag = [...motionTags, ...moodTags].includes(rawTag ?? "") ? rawTag : undefined;
+
+  const filtered = products.filter((product) => {
+    if (activeCategory && product.category !== activeCategory) return false;
+    if (activeTag) {
+      const tags = [...(product.motion ?? []), ...(product.mood ?? []), ...(product.badges ?? [])];
+      if (!tags.includes(activeTag)) return false;
+    }
+    return true;
+  });
+
+  const hasFilter = Boolean(activeCategory || activeTag);
 
   return (
     <section className="mx-auto max-w-[1200px] px-6 py-20">
@@ -104,17 +166,38 @@ export default function ShopPage() {
       </div>
 
       <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {collectionLinks.map((item) => (
-          <a
-            href="#products"
-            key={item.title}
-            className="rounded-[1.25rem] border border-[color:var(--color-border)] bg-white/78 p-4 transition-transform hover:-translate-y-1"
-          >
-            <div className="mb-4 h-2 w-16 rounded-full" style={{ background: item.tone }} />
-            <p className="font-display text-xl">{item.title}</p>
-            <p className="mt-1 text-sm text-[color:var(--color-fg-muted)]">{item.desc}</p>
-          </a>
-        ))}
+        <Link
+          href={shopHref(activeTag ? { tag: activeTag } : {})}
+          aria-pressed={!activeCategory}
+          className={`rounded-[1.25rem] border bg-white/78 p-4 transition-transform hover:-translate-y-1 ${
+            !activeCategory ? "border-[color:var(--color-accent)]" : "border-[color:var(--color-border)]"
+          }`}
+        >
+          <div className="mb-4 h-2 w-16 rounded-full bg-[color:var(--color-accent)]" />
+          <p className="font-display text-xl">全部小物</p>
+          <p className="mt-1 text-sm text-[color:var(--color-fg-muted)]">{products.length} 款测试中</p>
+        </Link>
+        {categories.map((category, index) => {
+          const count = products.filter((product) => product.category === category).length;
+          const active = activeCategory === category;
+          return (
+            <Link
+              href={shopHref({ category, ...(activeTag ? { tag: activeTag } : {}) })}
+              key={category}
+              aria-pressed={active}
+              className={`rounded-[1.25rem] border bg-white/78 p-4 transition-transform hover:-translate-y-1 ${
+                active ? "border-[color:var(--color-accent)]" : "border-[color:var(--color-border)]"
+              }`}
+            >
+              <div
+                className="mb-4 h-2 w-16 rounded-full"
+                style={{ background: categoryTones[index % categoryTones.length] }}
+              />
+              <p className="font-display text-xl">{categoryLabels[category] ?? category}</p>
+              <p className="mt-1 text-sm text-[color:var(--color-fg-muted)]">{count} 款</p>
+            </Link>
+          );
+        })}
       </div>
 
       <div className="mb-12 grid grid-cols-1 gap-4 md:grid-cols-[0.9fr_1.1fr]">
@@ -122,9 +205,16 @@ export default function ShopPage() {
           <p className="mb-3 font-semibold">按解压动作找</p>
           <div className="flex flex-wrap gap-2">
             {motionTags.map((value) => (
-              <span key={value} className="pill-badge">
-                {value}
-              </span>
+              <FilterPill
+                key={value}
+                label={value}
+                active={activeTag === value}
+                href={shopHref(
+                  activeTag === value
+                    ? { ...(activeCategory ? { category: activeCategory } : {}) }
+                    : { tag: value, ...(activeCategory ? { category: activeCategory } : {}) },
+                )}
+              />
             ))}
           </div>
         </div>
@@ -132,22 +222,54 @@ export default function ShopPage() {
           <p className="mb-3 font-semibold">按情绪价值找</p>
           <div className="flex flex-wrap gap-2">
             {moodTags.map((value) => (
-              <span key={value} className="pill-badge">
-                {value}
-              </span>
+              <FilterPill
+                key={value}
+                label={value}
+                active={activeTag === value}
+                href={shopHref(
+                  activeTag === value
+                    ? { ...(activeCategory ? { category: activeCategory } : {}) }
+                    : { tag: value, ...(activeCategory ? { category: activeCategory } : {}) },
+                )}
+              />
             ))}
           </div>
         </div>
       </div>
 
-      {products.length === 0 ? (
-        <div className="soft-panel p-8">
-          <h2 className="mb-3 text-3xl">商品正在准备中</h2>
-          <p className="text-[color:var(--color-fg-muted)]">首批测试款上架后会出现在这里。</p>
+      {hasFilter && (
+        <div className="mb-6 flex flex-wrap items-center gap-3 text-sm">
+          <span className="font-semibold">
+            {filtered.length} 款符合
+            {activeCategory ? `「${categoryLabels[activeCategory] ?? activeCategory}」` : ""}
+            {activeTag ? `「${activeTag}」` : ""}
+          </span>
+          <Link
+            href={shopHref({})}
+            className="font-semibold text-[color:var(--color-accent)] hover:underline"
+          >
+            清除筛选
+          </Link>
+        </div>
+      )}
+
+      {filtered.length === 0 ? (
+        <div id="products" className="soft-panel p-8">
+          <h2 className="mb-3 text-3xl">{hasFilter ? "这个组合暂时没有小物" : "商品正在准备中"}</h2>
+          <p className="mb-5 text-[color:var(--color-fg-muted)]">
+            {hasFilter
+              ? "换一个动作或情绪价值看看，或者浏览全部测试款。"
+              : "首批测试款上架后会出现在这里。"}
+          </p>
+          {hasFilter && (
+            <Link href={shopHref({})} className="secondary-cta">
+              看全部小物
+            </Link>
+          )}
         </div>
       ) : (
         <div id="products" className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((sku) => (
+          {filtered.map((sku) => (
             <ProductCard key={sku.slug} sku={sku} />
           ))}
         </div>

@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // /shop renders per-request (filter searchParams), so make sure the MDX
+  // content files are traced into its serverless bundle on Vercel.
+  outputFileTracingIncludes: {
+    "/shop": ["./content/**/*"],
+  },
   async redirects() {
     return [
       {

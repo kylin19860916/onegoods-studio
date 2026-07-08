@@ -1,6 +1,7 @@
 "use client";
 
 import type { Product } from "@/lib/content";
+import { SubscribeForm } from "@/components/SubscribeForm";
 
 declare global {
   interface Window {
@@ -39,12 +40,7 @@ export function PurchaseLinks({ product }: { product: Product }) {
         <p className="mb-4 text-sm leading-relaxed text-[color:var(--color-fg-muted)]">
           这个小物还在打样、拍摄或上架准备阶段。留下邮箱，开放购买、补货或新增颜色时通知你。
         </p>
-        <a
-          href="/contact"
-          className="primary-cta w-full"
-        >
-          加入上新提醒
-        </a>
+        <SubscribeForm />
       </div>
     );
   }

@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProductBySlug, getAllProducts } from "@/lib/content";
+import { getProductBySlug, getAllProducts, type Product } from "@/lib/content";
 import { MarkdownBody } from "@/components/MarkdownBody";
+import { ProductGallery } from "@/components/ProductGallery";
 import { PurchaseLinks } from "@/components/PurchaseLinks";
+
+const SITE_URL = "https://onegoods.studio";
 
 export async function generateStaticParams() {
   return getAllProducts({ includeDraft: true }).map((p) => ({ slug: p.slug }));
@@ -43,6 +46,42 @@ function uniqueTags(values: Array<string | undefined>) {
   return Array.from(new Set(values.filter(Boolean))) as string[];
 }
 
+function relatedProducts(product: Product) {
+  const others = getAllProducts().filter(
+    (p) => p.slug !== product.slug && p.salesStatus !== "idea",
+  );
+  return [
+    ...others.filter((p) => p.category === product.category),
+    ...others.filter((p) => p.category !== product.category),
+  ].slice(0, 3);
+}
+
+// Product structured data for search results. Offers are intentionally only
+// emitted for listed products with a real price — draft/testing SKUs must not
+// look purchasable.
+function productJsonLd(product: Product, images: string[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.shortDesc,
+    image: images.map((src) => (src.startsWith("http") ? src : `${SITE_URL}${src}`)),
+    url: `${SITE_URL}/shop/${product.slug}`,
+    brand: { "@type": "Brand", name: "OneGoods Studio" },
+    ...(product.salesStatus === "listed" && product.priceUSD > 0
+      ? {
+          offers: {
+            "@type": "Offer",
+            price: product.priceUSD,
+            priceCurrency: "USD",
+            availability: "https://schema.org/InStock",
+            url: `${SITE_URL}/shop/${product.slug}`,
+          },
+        }
+      : {}),
+  };
+}
+
 export default async function ProductDetailPage({
   params,
 }: {
@@ -53,7 +92,7 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const images = product.images?.length ? product.images : ["/images/products/onegoods-stress-relief-goods.png"];
-  const image = images[0];
+  const related = relatedProducts(product);
   const tags = uniqueTags([
     statusLabel(product.salesStatus),
     ...(product.motion ?? []),
@@ -72,6 +111,10 @@ export default async function ProductDetailPage({
 
   return (
     <article className="mx-auto max-w-[1200px] px-6 py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product, images)) }}
+      />
       <Link
         href="/shop"
         className="mb-8 inline-block text-sm font-semibold text-[color:var(--color-fg-muted)] transition-colors hover:text-[color:var(--color-accent)]"
@@ -80,20 +123,7 @@ export default async function ProductDetailPage({
       </Link>
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.05fr_0.95fr]">
-        <div>
-          <div className="overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white shadow-[var(--shadow-float)]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={image} alt={product.name} className="aspect-square h-full w-full object-cover" />
-          </div>
-          <div className="mt-4 grid grid-cols-4 gap-3">
-            {images.slice(0, 4).map((src, index) => (
-              <div key={src} className="aspect-square overflow-hidden rounded-[1rem] border border-[color:var(--color-border)] bg-white">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt={`${product.name} 图片 ${index + 1}`} className="h-full w-full object-cover" />
-              </div>
-            ))}
-          </div>
-        </div>
+        <ProductGallery images={images} name={product.name} />
 
         <div className="lg:pt-4">
           <p className="mb-4 text-sm font-semibold text-[color:var(--color-accent)]">
@@ -171,6 +201,52 @@ export default async function ProductDetailPage({
           <p>首批测试款会根据反馈调整颜色、手感、包装和上架渠道。</p>
         </div>
       </section>
+
+      {related.length > 0 && (
+        <section className="mt-16">
+          <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <h2 className="text-3xl">还可以看看</h2>
+            <Link
+              href="/shop"
+              className="text-sm font-semibold text-[color:var(--color-accent)] hover:underline"
+            >
+              看全部小物
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {related.map((item) => (
+              <Link key={item.slug} href={`/shop/${item.slug}`} className="group block">
+                <div className="h-full overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white/78 shadow-[var(--shadow-card)] transition-transform group-hover:-translate-y-1">
+                  <div className="aspect-[4/3] overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.images?.[0] ?? "/images/products/onegoods-stress-relief-goods.png"}
+                      alt={item.name}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    />
+                  </div>
+                  <div className="p-5">
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      <span className="pill-badge">{statusLabel(item.salesStatus)}</span>
+                      {(item.motion ?? []).slice(0, 2).map((tag) => (
+                        <span key={tag} className="pill-badge">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <h3 className="mb-2 text-xl transition-colors group-hover:text-[color:var(--color-accent)]">
+                      {item.name}
+                    </h3>
+                    <p className="text-sm font-semibold">
+                      {item.priceLabel ?? (item.priceUSD ? `$${item.priceUSD} USD` : "价格准备中")}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </article>
   );
 }
