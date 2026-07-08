@@ -2,8 +2,8 @@ import Link from "next/link";
 import { getAllPosts } from "@/lib/content";
 
 export const metadata = {
-  title: "工坊日记",
-  description: "Maker 实践记录 / 桌面 setup / 设计幕后",
+  title: "选品日记",
+  description: "OneGoods Studio 选品、打印、内容测试与上架记录",
 };
 
 export default function JournalPage() {
@@ -11,12 +11,12 @@ export default function JournalPage() {
 
   return (
     <section className="mx-auto max-w-[800px] px-6 py-24">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-[color:var(--color-accent)] mb-6">
-        Journal
+      <p className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-[color:var(--color-accent)]">
+        Selection journal
       </p>
-      <h1 className="font-display mb-4">工坊日记</h1>
-      <p className="text-[color:var(--color-fg-muted)] mb-16 max-w-xl">
-        Maker 实践记录 · 设计幕后 · 桌面 setup · AI 工作流。
+      <h1 className="font-display mb-4">选品日记</h1>
+      <p className="mb-16 max-w-xl text-[color:var(--color-fg-muted)]">
+        记录每个解压小物从选品、打印、拍内容、上架到反馈复盘的过程。
       </p>
 
       {posts.length === 0 ? (
@@ -26,24 +26,24 @@ export default function JournalPage() {
           {posts.map((post) => (
             <li
               key={post.slug}
-              className="group border-t border-[color:var(--color-border-subtle)] pt-8 cursor-pointer"
+              className="group cursor-pointer border-t border-[color:var(--color-border-subtle)] pt-8"
             >
               <Link href={`/journal/${post.slug}`} className="block">
-                <div className="flex justify-between items-start gap-6">
+                <div className="flex items-start justify-between gap-6">
                   <div className="flex-1">
-                    <p className="font-mono text-xs uppercase tracking-widest text-[color:var(--color-fg-muted)] mb-2">
+                    <p className="mb-2 font-mono text-xs uppercase tracking-widest text-[color:var(--color-fg-muted)]">
                       {post.category} · {post.date}
                     </p>
-                    <h2 className="text-2xl group-hover:text-[color:var(--color-accent)] transition-colors mb-2">
+                    <h2 className="mb-2 text-2xl transition-colors group-hover:text-[color:var(--color-accent)]">
                       {post.title}
                     </h2>
                     {post.excerpt && (
-                      <p className="text-[color:var(--color-fg-muted)] text-sm leading-relaxed">
+                      <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">
                         {post.excerpt}
                       </p>
                     )}
                   </div>
-                  <span className="text-[color:var(--color-fg-muted)] group-hover:text-[color:var(--color-accent)] transition-colors mt-2">
+                  <span className="mt-2 text-[color:var(--color-fg-muted)] transition-colors group-hover:text-[color:var(--color-accent)]">
                     →
                   </span>
                 </div>
@@ -55,4 +55,3 @@ export default function JournalPage() {
     </section>
   );
 }
-

@@ -8,6 +8,13 @@ const CONTENT_ROOT = path.join(process.cwd(), "content");
 // Products (MDX-driven SKU)
 // =============================================================
 
+export type PurchaseLinks = {
+  shopee?: string;
+  xiaohongshu?: string;
+  instagram?: string;
+  direct?: string;
+};
+
 export type Product = {
   slug: string;
   name: string;
@@ -15,6 +22,12 @@ export type Product = {
   family?: string;
   sourceType?: string;
   badges?: string[];
+  mood?: string[];
+  motion?: string[];
+  salesStatus?: string;
+  printDifficulty?: string;
+  contentScore?: number;
+  purchaseLinks?: PurchaseLinks;
   priceUSD: number;
   shortDesc: string;
   materials?: string;
@@ -48,6 +61,12 @@ export function getAllProducts(opts?: { includeDraft?: boolean }): Product[] {
       family: data.family,
       sourceType: data.sourceType,
       badges: toStringArray(data.badges),
+      mood: toStringArray(data.mood),
+      motion: toStringArray(data.motion),
+      salesStatus: data.salesStatus,
+      printDifficulty: data.printDifficulty,
+      contentScore: data.contentScore ? Number(data.contentScore) : undefined,
+      purchaseLinks: data.purchaseLinks,
       priceUSD: Number(data.priceUSD ?? 0),
       shortDesc: data.shortDesc ?? "",
       materials: data.materials,

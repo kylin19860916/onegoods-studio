@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductBySlug, getAllProducts } from "@/lib/content";
-import { CheckoutButton } from "@/components/CheckoutButton";
-import { PurchaseTracker } from "@/components/PurchaseTracker";
+import { PurchaseLinks } from "@/components/PurchaseLinks";
 
 export async function generateStaticParams() {
   return getAllProducts({ includeDraft: true }).map((p) => ({ slug: p.slug }));
@@ -22,13 +21,14 @@ export async function generateMetadata({
   };
 }
 
-function familyLabel(family?: string, category?: string) {
-  if (family === "fruit") return "水果系列";
-  if (family === "food") return "美食系列";
-  if (family === "nature") return "自然系列";
-  if (family === "studio" || category === "MagBlock" || category === "Modular System") return "工坊系列";
-  return "水果系列";
-}
+const statusLabel: Record<string, string> = {
+  idea: "选品池",
+  testing: "测试中",
+  "sample-ready": "已打样",
+  listed: "已上架",
+  "sold-out": "售罄",
+  retired: "已下架",
+};
 
 export default async function ProductDetailPage({
   params,
@@ -39,7 +39,7 @@ export default async function ProductDetailPage({
   const product = getProductBySlug(slug);
   if (!product) notFound();
 
-  const badges = Array.from(new Set([product.sourceType, ...(product.badges ?? []), product.priceUSD === 0 ? "即将上架" : undefined].filter(Boolean))) as string[];
+  const badges = Array.from(new Set([product.salesStatus ? statusLabel[product.salesStatus] ?? product.salesStatus : undefined, product.sourceType, ...(product.motion ?? []), ...(product.mood ?? []), ...(product.badges ?? [])].filter(Boolean))) as string[];
 
   return (
     <article className="mx-auto max-w-[1200px] px-6 py-20">
@@ -47,7 +47,7 @@ export default async function ProductDetailPage({
         href="/shop"
         className="mb-8 inline-block text-sm text-[color:var(--color-fg-muted)] transition-colors hover:text-[color:var(--color-accent)]"
       >
-        ← 返回 Shop
+        ← 返回测试款
       </Link>
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
@@ -57,15 +57,18 @@ export default async function ProductDetailPage({
             <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-[linear-gradient(135deg,var(--color-butter),var(--color-mint),#fffaf2)] px-8 text-center">
-              <span className="sticker-icon h-16 w-16 bg-white/78 text-3xl">✦</span>
-              <span>产品主图准备中</span>
+              <span className="sticker-icon h-16 w-16 bg-white/78">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/icons/v4-clean/squishy-blob.png" alt="" className="h-14 w-14 object-contain" />
+              </span>
+              <span>实拍 / 打样图准备中</span>
             </div>
           )}
         </div>
 
         <div>
           <p className="mb-3 font-mono text-xs uppercase tracking-widest text-[color:var(--color-fg-muted)]">
-            {familyLabel(product.family, product.category)}
+            {product.category}
           </p>
           <h1 className="font-display mb-5">{product.name}</h1>
           <div className="mb-6 flex flex-wrap gap-2">
@@ -76,7 +79,7 @@ export default async function ProductDetailPage({
             ))}
           </div>
           <p className="mb-8 text-2xl">
-            {product.priceUSD ? `$${product.priceUSD} USD` : "即将上架"}
+            {product.priceUSD ? `$${product.priceUSD} USD` : "价格待定 · 小批量测试款"}
           </p>
 
           {product.shortDesc && (
@@ -85,14 +88,31 @@ export default async function ProductDetailPage({
             </p>
           )}
 
-          <CheckoutButton slug={product.slug} priceUSD={product.priceUSD} name={product.name} />
-          <PurchaseTracker slug={product.slug} priceUSD={product.priceUSD} name={product.name} />
+          <PurchaseLinks links={product.purchaseLinks} />
 
           <div className="mt-12 space-y-4 text-sm">
-            {product.sourceType && (
+            {product.motion && product.motion.length > 0 && (
               <div className="flex justify-between gap-6 border-t border-[color:var(--color-border-subtle)] pt-4">
-                <span className="text-[color:var(--color-fg-muted)]">商品来源</span>
-                <span className="text-right">{product.sourceType}</span>
+                <span className="text-[color:var(--color-fg-muted)]">解压动作</span>
+                <span className="text-right">{product.motion.join(" · ")}</span>
+              </div>
+            )}
+            {product.mood && product.mood.length > 0 && (
+              <div className="flex justify-between gap-6 border-t border-[color:var(--color-border-subtle)] pt-4">
+                <span className="text-[color:var(--color-fg-muted)]">情绪价值</span>
+                <span className="text-right">{product.mood.join(" · ")}</span>
+              </div>
+            )}
+            {product.printDifficulty && (
+              <div className="flex justify-between gap-6 border-t border-[color:var(--color-border-subtle)] pt-4">
+                <span className="text-[color:var(--color-fg-muted)]">打印难度</span>
+                <span className="text-right">{product.printDifficulty}</span>
+              </div>
+            )}
+            {product.contentScore !== undefined && (
+              <div className="flex justify-between gap-6 border-t border-[color:var(--color-border-subtle)] pt-4">
+                <span className="text-[color:var(--color-fg-muted)]">内容拍摄力</span>
+                <span className="text-right">{product.contentScore}/5</span>
               </div>
             )}
             {product.materials && (
