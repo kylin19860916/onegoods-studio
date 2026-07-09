@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 export function SubscribeForm() {
   const [email, setEmail] = useState("");
@@ -8,6 +9,7 @@ export function SubscribeForm() {
     "idle"
   );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const { t } = useI18n();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,10 +40,10 @@ export function SubscribeForm() {
     return (
       <div className="rounded-[1.25rem] border border-[color:var(--color-accent)] bg-white px-4 py-6 text-center">
         <p className="mb-1 text-sm font-semibold text-[color:var(--color-accent)]">
-          订阅成功
+          {t("subscribe.successTitle")}
         </p>
         <p className="text-xs text-[color:var(--color-fg-muted)]">
-          首批购买入口开放时会通知你。
+          {t("subscribe.successBody")}
         </p>
       </div>
     );
@@ -50,7 +52,7 @@ export function SubscribeForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <label className="flex flex-col gap-2 text-sm font-semibold">
-        邮箱
+        {t("subscribe.email")}
         <input
           type="email"
           required
@@ -66,11 +68,11 @@ export function SubscribeForm() {
         disabled={state === "loading"}
         className="primary-cta disabled:cursor-wait disabled:opacity-50"
       >
-        {state === "loading" ? "正在订阅" : "通知我上新"}
+        {state === "loading" ? t("subscribe.loading") : t("subscribe.submit")}
       </button>
       {state === "error" && (
         <p className="text-xs font-semibold text-red-700">
-          {errorMsg ?? "订阅失败，请稍后再试。"}
+          {errorMsg ?? t("subscribe.error")}
         </p>
       )}
     </form>

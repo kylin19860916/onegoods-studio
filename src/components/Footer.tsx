@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { T } from "@/components/i18n/I18nProvider";
 
 export function Footer() {
   return (
@@ -7,27 +10,27 @@ export function Footer() {
         <div>
           <h3 className="mb-3 font-display text-2xl font-bold">OneGoods Studio</h3>
           <p className="max-w-md text-sm leading-relaxed text-[color:var(--color-fg-muted)]">
-            玩物工坊。把日常小物，变得更好玩。小批量 3D 打印、手感测试、内容反馈，再决定下一批。
+            <T k="footer.tagline" />
           </p>
         </div>
 
         <div>
-          <h4 className="mb-4 text-sm font-bold text-[color:var(--color-fg)]">站内</h4>
+          <h4 className="mb-4 text-sm font-bold text-[color:var(--color-fg)]"><T k="footer.site" /></h4>
           <ul className="space-y-3 text-sm text-[color:var(--color-fg-muted)]">
-            <li><Link href="/shop" className="transition-colors hover:text-[color:var(--color-coral)]">商品</Link></li>
-            <li><Link href="/journal" className="transition-colors hover:text-[color:var(--color-coral)]">选品日记</Link></li>
-            <li><Link href="/brand-story" className="transition-colors hover:text-[color:var(--color-coral)]">品牌故事</Link></li>
-            <li><Link href="/contact" className="transition-colors hover:text-[color:var(--color-coral)]">联系</Link></li>
+            <li><Link href="/shop" className="transition-colors hover:text-[color:var(--color-coral)]"><T k="footer.products" /></Link></li>
+            <li><Link href="/journal" className="transition-colors hover:text-[color:var(--color-coral)]"><T k="footer.journal" /></Link></li>
+            <li><Link href="/brand-story" className="transition-colors hover:text-[color:var(--color-coral)]"><T k="footer.story" /></Link></li>
+            <li><Link href="/contact" className="transition-colors hover:text-[color:var(--color-coral)]"><T k="footer.contact" /></Link></li>
           </ul>
         </div>
 
         <div>
-          <h4 className="mb-4 text-sm font-bold text-[color:var(--color-fg)]">购买渠道</h4>
+          <h4 className="mb-4 text-sm font-bold text-[color:var(--color-fg)]"><T k="footer.channels" /></h4>
           <ul className="space-y-3 text-sm text-[color:var(--color-fg-muted)]">
             <li>Shopee</li>
-            <li>小红书店</li>
+            <li><T k="footer.xhs" /></li>
             <li>Instagram</li>
-            <li>独立站提醒</li>
+            <li><T k="footer.reminder" /></li>
           </ul>
         </div>
       </div>
@@ -35,7 +38,7 @@ export function Footer() {
       <div className="border-t border-[color:var(--color-border-subtle)]">
         <div className="og-container flex flex-col items-center justify-between gap-3 py-6 text-xs text-[color:var(--color-fg-soft)] md:flex-row">
           <span>© 2026 OneGoods Studio · 玩物工坊</span>
-          <span>Everyday little things, made more fun.</span>
+          <span><T k="footer.bottom" /></span>
         </div>
       </div>
     </footer>
