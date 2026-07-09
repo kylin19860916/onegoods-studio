@@ -6,6 +6,8 @@ export const metadata = {
   description: "OneGoods Studio 解压 3D 打印小物",
 };
 
+const filters = ["全部", "解压玩具", "挂饰", "3D 打印", "限定"];
+
 const familyLabels: Record<string, string> = {
   fruit: "水果造型",
   food: "食物造型",
@@ -22,62 +24,48 @@ const statusLabels: Record<NonNullable<Product["salesStatus"]>, string> = {
   retired: "已下架",
 };
 
-const collectionLinks = [
-  { title: "Best Sellers", desc: "首批主推", tone: "var(--color-peach)" },
-  { title: "New Arrivals", desc: "新加入测试", tone: "var(--color-butter)" },
-  { title: "Desk Buddies", desc: "桌面陪伴", tone: "var(--color-mint)" },
-  { title: "Mini Cases", desc: "小收纳", tone: "var(--color-sky)" },
-];
-
 function familyLabel(product: Product) {
   if (product.family && familyLabels[product.family]) return familyLabels[product.family];
   return product.category;
 }
 
 function productTags(product: Product) {
-  return Array.from(
-    new Set([
-      ...(product.motion ?? []),
-      ...(product.mood ?? []),
-      ...(product.badges ?? []),
-    ]),
-  ).slice(0, 5);
+  return Array.from(new Set([...(product.motion ?? []), ...(product.mood ?? []), ...(product.badges ?? [])])).slice(0, 4);
 }
 
-function ProductCard({ sku }: { sku: Product }) {
-  const tags = productTags(sku);
-  const status = statusLabels[sku.salesStatus ?? "testing"];
-  const image = sku.images?.[0] ?? "/images/products/onegoods-stress-relief-goods.png";
+function priceText(product: Product) {
+  return product.priceLabel ?? (product.priceUSD ? `$${product.priceUSD} USD` : "价格准备中");
+}
+
+function ProductCard({ product }: { product: Product }) {
+  const image = product.images?.[0] ?? "/images/products/onegoods-prototype-hero.webp";
+  const tags = productTags(product);
 
   return (
-    <Link href={`/shop/${sku.slug}`} className="group block">
-      <div className="h-full overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white/78 shadow-[var(--shadow-card)] transition-transform group-hover:-translate-y-1">
-        <div className="aspect-[4/3] overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image} alt={sku.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+    <Link href={`/shop/${product.slug}`} className="group og-card og-hover-lift block p-3">
+      <div className="relative aspect-square overflow-hidden rounded-[18px] bg-[color:var(--color-cream)]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={image} alt={product.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]" />
+        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold text-[color:var(--color-coral)] shadow-sm">
+          {statusLabels[product.salesStatus ?? "testing"]}
+        </span>
+      </div>
+      <div className="px-2 pb-2 pt-4">
+        <p className="mb-2 text-xs font-bold text-[color:var(--color-coral)]">{familyLabel(product)}</p>
+        <h3 className="mb-2 text-xl transition-colors group-hover:text-[color:var(--color-coral)]">{product.name}</h3>
+        <p className="mb-4 min-h-[3.5rem] text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{product.shortDesc}</p>
+        <div className="mb-4 flex flex-wrap gap-1.5">
+          {tags.map((tag) => (
+            <span key={tag} className="og-pill text-[0.68rem]">
+              {tag}
+            </span>
+          ))}
         </div>
-        <div className="p-5">
-          <div className="mb-3 flex flex-wrap gap-2">
-            <span className="pill-badge">{status}</span>
-            {tags.map((tag) => (
-              <span key={tag} className="pill-badge">
-                {tag}
-              </span>
-            ))}
-          </div>
-          <p className="mb-2 text-sm font-semibold text-[color:var(--color-accent)]">
-            {familyLabel(sku)}
-          </p>
-          <h3 className="mb-3 text-2xl transition-colors group-hover:text-[color:var(--color-accent)]">
-            {sku.name}
-          </h3>
-          <p className="mb-5 min-h-[4.5rem] leading-relaxed text-[color:var(--color-fg-muted)]">
-            {sku.shortDesc}
-          </p>
-          <div className="flex items-center justify-between gap-4 border-t border-[color:var(--color-border-subtle)] pt-4 text-sm font-semibold">
-            <span>{sku.priceLabel ?? (sku.priceUSD ? `$${sku.priceUSD} USD` : "价格准备中")}</span>
-            <span className="text-[color:var(--color-accent)]">查看详情</span>
-          </div>
+        <div className="flex items-center justify-between gap-4">
+          <span className="font-display text-xl font-bold">{priceText(product)}</span>
+          <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[color:var(--color-coral)] text-lg font-bold text-white transition-colors group-hover:bg-[color:var(--color-coral-deep)]">
+            →
+          </span>
         </div>
       </div>
     </Link>
@@ -85,59 +73,45 @@ function ProductCard({ sku }: { sku: Product }) {
 }
 
 export default function ShopPage() {
-  const products = getAllProducts().filter((product) => product.salesStatus !== "idea").sort((a, b) => {
-    if (a.salesStatus === "testing" && b.salesStatus !== "testing") return -1;
-    if (a.salesStatus !== "testing" && b.salesStatus === "testing") return 1;
-    return a.order - b.order;
-  });
-  const motionTags = Array.from(new Set(products.flatMap((product) => product.motion ?? [])));
-  const moodTags = Array.from(new Set(products.flatMap((product) => product.mood ?? [])));
+  const products = getAllProducts()
+    .filter((product) => product.salesStatus !== "idea")
+    .sort((a, b) => {
+      if (a.salesStatus === "testing" && b.salesStatus !== "testing") return -1;
+      if (a.salesStatus !== "testing" && b.salesStatus === "testing") return 1;
+      return a.order - b.order;
+    });
 
   return (
-    <section className="mx-auto max-w-[1200px] px-6 py-20">
-      <div className="mb-12 max-w-3xl">
-        <p className="mb-5 text-sm font-semibold text-[color:var(--color-accent)]">Shop</p>
-        <h1 className="font-display mb-6">选一个手边的小暂停。</h1>
-        <p className="max-w-[66ch] text-lg leading-relaxed text-[color:var(--color-fg-muted)]">
-          解压 3D 打印小物目录。先按系列、动作或情绪价值逛，再进入商品页查看购买状态。
-        </p>
-      </div>
-
-      <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {collectionLinks.map((item) => (
-          <a
-            href="#products"
-            key={item.title}
-            className="rounded-[1.25rem] border border-[color:var(--color-border)] bg-white/78 p-4 transition-transform hover:-translate-y-1"
-          >
-            <div className="mb-4 h-2 w-16 rounded-full" style={{ background: item.tone }} />
-            <p className="font-display text-xl">{item.title}</p>
-            <p className="mt-1 text-sm text-[color:var(--color-fg-muted)]">{item.desc}</p>
-          </a>
-        ))}
-      </div>
-
-      <div className="mb-12 grid grid-cols-1 gap-4 md:grid-cols-[0.9fr_1.1fr]">
-        <div className="soft-panel p-5">
-          <p className="mb-3 font-semibold">按解压动作找</p>
-          <div className="flex flex-wrap gap-2">
-            {motionTags.map((value) => (
-              <span key={value} className="pill-badge">
-                {value}
-              </span>
-            ))}
+    <section className="og-container py-10 md:py-16">
+      <div className="og-panel mb-8 overflow-hidden p-7 md:p-10">
+        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
+          <div>
+            <span className="og-pill mb-5 text-[color:var(--color-coral)]">全部商品</span>
+            <h1 className="mb-5 max-w-[11ch] text-[clamp(3rem,6vw,5.5rem)] leading-[1.02]">
+              Pick your tiny mood.
+            </h1>
+            <p className="max-w-[48ch] text-lg leading-relaxed text-[color:var(--color-fg-muted)]">
+              解压玩具、包包挂饰、桌面小物。先从首批测试款开始，喜欢就进商品页等开放购买。
+            </p>
+          </div>
+          <div className="rounded-[28px] bg-white/72 p-4 shadow-[var(--shadow-card)]">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5 lg:grid-cols-2">
+              {filters.map((filter) => (
+                <a key={filter} href="#products" className="rounded-full border border-[color:var(--color-border)] bg-white px-4 py-3 text-center text-sm font-bold transition-colors hover:border-[color:var(--color-coral)] hover:text-[color:var(--color-coral)]">
+                  {filter}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="soft-panel p-5">
-          <p className="mb-3 font-semibold">按情绪价值找</p>
-          <div className="flex flex-wrap gap-2">
-            {moodTags.map((value) => (
-              <span key={value} className="pill-badge">
-                {value}
-              </span>
-            ))}
-          </div>
+      </div>
+
+      <div className="mb-6 flex flex-col justify-between gap-3 md:flex-row md:items-end">
+        <div>
+          <h2 className="text-3xl md:text-4xl">这周大家都在玩</h2>
+          <p className="mt-2 text-[color:var(--color-fg-soft)]">{products.length} 件小玩意。小批量测试中，正式购买入口会逐步开放。</p>
         </div>
+        <span className="og-pill self-start">最热优先</span>
       </div>
 
       {products.length === 0 ? (
@@ -146,9 +120,9 @@ export default function ShopPage() {
           <p className="text-[color:var(--color-fg-muted)]">首批测试款上架后会出现在这里。</p>
         </div>
       ) : (
-        <div id="products" className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((sku) => (
-            <ProductCard key={sku.slug} sku={sku} />
+        <div id="products" className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {products.map((product) => (
+            <ProductCard key={product.slug} product={product} />
           ))}
         </div>
       )}

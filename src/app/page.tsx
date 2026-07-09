@@ -1,75 +1,70 @@
 import Link from "next/link";
 import { getAllProducts, type Product } from "@/lib/content";
 
-const collectionTiles = [
+const categoryTiles = [
   {
-    name: "Best Sellers",
-    desc: "最适合先上架测款的解压小物。",
-    href: "/shop",
-    image: "/images/products/strawberry-button-fidget.png",
-    color: "var(--color-peach)",
+    title: "解压玩具",
+    sub: "按一按 捏一捏",
+    href: "/shop#products",
+    tone: "var(--color-mint)",
+    mark: "press",
   },
   {
-    name: "New Arrivals",
-    desc: "刚加入首批测试的桌面小东西。",
-    href: "/shop",
-    image: "/images/products/onegoods-stress-relief-goods.png",
-    color: "var(--color-butter)",
+    title: "包包挂饰",
+    sub: "挂上就出街",
+    href: "/shop#products",
+    tone: "var(--color-cream-deep)",
+    mark: "clip",
   },
   {
-    name: "Desk Buddies",
-    desc: "放在屏幕旁边，工作空档摸一下。",
-    href: "/shop",
-    image: "/images/products/mushroom-spinner-desk-buddy.png",
-    color: "var(--color-mint)",
+    title: "桌面小物",
+    sub: "摆在屏幕旁",
+    href: "/shop#products",
+    tone: "var(--color-sky)",
+    mark: "desk",
   },
   {
-    name: "Mini Cases",
-    desc: "带一点解压动作的小收纳。",
-    href: "/shop",
-    image: "/images/products/cloud-slide-mini-case.png",
-    color: "var(--color-sky)",
+    title: "限定候选",
+    sub: "小批量测试",
+    href: "/shop#products",
+    tone: "var(--color-lavender)",
+    mark: "drop",
   },
 ];
 
-const shopShortcuts = ["按一下", "转一下", "推一下", "摆桌上", "送朋友"];
-
-const tinyMoods = [
+const valueItems = [
   {
-    name: "草莓钮",
+    title: "小批量 3D 打印",
+    sub: "不先堆库存。先小批量打印、拍内容、看反馈，再决定下一批。",
+  },
+  {
+    title: "颜色和手感会迭代",
+    sub: "首批测试会根据真实反馈调整配色、按钮力度、尺寸和包装。",
+  },
+  {
+    title: "购买入口放商品页",
+    sub: "开放购买后，Shopee、小红书店、Instagram 或独立站按钮会在商品页出现。",
+  },
+];
+
+const moodFriends = [
+  {
+    name: "草莓按压钮",
     role: "负责把紧绷按小一点",
-    line: "手停不下来时，按它一下就好。",
-    image: "/images/products/strawberry-button-fidget.png",
     href: "/shop/strawberry-button-fidget",
+    image: "/images/products/strawberry-button-fidget.png",
   },
   {
     name: "蘑菇转转",
     role: "负责陪你等灵感回来",
-    line: "卡住的时候，转一圈再继续。",
-    image: "/images/products/mushroom-spinner-desk-buddy.png",
     href: "/shop/mushroom-spinner-desk-buddy",
+    image: "/images/products/mushroom-spinner-desk-buddy.png",
   },
   {
-    name: "云朵盒",
+    name: "云朵滑盖盒",
     role: "负责收起一点小混乱",
-    line: "把耳塞、戒指、小纸条都暂时放进去。",
-    image: "/images/products/cloud-slide-mini-case.png",
     href: "/shop/cloud-slide-mini-case",
-  },
-];
-
-const buyingNotes = [
-  {
-    title: "小批量 3D 打印",
-    desc: "每批数量不大，商品页会写清楚状态、材质、尺寸和注意事项。",
-  },
-  {
-    title: "先测三款",
-    desc: "先用内容反馈和真实询问决定补色、补货和下一批上架顺序。",
-  },
-  {
-    title: "购买入口在商品页",
-    desc: "开放购买后，Shopee、小红书店或独立站按钮会放在对应商品详情里。",
+    image: "/images/products/cloud-slide-mini-case.png",
   },
 ];
 
@@ -81,51 +76,57 @@ function statusLabel(status?: Product["salesStatus"]) {
   return "首批测试";
 }
 
-function sortedProducts() {
-  return getAllProducts().filter((product) => product.salesStatus !== "idea").sort((a, b) => {
-    if (a.salesStatus === "testing" && b.salesStatus !== "testing") return -1;
-    if (a.salesStatus !== "testing" && b.salesStatus === "testing") return 1;
-    return a.order - b.order;
-  });
-}
-
 function priceText(product: Product) {
   return product.priceLabel ?? (product.priceUSD ? `$${product.priceUSD} USD` : "开放购买前通知");
 }
 
-function ProductCard({ product, featured = false }: { product: Product; featured?: boolean }) {
-  const tags = [...(product.motion ?? []), ...(product.mood ?? [])].slice(0, featured ? 5 : 3);
-  const image = product.images?.[0] ?? "/images/products/onegoods-stress-relief-goods.png";
+function productTags(product: Product, limit = 3) {
+  return Array.from(new Set([...(product.motion ?? []), ...(product.mood ?? []), ...(product.badges ?? [])])).slice(0, limit);
+}
+
+function sortedProducts() {
+  return getAllProducts()
+    .filter((product) => product.salesStatus !== "idea")
+    .sort((a, b) => {
+      if (a.salesStatus === "testing" && b.salesStatus !== "testing") return -1;
+      if (a.salesStatus !== "testing" && b.salesStatus === "testing") return 1;
+      return a.order - b.order;
+    });
+}
+
+function ProductCard({ product }: { product: Product }) {
+  const image = product.images?.[0] ?? "/images/products/onegoods-prototype-hero.webp";
+  const colors = ["#EF6A55", "#FFD86B", "#A7E6C6"].slice(0, 3);
 
   return (
-    <Link
-      href={`/shop/${product.slug}`}
-      className={`group block overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white shadow-[var(--shadow-card)] transition-transform hover:-translate-y-1 ${featured ? "md:col-span-2" : ""}`}
-    >
-      <div className={featured ? "grid gap-0 md:grid-cols-[1.08fr_0.92fr]" : ""}>
-        <div className={featured ? "aspect-[4/3] md:aspect-auto" : "aspect-[4/3]"}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image} alt={product.name} className="h-full w-full object-cover" />
+    <Link href={`/shop/${product.slug}`} className="group og-card og-hover-lift block p-3">
+      <div className="relative aspect-square overflow-hidden rounded-[18px] bg-[color:var(--color-cream)]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={image} alt={product.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]" />
+        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold text-[color:var(--color-coral)] shadow-sm">
+          {statusLabel(product.salesStatus)}
+        </span>
+        <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[color:var(--color-fg-soft)] shadow-sm">
+          ♡
+        </span>
+      </div>
+      <div className="px-2 pb-2 pt-4">
+        <div className="mb-3 flex gap-1.5">
+          {colors.map((color) => (
+            <span key={color} className="og-color-dot" style={{ background: color }} />
+          ))}
         </div>
-        <div className="flex flex-col justify-between p-5 md:p-6">
-          <div>
-            <div className="mb-4 flex flex-wrap gap-2">
-              <span className="pill-badge">{statusLabel(product.salesStatus)}</span>
-              {tags.map((tag) => (
-                <span key={tag} className="pill-badge">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <h3 className="mb-3 text-2xl transition-colors group-hover:text-[color:var(--color-accent)]">
-              {product.name}
-            </h3>
-            <p className="leading-relaxed text-[color:var(--color-fg-muted)]">{product.shortDesc}</p>
-          </div>
-          <div className="mt-6 flex items-center justify-between gap-4 text-sm font-semibold">
-            <span>{priceText(product)}</span>
-            <span className="text-[color:var(--color-accent)]">查看商品</span>
-          </div>
+        <h3 className="mb-1 text-lg tracking-[-0.01em] transition-colors group-hover:text-[color:var(--color-coral)]">
+          {product.name}
+        </h3>
+        <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-[color:var(--color-fg-soft)]">
+          {product.shortDesc}
+        </p>
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-display text-xl font-bold">{priceText(product)}</span>
+          <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[color:var(--color-coral)] text-xl font-bold text-white transition-colors group-hover:bg-[color:var(--color-coral-deep)]">
+            +
+          </span>
         </div>
       </div>
     </Link>
@@ -134,147 +135,153 @@ function ProductCard({ product, featured = false }: { product: Product; featured
 
 export default function Home() {
   const products = sortedProducts();
-  const featuredProducts = products.slice(0, 3);
+  const featured = products.slice(0, 4);
 
   return (
     <>
-      <div className="bg-[color:var(--color-bg-dark)] px-6 py-2 text-center text-sm font-semibold text-white">
-        首批测试款准备上架中。订阅后开放购买、补货、上新会优先通知。
-      </div>
-
-      <section className="relative overflow-hidden">
-        <div className="mx-auto grid min-h-[calc(100dvh-96px)] max-w-[1200px] grid-cols-1 items-center gap-10 px-6 py-14 lg:grid-cols-[0.76fr_1.24fr]">
-          <div className="order-2 relative z-10 max-w-xl lg:order-none">
-            <p className="mb-5 text-sm font-semibold text-[color:var(--color-accent)]">
-              OneGoods Studio
-            </p>
-            <h1 className="font-display mb-6 text-[clamp(3rem,5.3vw,4.6rem)] leading-[1.03]">
-              <span className="block whitespace-nowrap">Cute fidgets</span>
-              <span className="block whitespace-nowrap">for tiny moods.</span>
-            </h1>
-            <p className="mb-8 max-w-[44ch] text-lg leading-relaxed text-[color:var(--color-fg-muted)]">
-              解压 3D 打印小物。按一下、转一下、推一下，把桌面变可爱一点。
-            </p>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Link href="/shop" className="primary-cta">
-                Shop all
-              </Link>
-              <Link href="/contact" className="secondary-cta">
-                上新提醒
-              </Link>
-            </div>
-            <div className="mt-7 flex flex-wrap gap-2">
-              {shopShortcuts.map((item) => (
-                <Link key={item} href="/shop" className="pill-badge">
-                  {item}
+      <section className="og-container py-8 md:py-10">
+        <div className="og-panel relative overflow-hidden p-6 md:p-12 lg:p-14">
+          <div className="grid items-center gap-9 lg:grid-cols-[0.96fr_1.04fr]">
+            <div className="relative z-10">
+              <span className="og-pill mb-5 text-[color:var(--color-coral)]">
+                全部 3D 打印 · 小批量测试
+              </span>
+              <h1 className="mb-5 max-w-[10ch] text-[clamp(3.3rem,7vw,5.7rem)] leading-[1.02]">
+                Play more.
+                <br />
+                Carry joy.
+                <br />
+                <span className="text-[color:var(--color-coral)]">Make it yours.</span>
+              </h1>
+              <p className="mb-2 inline-block -rotate-2 font-display text-2xl font-bold text-[color:var(--color-coral)] md:text-3xl">
+                把日常小物，变得更好玩
+              </p>
+              <p className="mt-4 max-w-[42ch] text-base leading-relaxed text-[color:var(--color-fg-muted)] md:text-lg">
+                口袋里的解压玩具、包上的小挂饰。每一件都从 3D 打印开始，慢慢长成有性格的小东西。
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link href="/shop" className="primary-cta">
+                  逛逛全部
                 </Link>
-              ))}
+                <Link href="/brand-story" className="secondary-cta">
+                  怎么做出来的
+                </Link>
+              </div>
+              <div className="mt-7 flex gap-2">
+                {productTags(featured[0] ?? products[0] ?? ({} as Product), 3).map((tag) => (
+                  <span key={tag} className="og-pill">
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="order-1 relative lg:order-none">
-            <div className="absolute left-6 bottom-6 z-10 rounded-[1rem] bg-[color:var(--color-bg-dark)] px-5 py-4 text-white shadow-[var(--shadow-card)]">
-              <p className="text-xs font-semibold text-white/60">首批主推</p>
-              <p className="font-bold">草莓按压解压钮</p>
+            <div className="relative">
+              <div className="og-floaty relative aspect-square overflow-hidden rounded-[28px] bg-white shadow-[var(--shadow-float)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/products/onegoods-stress-relief-goods.png"
+                  alt="OneGoods Studio 解压小物组合"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <span className="og-sticker absolute -left-2 -top-3 md:-left-4">
+                GOOD CHOICE
+              </span>
+              <span className="absolute -right-2 bottom-5 rounded-[18px] bg-white px-4 py-3 text-sm shadow-[0_10px_24px_rgba(43,43,43,.14)] md:-right-4">
+                <b className="font-display text-xl">NT$280</b>
+                <span className="text-[color:var(--color-fg-soft)]"> 起</span>
+                <br />
+                <span className="text-xs text-[color:var(--color-fg-muted)]">草莓按压解压钮</span>
+              </span>
             </div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/products/onegoods-stress-relief-goods.png"
-              alt="草莓按压钮、蘑菇旋转摆件和云朵滑盖小物盒"
-              className="product-photo aspect-[4/3] w-full"
-            />
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1200px] px-6 py-16">
-        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+      <section className="og-container py-10">
+        <div className="mb-6 flex flex-col justify-between gap-3 md:flex-row md:items-end">
           <div>
-            <h2 className="font-display mb-3">Best Sellers</h2>
-            <p className="max-w-[56ch] leading-relaxed text-[color:var(--color-fg-muted)]">
-              从最适合首批测试的几款开始。看图、看动作、看价格，喜欢就进商品页等开放购买。
-            </p>
+            <h2 className="mb-2 text-3xl md:text-4xl">按心情挑</h2>
+            <p className="text-[color:var(--color-fg-soft)]">四个小分类，总有一个对味。</p>
           </div>
-          <Link href="/shop" className="secondary-cta self-start md:self-auto">
-            View all
+          <Link href="/shop" className="text-sm font-bold text-[color:var(--color-coral)] hover:text-[color:var(--color-coral-deep)]">
+            查看全部 →
           </Link>
         </div>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {featuredProducts.map((product, index) => (
-            <ProductCard key={product.slug} product={product} featured={index === 0} />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {categoryTiles.map((item) => (
+            <Link
+              key={item.title}
+              href={item.href}
+              className="og-hover-lift relative min-h-[190px] overflow-hidden rounded-[24px] p-6"
+              style={{ background: item.tone }}
+            >
+              <span className="font-mono text-xs font-bold uppercase tracking-[0.12em] text-[color:var(--color-fg-muted)]">
+                {item.mark}
+              </span>
+              <h3 className="mt-5 text-2xl">{item.title}</h3>
+              <p className="mt-1 text-sm text-[color:var(--color-fg-muted)]">{item.sub}</p>
+              <span className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-full bg-white text-lg">
+                →
+              </span>
+            </Link>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1200px] px-6 py-16">
-        <div className="mb-8">
-          <h2 className="font-display mb-3">Shop by Collection</h2>
-          <p className="max-w-[56ch] leading-relaxed text-[color:var(--color-fg-muted)]">
-            按你想要的用途来逛：热卖款、新到款、桌面陪伴，或者带一点功能的小收纳。
-          </p>
+      <section className="og-container py-10">
+        <div className="mb-6 flex flex-col justify-between gap-3 md:flex-row md:items-end">
+          <div>
+            <h2 className="mb-2 text-3xl md:text-4xl">这周大家都在玩</h2>
+            <p className="text-[color:var(--color-fg-soft)]">小批量出品，售完就等下一批。</p>
+          </div>
+          <Link href="/shop" className="text-sm font-bold text-[color:var(--color-coral)] hover:text-[color:var(--color-coral-deep)]">
+            View all →
+          </Link>
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {collectionTiles.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="group overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white shadow-[var(--shadow-card)] transition-transform hover:-translate-y-1"
-            >
-              <div className="relative aspect-[4/3] overflow-hidden" style={{ background: item.color }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.image} alt={item.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]" />
-              </div>
-              <div className="p-5">
-                <h3 className="mb-2 text-2xl group-hover:text-[color:var(--color-accent)]">{item.name}</h3>
-                <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{item.desc}</p>
-              </div>
-            </Link>
+          {featured.map((product) => (
+            <ProductCard key={product.slug} product={product} />
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1200px] px-6 py-16">
-        <div className="rounded-[2rem] border border-[color:var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)] md:p-10">
-          <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-            <div>
-              <h2 className="font-display mb-3">Meet the tiny mood friends</h2>
-              <p className="max-w-[60ch] leading-relaxed text-[color:var(--color-fg-muted)]">
-                每个小物都有自己的小性格。先记住它，再把它放到桌上、包里或送给朋友。
-              </p>
-            </div>
-            <Link href="/shop" className="secondary-cta self-start md:self-auto">
-              Shop friends
-            </Link>
-          </div>
-          <div className="grid gap-5 md:grid-cols-3">
-            {tinyMoods.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="group overflow-hidden rounded-[1.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-bg)] transition-transform hover:-translate-y-1"
-              >
-                <div className="aspect-[5/4] overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.image} alt={item.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]" />
+      <section className="og-container py-10">
+        <div className="dark-panel p-7 md:p-12">
+          <div className="grid gap-8 md:grid-cols-3">
+            {valueItems.map((item) => (
+              <div key={item.title}>
+                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-[14px] bg-white/10 text-[color:var(--color-butter)]">
+                  +
                 </div>
-                <div className="p-5">
-                  <p className="mb-2 text-sm font-semibold text-[color:var(--color-accent)]">{item.role}</p>
-                  <h3 className="mb-3 text-2xl">{item.name}</h3>
-                  <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{item.line}</p>
-                </div>
-              </Link>
+                <h3 className="mb-3 text-2xl text-white">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-white/68">{item.sub}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1200px] px-6 py-16">
+      <section className="og-container py-10 md:pb-20">
+        <div className="mb-6">
+          <h2 className="mb-2 text-3xl md:text-4xl">Meet the tiny mood friends</h2>
+          <p className="max-w-[58ch] text-[color:var(--color-fg-soft)]">
+            每个小物都有自己的小性格。先记住它，再把它放到桌上、包里或送给朋友。
+          </p>
+        </div>
         <div className="grid gap-5 md:grid-cols-3">
-          {buyingNotes.map((item) => (
-            <div key={item.title} className="rounded-[1.5rem] border border-[color:var(--color-border)] bg-white/78 p-6">
-              <h3 className="mb-3 text-2xl">{item.title}</h3>
-              <p className="leading-relaxed text-[color:var(--color-fg-muted)]">{item.desc}</p>
-            </div>
+          {moodFriends.map((item) => (
+            <Link key={item.name} href={item.href} className="og-card og-hover-lift overflow-hidden">
+              <div className="aspect-[4/3] overflow-hidden bg-white">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+              </div>
+              <div className="p-6">
+                <h3 className="mb-2 text-2xl">{item.name}</h3>
+                <p className="text-sm leading-relaxed text-[color:var(--color-fg-muted)]">{item.role}</p>
+              </div>
+            </Link>
           ))}
         </div>
       </section>
