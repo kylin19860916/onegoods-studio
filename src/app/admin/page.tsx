@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { hasAdminSession } from "@/lib/admin-auth";
 import { LogoutButton } from "@/components/admin/LogoutButton";
+import { AdminStats } from "@/components/admin/AdminStats";
 
 const modules = [
   {
@@ -11,22 +12,22 @@ const modules = [
     status: "可用",
   },
   {
-    title: "集合与分类",
-    desc: "管理 Best Sellers、New Arrivals、Desk Buddies 等首页集合。",
-    href: "/admin/products",
-    status: "商品标签驱动",
+    title: "销售记录",
+    desc: "查看 Stripe Checkout 订单、成交金额、买家邮箱和付款状态。",
+    href: "/admin/orders",
+    status: "Stripe 只读",
+  },
+  {
+    title: "用户信息",
+    desc: "汇总 Stripe 买家和 Resend 邮件订阅者，方便看谁买过、谁在等待新品。",
+    href: "/admin/customers",
+    status: "Stripe + Resend",
   },
   {
     title: "购买渠道",
     desc: "给每个商品配置 Shopee、小红书店、Instagram 或独立站链接。",
     href: "/admin/products",
     status: "可用",
-  },
-  {
-    title: "素材库",
-    desc: "管理商品图、场景图和后续短视频素材。",
-    href: "/admin/products",
-    status: "图片路径驱动",
   },
 ];
 
@@ -62,6 +63,8 @@ export default async function AdminHomePage() {
         </div>
       </div>
 
+      <AdminStats />
+
       <section className="grid gap-5 md:grid-cols-2">
         {modules.map((item) => (
           <Link
@@ -81,7 +84,7 @@ export default async function AdminHomePage() {
       <section className="mt-10 rounded-[1.5rem] bg-[color:var(--color-bg-dark)] p-6 text-white md:p-8">
         <h2 className="mb-4 text-3xl text-white">现在可以怎么用</h2>
         <p className="max-w-[72ch] leading-relaxed text-white/72">
-          在本地打开 CMS，新增或编辑商品，保存后会写入 `content/products`。检查前台没问题后推到 main，线上站会自动更新。后续如果要像 Shopify 一样在线保存，需要继续接数据库、图片上传和登录权限。
+          在本地打开 CMS，新增或编辑商品，保存后会写入 `content/products`。销售记录和用户信息从 Stripe、Resend 实时读取，只做轻量查看。退款、发票和邮件名单维护仍然回各自 dashboard 处理。
         </p>
       </section>
     </main>
