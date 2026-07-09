@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Price, useI18n } from "@/components/i18n/I18nProvider";
 
 declare global {
   interface Window {
@@ -19,6 +20,7 @@ export function CheckoutButton({
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useI18n();
 
   async function handleCheckout() {
     setLoading(true);
@@ -57,7 +59,7 @@ export function CheckoutButton({
         disabled
         className="w-full px-6 py-4 bg-[color:var(--color-bg-elevated)] text-[color:var(--color-fg-muted)] font-medium rounded-full cursor-not-allowed"
       >
-        即将上架
+        {t("checkout.soon")}
       </button>
     );
   }
@@ -69,7 +71,7 @@ export function CheckoutButton({
         disabled={loading}
         className="w-full px-6 py-4 bg-[color:var(--color-accent)] text-[color:var(--color-bg)] font-medium rounded-full hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-wait"
       >
-        {loading ? "正在跳转 Stripe..." : `加入购物车 · $${priceUSD} USD`}
+        {loading ? t("checkout.loading") : <>{t("checkout.add")} · <Price priceUSD={priceUSD} /></>}
       </button>
       {error && (
         <p className="text-red-400 text-sm mt-3">{error}</p>
@@ -77,4 +79,3 @@ export function CheckoutButton({
     </>
   );
 }
-
