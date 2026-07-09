@@ -1,0 +1,39 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #FAF2E4;
+  font-family: 'Inter', 'Noto Sans SC', sans-serif;
+  color: #2E2A24;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: #EF6A55; text-decoration: none; }
+a:hover { color: #DB5842; }
+
+::selection { background: #FFD86B; }
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes wob {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+/* ---- hover utilities (mirror the prototype's style-hover attributes) ---- */
+.h-card { transition: transform .18s ease; }
+.h-card:hover { transform: translateY(-4px); }
+
+.h-coral:hover { background: #DB5842 !important; }
+.h-nav:hover { background: rgba(43, 43, 43, .05); }
+.h-white:hover { background: #F3EBDA !important; }
+.h-dark:hover { background: #000 !important; }
+.h-bright:hover { filter: brightness(.97); }
+.h-remove:hover { color: #EF6A55 !important; }
+
+/* related-card add button: idle #EFE6D6 → hover coral */
+.h-addrel:hover { background: #EF6A55 !important; color: #fff !important; }
+
+button { font-family: inherit; }
