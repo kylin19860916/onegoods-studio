@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getAllProducts, type Product } from "@/lib/content";
+import { ProductImage } from "@/components/ProductImage";
 
 export const metadata = {
   title: "Shop",
@@ -87,9 +88,13 @@ function ProductCard({ sku }: { sku: Product }) {
   return (
     <Link href={`/shop/${sku.slug}`} className="group block">
       <div className="h-full overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white/78 shadow-[var(--shadow-card)] transition-transform group-hover:-translate-y-1">
-        <div className="aspect-[4/3] overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image} alt={sku.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+        <div className="relative aspect-[4/3] overflow-hidden">
+          <ProductImage
+            src={image}
+            alt={sku.name}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
+            className="transition-transform duration-300 group-hover:scale-[1.03]"
+          />
         </div>
         <div className="p-5">
           <div className="mb-3 flex flex-wrap gap-2">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getAllProducts, type Product } from "@/lib/content";
+import { ProductImage } from "@/components/ProductImage";
 
 // Curated homepage copy keyed by slug; products missing from this map fall
 // back to their MDX frontmatter so renamed/unpublished SKUs never break links.
@@ -102,9 +103,12 @@ function ProductCard({ product, featured = false }: { product: Product; featured
       className={`group block overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white shadow-[var(--shadow-card)] transition-transform hover:-translate-y-1 ${featured ? "md:col-span-2" : ""}`}
     >
       <div className={featured ? "grid gap-0 md:grid-cols-[1.08fr_0.92fr]" : ""}>
-        <div className={featured ? "aspect-[4/3] md:aspect-auto" : "aspect-[4/3]"}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={productImage(product)} alt={product.name} className="h-full w-full object-cover" />
+        <div className={`relative ${featured ? "aspect-[4/3] md:aspect-auto md:min-h-[280px]" : "aspect-[4/3]"}`}>
+          <ProductImage
+            src={productImage(product)}
+            alt={product.name}
+            sizes={featured ? "(max-width: 768px) 100vw, 640px" : "(max-width: 1024px) 100vw, 400px"}
+          />
         </div>
         <div className="flex flex-col justify-between p-5 md:p-6">
           <div>
@@ -192,12 +196,14 @@ export default function Home() {
                 <p className="font-bold">{heroProduct.name}</p>
               </Link>
             )}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={FALLBACK_IMAGE}
-              alt="草莓按压钮、蘑菇旋转摆件和云朵滑盖小物盒"
-              className="product-photo aspect-[4/3] w-full"
-            />
+            <div className="product-photo relative aspect-[4/3] w-full overflow-hidden">
+              <ProductImage
+                src={FALLBACK_IMAGE}
+                alt="草莓按压钮、蘑菇旋转摆件和云朵滑盖小物盒"
+                sizes="(max-width: 1024px) 100vw, 720px"
+                preload
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -241,11 +247,11 @@ export default function Home() {
                   className="relative aspect-[4/3] overflow-hidden"
                   style={{ background: motionTones[index % motionTones.length] }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <ProductImage
                     src={sample ? productImage(sample) : FALLBACK_IMAGE}
                     alt={motion}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
+                    className="transition-transform duration-300 group-hover:scale-[1.04]"
                   />
                 </div>
                 <div className="p-5">
@@ -280,9 +286,13 @@ export default function Home() {
                 href={`/shop/${product.slug}`}
                 className="group overflow-hidden rounded-[1.5rem] border border-[color:var(--color-border)] bg-[color:var(--color-bg)] transition-transform hover:-translate-y-1"
               >
-                <div className="aspect-[5/4] overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={productImage(product)} alt={product.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]" />
+                <div className="relative aspect-[5/4] overflow-hidden">
+                  <ProductImage
+                    src={productImage(product)}
+                    alt={product.name}
+                    sizes="(max-width: 768px) 100vw, 380px"
+                    className="transition-transform duration-300 group-hover:scale-[1.04]"
+                  />
                 </div>
                 <div className="p-5">
                   <p className="mb-2 text-sm font-semibold text-[color:var(--color-accent)]">{role}</p>

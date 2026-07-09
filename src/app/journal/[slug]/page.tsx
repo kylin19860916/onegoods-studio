@@ -4,7 +4,7 @@ import { MarkdownBody } from "@/components/MarkdownBody";
 import { getAllPosts, getPostBySlug } from "@/lib/content";
 
 export async function generateStaticParams() {
-  return getAllPosts({ includeDraft: true }).map((post) => ({ slug: post.slug }));
+  return getAllPosts().map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({
@@ -28,7 +28,7 @@ export default async function JournalDetailPage({
 }) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
-  if (!post) notFound();
+  if (!post || post.status !== "published") notFound();
 
   return (
     <article className="mx-auto max-w-[820px] px-6 py-20">

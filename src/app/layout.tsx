@@ -37,6 +37,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "zh_CN",
     siteName: "OneGoods Studio",
+    images: ["/images/products/onegoods-stress-relief-goods.png"],
   },
 };
 

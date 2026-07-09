@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ProductImage } from "@/components/ProductImage";
 
 export function ProductGallery({ images, name }: { images: string[]; name: string }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -8,9 +9,13 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
 
   return (
     <div>
-      <div className="overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white shadow-[var(--shadow-float)]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={active} alt={name} className="aspect-square h-full w-full object-cover" />
+      <div className="relative aspect-square overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white shadow-[var(--shadow-float)]">
+        <ProductImage
+          src={active}
+          alt={name}
+          sizes="(max-width: 1024px) 100vw, 620px"
+          preload
+        />
       </div>
       {images.length > 1 && (
         <div className="mt-4 grid grid-cols-4 gap-3">
@@ -21,14 +26,13 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
               onClick={() => setActiveIndex(index)}
               aria-label={`查看${name}图片 ${index + 1}`}
               aria-pressed={index === activeIndex}
-              className={`aspect-square overflow-hidden rounded-[1rem] border bg-white transition-colors ${
+              className={`relative aspect-square overflow-hidden rounded-[1rem] border bg-white transition-colors ${
                 index === activeIndex
                   ? "border-[color:var(--color-accent)]"
                   : "border-[color:var(--color-border)] hover:border-[color:var(--color-accent)]"
               }`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt={`${name} 图片 ${index + 1}`} className="h-full w-full object-cover" />
+              <ProductImage src={src} alt={`${name} 图片 ${index + 1}`} sizes="150px" />
             </button>
           ))}
         </div>

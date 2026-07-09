@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getProductBySlug, getAllProducts, type Product } from "@/lib/content";
 import { MarkdownBody } from "@/components/MarkdownBody";
 import { ProductGallery } from "@/components/ProductGallery";
+import { ProductImage } from "@/components/ProductImage";
 import { PurchaseLinks } from "@/components/PurchaseLinks";
 
 const SITE_URL = "https://onegoods.studio";
@@ -19,9 +20,15 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = getProductBySlug(slug);
   if (!product) return { title: "Product not found" };
+  const image = product.images?.[0] ?? "/images/products/onegoods-stress-relief-goods.png";
   return {
     title: product.name,
     description: product.shortDesc,
+    openGraph: {
+      title: product.name,
+      description: product.shortDesc,
+      images: [image.startsWith("http") ? image : `${SITE_URL}${image}`],
+    },
   };
 }
 
@@ -217,12 +224,12 @@ export default async function ProductDetailPage({
             {related.map((item) => (
               <Link key={item.slug} href={`/shop/${item.slug}`} className="group block">
                 <div className="h-full overflow-hidden rounded-[var(--radius-card)] border border-[color:var(--color-border)] bg-white/78 shadow-[var(--shadow-card)] transition-transform group-hover:-translate-y-1">
-                  <div className="aspect-[4/3] overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <ProductImage
                       src={item.images?.[0] ?? "/images/products/onegoods-stress-relief-goods.png"}
                       alt={item.name}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
+                      className="transition-transform duration-300 group-hover:scale-[1.03]"
                     />
                   </div>
                   <div className="p-5">

@@ -7,7 +7,7 @@ export const metadata = {
 };
 
 export default function JournalPage() {
-  const posts = getAllPosts({ includeDraft: true });
+  const posts = getAllPosts();
 
   return (
     <section className="mx-auto max-w-[800px] px-6 py-24">
