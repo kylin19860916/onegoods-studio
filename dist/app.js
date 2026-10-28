@@ -19,7 +19,7 @@ document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if
 qs('#year').textContent=new Date().getFullYear();renderProducts();renderCart();
 
 // Only set this to the owner's verified public creator-profile URL.
-const makerWorldProfile = '';
+const makerWorldProfile = 'https://makerworld.com/zh/@OGStudio';
 const profileSlot = qs('#makerworld-profile');
 if(profileSlot && /^https:\/\/(www\.)?makerworld\.(com|cn)\//.test(makerWorldProfile)){
 const link=document.createElement('a');link.className='button mint';link.href=makerWorldProfile;link.target='_blank';link.rel='noopener noreferrer';link.textContent='我的 MakerWorld 设计主页';profileSlot.append(link);profileSlot.hidden=false;
