@@ -3,7 +3,7 @@ const products=[
 {id:'cloud-key',name:'按键挂饰',en:'TAKE JOY WITH YOU',type:'press',format:'打印成品',color:'#f6dfab',art:'cloud',desc:'把一朵软乎乎的好心情，挂在身边。',detail:'将按键玩法带在身边的挂饰类别。具体产品照片、规格与配件以正式发布为准。',mark:'02'},
 {id:'spin-ring',name:'旋转解压小物',en:'ROUND & ROUND',type:'spin',format:'打印成品',color:'#f1c6b5',art:'spin',desc:'手指转一圈，日常多一点轻松。',detail:'围绕手指旋转玩法展开的解压小物类别。具体造型、结构与配件以正式发布为准。',mark:'03'},
 {id:'good-file',name:'数字设计文件',en:'MAKE YOUR OWN GOOD',type:'file',format:'数字文件',color:'#cfdfcd',art:'file',desc:'用自己的打印机，让一个好点子成形。',detail:'面向希望自行打印和组装的使用者。商品照片、文件格式、配件及授权范围以正式发布为准。',mark:'04'}];
-function art(p){if(p.type==='file')return `<span class="photo-slot"><span class="slot-type">虚拟商品</span><strong>设计预览图预留</strong><small>自行打印 · 不含实体产品</small></span>`;return `<span class="photo-slot"><strong>产品照片预留</strong><small>等待实物亮相</small></span>`}
+function art(p){if(p.type==='file')return `<span class="photo-slot"><span class="slot-type">虚拟商品</span><strong>设计预览图预留</strong><small>自行打印 · 不含实体产品</small></span>`;return `<span class="photo-slot" aria-hidden="true"></span>`}
 
 const qs=s=>document.querySelector(s);
 const makerWorldProfile='https://makerworld.com/zh/@OGStudio';
