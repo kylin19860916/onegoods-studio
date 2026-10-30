@@ -1,142 +1,698 @@
 {
-"首页":["首頁","Home"],
-"实体产品":["實體商品","Physical goods"],
-"设计文档":["設計檔案","Design files"],
-"关于 OGS":["關於 OGS","About OGS"],
-"主导航":["主要導覽","Main navigation"],
-"One Goods Studio 首页":["One Goods Studio 首頁","One Goods Studio home"],
-"One Goods Studio 品牌标志":["One Goods Studio 品牌標誌","One Goods Studio logo"],
-"给日常一点好玩":["給日常一點好玩","A little joy, every day"],
-"给日常，":["給日常，","Every day,<br>"],
-"一点":["一點","a little "],
-"好玩。":["好玩。","joy."],
-"按一下，转一圈。":["按一下，轉一圈。","Press. Spin. Enjoy."],
-"把喜欢的小东西，带在身边。":["把喜歡的小東西，帶在身邊。","Keep a little joy close at hand."],
-"找一件合拍的小物":["找一件合拍的小物","Find your little joy"],
-"原创 3D 打印设计":["原創 3D 列印設計","Original 3D print designs"],
-"按压 · 旋转 · 随身挂饰":["按壓 · 旋轉 · 隨身吊飾","Press · Spin · Carry"],
-"设计材料摄影风格示意":["設計材料攝影風格示意","Studio materials concept image"],
-"机械轴体、3D 打印材料样片与钥匙圈的 AI 摄影风格示意":["機械軸體、3D 列印材料樣片與鑰匙圈的 AI 攝影風格示意","AI concept image of mechanical switches, 3D print samples and key rings"],
-"AI 摄影风格示意 · 非实际商品照片":["AI 攝影風格示意 · 非實際商品照片","AI concept image · Not an actual product photograph"],
-"先遇见，一点小快乐。":["先遇見，一點小快樂。","Meet your next little joy."],
-"按压派、旋转派，都是拿在手里的快乐。":["按壓派、旋轉派，都是拿在手裡的快樂。","A press or a spin — a little joy in your hands."],
-"商品照片与售价尚未公布。全站以新台币（TWD / NT$）计价，实际商品、规格及文件内容以正式发布为准。":["商品照片與售價尚未公布。全站以新臺幣（TWD / NT$）計價，實際商品、規格及檔案內容以正式發布為準。","Product photos and prices have not been announced. Prices will be in New Taiwan dollars (TWD / NT$). Final listings will confirm products, specifications and file contents."],
-"探索全部实体产品":["探索全部實體商品","Explore physical goods"],
-"虚拟商品 · 自己打印":["數位商品 · 自己列印","Digital goods · Print your own"],
-"把好点子，":["把好點子，","Bring good ideas<br>"],
-"打印成你的日常。":["列印成你的日常。","into your day."],
-"已有打印机？从一份原创设计出发。":["已有列印機？從一份原創設計出發。","Have a 3D printer? Start with an original design."],
-"在设计文档专区，探索模型文件与制作说明。":["在設計檔案專區，探索模型檔案與製作說明。","Explore models and making guides in our design library."],
-"探索设计文档":["探索設計檔案","Explore design files"],
-"选一份喜欢的设计":["選一份喜歡的設計","Choose a design"],
-"数字文件独立浏览，与实体产品分开选择。":["數位檔案獨立瀏覽，與實體商品分開選擇。","Browse digital files separately from physical goods."],
-"了解制作与授权":["了解製作與授權","Check the making guide and license"],
-"核对文件格式、所需配件与设计使用范围。":["核對檔案格式、所需配件與設計使用範圍。","Check file formats, required parts and permitted uses."],
-"让喜欢亲手成形":["讓喜歡親手成形","Make it your own"],
-"使用自己的打印机，体验制作的乐趣。":["使用自己的列印機，體驗製作的樂趣。","Enjoy making with your own 3D printer."],
-"在 MakerWorld 认识我的设计":["在 MakerWorld 認識我們的設計","Explore our designs on MakerWorld"],
-"小小工作室，认真做好玩。":["小小工作室，認真做好玩。","A small studio. Serious about fun."],
-"One Goods Studio，把原创设计变成日常里可以触碰的小快乐。":["One Goods Studio，把原創設計變成日常裡可以觸碰的小快樂。","One Goods Studio turns original ideas into little joys you can hold."],
-"认识 OGS":["認識 OGS","Meet OGS"],
-"好心情，可以很小。":["好心情，可以很小。","Good moments come in small things."],
-"继续逛逛":["繼續逛逛","Keep exploring"],
-"解压、有趣，自成一格。":["紓壓、有趣，自成一格。","Relaxing. Playful. Uniquely yours."],
-"购买与授权说明":["購買與授權說明","Buying and licensing"],
-"关闭商品详情":["關閉商品詳情","Close product details"],
-"关闭说明":["關閉說明","Close information"],
-"当前商品尚未开售。实体商品开售后将通过 7-ELEVEN 賣貨便完成下单、付款和配送选择。销售币种为新台币（TWD / NT$）。":["目前商品尚未開賣。實體商品開賣後將透過 7-ELEVEN 賣貨便完成下單、付款與配送選擇。計價幣別為新臺幣（TWD / NT$）。","Products are not yet on sale. Once available, physical goods will be ordered and paid for through 7-ELEVEN MyShip, where delivery options will also be selected. Prices are in New Taiwan dollars (TWD / NT$)."],
-"实体商品":["實體商品","Physical goods"],
-"正式销售时，商品页将列明价格、规格、材质、配件与配送信息。":["正式販售時，商品頁將列明價格、規格、材質、配件與配送資訊。","Final product listings will specify prices, specifications, materials, included parts and delivery information."],
-"数字文件":["數位檔案","Digital files"],
-"数字文件不包含实体商品。购买前需核对文件格式、所需配件、打印要求及授权范围。":["數位檔案不包含實體商品。購買前請核對檔案格式、所需配件、列印要求及授權範圍。","Digital files do not include physical goods. Check file formats, required parts, printing requirements and license terms before buying."],
-"原创 3D 打印小物与数字设计。探索按压、旋转的小快乐。":["原創 3D 列印小物與數位設計。探索按壓、旋轉的小快樂。","Original 3D printed objects and digital designs. Discover the little joys of pressing and spinning."],
-"拿在手里，":["拿在手裡，","Little things,<br>"],
-"才是":["才是","hands-on "],
-"小快乐。":["小快樂。","happiness."],
-"按压派、旋转派。选一种玩法，找到合拍的日常小物。":["按壓派、旋轉派。選一種玩法，找到合拍的日常小物。","Press or spin. Find a playful companion for everyday life."],
-"实体小物，选一种玩法。":["實體小物，選一種玩法。","Find your kind of fun."],
-"按玩法筛选":["依玩法篩選","Filter by play style"],
-"全部实体产品":["全部實體商品","All physical goods"],
-"按压派":["按壓派","Press"],
-"旋转派":["旋轉派","Spin"],
-"新台币 TWD / NT$ · 暂未开售":["新臺幣 TWD / NT$ · 尚未開賣","TWD / NT$ · Not yet on sale"],
-"探索实体按压玩具、旋转小物与挂饰，使用新台币计价。":["探索實體按壓玩具、旋轉小物與吊飾，以新臺幣計價。","Explore physical press toys, spinning objects and charms. Prices in TWD."],
-"好点子，":["好點子，","Good ideas,<br>"],
-"由你":["由你","you "],
-"打印。":["列印。","make them."],
-"这里是 One Goods Studio 的设计文档专区。":["這裡是 One Goods Studio 的設計檔案專區。","Welcome to the One Goods Studio design library."],
-"选择数字设计，使用自己的打印机，把喜欢带进现实。":["選擇數位設計，使用自己的列印機，把喜歡帶進現實。","Choose a digital design and bring it to life with your own printer."],
-"虚拟商品 · 不含实体产品":["數位商品 · 不含實體商品","Digital goods · No physical product included"],
-"一份设计，":["一份設計，","One design.<br>"],
-"一次亲手制作的乐趣。":["一次親手製作的樂趣。","The joy of making."],
-"设计文件与实体产品分开浏览。每份设计的文件格式、配件、打印与组装要求，以及使用授权，均以对应商品说明为准。":["設計檔案與實體商品分開瀏覽。每份設計的檔案格式、配件、列印與組裝要求，以及使用授權，均以對應商品說明為準。","Design files and physical goods are listed separately. See each listing for file formats, parts, printing and assembly requirements, and licensing."],
-"想直接玩？浏览实体产品":["想直接玩？瀏覽實體商品","Ready to play? Browse physical goods"],
-"原创设计文档":["原創設計檔案","Original design files"],
-"购买文件前，先看这些。":["購買檔案前，先看這些。","Before choosing a file"],
-"01 / 文件与版本":["01 / 檔案與版本","01 / Files and versions"],
-"确认文件格式与适用软件，了解你将收到的内容。":["確認檔案格式與適用軟體，了解你將收到的內容。","Check formats, compatible software and what is included."],
-"02 / 打印与组装":["02 / 列印與組裝","02 / Printing and assembly"],
-"核对打印要求、额外配件与组装说明。":["核對列印要求、額外配件與組裝說明。","Check printing requirements, additional parts and assembly instructions."],
-"03 / 使用授权":["03 / 使用授權","03 / Licensing"],
-"个人制作、商业使用及文件分享，以每份设计的授权范围为准。":["個人製作、商業使用及檔案分享，以每份設計的授權範圍為準。","Personal making, commercial use and file sharing are subject to each design's license."],
-"设计预览与文件内容尚未公布。数字商品不包含打印成品，当前不开放付款或文件下载。":["設計預覽與檔案內容尚未公布。數位商品不包含列印成品，目前不開放付款或檔案下載。","Design previews and file contents have not been announced. Digital goods do not include printed objects. Payment and downloads are not currently available."],
-"原创数字设计文档、制作与授权说明，以及 OGS 的 MakerWorld 主页。":["原創數位設計檔案、製作與授權說明，以及 OGS 的 MakerWorld 主頁。","Original digital designs, making and licensing guides, and the OGS MakerWorld profile."],
-"解压、有趣，":["紓壓、有趣，","Relaxing. Playful.<br>"],
-"自成一格。":["自成一格。","Uniquely yours."],
-"用认真设计的小东西，为生活留一点轻松。":["用認真設計的小東西，為生活留一點輕鬆。","Thoughtfully designed little things for lighter moments."],
-"认真设计，":["認真設計，","Thoughtful design.<br>"],
-"轻松一点。":["輕鬆一點。","A lighter day."],
-"One Goods Studio 是一个围绕原创 3D 打印小物展开的独立设计品牌。":["One Goods Studio 是一個以原創 3D 列印小物為核心的獨立設計品牌。","One Goods Studio is an independent design brand focused on original 3D printed objects."],
-"我们关心可爱的外表，也关心手指按下去、轻轻转动时的那一点乐趣。从桌上的玩具到包上的挂饰，让设计成为日常里可以触碰的小快乐。":["我們關心可愛的外表，也關心手指按下去、輕輕轉動時的那一點樂趣。從桌上的玩具到包上的吊飾，讓設計成為日常裡可以觸碰的小快樂。","We care about playful looks and the satisfying feel of a press or a gentle spin. From desk toys to bag charms, we make little joys you can hold."],
-"从自己的点子开始。":["從自己的點子開始。","It starts with an idea."],
-"围绕原创 3D 打印设计，探索小物的造型和玩法。":["圍繞原創 3D 列印設計，探索小物的造型和玩法。","Exploring form and play through original 3D print design."],
-"好玩，发生在指尖。":["好玩，發生在指尖。","Fun at your fingertips."],
-"关注按下去、转起来时，人与物件之间的小小互动。":["關注按下去、轉起來時，人與物件之間的小小互動。","Celebrating the little interactions of a press or a spin."],
-"带进真实的日常。":["帶進真實的日常。","Made for everyday moments."],
-"在桌面、包上或手边，让喜欢的小东西陪伴生活。":["在桌面、包上或手邊，讓喜歡的小東西陪伴生活。","On your desk, on your bag or close at hand — small companions for daily life."],
-"再多了解一点。":["再多了解一點。","A little more to know."],
-"成品和数字文件有什么区别？":["成品和數位檔案有什麼區別？","How do physical goods and digital files differ?"],
-"成品是实体小物；数字文件是供自行制作使用的电子文件，不包含实体商品。正式销售时会分别标明交付内容。":["成品是實體小物；數位檔案是供自行製作使用的電子檔案，不包含實體商品。正式販售時會分別標明交付內容。","Physical goods are tangible objects. Digital files are for making your own and do not include physical goods. Final listings will specify what is included."],
-"按压和旋转，是两种不同玩法吗？":["按壓和旋轉，是兩種不同玩法嗎？","Are pressing and spinning different play styles?"],
-"是的。按压系列围绕机械按键的触感展开；旋转系列围绕手指转动的玩法展开。具体结构与配件以对应商品说明为准。":["是的。按壓系列著重機械按鍵的觸感；旋轉系列著重手指轉動的玩法。具體結構與配件以對應商品說明為準。","Yes. Press designs focus on the feel of mechanical switches; spin designs focus on finger-driven rotation. See each listing for structure and parts."],
-"数字文件可以打印后出售吗？":["數位檔案可以列印後出售嗎？","Can I sell prints made from digital files?"],
-"不同设计可能采用不同授权。购买前请查看对应商品的授权范围；未明确授权时，请勿将文件转售或用于商业生产。":["不同設計可能採用不同授權。購買前請查看對應商品的授權範圍；未明確授權時，請勿將檔案轉售或用於商業生產。","Licenses vary by design. Check the specific terms before buying. Do not resell files or use them for commercial production without explicit permission."],
-"现在可以购买吗？":["現在可以購買嗎？","Can I buy now?"],
-"商品尚未开售。开售后，可通过商品页前往 7-ELEVEN 賣貨便下单。":["商品尚未開賣。開賣後，可透過商品頁前往 7-ELEVEN 賣貨便下單。","Products are not yet on sale. Once available, product pages will link to 7-ELEVEN MyShip for ordering."],
-"认识 One Goods Studio，一个围绕原创 3D 打印小物的独立设计品牌。":["認識 One Goods Studio，一個以原創 3D 列印小物為核心的獨立設計品牌。","Meet One Goods Studio, an independent brand for original 3D printed objects."],
-"商品详情":["商品詳情","Product details"],
-"查看 OGS 商品内容及购买说明。":["查看 OGS 商品內容及購買說明。","View OGS product information and buying details."],
-"返回实体产品":["返回實體商品","Back to physical goods"],
-"浏览实体产品":["瀏覽實體商品","Browse physical goods"],
-"按压解压小物":["按壓紓壓小物","Press fidgets"],
-"按键挂饰":["按鍵吊飾","Key-switch charms"],
-"旋转解压小物":["旋轉紓壓小物","Spin fidgets"],
-"数字设计文件":["數位設計檔案","Digital design files"],
-"打印成品":["列印成品","Printed object"],
-"按一下，给思绪放个小假。":["按一下，給思緒放個小假。","A little press. A little pause."],
-"把一朵软乎乎的好心情，挂在身边。":["把一朵軟乎乎的好心情，掛在身邊。","Carry a little cloud of happiness."],
-"手指转一圈，日常多一点轻松。":["手指轉一圈，日常多一點輕鬆。","A gentle spin for a lighter moment."],
-"用自己的打印机，让一个好点子成形。":["用自己的列印機，讓一個好點子成形。","Bring a good idea to life with your own printer."],
-"围绕机械按压触感展开的产品类别。具体造型、规格与配件以商品正式发布为准。":["以機械按壓觸感為主的商品類別。具體造型、規格與配件以商品正式發布為準。","A category exploring mechanical press feedback. Final listings will confirm designs, specifications and parts."],
-"将按键玩法带在身边的挂饰类别。具体产品照片、规格与配件以正式发布为准。":["將按鍵玩法帶在身邊的吊飾類別。具體商品照片、規格與配件以正式發布為準。","Charms that bring key-switch play along with you. Final listings will confirm photos, specifications and parts."],
-"围绕手指旋转玩法展开的解压小物类别。具体造型、结构与配件以正式发布为准。":["以手指旋轉玩法為主的紓壓小物類別。具體造型、結構與配件以正式發布為準。","A category of finger-spun fidgets. Final listings will confirm designs, structure and parts."],
-"面向希望自行打印和组装的使用者。商品照片、文件格式、配件及授权范围以正式发布为准。":["提供給希望自行列印和組裝的使用者。商品照片、檔案格式、配件及授權範圍以正式發布為準。","For makers who want to print and assemble their own. Final listings will confirm images, formats, parts and license terms."],
-"虚拟商品":["數位商品","Digital goods"],
-"数字设计":["數位設計","Digital designs"],
-"自行打印 · 不含实体产品":["自行列印 · 不含實體商品","Print your own · No physical product"],
-"探索此类别":["探索此類別","Explore this category"],
-"商品尚未开售":["商品尚未開賣","Products are not yet on sale"],
-"尚未开售":["尚未開賣","Not yet on sale"],
-"商品类别":["商品類別","Product category"],
-"售价未公布":["售價未公布","Price not announced"],
-"查看详情":["查看詳情","View details"],
-"查看":["查看","View "],
-"详情":["詳情"," details"],
-"设计文档尚未开售，文件内容与授权以正式发布为准。":["設計檔案尚未開賣，檔案內容與授權以正式發布為準。","Design files are not yet on sale. Final listings will confirm contents and license terms."],
-"我的 MakerWorld 设计主页":["我們的 MakerWorld 設計主頁","Our designs on MakerWorld"],
-"没有找到这件商品。":["找不到這件商品。","Product not found."],
-"请返回实体产品页，重新选择。":["請返回實體商品頁，重新選擇。","Please return to physical goods and choose another item."],
-"前往 7-ELEVEN 賣貨便购买":["前往 7-ELEVEN 賣貨便購買","Buy on 7-ELEVEN MyShip"],
-"购买渠道：7-ELEVEN 賣貨便":["購買管道：7-ELEVEN 賣貨便","Order through 7-ELEVEN MyShip"],
-"产品照片、材质、尺寸及售价以正式发布为准。当前尚未开售。":["商品照片、材質、尺寸及售價以正式發布為準。目前尚未開賣。","Final listings will confirm photos, materials, dimensions and prices. Products are not yet on sale."]
+  "首页": [
+    "首頁",
+    "Home"
+  ],
+  "实体产品": [
+    "實體商品",
+    "Physical goods"
+  ],
+  "设计文档": [
+    "設計檔案",
+    "Design files"
+  ],
+  "关于 OGS": [
+    "關於 OGS",
+    "About OGS"
+  ],
+  "主导航": [
+    "主要導覽",
+    "Main navigation"
+  ],
+  "One Goods Studio 首页": [
+    "One Goods Studio 首頁",
+    "One Goods Studio home"
+  ],
+  "One Goods Studio 品牌标志": [
+    "One Goods Studio 品牌標誌",
+    "One Goods Studio logo"
+  ],
+  "给日常一点好玩": [
+    "給日常一點好玩",
+    "A little joy, every day"
+  ],
+  "给日常，": [
+    "給日常，",
+    "Every day,<br>"
+  ],
+  "一点": [
+    "一點",
+    "a little "
+  ],
+  "好玩。": [
+    "好玩。",
+    "joy."
+  ],
+  "按一下，转一圈。": [
+    "按一下，轉一圈。",
+    "Press. Spin. Enjoy."
+  ],
+  "把喜欢的小东西，带在身边。": [
+    "把喜歡的小東西，帶在身邊。",
+    "Keep a little joy close at hand."
+  ],
+  "找一件合拍的小物": [
+    "找一件合拍的小物",
+    "Find your little joy"
+  ],
+  "原创 3D 打印设计": [
+    "原創 3D 列印設計",
+    "Original 3D print designs"
+  ],
+  "按压 · 旋转 · 随身挂饰": [
+    "按壓 · 旋轉 · 隨身吊飾",
+    "Press · Spin · Carry"
+  ],
+  "设计材料摄影风格示意": [
+    "設計材料攝影風格示意",
+    "Studio materials concept image"
+  ],
+  "机械轴体、3D 打印材料样片与钥匙圈的 AI 摄影风格示意": [
+    "機械軸體、3D 列印材料樣片與鑰匙圈的 AI 攝影風格示意",
+    "AI concept image of mechanical switches, 3D print samples and key rings"
+  ],
+  "AI 摄影风格示意 · 非实际商品照片": [
+    "AI 攝影風格示意 · 非實際商品照片",
+    "AI concept image · Not an actual product photograph"
+  ],
+  "先遇见，一点小快乐。": [
+    "先遇見，一點小快樂。",
+    "Meet your next little joy."
+  ],
+  "按压派、旋转派，都是拿在手里的快乐。": [
+    "按壓派、旋轉派，都是拿在手裡的快樂。",
+    "A press or a spin — a little joy in your hands."
+  ],
+  "商品照片与售价尚未公布。全站以新台币（TWD / NT$）计价，实际商品、规格及文件内容以正式发布为准。": [
+    "商品照片與售價尚未公布。全站以新臺幣（TWD / NT$）計價，實際商品、規格及檔案內容以正式發布為準。",
+    "Product photos and prices have not been announced. Prices will be in New Taiwan dollars (TWD / NT$). Final listings will confirm products, specifications and file contents."
+  ],
+  "探索全部实体产品": [
+    "探索全部實體商品",
+    "Explore physical goods"
+  ],
+  "虚拟商品 · 自己打印": [
+    "數位商品 · 自己列印",
+    "Digital goods · Print your own"
+  ],
+  "把好点子，": [
+    "把好點子，",
+    "Bring good ideas<br>"
+  ],
+  "打印成你的日常。": [
+    "列印成你的日常。",
+    "into your day."
+  ],
+  "已有打印机？从一份原创设计出发。": [
+    "已有列印機？從一份原創設計出發。",
+    "Have a 3D printer? Start with an original design."
+  ],
+  "在设计文档专区，探索模型文件与制作说明。": [
+    "在設計檔案專區，探索模型檔案與製作說明。",
+    "Explore models and making guides in our design library."
+  ],
+  "探索设计文档": [
+    "探索設計檔案",
+    "Explore design files"
+  ],
+  "选一份喜欢的设计": [
+    "選一份喜歡的設計",
+    "Choose a design"
+  ],
+  "数字文件独立浏览，与实体产品分开选择。": [
+    "數位檔案獨立瀏覽，與實體商品分開選擇。",
+    "Browse digital files separately from physical goods."
+  ],
+  "了解制作与授权": [
+    "了解製作與授權",
+    "Check the making guide and license"
+  ],
+  "核对文件格式、所需配件与设计使用范围。": [
+    "核對檔案格式、所需配件與設計使用範圍。",
+    "Check file formats, required parts and permitted uses."
+  ],
+  "让喜欢亲手成形": [
+    "讓喜歡親手成形",
+    "Make it your own"
+  ],
+  "使用自己的打印机，体验制作的乐趣。": [
+    "使用自己的列印機，體驗製作的樂趣。",
+    "Enjoy making with your own 3D printer."
+  ],
+  "在 MakerWorld 认识我的设计": [
+    "在 MakerWorld 認識我們的設計",
+    "Explore our designs on MakerWorld"
+  ],
+  "小小工作室，认真做好玩。": [
+    "小小工作室，認真做好玩。",
+    "A small studio. Serious about fun."
+  ],
+  "One Goods Studio，把原创设计变成日常里可以触碰的小快乐。": [
+    "One Goods Studio，把原創設計變成日常裡可以觸碰的小快樂。",
+    "One Goods Studio turns original ideas into little joys you can hold."
+  ],
+  "认识 OGS": [
+    "認識 OGS",
+    "Meet OGS"
+  ],
+  "好心情，可以很小。": [
+    "好心情，可以很小。",
+    "Good moments come in small things."
+  ],
+  "继续逛逛": [
+    "繼續逛逛",
+    "Keep exploring"
+  ],
+  "解压、有趣，自成一格。": [
+    "紓壓、有趣，自成一格。",
+    "Relaxing. Playful. Uniquely yours."
+  ],
+  "购买与授权说明": [
+    "購買與授權說明",
+    "Buying and licensing"
+  ],
+  "关闭商品详情": [
+    "關閉商品詳情",
+    "Close product details"
+  ],
+  "关闭说明": [
+    "關閉說明",
+    "Close information"
+  ],
+  "当前商品尚未开售。实体商品开售后将通过 7-ELEVEN 賣貨便完成下单、付款和配送选择。销售币种为新台币（TWD / NT$）。": [
+    "目前商品尚未開賣。實體商品開賣後將透過 7-ELEVEN 賣貨便完成下單、付款與配送選擇。計價幣別為新臺幣（TWD / NT$）。",
+    "Products are not yet on sale. Once available, physical goods will be ordered and paid for through 7-ELEVEN MyShip, where delivery options will also be selected. Prices are in New Taiwan dollars (TWD / NT$)."
+  ],
+  "实体商品": [
+    "實體商品",
+    "Physical goods"
+  ],
+  "正式销售时，商品页将列明价格、规格、材质、配件与配送信息。": [
+    "正式販售時，商品頁將列明價格、規格、材質、配件與配送資訊。",
+    "Final product listings will specify prices, specifications, materials, included parts and delivery information."
+  ],
+  "数字文件": [
+    "數位檔案",
+    "Digital files"
+  ],
+  "数字文件不包含实体商品。购买前需核对文件格式、所需配件、打印要求及授权范围。": [
+    "數位檔案不包含實體商品。購買前請核對檔案格式、所需配件、列印要求及授權範圍。",
+    "Digital files do not include physical goods. Check file formats, required parts, printing requirements and license terms before buying."
+  ],
+  "原创 3D 打印小物与数字设计。探索按压、旋转的小快乐。": [
+    "原創 3D 列印小物與數位設計。探索按壓、旋轉的小快樂。",
+    "Original 3D printed objects and digital designs. Discover the little joys of pressing and spinning."
+  ],
+  "拿在手里，": [
+    "拿在手裡，",
+    "Little things,<br>"
+  ],
+  "才是": [
+    "才是",
+    "hands-on "
+  ],
+  "小快乐。": [
+    "小快樂。",
+    "happiness."
+  ],
+  "按压派、旋转派。选一种玩法，找到合拍的日常小物。": [
+    "按壓派、旋轉派。選一種玩法，找到合拍的日常小物。",
+    "Press or spin. Find a playful companion for everyday life."
+  ],
+  "实体小物，选一种玩法。": [
+    "實體小物，選一種玩法。",
+    "Find your kind of fun."
+  ],
+  "按玩法筛选": [
+    "依玩法篩選",
+    "Filter by play style"
+  ],
+  "全部实体产品": [
+    "全部實體商品",
+    "All physical goods"
+  ],
+  "按压派": [
+    "按壓派",
+    "Press"
+  ],
+  "旋转派": [
+    "旋轉派",
+    "Spin"
+  ],
+  "新台币 TWD / NT$ · 暂未开售": [
+    "新臺幣 TWD / NT$ · 尚未開賣",
+    "TWD / NT$ · Not yet on sale"
+  ],
+  "探索实体按压玩具、旋转小物与挂饰，使用新台币计价。": [
+    "探索實體按壓玩具、旋轉小物與吊飾，以新臺幣計價。",
+    "Explore physical press toys, spinning objects and charms. Prices in TWD."
+  ],
+  "好点子，": [
+    "好點子，",
+    "Good ideas,<br>"
+  ],
+  "由你": [
+    "由你",
+    "you "
+  ],
+  "打印。": [
+    "列印。",
+    "make them."
+  ],
+  "这里是 One Goods Studio 的设计文档专区。": [
+    "這裡是 One Goods Studio 的設計檔案專區。",
+    "Welcome to the One Goods Studio design library."
+  ],
+  "选择数字设计，使用自己的打印机，把喜欢带进现实。": [
+    "選擇數位設計，使用自己的列印機，把喜歡帶進現實。",
+    "Choose a digital design and bring it to life with your own printer."
+  ],
+  "虚拟商品 · 不含实体产品": [
+    "數位商品 · 不含實體商品",
+    "Digital goods · No physical product included"
+  ],
+  "一份设计，": [
+    "一份設計，",
+    "One design.<br>"
+  ],
+  "一次亲手制作的乐趣。": [
+    "一次親手製作的樂趣。",
+    "The joy of making."
+  ],
+  "设计文件与实体产品分开浏览。每份设计的文件格式、配件、打印与组装要求，以及使用授权，均以对应商品说明为准。": [
+    "設計檔案與實體商品分開瀏覽。每份設計的檔案格式、配件、列印與組裝要求，以及使用授權，均以對應商品說明為準。",
+    "Design files and physical goods are listed separately. See each listing for file formats, parts, printing and assembly requirements, and licensing."
+  ],
+  "想直接玩？浏览实体产品": [
+    "想直接玩？瀏覽實體商品",
+    "Ready to play? Browse physical goods"
+  ],
+  "原创设计文档": [
+    "原創設計檔案",
+    "Original design files"
+  ],
+  "购买文件前，先看这些。": [
+    "購買檔案前，先看這些。",
+    "Before choosing a file"
+  ],
+  "01 / 文件与版本": [
+    "01 / 檔案與版本",
+    "01 / Files and versions"
+  ],
+  "确认文件格式与适用软件，了解你将收到的内容。": [
+    "確認檔案格式與適用軟體，了解你將收到的內容。",
+    "Check formats, compatible software and what is included."
+  ],
+  "02 / 打印与组装": [
+    "02 / 列印與組裝",
+    "02 / Printing and assembly"
+  ],
+  "核对打印要求、额外配件与组装说明。": [
+    "核對列印要求、額外配件與組裝說明。",
+    "Check printing requirements, additional parts and assembly instructions."
+  ],
+  "03 / 使用授权": [
+    "03 / 使用授權",
+    "03 / Licensing"
+  ],
+  "个人制作、商业使用及文件分享，以每份设计的授权范围为准。": [
+    "個人製作、商業使用及檔案分享，以每份設計的授權範圍為準。",
+    "Personal making, commercial use and file sharing are subject to each design's license."
+  ],
+  "设计预览与文件内容尚未公布。数字商品不包含打印成品，当前不开放付款或文件下载。": [
+    "設計預覽與檔案內容尚未公布。數位商品不包含列印成品，目前不開放付款或檔案下載。",
+    "Design previews and file contents have not been announced. Digital goods do not include printed objects. Payment and downloads are not currently available."
+  ],
+  "原创数字设计文档、制作与授权说明，以及 OGS 的 MakerWorld 主页。": [
+    "原創數位設計檔案、製作與授權說明，以及 OGS 的 MakerWorld 主頁。",
+    "Original digital designs, making and licensing guides, and the OGS MakerWorld profile."
+  ],
+  "解压、有趣，": [
+    "紓壓、有趣，",
+    "Relaxing. Playful.<br>"
+  ],
+  "自成一格。": [
+    "自成一格。",
+    "Uniquely yours."
+  ],
+  "用认真设计的小东西，为生活留一点轻松。": [
+    "用認真設計的小東西，為生活留一點輕鬆。",
+    "Thoughtfully designed little things for lighter moments."
+  ],
+  "认真设计，": [
+    "認真設計，",
+    "Thoughtful design.<br>"
+  ],
+  "轻松一点。": [
+    "輕鬆一點。",
+    "A lighter day."
+  ],
+  "One Goods Studio 是一个围绕原创 3D 打印小物展开的独立设计品牌。": [
+    "One Goods Studio 是一個以原創 3D 列印小物為核心的獨立設計品牌。",
+    "One Goods Studio is an independent design brand focused on original 3D printed objects."
+  ],
+  "我们关心可爱的外表，也关心手指按下去、轻轻转动时的那一点乐趣。从桌上的玩具到包上的挂饰，让设计成为日常里可以触碰的小快乐。": [
+    "我們關心可愛的外表，也關心手指按下去、輕輕轉動時的那一點樂趣。從桌上的玩具到包上的吊飾，讓設計成為日常裡可以觸碰的小快樂。",
+    "We care about playful looks and the satisfying feel of a press or a gentle spin. From desk toys to bag charms, we make little joys you can hold."
+  ],
+  "从自己的点子开始。": [
+    "從自己的點子開始。",
+    "It starts with an idea."
+  ],
+  "围绕原创 3D 打印设计，探索小物的造型和玩法。": [
+    "圍繞原創 3D 列印設計，探索小物的造型和玩法。",
+    "Exploring form and play through original 3D print design."
+  ],
+  "好玩，发生在指尖。": [
+    "好玩，發生在指尖。",
+    "Fun at your fingertips."
+  ],
+  "关注按下去、转起来时，人与物件之间的小小互动。": [
+    "關注按下去、轉起來時，人與物件之間的小小互動。",
+    "Celebrating the little interactions of a press or a spin."
+  ],
+  "带进真实的日常。": [
+    "帶進真實的日常。",
+    "Made for everyday moments."
+  ],
+  "在桌面、包上或手边，让喜欢的小东西陪伴生活。": [
+    "在桌面、包上或手邊，讓喜歡的小東西陪伴生活。",
+    "On your desk, on your bag or close at hand — small companions for daily life."
+  ],
+  "再多了解一点。": [
+    "再多了解一點。",
+    "A little more to know."
+  ],
+  "成品和数字文件有什么区别？": [
+    "成品和數位檔案有什麼區別？",
+    "How do physical goods and digital files differ?"
+  ],
+  "成品是实体小物；数字文件是供自行制作使用的电子文件，不包含实体商品。正式销售时会分别标明交付内容。": [
+    "成品是實體小物；數位檔案是供自行製作使用的電子檔案，不包含實體商品。正式販售時會分別標明交付內容。",
+    "Physical goods are tangible objects. Digital files are for making your own and do not include physical goods. Final listings will specify what is included."
+  ],
+  "按压和旋转，是两种不同玩法吗？": [
+    "按壓和旋轉，是兩種不同玩法嗎？",
+    "Are pressing and spinning different play styles?"
+  ],
+  "是的。按压系列围绕机械按键的触感展开；旋转系列围绕手指转动的玩法展开。具体结构与配件以对应商品说明为准。": [
+    "是的。按壓系列著重機械按鍵的觸感；旋轉系列著重手指轉動的玩法。具體結構與配件以對應商品說明為準。",
+    "Yes. Press designs focus on the feel of mechanical switches; spin designs focus on finger-driven rotation. See each listing for structure and parts."
+  ],
+  "数字文件可以打印后出售吗？": [
+    "數位檔案可以列印後出售嗎？",
+    "Can I sell prints made from digital files?"
+  ],
+  "不同设计可能采用不同授权。购买前请查看对应商品的授权范围；未明确授权时，请勿将文件转售或用于商业生产。": [
+    "不同設計可能採用不同授權。購買前請查看對應商品的授權範圍；未明確授權時，請勿將檔案轉售或用於商業生產。",
+    "Licenses vary by design. Check the specific terms before buying. Do not resell files or use them for commercial production without explicit permission."
+  ],
+  "现在可以购买吗？": [
+    "現在可以購買嗎？",
+    "Can I buy now?"
+  ],
+  "商品尚未开售。开售后，可通过商品页前往 7-ELEVEN 賣貨便下单。": [
+    "商品尚未開賣。開賣後，可透過商品頁前往 7-ELEVEN 賣貨便下單。",
+    "Products are not yet on sale. Once available, product pages will link to 7-ELEVEN MyShip for ordering."
+  ],
+  "认识 One Goods Studio，一个围绕原创 3D 打印小物的独立设计品牌。": [
+    "認識 One Goods Studio，一個以原創 3D 列印小物為核心的獨立設計品牌。",
+    "Meet One Goods Studio, an independent brand for original 3D printed objects."
+  ],
+  "商品详情": [
+    "商品詳情",
+    "Product details"
+  ],
+  "查看 OGS 商品内容及购买说明。": [
+    "查看 OGS 商品內容及購買說明。",
+    "View OGS product information and buying details."
+  ],
+  "返回实体产品": [
+    "返回實體商品",
+    "Back to physical goods"
+  ],
+  "浏览实体产品": [
+    "瀏覽實體商品",
+    "Browse physical goods"
+  ],
+  "按压解压小物": [
+    "按壓紓壓小物",
+    "Press fidgets"
+  ],
+  "按键挂饰": [
+    "按鍵吊飾",
+    "Key-switch charms"
+  ],
+  "旋转解压小物": [
+    "旋轉紓壓小物",
+    "Spin fidgets"
+  ],
+  "数字设计文件": [
+    "數位設計檔案",
+    "Digital design files"
+  ],
+  "打印成品": [
+    "列印成品",
+    "Printed object"
+  ],
+  "按一下，给思绪放个小假。": [
+    "按一下，給思緒放個小假。",
+    "A little press. A little pause."
+  ],
+  "把一朵软乎乎的好心情，挂在身边。": [
+    "把一朵軟乎乎的好心情，掛在身邊。",
+    "Carry a little cloud of happiness."
+  ],
+  "手指转一圈，日常多一点轻松。": [
+    "手指轉一圈，日常多一點輕鬆。",
+    "A gentle spin for a lighter moment."
+  ],
+  "用自己的打印机，让一个好点子成形。": [
+    "用自己的列印機，讓一個好點子成形。",
+    "Bring a good idea to life with your own printer."
+  ],
+  "围绕机械按压触感展开的产品类别。具体造型、规格与配件以商品正式发布为准。": [
+    "以機械按壓觸感為主的商品類別。具體造型、規格與配件以商品正式發布為準。",
+    "A category exploring mechanical press feedback. Final listings will confirm designs, specifications and parts."
+  ],
+  "将按键玩法带在身边的挂饰类别。具体产品照片、规格与配件以正式发布为准。": [
+    "將按鍵玩法帶在身邊的吊飾類別。具體商品照片、規格與配件以正式發布為準。",
+    "Charms that bring key-switch play along with you. Final listings will confirm photos, specifications and parts."
+  ],
+  "围绕手指旋转玩法展开的解压小物类别。具体造型、结构与配件以正式发布为准。": [
+    "以手指旋轉玩法為主的紓壓小物類別。具體造型、結構與配件以正式發布為準。",
+    "A category of finger-spun fidgets. Final listings will confirm designs, structure and parts."
+  ],
+  "面向希望自行打印和组装的使用者。商品照片、文件格式、配件及授权范围以正式发布为准。": [
+    "提供給希望自行列印和組裝的使用者。商品照片、檔案格式、配件及授權範圍以正式發布為準。",
+    "For makers who want to print and assemble their own. Final listings will confirm images, formats, parts and license terms."
+  ],
+  "虚拟商品": [
+    "數位商品",
+    "Digital goods"
+  ],
+  "数字设计": [
+    "數位設計",
+    "Digital designs"
+  ],
+  "自行打印 · 不含实体产品": [
+    "自行列印 · 不含實體商品",
+    "Print your own · No physical product"
+  ],
+  "探索此类别": [
+    "探索此類別",
+    "Explore this category"
+  ],
+  "商品尚未开售": [
+    "商品尚未開賣",
+    "Products are not yet on sale"
+  ],
+  "尚未开售": [
+    "尚未開賣",
+    "Not yet on sale"
+  ],
+  "商品类别": [
+    "商品類別",
+    "Product category"
+  ],
+  "售价未公布": [
+    "售價未公布",
+    "Price not announced"
+  ],
+  "查看详情": [
+    "查看詳情",
+    "View details"
+  ],
+  "查看": [
+    "查看",
+    "View "
+  ],
+  "详情": [
+    "詳情",
+    " details"
+  ],
+  "设计文档尚未开售，文件内容与授权以正式发布为准。": [
+    "設計檔案尚未開賣，檔案內容與授權以正式發布為準。",
+    "Design files are not yet on sale. Final listings will confirm contents and license terms."
+  ],
+  "我的 MakerWorld 设计主页": [
+    "我們的 MakerWorld 設計主頁",
+    "Our designs on MakerWorld"
+  ],
+  "没有找到这件商品。": [
+    "找不到這件商品。",
+    "Product not found."
+  ],
+  "请返回实体产品页，重新选择。": [
+    "請返回實體商品頁，重新選擇。",
+    "Please return to physical goods and choose another item."
+  ],
+  "前往 7-ELEVEN 賣貨便购买": [
+    "前往 7-ELEVEN 賣貨便購買",
+    "Buy on 7-ELEVEN MyShip"
+  ],
+  "购买渠道：7-ELEVEN 賣貨便": [
+    "購買管道：7-ELEVEN 賣貨便",
+    "Order through 7-ELEVEN MyShip"
+  ],
+  "产品照片、材质、尺寸及售价以正式发布为准。当前尚未开售。": [
+    "商品照片、材質、尺寸及售價以正式發布為準。目前尚未開賣。",
+    "Final listings will confirm photos, materials, dimensions and prices. Products are not yet on sale."
+  ],
+  "12 个独立机械按键，把键盘的手感握进掌心。": [
+    "12 個獨立機械按鍵，把鍵盤的手感握進掌心。",
+    "Twelve independent mechanical keys. Keyboard feel in the palm of your hand."
+  ],
+  "手雷造型与机械键轴结合的掌心解压小物。12 个大面板可独立按压，其余小面板为固定造型件。转动握持角度，找到下一个想按的位置。": [
+    "手雷造型與機械鍵軸結合的掌心紓壓小物。12 個大面板可獨立按壓，其餘小面板為固定造型件。轉動握持角度，找到下一個想按的位置。",
+    "A grenade-shaped mechanical fidget for everyday breaks. Twelve large panels press independently; the small panels are fixed details. Turn it in your hand and find your next key."
+  ],
+  "Keynade MX 金色成品正面实拍": [
+    "Keynade MX 金色成品正面實拍",
+    "Original front photograph of the gold Keynade MX"
+  ],
+  "Keynade MX 商品实拍": [
+    "Keynade MX 商品實拍",
+    "Keynade MX product photograph"
+  ],
+  "Keynade MX · 商品实拍": [
+    "Keynade MX · 商品實拍",
+    "Keynade MX · Original photograph"
+  ],
+  "认识 Keynade MX": [
+    "認識 Keynade MX",
+    "Meet Keynade MX"
+  ],
+  "全站以新台币（TWD / NT$）计价。Keynade MX 现展示实拍与产品资料，其他类别尚未公布商品。": [
+    "全站以新臺幣（TWD / NT$）計價。Keynade MX 現展示實拍與產品資料，其他類別尚未公布商品。",
+    "All prices are in New Taiwan dollars (TWD / NT$). Keynade MX is shown with original photographs and product information; products in other categories have not been announced."
+  ],
+  "正面实拍": [
+    "正面實拍",
+    "Front view"
+  ],
+  "侧面实拍": [
+    "側面實拍",
+    "Side view"
+  ],
+  "顶部与装饰插销实拍": [
+    "頂部與裝飾插銷實拍",
+    "Top and decorative pin"
+  ],
+  "商品实拍视角": [
+    "商品實拍視角",
+    "Product photo views"
+  ],
+  "12 键机械按压手雷": [
+    "12 鍵機械按壓手雷",
+    "12-Key Mechanical Fidget Grenade"
+  ],
+  "独立按键": [
+    "獨立按鍵",
+    "Independent keys"
+  ],
+  "机械键轴结构": [
+    "機械鍵軸結構",
+    "Switch format"
+  ],
+  "金属珠链随附": [
+    "金屬珠鏈隨附",
+    "Ball chain included"
+  ],
+  "已组装成品，包含 12 颗已安装轴体与 1 条金属珠链。": [
+    "已組裝成品，包含 12 顆已安裝軸體與 1 條金屬珠鏈。",
+    "Fully assembled, with 12 switches installed and one metal ball chain included."
+  ],
+  "让每一次按压，都有手感。": [
+    "讓每一次按壓，都有手感。",
+    "A little more feel in every press."
+  ],
+  "几何外壳上的 12 个大面板，都是可独立按压的机械按键。顶部插销可以拔出、插回，是造型与把玩的装饰细节。": [
+    "幾何外殼上的 12 個大面板，都是可獨立按壓的機械按鍵。頂部插銷可以拔出、插回，是造型與把玩的裝飾細節。",
+    "The twelve large geometric panels are independent mechanical keys. The top pin pulls out and slides back in as a decorative, hands-on detail."
+  ],
+  "3D 打印的层纹与金色闪点，保留在真实物件的表面。按压声音与手感依搭配的轴体而定。": [
+    "3D 列印的層紋與金色閃點，保留在真實物件的表面。按壓聲音與手感依搭配的軸體而定。",
+    "Visible 3D print layers and gold sparkle are part of the real object. Sound and feel depend on the installed switches."
+  ],
+  "规格与随附内容": [
+    "規格與隨附內容",
+    "Specifications and included items"
+  ],
+  "品名": [
+    "品名",
+    "Product"
+  ],
+  "按键数量": [
+    "按鍵數量",
+    "Key count"
+  ],
+  "12 个独立机械按键": [
+    "12 個獨立機械按鍵",
+    "12 independent mechanical keys"
+  ],
+  "轴体结构": [
+    "軸體結構",
+    "Switch format"
+  ],
+  "配色": [
+    "配色",
+    "Finish"
+  ],
+  "金色闪点，依实拍展示": [
+    "金色閃點，依實拍展示",
+    "Gold sparkle, as photographed"
+  ],
+  "成品配置": [
+    "成品配置",
+    "Assembled product"
+  ],
+  "Keynade MX ×1，已组装并安装 12 颗轴体": [
+    "Keynade MX ×1，已組裝並安裝 12 顆軸體",
+    "1 assembled Keynade MX with 12 switches installed"
+  ],
+  "随附配件": [
+    "隨附配件",
+    "Included accessory"
+  ],
+  "金属珠链 ×1": [
+    "金屬珠鏈 ×1",
+    "1 metal ball chain"
+  ],
+  "价格": [
+    "價格",
+    "Price"
+  ],
+  "关于这件小物": [
+    "關於這件小物",
+    "About this little object"
+  ],
+  "顶部插销为装饰零件；小面板为固定造型件，12 个大面板可按压。实拍中的场景物件不属于随附内容。": [
+    "頂部插銷為裝飾零件；小面板為固定造型件，12 個大面板可按壓。實拍中的場景物件不屬於隨附內容。",
+    "The top pin is decorative. Small panels are fixed; twelve large panels can be pressed. Scene props in the photographs are not included."
+  ],
+  "当前仅展示产品资料，尚未开售。": [
+    "目前僅展示產品資料，尚未開賣。",
+    "Product information only. Not yet on sale."
+  ]
 }
