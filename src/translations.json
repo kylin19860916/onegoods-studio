@@ -694,5 +694,9 @@
   "当前仅展示产品资料，尚未开售。": [
     "目前僅展示產品資料，尚未開賣。",
     "Product information only. Not yet on sale."
+  ],
+  "商品照片经过 AI 辅助统一色调、光线与背景。": [
+    "商品照片經過 AI 輔助統一色調、光線與背景。",
+    "Product photos are AI-assisted to harmonize color, lighting and backgrounds."
   ]
 }
