@@ -59,3 +59,9 @@ html[lang="en"] .product-meta{letter-spacing:.03em;flex-wrap:wrap}
 .products>.product-card{width:100%;min-width:0;border:1px solid #29233150}
 .products .product-art{width:100%;max-width:100%;box-sizing:border-box}
 @media(max-width:650px){.shop .products{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Rounded Traditional Chinese display face; body text and outlined brand assets stay independent. */
+@font-face{font-family:"OGS Heading Rounded";src:url("assets/fonts/ogs-heading-rounded-v1.woff2") format("woff2");font-style:normal;font-weight:200 900;font-display:swap}
+html[lang="zh-Hant"] h1,html[lang="zh-Hant"] h2{font-family:"OGS Heading Rounded","PingFang TC",sans-serif;font-synthesis:none;letter-spacing:-.025em}
+html[lang="zh-Hant"] h1{font-weight:750}
+html[lang="zh-Hant"] h2{font-weight:650;line-height:1.35}
