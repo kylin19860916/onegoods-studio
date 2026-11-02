@@ -16,7 +16,7 @@ export function validateProduct(input:any){
  check(['draft','published','archived'].includes(input.status),'商品狀態不正確。');
  const name=text(input.name,150);check(name,'請填寫商品名稱。');
  const price=input.price===null||input.price===''||input.price===undefined?null:Number(input.price);check(price===null||(Number.isFinite(price)&&price>=0&&price<=10000000),'價格必須是有效的非負數。');
- const category=input.kind==='design'?'file':input.category;check(['press','spin','other','file'].includes(category),'請選擇玩法分類。');
+ const category=input.kind==='design'?'file':input.category;check(input.kind==='design'||['press','spin','other'].includes(category),'請選擇正確的實體玩法分類。');
  check(Array.isArray(input.images)&&input.images.length<=12,'圖片最多12張。');
  const images=input.images.map((im:any)=>{const url=text(im.url,2048);check(/^\/media\/[a-f0-9-]+$/.test(url)||/^\/?assets\/[a-zA-Z0-9_/.\-]+$/.test(url)||/^https:\/\//.test(url),'圖片網址不正確。');check(!url.includes('..'),'圖片路徑不正確。');if(url.startsWith('https:'))safeLink(url);return {url,alt:text(im.alt,250)};});
  const purchaseUrl=safeLink(input.purchaseUrl,['myship.7-11.com.tw']);

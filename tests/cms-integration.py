@@ -24,6 +24,7 @@ s,b=req('/api/admin/catalog/'+p['id'],'PUT',p);ok(s==409,'stale revision rejecte
 p=new;items=obj(req('/api/catalog',client=anon)[1])['items'];public=next(x for x in items if x['id']==p['id']);ok('internalNotes' not in public and 'fileIds' not in public,'private notes and attachment IDs stripped from public response')
 bad=p.copy();bad['saleStatus']='available';bad['purchaseUrl']='';ok(req('/api/admin/catalog/'+p['id'],'PUT',bad)[0]==400,'sale requires verified platform URL')
 bad=p.copy();bad['price']=-1;ok(req('/api/admin/catalog/'+p['id'],'PUT',bad)[0]==400,'invalid price rejected')
+bad=p.copy();bad['category']='file';ok(req('/api/admin/catalog/'+p['id'],'PUT',bad)[0]==400,'physical goods cannot enter digital category')
 def upload(content,name,kind,mime):
  boundary='ogstest'+uuid.uuid4().hex
  body=(f'--{boundary}\r\nContent-Disposition: form-data; name="kind"\r\n\r\n{kind}\r\n--{boundary}\r\nContent-Disposition: form-data; name="file"; filename="{name}"\r\nContent-Type: {mime}\r\n\r\n'.encode()+content+f'\r\n--{boundary}--\r\n'.encode())
