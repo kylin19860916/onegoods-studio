@@ -47,13 +47,12 @@ html[lang="en"] .product-meta{letter-spacing:.03em;flex-wrap:wrap}
 .keynade-hero{height:auto;min-height:0;aspect-ratio:1;align-self:center;background:transparent}.keynade-hero .hero-photo{object-fit:cover;object-position:center}.gallery-thumbs button{aspect-ratio:1;height:auto}.real-product-image{object-position:center}
 
 /* Brand hero and square catalog photography. */
-.studio-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;align-self:stretch;gap:14px;height:auto;min-height:0;padding:48px clamp(24px,5vw,80px);background:transparent;border-left:0}
-.studio-hero .hero-photo{position:static;inset:auto;display:block;width:100%;max-width:352px;height:auto;max-height:440px;object-fit:contain;object-position:center;border-radius:14px}
-.studio-hero .concept-caption{position:static;max-width:352px;margin:0;padding:0;border:0;background:transparent;color:#635b69;font-size:10px;line-height:1.6;text-align:center}
+.studio-hero{display:block;align-self:stretch;height:auto;min-height:0;padding:0;background:transparent;border-left:0}
+.studio-hero .hero-photo{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;object-position:center;border-radius:0}
 .products .product-art{aspect-ratio:1 / 1;width:100%;height:auto;min-height:0;padding:0;border-bottom:var(--line)}
 .products .product-art:has(.real-product-image){display:block;background:transparent!important}
 .products .product-art>.real-product-image{width:100%;height:auto;aspect-ratio:1 / 1;object-fit:cover;object-position:center;display:block;flex:none}
-@media(max-width:650px){.studio-hero{height:auto;min-height:0;padding:0 9% 36px;gap:12px}.studio-hero .hero-photo{width:min(100%,280px);max-height:350px}.studio-hero .concept-caption{font-size:9px}}
+@media(max-width:650px){.studio-hero{height:auto;min-height:0;aspect-ratio:4 / 5;padding:0}}
 
 /* Give photographs and empty colour panels the same visible card boundary. */
 .shop .products{grid-template-columns:repeat(3,minmax(0,1fr))}
