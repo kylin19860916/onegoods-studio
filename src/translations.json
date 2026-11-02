@@ -698,5 +698,37 @@
   "商品照片经过 AI 辅助统一色调、光线与背景。": [
     "商品照片經過 AI 輔助統一色調、光線與背景。",
     "Product photos are AI-assisted to harmonize color, lighting and backgrounds."
+  ],
+  "商品资料暂时无法载入，请稍后重新整理页面。": [
+    "商品資料暫時無法載入，請稍後重新整理頁面。",
+    "Product information could not be loaded. Please refresh the page."
+  ],
+  "目前没有符合条件的商品。": [
+    "目前沒有符合條件的商品。",
+    "No items match this selection."
+  ],
+  "商品介绍": [
+    "商品介紹",
+    "About this product"
+  ],
+  "全站以新台币（TWD / NT$）计价。实体成品与数字设计文件分开浏览。": [
+    "全站以新臺幣（TWD / NT$）計價。實體成品與數位設計檔案分開瀏覽。",
+    "Prices are in New Taiwan dollars (TWD / NT$). Physical products and digital designs are listed separately."
+  ],
+  "数字商品不包含打印成品。文件内容、打印要求与授权，请查看对应的设计说明。": [
+    "數位商品不包含列印成品。檔案內容、列印要求與授權，請查看對應的設計說明。",
+    "Digital designs do not include printed objects. See each design for file contents, printing requirements and licensing."
+  ],
+  "实体商品的下单、付款和配送选择通过 7-ELEVEN 賣貨便完成，是否开售以对应商品页为准。销售币种为新台币（TWD / NT$）。": [
+    "實體商品的下單、付款與配送選擇透過 7-ELEVEN 賣貨便完成，是否開售以對應商品頁為準。銷售幣別為新臺幣（TWD / NT$）。",
+    "Orders, payments and shipping for physical goods are handled by 7-ELEVEN MyShip. Check each product for availability. Prices are in New Taiwan dollars (TWD / NT$)."
+  ],
+  "新台币 TWD / NT$": [
+    "新臺幣 TWD / NT$",
+    "New Taiwan dollars / NT$"
+  ],
+  "请查看对应商品页的销售状态。已开售的实体商品会显示 7-ELEVEN 賣貨便下单入口。": [
+    "請查看對應商品頁的銷售狀態。已開售的實體商品會顯示 7-ELEVEN 賣貨便下單入口。",
+    "Check the availability on each product page. Physical products on sale show a 7-ELEVEN MyShip order link."
   ]
 }

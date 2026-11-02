@@ -3,7 +3,7 @@ from pathlib import Path
 import json, re, hashlib
 
 root = Path(__file__).resolve().parent
-src, dist = root / 'src', root / 'dist'
+src, dist = root / 'src', root / 'public'
 translations = json.loads((src / 'translations.json').read_text())
 pattern = re.compile('|'.join(re.escape(k) for k in sorted(translations, key=len, reverse=True)))
 origin = 'https://one-goods-studio.kylin1986.chatgpt.site'
@@ -51,3 +51,8 @@ for lang, folder, column in locales:
 (dist / 'style.css').write_text((src / 'style.css').read_text())
 (dist / 'locale.js').write_text((src / 'locale.js').read_text())
 print('Built 3 locales × 6 routes, localized product data and metadata.')
+
+# Shared admin assets are private-data free; record access is enforced by the server.
+import shutil
+for name in ["admin.css", "admin.js"]:
+    shutil.copy2(root / "admin" / name, dist / name)

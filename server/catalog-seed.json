@@ -1,0 +1,254 @@
+[
+  {
+    "id": "keynade-mx",
+    "kind": "physical",
+    "category": "press",
+    "status": "published",
+    "name": "Keynade MX",
+    "tagline": "12-KEY MECHANICAL FIDGET",
+    "description": "12 個獨立機械按鍵，把鍵盤的手感握進掌心。",
+    "detail": "手雷造型與機械鍵軸結合的掌心紓壓小物。12 個大面板可獨立按壓，其餘小面板為固定造型件。轉動握持角度，找到下一個想按的位置。",
+    "price": 499,
+    "color": "#eee8de",
+    "images": [
+      {
+        "url": "assets/keynade/01-front-retouched-v2.jpg",
+        "alt": "Keynade MX 金色成品正面實拍"
+      },
+      {
+        "url": "assets/keynade/02-side-retouched-v2.jpg",
+        "alt": "側面實拍"
+      },
+      {
+        "url": "assets/keynade/03-top-and-pin-retouched-v2.jpg",
+        "alt": "頂部與裝飾插銷實拍"
+      }
+    ],
+    "specs": [
+      {
+        "label": "按鍵數量",
+        "value": "12 個獨立機械按鍵"
+      },
+      {
+        "label": "軸體結構",
+        "value": "MX-Style"
+      },
+      {
+        "label": "配色",
+        "value": "金色閃點，依實拍展示"
+      },
+      {
+        "label": "成品配置",
+        "value": "Keynade MX ×1，已組裝並安裝 12 顆軸體"
+      },
+      {
+        "label": "隨附配件",
+        "value": "金屬珠鏈 ×1"
+      }
+    ],
+    "fileIds": [],
+    "saleStatus": "coming_soon",
+    "purchaseUrl": "",
+    "makerworldUrl": "",
+    "version": "",
+    "license": "",
+    "printingNotes": "",
+    "included": "已組裝成品，包含 12 顆已安裝軸體與 1 條金屬珠鏈。",
+    "internalNotes": "",
+    "sortOrder": 10,
+    "isPlaceholder": false,
+    "keynadeFacts": true,
+    "translations": {
+      "zh-Hans": {
+        "name": "Keynade MX",
+        "description": "12 个独立机械按键，把键盘的手感握进掌心。",
+        "detail": "手雷造型与机械键轴结合的掌心解压小物。12 个大面板可独立按压，其余小面板为固定造型件。转动握持角度，找到下一个想按的位置。",
+        "tagline": "12-KEY MECHANICAL FIDGET",
+        "included": "已组装成品，包含 12 颗已安装轴体与 1 条金属珠链。",
+        "specs": [
+          {
+            "label": "按键数量",
+            "value": "12 个独立机械按键"
+          },
+          {
+            "label": "轴体结构",
+            "value": "MX-Style"
+          },
+          {
+            "label": "配色",
+            "value": "金色闪点，依实拍展示"
+          },
+          {
+            "label": "成品配置",
+            "value": "Keynade MX ×1，已组装并安装 12 颗轴体"
+          },
+          {
+            "label": "随附配件",
+            "value": "金属珠链 ×1"
+          }
+        ]
+      },
+      "en": {
+        "name": "Keynade MX",
+        "description": "Twelve independent mechanical keys. Keyboard feel in the palm of your hand.",
+        "detail": "A grenade-shaped mechanical fidget for everyday breaks. Twelve large panels press independently; the small panels are fixed details. Turn it in your hand and find your next key.",
+        "tagline": "12-KEY MECHANICAL FIDGET",
+        "included": "Fully assembled, with 12 switches installed and one metal ball chain included.",
+        "specs": [
+          {
+            "label": "Key count",
+            "value": "12 independent mechanical keys"
+          },
+          {
+            "label": "Switch format",
+            "value": "MX-Style"
+          },
+          {
+            "label": "Finish",
+            "value": "Gold sparkle, as photographed"
+          },
+          {
+            "label": "Assembled product",
+            "value": "1 assembled Keynade MX with 12 switches installed"
+          },
+          {
+            "label": "Included accessory",
+            "value": "1 metal ball chain"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "cloud-key",
+    "kind": "physical",
+    "category": "press",
+    "status": "published",
+    "name": "按鍵吊飾",
+    "tagline": "TAKE JOY WITH YOU",
+    "description": "把一朵軟乎乎的好心情，掛在身邊。",
+    "detail": "將按鍵玩法帶在身邊的吊飾類別。具體商品照片、規格與配件以正式發布為準。",
+    "price": null,
+    "color": "#f6dfab",
+    "images": [],
+    "specs": [],
+    "fileIds": [],
+    "saleStatus": "coming_soon",
+    "purchaseUrl": "",
+    "makerworldUrl": "",
+    "version": "",
+    "license": "",
+    "printingNotes": "",
+    "included": "",
+    "internalNotes": "",
+    "sortOrder": 20,
+    "isPlaceholder": true,
+    "keynadeFacts": false,
+    "translations": {
+      "zh-Hans": {
+        "name": "按键挂饰",
+        "description": "把一朵软乎乎的好心情，挂在身边。",
+        "detail": "将按键玩法带在身边的挂饰类别。具体产品照片、规格与配件以正式发布为准。",
+        "tagline": "TAKE JOY WITH YOU",
+        "included": "",
+        "specs": []
+      },
+      "en": {
+        "name": "Key-switch charms",
+        "description": "Carry a little cloud of happiness.",
+        "detail": "Charms that bring key-switch play along with you. Final listings will confirm photos, specifications and parts.",
+        "tagline": "TAKE JOY WITH YOU",
+        "included": "",
+        "specs": []
+      }
+    }
+  },
+  {
+    "id": "spin-ring",
+    "kind": "physical",
+    "category": "spin",
+    "status": "published",
+    "name": "旋轉紓壓小物",
+    "tagline": "ROUND & ROUND",
+    "description": "手指轉一圈，日常多一點輕鬆。",
+    "detail": "以手指旋轉玩法為主的紓壓小物類別。具體造型、結構與配件以正式發布為準。",
+    "price": null,
+    "color": "#f1c6b5",
+    "images": [],
+    "specs": [],
+    "fileIds": [],
+    "saleStatus": "coming_soon",
+    "purchaseUrl": "",
+    "makerworldUrl": "",
+    "version": "",
+    "license": "",
+    "printingNotes": "",
+    "included": "",
+    "internalNotes": "",
+    "sortOrder": 30,
+    "isPlaceholder": true,
+    "keynadeFacts": false,
+    "translations": {
+      "zh-Hans": {
+        "name": "旋转解压小物",
+        "description": "手指转一圈，日常多一点轻松。",
+        "detail": "围绕手指旋转玩法展开的解压小物类别。具体造型、结构与配件以正式发布为准。",
+        "tagline": "ROUND & ROUND",
+        "included": "",
+        "specs": []
+      },
+      "en": {
+        "name": "Spin fidgets",
+        "description": "A gentle spin for a lighter moment.",
+        "detail": "A category of finger-spun fidgets. Final listings will confirm designs, structure and parts.",
+        "tagline": "ROUND & ROUND",
+        "included": "",
+        "specs": []
+      }
+    }
+  },
+  {
+    "id": "good-file",
+    "kind": "design",
+    "category": "file",
+    "status": "published",
+    "name": "數位設計檔案",
+    "tagline": "MAKE YOUR OWN GOOD",
+    "description": "用自己的列印機，讓一個好點子成形。",
+    "detail": "提供給希望自行列印和組裝的使用者。商品照片、檔案格式、配件及授權範圍以正式發布為準。",
+    "price": null,
+    "color": "#cfdfcd",
+    "images": [],
+    "specs": [],
+    "fileIds": [],
+    "saleStatus": "coming_soon",
+    "purchaseUrl": "",
+    "makerworldUrl": "https://makerworld.com/zh/@OGStudio",
+    "version": "",
+    "license": "",
+    "printingNotes": "",
+    "included": "",
+    "internalNotes": "",
+    "sortOrder": 40,
+    "isPlaceholder": true,
+    "keynadeFacts": false,
+    "translations": {
+      "zh-Hans": {
+        "name": "数字设计文件",
+        "description": "用自己的打印机，让一个好点子成形。",
+        "detail": "面向希望自行打印和组装的使用者。商品照片、文件格式、配件及授权范围以正式发布为准。",
+        "tagline": "MAKE YOUR OWN GOOD",
+        "included": "",
+        "specs": []
+      },
+      "en": {
+        "name": "Digital design files",
+        "description": "Bring a good idea to life with your own printer.",
+        "detail": "For makers who want to print and assemble their own. Final listings will confirm images, formats, parts and license terms.",
+        "tagline": "MAKE YOUR OWN GOOD",
+        "included": "",
+        "specs": []
+      }
+    }
+  }
+]
