@@ -14,6 +14,16 @@
       try { localStorage.setItem('ogs-language', link.dataset.language); } catch (_) {}
     });
   });
+  const menu = document.querySelector('.language-menu');
+  document.addEventListener('click', event => {
+    if (menu && !menu.contains(event.target)) menu.open = false;
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && menu?.open) {
+      menu.open = false;
+      menu.querySelector('summary').focus();
+    }
+  });
   // Direct links to a translated page take priority over remembered preferences.
   if (!inFolder) {
     try {

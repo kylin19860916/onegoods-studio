@@ -32,10 +32,12 @@ for lang, folder, column in locales:
             for alternate, directory, _ in locales:
                 prefix = '../' if folder else ''
                 url = prefix + (directory + '/' if directory else '') + page.name
-                label = {'zh-Hant': '繁體', 'zh-Hans': '简体', 'en': 'EN'}[alternate]
+                label = {'zh-Hant': '繁體中文', 'zh-Hans': '简体中文', 'en': 'English'}[alternate]
                 current = ' aria-current="true"' if lang == alternate else ''
                 options.append(f'<a href="{url}" lang="{alternate}" hreflang="{alternate}" data-language="{alternate}"{current}>{label}</a>')
-            nav = '<nav class="language-switch" aria-label="Language">' + ''.join(options) + '</nav>'
+            current_label = {'zh-Hant': '繁體', 'zh-Hans': '简体', 'en': 'EN'}[lang]
+            switch_label = {'zh-Hant': '切換語言，目前：繁體中文', 'zh-Hans': '切换语言，当前：简体中文', 'en': 'Change language. Current: English'}[lang]
+            nav = f'<nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="{switch_label}">{current_label}<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options">' + ''.join(options) + '</div></details></nav>'
             text = text.replace('</header>', nav + '</header>')
             prefix = '../' if folder else ''
             text = text.replace('<script src="app.js"', f'<script src="{prefix}locale.js" defer></script><script src="app.js"')
