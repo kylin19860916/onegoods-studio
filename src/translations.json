@@ -754,5 +754,41 @@
   "订单、付款与配送由各平台处理。": [
     "訂單、付款與配送由各平台處理。",
     "Orders, payment and delivery are handled by the selected platform."
+  ],
+  "探索模型文件，找到想亲手制作的小物。": [
+    "探索模型檔案，找到想親手製作的小物。",
+    "Explore model files and find something you would like to make."
+  ],
+  "选一份原创设计，<br>使用自己的打印机，把喜欢带进现实。": [
+    "選一份原創設計，<br>使用自己的列印機，把喜歡帶進現實。",
+    "Choose an original design.<br>Bring it to life with your own printer."
+  ],
+  "制作前，请查看设计说明中的文件格式、所需配件、打印与组装要求及使用授权。": [
+    "製作前，請查看設計說明中的檔案格式、所需配件、列印與組裝要求及使用授權。",
+    "Before making, check the design notes for file formats, required parts, printing, assembly and licensing."
+  ],
+  "成品是可直接把玩的实体小物；数字文件供你自行打印和组装，不包含实体商品。": [
+    "成品是可直接把玩的實體小物；數位檔案供你自行列印和組裝，不包含實體商品。",
+    "Physical goods are ready to play with. Digital files are for printing and assembling yourself and do not include a physical product."
+  ],
+  "已开售商品可从商品页选择賣貨便或蝦皮购买；尚未开售的商品会标明状态。": [
+    "已開售商品可從商品頁選擇賣貨便或蝦皮購買；尚未開售的商品會標明狀態。",
+    "For products on sale, choose MyShip or Shopee on the product page. Products not yet on sale are marked accordingly."
+  ],
+  "从商品页选择賣貨便或蝦皮，即可前往购买。": [
+    "從商品頁選擇賣貨便或蝦皮，即可前往購買。",
+    "Choose MyShip or Shopee on the product page to purchase."
+  ],
+  "订单、付款与配送由所选平台处理。购买前，请确认商品内容与平台上的配送信息。": [
+    "訂單、付款與配送由所選平台處理。購買前，請確認商品內容與平台上的配送資訊。",
+    "Orders, payments and delivery are handled by your chosen platform. Check the product contents and delivery details before ordering."
+  ],
+  "探索 OGS 原创按压玩具、旋转小物与随身挂饰。": [
+    "探索 OGS 原創按壓玩具、旋轉小物與隨身掛飾。",
+    "Explore OGS original press toys, spinning objects and carry-along charms."
+  ],
+  "前往 MakerWorld，探索我们的设计。": [
+    "前往 MakerWorld，探索我們的設計。",
+    "Explore our designs on MakerWorld."
   ]
 }
