@@ -27,14 +27,15 @@ export function validateProduct(input:any){
  check(Array.isArray(input.images)&&input.images.length<=12,'圖片最多12張。');
  const images=input.images.map((im:any)=>{const url=text(im.url,2048);check(/^\/media\/[a-f0-9-]+$/.test(url)||/^\/?assets\/[a-zA-Z0-9_/.\-]+$/.test(url)||/^https:\/\//.test(url),'圖片網址不正確。');check(!url.includes('..'),'圖片路徑不正確。');if(url.startsWith('https:'))safeLink(url);return {url,alt:text(im.alt,250)};});
  const purchaseUrl=safeLink(input.purchaseUrl,['myship.7-11.com.tw']);
+ const shopeeUrl=safeLink(input.shopeeUrl,['shopee.tw','www.shopee.tw','s.shopee.tw','tw.shp.ee']);
  const makerworldUrl=safeLink(input.makerworldUrl,['makerworld.com','www.makerworld.com']);
  check(['coming_soon','available'].includes(input.saleStatus),'銷售狀態不正確。');
- if(input.saleStatus==='available')check(input.kind==='physical'?purchaseUrl:makerworldUrl,'開售前請填寫對應的下單或設計頁連結。');
+ if(input.saleStatus==='available')check(input.kind==='physical'?(purchaseUrl||shopeeUrl):makerworldUrl,'開售前請填寫對應的下單或設計頁連結。');
  const specs=Array.isArray(input.specs)?input.specs.slice(0,30).map((s:any)=>({label:text(s.label,100),value:text(s.value,1000)})).filter((s:any)=>s.label&&s.value):[];
  const translations:any={};for(const locale of ['en','zh-Hans']){const t=input.translations?.[locale]||{};translations[locale]={name:text(t.name,150),description:text(t.description,2000),detail:text(t.detail,15000),tagline:text(t.tagline,150),included:text(t.included,3000),license:text(t.license,3000),printingNotes:text(t.printingNotes,5000),specs:Array.isArray(t.specs)?t.specs.slice(0,30).map((s:any)=>({label:text(s.label,100),value:text(s.value,1000)})).filter((s:any)=>s.label&&s.value):[]};}
  const fileIds=Array.isArray(input.fileIds)?input.fileIds.filter((x:any)=>typeof x==='string'&&/^[a-f0-9-]{36}$/.test(x)).slice(0,30):[];
  return {id,kind:input.kind,status:input.status,name,category,price,description:text(input.description,2000),detail:text(input.detail,15000),tagline:text(input.tagline,150),
-  color:/^#[0-9a-fA-F]{6}$/.test(input.color)?input.color:'#eee8f4',images,specs,translations,fileIds,purchaseUrl,makerworldUrl,
+  color:/^#[0-9a-fA-F]{6}$/.test(input.color)?input.color:'#eee8f4',images,specs,translations,fileIds,purchaseUrl,shopeeUrl,makerworldUrl,
   saleStatus:input.saleStatus,version:text(input.version,100),license:text(input.license,3000),printingNotes:text(input.printingNotes,5000),included:text(input.included,3000),
   internalNotes:text(input.internalNotes,5000),sortOrder:Math.max(0,Math.min(99999,Math.round(Number(input.sortOrder)||0))),isPlaceholder:input.isPlaceholder===true,
   keynadeFacts:input.id==='keynade-mx'?input.keynadeFacts===true:false};

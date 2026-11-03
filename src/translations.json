@@ -730,5 +730,29 @@
   "请查看对应商品页的销售状态。已开售的实体商品会显示 7-ELEVEN 賣貨便下单入口。": [
     "請查看對應商品頁的銷售狀態。已開售的實體商品會顯示 7-ELEVEN 賣貨便下單入口。",
     "Check the availability on each product page. Physical products on sale show a 7-ELEVEN MyShip order link."
+  ],
+  "选择购买平台": [
+    "選擇購買平台",
+    "Choose where to buy"
+  ],
+  "賣貨便购买": [
+    "賣貨便購買",
+    "Buy on MyShip"
+  ],
+  "需登入 uniopen 会员": [
+    "需登入 uniopen 會員",
+    "uniopen sign-in required"
+  ],
+  "蝦皮购买": [
+    "蝦皮購買",
+    "Buy on Shopee"
+  ],
+  "前往 Shopee 商品页": [
+    "前往 Shopee 商品頁",
+    "View on Shopee"
+  ],
+  "订单、付款与配送由各平台处理。": [
+    "訂單、付款與配送由各平台處理。",
+    "Orders, payment and delivery are handled by the selected platform."
   ]
 }
