@@ -47,7 +47,7 @@ html[lang="en"] .product-meta{letter-spacing:.03em;flex-wrap:wrap}
 .keynade-hero{height:auto;min-height:0;aspect-ratio:1;align-self:center;background:transparent}.keynade-hero .hero-photo{object-fit:cover;object-position:center}.gallery-thumbs button{aspect-ratio:1;height:auto}.real-product-image{object-position:center}
 
 /* Brand hero and square catalog photography. */
-.studio-hero{display:block;align-self:stretch;height:auto;min-height:0;aspect-ratio:1 / 1;padding:0;background:transparent;border-left:0}
+.studio-hero{display:block;align-self:stretch;width:100%;min-width:0;height:auto;min-height:0;aspect-ratio:1 / 1;padding:0;background:transparent;border-left:0}
 .studio-hero .hero-photo{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;object-position:50% 85%;transform:scale(1.1);transform-origin:50% 100%;border-radius:0}
 .products .product-art{aspect-ratio:1 / 1;width:100%;height:auto;min-height:0;padding:0;border-bottom:var(--line)}
 .products .product-art:has(.real-product-image){display:block;background:transparent!important}
