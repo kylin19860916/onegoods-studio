@@ -1,4 +1,11 @@
 import seed from './catalog-seed.json';
+const defaultCategories=[
+ {id:'press',name:'按壓派',nameEn:'Press & relax',nameZhHans:'按压派',sortOrder:10,active:true},
+ {id:'spin',name:'旋轉派',nameEn:'Spin & unwind',nameZhHans:'旋转派',sortOrder:20,active:true},
+ {id:'other',name:'其他小物',nameEn:'Other little goods',nameZhHans:'其他小物',sortOrder:30,active:true},
+];
+const categoryFromRow=(r:any)=>({id:r.id,name:r.name,nameEn:r.name_en,nameZhHans:r.name_zh_hans,sortOrder:r.sort_order,active:!!r.active,revision:r.revision,updatedAt:r.updated_at});
+async function allCategories(env:any){const rows=(await env.DB.prepare('SELECT * FROM catalog_categories ORDER BY sort_order,id').all()).results||[];return rows.map(categoryFromRow);}
 const noCache={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
 export function json(value:unknown,status=200){return Response.json(value,{status,headers:noCache});}
 export function isAdmin(user:any,env:any){
@@ -16,7 +23,7 @@ export function validateProduct(input:any){
  check(['draft','published','archived'].includes(input.status),'商品狀態不正確。');
  const name=text(input.name,150);check(name,'請填寫商品名稱。');
  const price=input.price===null||input.price===''||input.price===undefined?null:Number(input.price);check(price===null||(Number.isFinite(price)&&price>=0&&price<=10000000),'價格必須是有效的非負數。');
- const category=input.kind==='design'?'file':input.category;check(input.kind==='design'||['press','spin','other'].includes(category),'請選擇正確的實體玩法分類。');
+ const category=input.kind==='design'?'file':input.category;check(input.kind==='design'||(typeof category==='string'&&/^[a-z0-9][a-z0-9-]{0,79}$/.test(category)&&category!=='file'),'請選擇正確的實體商品分類。');
  check(Array.isArray(input.images)&&input.images.length<=12,'圖片最多12張。');
  const images=input.images.map((im:any)=>{const url=text(im.url,2048);check(/^\/media\/[a-f0-9-]+$/.test(url)||/^\/?assets\/[a-zA-Z0-9_/.\-]+$/.test(url)||/^https:\/\//.test(url),'圖片網址不正確。');check(!url.includes('..'),'圖片路徑不正確。');if(url.startsWith('https:'))safeLink(url);return {url,alt:text(im.alt,250)};});
  const purchaseUrl=safeLink(input.purchaseUrl,['myship.7-11.com.tw']);
@@ -42,7 +49,7 @@ export async function catalogApi(request:Request,env:any,user:any){try{
  const url=new URL(request.url),path=url.pathname;
  if(path==='/api/catalog'&&request.method==='GET'){
   const rows=await allRows(env);const items=rows.length?rows.map(parse).filter((p:any)=>p.status==='published'):seed;
-  return json({items:items.map(publicItem)});
+  const stored=await allCategories(env);const categories=(stored.length?stored:defaultCategories).filter((c:any)=>c.active);return json({items:items.map(publicItem),categories:categories.map(({id,name,nameEn,nameZhHans,sortOrder}:any)=>({id,name,nameEn,nameZhHans,sortOrder}))});
  }
  if(!path.startsWith('/api/admin/'))return json({error:'找不到此功能。'},404);
  if(!user)return json({error:'請先登入。',signIn:'/signin-with-chatgpt?return_to=%2Fadmin'},401);
@@ -53,9 +60,31 @@ export async function catalogApi(request:Request,env:any,user:any){try{
   const statements=seed.map(p=>env.DB.prepare('INSERT OR IGNORE INTO catalog (id,kind,status,data,revision,updated_at) VALUES (?,?,?,?,1,?)').bind(p.id,p.kind,p.status,JSON.stringify(p),new Date().toISOString()));
   // Idempotent backfill outside schema migrations; never rewrite product content.
   statements.push(env.DB.prepare('INSERT INTO catalog_codes (product_id) SELECT id FROM catalog WHERE NOT EXISTS (SELECT 1 FROM catalog_codes WHERE product_id=catalog.id) ORDER BY rowid'));
+  for(const c of defaultCategories)statements.push(env.DB.prepare('INSERT OR IGNORE INTO catalog_categories (id,name,name_en,name_zh_hans,sort_order,active,revision,updated_at) VALUES (?,?,?,?,?,1,1,?)').bind(c.id,c.name,c.nameEn,c.nameZhHans,c.sortOrder,new Date().toISOString()));
   await env.DB.batch(statements);return json({ok:true});
  }
  if(path==='/api/admin/catalog'&&request.method==='GET')return json({items:(await allRows(env)).map(parse)});
+ if(path==='/api/admin/categories'&&request.method==='GET')return json({items:await allCategories(env)});
+ const categoryMatch=path.match(/^\/api\/admin\/categories(?:\/([a-z0-9-]+))?$/);
+ if(categoryMatch&&((request.method==='POST'&&!categoryMatch[1])||(request.method==='PUT'&&categoryMatch[1]))){
+  const body:any=await request.json();const name=text(body.name,80),nameEn=text(body.nameEn,100),nameZhHans=text(body.nameZhHans,80);
+  check(name,'請填寫分類名稱。');check(typeof body.active==='boolean','請選擇分類狀態。');
+  const sortOrder=Number(body.sortOrder);check(Number.isInteger(sortOrder)&&sortOrder>=0&&sortOrder<=99999,'排列順序請填0到99999的整數。');
+  const id=categoryMatch[1]||'cat-'+crypto.randomUUID(),stamp=new Date().toISOString();
+  // The conditional write rejects duplicate normalized names atomically, including concurrent requests.
+  const conflictId=categoryMatch[1]||'';
+  const duplicate=await env.DB.prepare('SELECT id FROM catalog_categories WHERE id<>? AND name=? COLLATE NOCASE').bind(conflictId,name.normalize('NFKC')).first();
+  if(duplicate)throw new HttpError(409,'已有同名分類，請使用不同名稱。');
+  if(request.method==='POST'){
+   const result=await env.DB.prepare('INSERT INTO catalog_categories (id,name,name_en,name_zh_hans,sort_order,active,revision,updated_at) SELECT ?,?,?,?,?,?,1,? WHERE NOT EXISTS (SELECT 1 FROM catalog_categories WHERE name=? COLLATE NOCASE)').bind(id,name.normalize('NFKC'),nameEn,nameZhHans,sortOrder,body.active?1:0,stamp,name.normalize('NFKC')).run();
+   if(!result.meta.changes)throw new HttpError(409,'已有同名分類，請使用不同名稱。');
+  }else{
+   check(Number.isInteger(body.revision)&&body.revision>0,'版本不正確，請重新讀取分類。');
+   const result=await env.DB.prepare('UPDATE catalog_categories SET name=?,name_en=?,name_zh_hans=?,sort_order=?,active=?,revision=revision+1,updated_at=? WHERE id=? AND revision=? AND NOT EXISTS (SELECT 1 FROM catalog_categories WHERE id<>? AND name=? COLLATE NOCASE)').bind(name.normalize('NFKC'),nameEn,nameZhHans,sortOrder,body.active?1:0,stamp,id,body.revision,id,name.normalize('NFKC')).run();
+   if(!result.meta.changes)throw new HttpError(409,'分類已在其他視窗更新，或名稱重複。請重新載入後再試。');
+  }
+  return json({item:categoryFromRow(await env.DB.prepare('SELECT * FROM catalog_categories WHERE id=?').bind(id).first())});
+ }
  if(path==='/api/admin/assets'&&request.method==='GET')return json({items:(await env.DB.prepare('SELECT * FROM catalog_assets ORDER BY created_at DESC').all()).results||[]});
  if(path==='/api/admin/upload'&&request.method==='POST'){
   if(Number(request.headers.get('Content-Length'))>32*1024*1024)throw new HttpError(413,'單次上傳請小於30MB。');
@@ -76,6 +105,11 @@ export async function catalogApi(request:Request,env:any,user:any){try{
   const body:any=await request.json();const p=validateProduct(body);check(!match[1]||match[1]===p.id,'商品代號不一致。');
   for(const id of p.fileIds){const a=await env.DB.prepare('SELECT kind FROM catalog_assets WHERE id=?').bind(id).first();check(a?.kind==='design','附件不存在，請重新選擇。');}
   for(const im of p.images){if(im.url.startsWith('/media/')){const a=await env.DB.prepare('SELECT kind FROM catalog_assets WHERE id=?').bind(im.url.slice(7)).first();check(a?.kind==='image','圖片不存在，請重新上傳。');}}
+  if(p.kind==='physical'){
+   const category=await env.DB.prepare('SELECT active FROM catalog_categories WHERE id=?').bind(p.category).first();
+   check(category,'這個分類不存在，請重新選擇。');
+   if(!category.active){const current=request.method==='PUT'?await env.DB.prepare('SELECT kind,data FROM catalog WHERE id=?').bind(p.id).first():null;check(current?.kind==='physical'&&JSON.parse(current.data).category===p.category,'這個分類已停用，請選擇啟用中的分類。');}
+  }
   const stamp=new Date().toISOString();
   if(request.method==='POST'){
    const old=await env.DB.prepare('SELECT id FROM catalog WHERE id=?').bind(p.id).first();if(old)throw new HttpError(409,'這個商品代號已使用，請換一個。');

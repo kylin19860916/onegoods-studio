@@ -13,3 +13,8 @@ export const catalogCodes = sqliteTable('catalog_codes', {
  number:integer('number').primaryKey({autoIncrement:true}),
  productId:text('product_id').notNull().unique(),
 });
+
+export const catalogCategories = sqliteTable('catalog_categories', {
+ id:text('id').primaryKey(), name:text('name').notNull(), nameEn:text('name_en').notNull().default(''), nameZhHans:text('name_zh_hans').notNull().default(''),
+ sortOrder:integer('sort_order').notNull().default(0), active:integer('active').notNull().default(1), revision:integer('revision').notNull().default(1), updatedAt:text('updated_at').notNull(),
+});
