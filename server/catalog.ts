@@ -32,9 +32,9 @@ export function validateProduct(input:any){
   internalNotes:text(input.internalNotes,5000),sortOrder:Math.max(0,Math.min(99999,Math.round(Number(input.sortOrder)||0))),isPlaceholder:input.isPlaceholder===true,
   keynadeFacts:input.id==='keynade-mx'?input.keynadeFacts===true:false};
 }
-function parse(row:any){return {...JSON.parse(row.data),status:row.status,revision:row.revision,updatedAt:row.updated_at};}
-function publicItem(p:any){const {internalNotes,fileIds,revision,...safe}=p;return safe;}
-async function allRows(env:any){return (await env.DB.prepare('SELECT * FROM catalog ORDER BY json_extract(data, \'$.sortOrder\'), id').all()).results||[];}
+function parse(row:any){return {...JSON.parse(row.data),status:row.status,revision:row.revision,updatedAt:row.updated_at,managementCode:row.management_number?'OGS-'+String(row.management_number).padStart(6,'0'):null};}
+function publicItem(p:any){const {internalNotes,fileIds,revision,managementCode,...safe}=p;return safe;}
+async function allRows(env:any){return (await env.DB.prepare('SELECT catalog.*, catalog_codes.number AS management_number FROM catalog LEFT JOIN catalog_codes ON catalog_codes.product_id=catalog.id ORDER BY json_extract(data, \'$.sortOrder\'), catalog.id').all()).results||[];}
 function enforceWrite(request:Request){const origin=request.headers.get('Origin');if(origin!==new URL(request.url).origin)throw new HttpError(403,'請在本網站內操作。');const t=request.headers.get('content-type')||'';check(t.startsWith('application/json')||t.startsWith('multipart/form-data'),'不支援的資料格式。');}
 const imageTypes=new Map([['image/jpeg','jpg'],['image/png','png'],['image/webp','webp']]);
 export function detectImage(b:Uint8Array){if(b[0]===0xff&&b[1]===0xd8&&b[2]===0xff)return'image/jpeg';if([137,80,78,71,13,10,26,10].every((v,i)=>b[i]===v))return'image/png';if(String.fromCharCode(...b.slice(0,4))==='RIFF'&&String.fromCharCode(...b.slice(8,12))==='WEBP')return'image/webp';return null;}
@@ -51,6 +51,8 @@ export async function catalogApi(request:Request,env:any,user:any){try{
  if(path==='/api/admin/session')return json({name:user.displayName,email:user.email});
  if(path==='/api/admin/initialize'&&request.method==='POST'){
   const statements=seed.map(p=>env.DB.prepare('INSERT OR IGNORE INTO catalog (id,kind,status,data,revision,updated_at) VALUES (?,?,?,?,1,?)').bind(p.id,p.kind,p.status,JSON.stringify(p),new Date().toISOString()));
+  // Idempotent backfill outside schema migrations; never rewrite product content.
+  statements.push(env.DB.prepare('INSERT INTO catalog_codes (product_id) SELECT id FROM catalog WHERE NOT EXISTS (SELECT 1 FROM catalog_codes WHERE product_id=catalog.id) ORDER BY rowid'));
   await env.DB.batch(statements);return json({ok:true});
  }
  if(path==='/api/admin/catalog'&&request.method==='GET')return json({items:(await allRows(env)).map(parse)});
@@ -77,13 +79,16 @@ export async function catalogApi(request:Request,env:any,user:any){try{
   const stamp=new Date().toISOString();
   if(request.method==='POST'){
    const old=await env.DB.prepare('SELECT id FROM catalog WHERE id=?').bind(p.id).first();if(old)throw new HttpError(409,'這個商品代號已使用，請換一個。');
-   await env.DB.prepare('INSERT INTO catalog (id,kind,status,data,revision,updated_at) VALUES (?,?,?,?,1,?)').bind(p.id,p.kind,p.status,JSON.stringify(p),stamp).run();
+   await env.DB.batch([
+    env.DB.prepare('INSERT INTO catalog (id,kind,status,data,revision,updated_at) VALUES (?,?,?,?,1,?)').bind(p.id,p.kind,p.status,JSON.stringify(p),stamp),
+    env.DB.prepare('INSERT INTO catalog_codes (product_id) VALUES (?)').bind(p.id)
+   ]);
   }else{
    check(Number.isInteger(body.revision)&&body.revision>0,'版本不正確，請重新讀取商品。');
    const result=await env.DB.prepare('UPDATE catalog SET kind=?,status=?,data=?,revision=revision+1,updated_at=? WHERE id=? AND revision=?').bind(p.kind,p.status,JSON.stringify(p),stamp,p.id,body.revision).run();
    if(!result.meta.changes)throw new HttpError(409,'資料已被另一個視窗更新。請重新載入後再修改。');
   }
-  const updated=await env.DB.prepare('SELECT * FROM catalog WHERE id=?').bind(p.id).first();return json({item:parse(updated)});
+  const updated=await env.DB.prepare('SELECT catalog.*, catalog_codes.number AS management_number FROM catalog LEFT JOIN catalog_codes ON catalog_codes.product_id=catalog.id WHERE catalog.id=?').bind(p.id).first();return json({item:parse(updated)});
  }
  return json({error:'找不到此功能。'},404);
  }catch(error){if(error instanceof HttpError)return json({error:error.message},error.status);console.error('Catalog request failed',error instanceof Error?error.message:'unknown');return json({error:'暫時無法完成操作，請稍後重試。'},500);}}

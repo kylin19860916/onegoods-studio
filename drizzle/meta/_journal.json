@@ -8,6 +8,13 @@
       "when": 1793602235753,
       "tag": "0000_gifted_blink",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793693323701,
+      "tag": "0001_goofy_ken_ellis",
+      "breakpoints": true
     }
   ]
 }
