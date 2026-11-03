@@ -6,7 +6,7 @@ root = Path(__file__).resolve().parent
 src, dist = root / 'src', root / 'public'
 translations = json.loads((src / 'translations.json').read_text())
 pattern = re.compile('|'.join(re.escape(k) for k in sorted(translations, key=len, reverse=True)))
-origin = 'https://one-goods-studio.kylin1986.chatgpt.site'
+origin = 'https://onegoods.studio'
 build_id = hashlib.sha256(b''.join(p.read_bytes() for p in sorted(src.glob('*')) if p.is_file())).hexdigest()[:12]
 locales = [('zh-Hant', '', 0), ('zh-Hans', 'zh-cn', None), ('en', 'en', 1)]
 
