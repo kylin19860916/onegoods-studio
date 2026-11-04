@@ -35,7 +35,7 @@ for lang, folder, column in locales:
                 label = {'zh-Hant': '繁體中文', 'zh-Hans': '简体中文', 'en': 'English'}[alternate]
                 current = ' aria-current="true"' if lang == alternate else ''
                 options.append(f'<a href="{url}" lang="{alternate}" hreflang="{alternate}" data-language="{alternate}"{current}>{label}</a>')
-            current_label = {'zh-Hant': '繁體', 'zh-Hans': '简体', 'en': 'EN'}[lang]
+            current_label = {'zh-Hant': '繁', 'zh-Hans': '简', 'en': 'en'}[lang]
             switch_label = {'zh-Hant': '切換語言，目前：繁體中文', 'zh-Hans': '切换语言，当前：简体中文', 'en': 'Change language. Current: English'}[lang]
             nav = f'<nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="{switch_label}">{current_label}<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options">' + ''.join(options) + '</div></details></nav>'
             text = text.replace('</header>', nav + '</header>')
