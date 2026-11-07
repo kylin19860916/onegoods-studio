@@ -55,7 +55,12 @@ html[lang="en"] .product-meta{letter-spacing:.03em;flex-wrap:wrap}
 @media(max-width:650px){.studio-hero{height:auto;min-height:0;aspect-ratio:4 / 5;padding:0}}
 
 /* Give photographs and empty colour panels the same visible card boundary. */
-.shop .products{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* Compact storefront cards, capped at four columns on wide screens. */
+.shop{max-width:1240px;margin-inline:auto}
+.shop .products{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.shop .product-info{padding:16px}
+@media(max-width:950px){.shop .products{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.shop .products{gap:12px}.shop .product-info{padding:12px}}
 .products>.product-card{width:100%;min-width:0;border:1px solid #29233150}
 .products .product-art{width:100%;max-width:100%;box-sizing:border-box}
 @media(max-width:650px){.shop .products{grid-template-columns:repeat(2,minmax(0,1fr))}}
