@@ -60,7 +60,13 @@ html[lang="en"] .product-meta{letter-spacing:.03em;flex-wrap:wrap}
 .shop .products{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
 .shop .product-info{padding:16px}
 @media(max-width:950px){.shop .products{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:650px){.shop .products{gap:12px}.shop .product-info{padding:12px}}
+@media(max-width:650px){
+  .shop .products{gap:12px}
+  .shop .product-info{padding:12px}
+  .shop .product-info p{font-size:12px}
+  .shop .card-bottom{font-size:11px}
+  .shop .card-details{font-size:11px;padding:7px 10px}
+}
 .products>.product-card{width:100%;min-width:0;border:1px solid #29233150}
 .products .product-art{width:100%;max-width:100%;box-sizing:border-box}
 @media(max-width:650px){.shop .products{grid-template-columns:repeat(2,minmax(0,1fr))}}
