@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#a087c1">
   <title>客制名牌 — One Goods Studio</title>
-  <meta name="description" content="输入名字，选好字体、底板和尺寸，再为你的钥匙圈配色。">
+  <meta name="description" content="选一款造型和尺寸，为你的名字配上喜欢的颜色。">
   <link rel="icon" href="assets/icon.png">
   <link rel="stylesheet" href="style.css">
   <script src="nameplate.js" defer></script>
@@ -17,7 +17,7 @@
   <div class="nameplate-heading">
     <span class="eyebrow">OGS / KEYRING STUDIO</span>
     <h1>客制你的姓名钥匙圈。</h1>
-    <p>输入名字，选好字体、底板和尺寸，再为你的钥匙圈配色。</p>
+    <p>选一款造型和尺寸，为你的名字配上喜欢的颜色。</p>
   </div>
   <div class="nameplate-workspace">
     <figure class="nameplate-stage">
@@ -42,26 +42,13 @@
       <figcaption>画面为设计示意，实际成品颜色与尺寸依制作确认为准。</figcaption>
     </figure>
     <form id="nameplate-form" class="nameplate-form">
+      <div class="keyring-step-panel">
       <ol class="keyring-steps" aria-label="客制步骤">
-        <li aria-current="step"><span>01</span> 名字与造型</li>
+        <li aria-current="step"><span>01</span> 款式与尺寸</li>
         <li><span>02</span> 选颜色</li>
       </ol>
       <section class="keyring-step" id="keyring-design">
-        <h2 tabindex="-1">名字与造型</h2>
-        <div class="nameplate-field">
-          <label for="plate-name">姓名文字</label>
-          <input id="plate-name" name="nameText" maxlength="20" placeholder="你的名字" required pattern=".*\S.*" autocomplete="off">
-        </div>
-        <div class="nameplate-field">
-          <label for="plate-style">字形风格</label>
-          <select id="plate-style" name="style">
-            <option value="huninn">粉圆 · 中英文</option>
-            <option value="sans-tc">繁体黑体 · Sans Serif</option>
-            <option value="serif-tc">繁体宋体 · Serif</option>
-            <option value="sans-sc">简体黑体 · Sans Serif</option>
-            <option value="serif-sc">简体宋体 · Serif</option>
-          </select>
-        </div>
+        <h2 tabindex="-1">款式与尺寸</h2>
         <fieldset class="keyring-shapes">
           <legend>底板造型</legend>
           <label><input type="radio" name="shape" value="contour" checked>
@@ -72,6 +59,15 @@
           </label>
           <label><input type="radio" name="shape" value="rounded">
             <img class="keyring-template" src="assets/keyring/rounded.svg" alt=""><span>圆角底板</span>
+          </label>
+          <label><input type="radio" name="shape" value="heart">
+            <img class="keyring-template" src="assets/keyring/heart.svg" alt=""><span>爱心</span>
+          </label>
+          <label><input type="radio" name="shape" value="star">
+            <img class="keyring-template" src="assets/keyring/star.svg" alt=""><span>星星</span>
+          </label>
+          <label><input type="radio" name="shape" value="flower">
+            <img class="keyring-template" src="assets/keyring/flower.svg" alt=""><span>花朵</span>
           </label>
         </fieldset>
         <fieldset class="keyring-sizes">
@@ -119,6 +115,24 @@
           <a class="button cream" id="plate-download" download="OGS-keyring-preview.png" hidden>下载 PNG</a>
           <p id="plate-status" role="status" data-error="预览图生成失败，请再试一次。" data-ready="预览图已生成。"></p>
           <p class="nameplate-order-note">正式售价与賣貨便商品连结确认后开放送单。</p>
+        </div>
+      </section>
+      </div>
+      <section class="keyring-shared" aria-labelledby="keyring-shared-title">
+        <h2 id="keyring-shared-title">姓名与字体</h2>
+        <div class="nameplate-field">
+          <label for="plate-name">姓名文字</label>
+          <input id="plate-name" name="nameText" maxlength="20" placeholder="你的名字" required pattern=".*\S.*" autocomplete="off">
+        </div>
+        <div class="nameplate-field">
+          <label for="plate-style">字形风格</label>
+          <select id="plate-style" name="style">
+            <option value="huninn">粉圆 · 中英文</option>
+            <option value="sans-tc">繁体黑体 · Sans Serif</option>
+            <option value="serif-tc">繁体宋体 · Serif</option>
+            <option value="sans-sc">简体黑体 · Sans Serif</option>
+            <option value="serif-sc">简体宋体 · Serif</option>
+          </select>
         </div>
       </section>
     </form>

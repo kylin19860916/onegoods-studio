@@ -69,6 +69,47 @@ function roundedPlate(width, height, radius) {
   }));
 }
 
+const motifShapes = new Set(['heart', 'star', 'flower']);
+
+function motifPlate(shape, width, height) {
+  const points = [];
+  const count = shape === 'star' ? 10 : 120;
+  for (let i = 0; i < count; i++) {
+    const angle = i * 2 * Math.PI / count;
+    if (shape === 'heart') {
+      points.push([16 * Math.sin(angle) ** 3, 13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)]);
+    } else {
+      const radius = shape === 'star' ? (i % 2 ? 0.56 : 1) : 0.83 + 0.17 * Math.cos(5 * angle);
+      points.push([radius * Math.sin(angle), radius * Math.cos(angle)]);
+    }
+  }
+
+  // Leave a smaller name band so the motif remains distinct from the base silhouette.
+  const emblemWidth = height * 0.9;
+  const bandX = emblemWidth * 0.51;
+  const bandHeight = height * 0.64;
+  const bounds = [0, 1].map(axis => {
+    const values = points.map(point => point[axis]);
+    return [Math.min(...values), Math.max(...values)];
+  });
+  const emblem = points.map(([x, y]) => ({
+    X: Math.round((x - bounds[0][0]) / (bounds[0][1] - bounds[0][0]) * emblemWidth * units),
+    Y: Math.round((y - bounds[1][0]) / (bounds[1][1] - bounds[1][0]) * height * units),
+  }));
+  if (!Clipper.Orientation(emblem)) emblem.reverse();
+  const band = roundedPlate(width - bandX, bandHeight, bandHeight / 2).map(point => ({
+    X: point.X + Math.round(bandX * units),
+    Y: point.Y + Math.round((height - bandHeight) / 2 * units),
+  }));
+  return {
+    paths: polygons([emblem, band]).flat(),
+    holeX: Math.round(emblemWidth * 0.44 * units),
+    holeY: Math.round(height * 0.51 * units),
+    textLeft: emblemWidth * 0.86,
+    textHeight: bandHeight - 4,
+  };
+}
+
 function pathData(polys) {
   return polys.flatMap(poly => poly.map(ring =>
     ring.map(({ X, Y }, i) => `${i ? 'L' : 'M'}${X / units} ${-Y / units}`).join(' ') + 'Z'
@@ -129,13 +170,16 @@ function buildKeyring(font, name, spec) {
   const minY = Math.min(...ys), maxY = Math.max(...ys);
   const { widthMm, heightMm, baseMm, letteringMm, holeMm, rimMm, baseColor, textColor, accentColor, shape = 'contour' } = spec;
   const isContour = shape === 'contour';
+  const motif = motifShapes.has(shape) ? motifPlate(shape, widthMm, heightMm) : null;
   const outerRadius = holeMm / 2 + rimMm;
   const ringExtension = 2 * outerRadius - rimMm;
-  const availableWidth = isContour ? widthMm - ringExtension - 2 * rimMm : widthMm - 20;
-  const availableHeight = isContour ? heightMm - 2 * outerRadius - 2 * rimMm : heightMm - 7;
+  const textLeft = motif?.textLeft ?? 12;
+  const plateTextWidth = motif ? widthMm - textLeft - 6 : widthMm - 20;
+  const availableWidth = isContour ? widthMm - ringExtension - 2 * rimMm : plateTextWidth;
+  const availableHeight = isContour ? heightMm - 2 * outerRadius - 2 * rimMm : (motif?.textHeight ?? heightMm - 7);
   const scale = Math.min(availableWidth / (maxX - minX), availableHeight / (maxY - minY));
   if (!(scale > 0)) throw new Error('此尺寸無法容納掛孔和文字。');
-  const textX = isContour ? 0 : 12 + (availableWidth - (maxX - minX) * scale) / 2;
+  const textX = isContour ? 0 : textLeft + (availableWidth - (maxX - minX) * scale) / 2;
   const textY = isContour ? 0 : (heightMm - (maxY - minY) * scale) / 2;
   const lettering = polygons(outlines.map(ring => ring.map(([x, y]) => ({
     X: Math.round(((x - minX) * scale + textX) * units),
@@ -154,14 +198,17 @@ function buildKeyring(font, name, spec) {
     holeY = edge.Y;
     basePaths = polygons([...pad, circle(holeX, holeY, outerRadius * units)]).flat();
   } else {
-    basePaths = [roundedPlate(widthMm, heightMm, shape === 'capsule' ? heightMm / 2 : 4)];
-    holeX = 5.8 * units;
-    holeY = heightMm / 2 * units;
+    basePaths = motif?.paths ?? [roundedPlate(widthMm, heightMm, shape === 'capsule' ? heightMm / 2 : 4)];
+    holeX = motif?.holeX ?? 5.8 * units;
+    holeY = motif?.holeY ?? heightMm / 2 * units;
     if (polygons(lettering.flat(), basePaths, ClipType.ctDifference).length) {
       throw new Error('文字超出底板，請縮短姓名。');
     }
   }
 
+  if (motif && polygons([circle(holeX, holeY, (holeMm / 2 + 1.5) * units)], basePaths, ClipType.ctDifference).length) {
+    throw new Error('掛孔與底板邊緣距離不足。');
+  }
   const drilled = polygons(basePaths, [circle(holeX, holeY, holeMm / 2 * units)], ClipType.ctDifference);
   if (drilled.length !== 1) throw new DisconnectedBaseError('字形之間未連成完整底板，請縮短姓名或換款式。');
   const stripeHeight = accentColor ? Math.min(0.8, baseMm / 2) : 0;

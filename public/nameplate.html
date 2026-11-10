@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#a087c1">
   <title>客製名牌 — One Goods Studio</title>
-  <meta name="description" content="輸入名字，選好字型、底板和尺寸，再為你的鑰匙圈配色。">
+  <meta name="description" content="選一款造型和尺寸，為你的名字配上喜歡的顏色。">
   <link rel="icon" href="assets/icon.png">
-  <link rel="stylesheet" href="style.css?v=d0ceab27b267">
-  <script src="locale.js?v=d0ceab27b267" defer></script><script src="nameplate.js?v=d0ceab27b267" defer></script>
+  <link rel="stylesheet" href="style.css?v=90a0efb4f4bf">
+  <script src="locale.js?v=90a0efb4f4bf" defer></script><script src="nameplate.js?v=90a0efb4f4bf" defer></script>
 <link rel="canonical" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客製名牌</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="en/nameplate.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客製名牌</a><a href="about.html">關於 OGS</a></nav>
@@ -17,7 +17,7 @@
   <div class="nameplate-heading">
     <span class="eyebrow">OGS / KEYRING STUDIO</span>
     <h1>客製你的姓名鑰匙圈。</h1>
-    <p>輸入名字，選好字型、底板和尺寸，再為你的鑰匙圈配色。</p>
+    <p>選一款造型和尺寸，為你的名字配上喜歡的顏色。</p>
   </div>
   <div class="nameplate-workspace">
     <figure class="nameplate-stage">
@@ -42,26 +42,13 @@
       <figcaption>畫面為設計示意，實際成品顏色與尺寸依製作確認為準。</figcaption>
     </figure>
     <form id="nameplate-form" class="nameplate-form">
+      <div class="keyring-step-panel">
       <ol class="keyring-steps" aria-label="客製步驟">
-        <li aria-current="step"><span>01</span> 名字與造型</li>
+        <li aria-current="step"><span>01</span> 款式與尺寸</li>
         <li><span>02</span> 選顏色</li>
       </ol>
       <section class="keyring-step" id="keyring-design">
-        <h2 tabindex="-1">名字與造型</h2>
-        <div class="nameplate-field">
-          <label for="plate-name">姓名文字</label>
-          <input id="plate-name" name="nameText" maxlength="20" placeholder="你的名字" required pattern=".*\S.*" autocomplete="off">
-        </div>
-        <div class="nameplate-field">
-          <label for="plate-style">字形風格</label>
-          <select id="plate-style" name="style">
-            <option value="huninn">粉圓 · 中英文</option>
-            <option value="sans-tc">繁體黑體 · Sans Serif</option>
-            <option value="serif-tc">繁體宋體 · Serif</option>
-            <option value="sans-sc">簡體黑體 · Sans Serif</option>
-            <option value="serif-sc">簡體宋體 · Serif</option>
-          </select>
-        </div>
+        <h2 tabindex="-1">款式與尺寸</h2>
         <fieldset class="keyring-shapes">
           <legend>底板造型</legend>
           <label><input type="radio" name="shape" value="contour" checked>
@@ -72,6 +59,15 @@
           </label>
           <label><input type="radio" name="shape" value="rounded">
             <img class="keyring-template" src="assets/keyring/rounded.svg" alt=""><span>圓角底板</span>
+          </label>
+          <label><input type="radio" name="shape" value="heart">
+            <img class="keyring-template" src="assets/keyring/heart.svg" alt=""><span>愛心</span>
+          </label>
+          <label><input type="radio" name="shape" value="star">
+            <img class="keyring-template" src="assets/keyring/star.svg" alt=""><span>星星</span>
+          </label>
+          <label><input type="radio" name="shape" value="flower">
+            <img class="keyring-template" src="assets/keyring/flower.svg" alt=""><span>花朵</span>
           </label>
         </fieldset>
         <fieldset class="keyring-sizes">
@@ -119,6 +115,24 @@
           <a class="button cream" id="plate-download" download="OGS-keyring-preview.png" hidden>下載 PNG</a>
           <p id="plate-status" role="status" data-error="預覽圖生成失敗，請再試一次。" data-ready="預覽圖已生成。"></p>
           <p class="nameplate-order-note">正式售價與賣貨便商品連結確認後開放送單。</p>
+        </div>
+      </section>
+      </div>
+      <section class="keyring-shared" aria-labelledby="keyring-shared-title">
+        <h2 id="keyring-shared-title">姓名與字型</h2>
+        <div class="nameplate-field">
+          <label for="plate-name">姓名文字</label>
+          <input id="plate-name" name="nameText" maxlength="20" placeholder="你的名字" required pattern=".*\S.*" autocomplete="off">
+        </div>
+        <div class="nameplate-field">
+          <label for="plate-style">字形風格</label>
+          <select id="plate-style" name="style">
+            <option value="huninn">粉圓 · 中英文</option>
+            <option value="sans-tc">繁體黑體 · Sans Serif</option>
+            <option value="serif-tc">繁體宋體 · Serif</option>
+            <option value="sans-sc">簡體黑體 · Sans Serif</option>
+            <option value="serif-sc">簡體宋體 · Serif</option>
+          </select>
         </div>
       </section>
     </form>
