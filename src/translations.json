@@ -1,4 +1,11 @@
 {
+  "输入名字，选好字体、底板和尺寸，再为你的钥匙圈配色。": ["輸入名字，選好字型、底板和尺寸，再為你的鑰匙圈配色。", "Enter a name, pick a font, base and size, then colour your keyring."],
+  "尺寸规格": ["尺寸規格", "Size"],
+  "<strong>小型</strong>": ["<strong>小型</strong>", "<strong>Small</strong>"],
+  "<strong>中型</strong>": ["<strong>中型</strong>", "<strong>Medium</strong>"],
+  "<strong>大型</strong>": ["<strong>大型</strong>", "<strong>Large</strong>"],
+  "以上为长宽上限。随字轮廓的实际尺寸会依字形调整。": ["以上為長寬上限。隨字輪廓的實際尺寸會依字形調整。", "These are maximum dimensions. The contour shape adapts to the lettering."],
+  "模型尺寸": ["模型尺寸", "Model dimensions"],
   "输入名字，选好字体和底板，再为你的钥匙圈配色。": ["輸入名字，選好字型和底板，再為你的鑰匙圈配色。", "Enter a name, pick a font and base, then colour your keyring."],
   "名字与造型": ["名字與造型", "Name and shape"],
   "选颜色": ["選顏色", "Choose colours"],

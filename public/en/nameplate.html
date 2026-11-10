@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#a087c1">
   <title>Custom nameplate — One Goods Studio</title>
-  <meta name="description" content="Enter a name, pick a font and base, then colour your keyring.">
+  <meta name="description" content="Enter a name, pick a font, base and size, then colour your keyring.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=5b48a938fdfd">
-  <script src="../locale.js?v=5b48a938fdfd" defer></script><script src="../nameplate.js?v=5b48a938fdfd" defer></script>
+  <link rel="stylesheet" href="../style.css?v=d0ceab27b267">
+  <script src="../locale.js?v=d0ceab27b267" defer></script><script src="../nameplate.js?v=d0ceab27b267" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="nameplate.html" aria-current="page">Custom nameplate</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="nameplate.html" aria-current="page">Custom nameplate</a><a href="about.html">About OGS</a></nav>
@@ -17,7 +17,7 @@
   <div class="nameplate-heading">
     <span class="eyebrow">OGS / KEYRING STUDIO</span>
     <h1>Make your own name keyring.</h1>
-    <p>Enter a name, pick a font and base, then colour your keyring.</p>
+    <p>Enter a name, pick a font, base and size, then colour your keyring.</p>
   </div>
   <div class="nameplate-workspace">
     <figure class="nameplate-stage">
@@ -38,6 +38,7 @@
       </div>
       <p class="plate-view-hint" id="plate-view-hint" hidden>Drag to rotate · Pinch to zoom</p>
       <p id="plate-preview-status" role="status" data-loading="Generating outlines…" data-error="This text cannot form a complete base. Try a shorter name or a different base shape."></p>
+      <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="Model dimensions"></p>
       <figcaption>Design preview. Final colours and dimensions depend on production specifications.</figcaption>
     </figure>
     <form id="nameplate-form" class="nameplate-form">
@@ -73,7 +74,13 @@
             <img class="keyring-template" src="../assets/keyring/rounded.svg" alt=""><span>Rounded rectangle</span>
           </label>
         </fieldset>
-        <p class="nameplate-order-note">Standard preview size: up to 65 mm long and 4 mm thick.</p>
+        <fieldset class="keyring-sizes">
+          <legend>Size</legend>
+          <label><input type="radio" name="size" value="small"><strong>Small</strong><small>50 × 20.8 mm</small></label>
+          <label><input type="radio" name="size" value="medium" checked><strong>Medium</strong><small>65 × 27 mm</small></label>
+          <label><input type="radio" name="size" value="large"><strong>Large</strong><small>80 × 33.2 mm</small></label>
+        </fieldset>
+        <p class="nameplate-order-note">These are maximum dimensions. The contour shape adapts to the lettering.</p>
         <button class="button yellow" id="keyring-next" type="submit" disabled>Next: Choose colours</button>
       </section>
       <section class="keyring-step" id="keyring-colors" hidden>

@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#a087c1">
   <title>客制名牌 — One Goods Studio</title>
-  <meta name="description" content="输入名字，选好字体和底板，再为你的钥匙圈配色。">
+  <meta name="description" content="输入名字，选好字体、底板和尺寸，再为你的钥匙圈配色。">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=5b48a938fdfd">
-  <script src="../locale.js?v=5b48a938fdfd" defer></script><script src="../nameplate.js?v=5b48a938fdfd" defer></script>
+  <link rel="stylesheet" href="../style.css?v=d0ceab27b267">
+  <script src="../locale.js?v=d0ceab27b267" defer></script><script src="../nameplate.js?v=d0ceab27b267" defer></script>
 <link rel="canonical" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首页"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主导航"><a href="index.html">首页</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客制名牌</a><a href="about.html">关于 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切换语言，当前：简体中文">简<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans" aria-current="true">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主导航"><a href="index.html">首页</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客制名牌</a><a href="about.html">关于 OGS</a></nav>
@@ -17,7 +17,7 @@
   <div class="nameplate-heading">
     <span class="eyebrow">OGS / KEYRING STUDIO</span>
     <h1>客制你的姓名钥匙圈。</h1>
-    <p>输入名字，选好字体和底板，再为你的钥匙圈配色。</p>
+    <p>输入名字，选好字体、底板和尺寸，再为你的钥匙圈配色。</p>
   </div>
   <div class="nameplate-workspace">
     <figure class="nameplate-stage">
@@ -38,6 +38,7 @@
       </div>
       <p class="plate-view-hint" id="plate-view-hint" hidden>拖动旋转 · 捏合缩放</p>
       <p id="plate-preview-status" role="status" data-loading="正在生成轮廓…" data-error="这组文字无法生成完整底板，请缩短姓名或换一种底板造型。"></p>
+      <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="模型尺寸"></p>
       <figcaption>画面为设计示意，实际成品颜色与尺寸依制作确认为准。</figcaption>
     </figure>
     <form id="nameplate-form" class="nameplate-form">
@@ -73,7 +74,13 @@
             <img class="keyring-template" src="../assets/keyring/rounded.svg" alt=""><span>圆角底板</span>
           </label>
         </fieldset>
-        <p class="nameplate-order-note">统一预览规格：最长 65 mm，底板与凸字总厚 4 mm。</p>
+        <fieldset class="keyring-sizes">
+          <legend>尺寸规格</legend>
+          <label><input type="radio" name="size" value="small"><strong>小型</strong><small>50 × 20.8 mm</small></label>
+          <label><input type="radio" name="size" value="medium" checked><strong>中型</strong><small>65 × 27 mm</small></label>
+          <label><input type="radio" name="size" value="large"><strong>大型</strong><small>80 × 33.2 mm</small></label>
+        </fieldset>
+        <p class="nameplate-order-note">以上为长宽上限。随字轮廓的实际尺寸会依字形调整。</p>
         <button class="button yellow" id="keyring-next" type="submit" disabled>下一步：选颜色</button>
       </section>
       <section class="keyring-step" id="keyring-colors" hidden>

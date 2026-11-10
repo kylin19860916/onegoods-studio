@@ -2,7 +2,7 @@ import { parseKeyringFont, generateKeyring } from '../server/keyring-geometry.mj
 import { createKeyringViewer } from './keyring-viewer.js';
 
 const form = document.querySelector('#nameplate-form');
-const { nameText, style, shape, mode, baseColor, textColor, useAccent, accentColor } = form.elements;
+const { nameText, style, shape, size, mode, baseColor, textColor, useAccent, accentColor } = form.elements;
 const preview = document.querySelector('#plate-preview');
 const position = document.querySelector('#plate-position');
 const canvas = document.querySelector('#plate-canvas');
@@ -16,6 +16,7 @@ if (viewer) {
   document.querySelector('#plate-view-hint').hidden = false;
 }
 const previewStatus = document.querySelector('#plate-preview-status');
+const dimensions = document.querySelector('#keyring-dimensions');
 const exportStatus = document.querySelector('#plate-status');
 const next = document.querySelector('#keyring-next');
 const generate = document.querySelector('#keyring-generate');
@@ -38,7 +39,8 @@ const fonts = {
   'sans-sc': 'NotoSansSC-Bold.woff',
   'serif-sc': 'NotoSerifSC-Bold.woff',
 };
-const spec = { widthMm: 65, heightMm: 27, baseMm: 3, letteringMm: 1, holeMm: 4, rimMm: 1.8 };
+const sizes = { small: [50, 20.8], medium: [65, 27], large: [80, 33.2] };
+const spec = { baseMm: 3, letteringMm: 1, holeMm: 4, rimMm: 1.8 };
 let currentFont;
 let fontPromise;
 let previewVersion = 0;
@@ -85,8 +87,9 @@ async function render(version) {
     const base = baseColor.value;
     const ink = mode.value === 'single' ? base : textColor.value;
     const third = mode.value === 'dual' && useAccent.checked ? accentColor.value : undefined;
+    const [widthMm, heightMm] = sizes[size.value];
     const model = generateKeyring(font, nameText.value.trim() || nameText.placeholder, {
-      ...spec, shape: shape.value, baseColor: base, textColor: ink, accentColor: third,
+      ...spec, widthMm, heightMm, shape: shape.value, baseColor: base, textColor: ink, accentColor: third,
     });
     const colors = { base, side: third || shade(base), ink, shadow: shade(ink) };
     for (const [part, color] of Object.entries(colors)) {
@@ -98,11 +101,14 @@ async function render(version) {
       path.setAttribute('d', model.preview[path.dataset.outline]);
     });
     viewer?.setMeshes(model.meshes);
+    const numbers = model.dimensions.map(value => Number(value.toFixed(1)));
+    dimensions.textContent = dimensions.dataset.label + ' · ' + numbers.join(' × ') + ' mm';
     previewStatus.textContent = '';
     next.disabled = generate.disabled = !nameText.value.trim();
   } catch {
     if (version !== previewVersion) return;
     viewer?.setMeshes([]);
+    dimensions.textContent = '';
     preview.querySelectorAll('[data-outline]').forEach(path => path.removeAttribute('d'));
     previewStatus.textContent = previewStatus.dataset.error;
   }
