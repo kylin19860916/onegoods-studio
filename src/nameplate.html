@@ -19,7 +19,11 @@
     <h1>客制你的姓名钥匙圈。</h1>
     <p>选一款造型和尺寸，为你的名字配上喜欢的颜色。</p>
   </div>
-  <div class="nameplate-workspace">
+  <nav class="keyring-product-nav" aria-label="客制类型">
+    <a href="#name-tag" data-keyring-product="name-tag" aria-current="true">姓名钥匙圈</a>
+    <a href="#name-clicker" data-keyring-product="name-clicker">姓名按压款</a>
+  </nav>
+  <div class="nameplate-workspace" id="name-tag" data-keyring-panel>
     <figure class="nameplate-stage">
       <div class="plate-view-header">
         <span class="eyebrow">LIVE 3D PREVIEW</span>
@@ -37,11 +41,28 @@
       </svg>
       </div>
       <p class="plate-view-hint" id="plate-view-hint" hidden>拖动旋转 · 捏合缩放</p>
-      <p id="plate-preview-status" role="status" data-loading="正在生成轮廓…" data-error="这组文字无法生成完整底板，请缩短姓名或换一种底板造型。"></p>
+      <p id="plate-preview-status" role="status" data-loading="正在生成轮廓…" data-error="这组文字无法生成完整底板，请缩短姓名或换一种造型。"></p>
       <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="模型尺寸"></p>
       <figcaption>画面为设计示意，实际成品颜色与尺寸依制作确认为准。</figcaption>
     </figure>
     <form id="nameplate-form" class="nameplate-form">
+      <section class="keyring-shared" aria-labelledby="keyring-shared-title">
+        <h2 id="keyring-shared-title">姓名与字体</h2>
+        <div class="nameplate-field">
+          <label for="plate-name">姓名文字</label>
+          <input id="plate-name" name="nameText" maxlength="20" placeholder="你的名字" required pattern=".*\S.*" autocomplete="off">
+        </div>
+        <div class="nameplate-field">
+          <label for="plate-style">字形风格</label>
+          <select id="plate-style" name="style">
+            <option value="huninn">粉圆 · 中英文</option>
+            <option value="sans-tc">繁体黑体 · Sans Serif</option>
+            <option value="serif-tc">繁体宋体 · Serif</option>
+            <option value="sans-sc">简体黑体 · Sans Serif</option>
+            <option value="serif-sc">简体宋体 · Serif</option>
+          </select>
+        </div>
+      </section>
       <div class="keyring-step-panel">
       <ol class="keyring-steps" aria-label="客制步骤">
         <li aria-current="step"><span>01</span> 款式与尺寸</li>
@@ -50,7 +71,7 @@
       <section class="keyring-step" id="keyring-design">
         <h2 tabindex="-1">款式与尺寸</h2>
         <fieldset class="keyring-shapes">
-          <legend>底板造型</legend>
+          <legend>造型</legend>
           <label><input type="radio" name="shape" value="contour" checked>
             <img class="keyring-template" src="assets/keyring/contour.svg" alt=""><span>随字轮廓</span>
           </label>
@@ -118,23 +139,36 @@
         </div>
       </section>
       </div>
-      <section class="keyring-shared" aria-labelledby="keyring-shared-title">
-        <h2 id="keyring-shared-title">姓名与字体</h2>
+    </form>
+  </div>
+  <div class="nameplate-workspace" id="name-clicker" data-keyring-panel hidden>
+    <figure class="nameplate-stage clicker-stage">
+      <span class="eyebrow">CLICKER CONCEPT</span>
+      <div class="clicker-rail" id="clicker-rail" aria-label="按键互动示意"></div>
+      <figcaption>点按预览中的按键，看看姓名怎样分在各格。</figcaption>
+    </figure>
+    <form class="nameplate-form" id="clicker-form">
+      <div class="keyring-step-panel">
+        <div><span class="eyebrow">OGS / PRESS &amp; PLAY</span><h2>姓名按压款</h2></div>
         <div class="nameplate-field">
-          <label for="plate-name">姓名文字</label>
-          <input id="plate-name" name="nameText" maxlength="20" placeholder="你的名字" required pattern=".*\S.*" autocomplete="off">
-        </div>
-        <div class="nameplate-field">
-          <label for="plate-style">字形风格</label>
-          <select id="plate-style" name="style">
-            <option value="huninn">粉圆 · 中英文</option>
-            <option value="sans-tc">繁体黑体 · Sans Serif</option>
-            <option value="serif-tc">繁体宋体 · Serif</option>
-            <option value="sans-sc">简体黑体 · Sans Serif</option>
-            <option value="serif-sc">简体宋体 · Serif</option>
+          <label for="clicker-count">01 · 按键格数</label>
+          <select id="clicker-count" name="keyCount">
+            <option value="1">1 格</option><option value="2">2 格</option>
+            <option value="3" selected>3 格</option><option value="4">4 格</option>
           </select>
         </div>
-      </section>
+        <fieldset id="clicker-labels" class="clicker-labels" data-key-label="按键">
+          <legend>02 · 每格文字</legend>
+          <template id="clicker-label-template">
+            <label class="nameplate-field"><span></span><input maxlength="8" autocomplete="off"></label>
+          </template>
+        </fieldset>
+        <div class="clicker-colors">
+          <div class="nameplate-field"><label for="clicker-base">03 · 底座颜色</label><select id="clicker-base" name="base"></select></div>
+          <div class="nameplate-field"><label for="clicker-cap">键帽颜色</label><select id="clicker-cap" name="cap"></select></div>
+        </div>
+        <p class="nameplate-order-note">按压款为互动示意，实际轴体与键帽结构待试印确认。</p>
+      </div>
     </form>
   </div>
 </main>

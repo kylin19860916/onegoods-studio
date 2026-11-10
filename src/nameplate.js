@@ -1,5 +1,6 @@
 import { parseKeyringFont, generateKeyring } from '../server/keyring-geometry.mjs';
 import { createKeyringViewer } from './keyring-viewer.js';
+import { setupClicker } from './keyring-clicker.js';
 
 const form = document.querySelector('#nameplate-form');
 const { nameText, style, shape, size, mode, baseColor, textColor, useAccent, accentColor } = form.elements;
@@ -182,3 +183,5 @@ form.addEventListener('submit', event => {
   } else if (!generate.disabled) exportImage();
 });
 queuePreview();
+
+setupClicker();

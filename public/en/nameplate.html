@@ -7,8 +7,8 @@
   <title>Custom nameplate — One Goods Studio</title>
   <meta name="description" content="Pick a shape and size, then colour your name keyring.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=90a0efb4f4bf">
-  <script src="../locale.js?v=90a0efb4f4bf" defer></script><script src="../nameplate.js?v=90a0efb4f4bf" defer></script>
+  <link rel="stylesheet" href="../style.css?v=e877c3e598c1">
+  <script src="../locale.js?v=e877c3e598c1" defer></script><script src="../nameplate.js?v=e877c3e598c1" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="nameplate.html" aria-current="page">Custom nameplate</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="nameplate.html" aria-current="page">Custom nameplate</a><a href="about.html">About OGS</a></nav>
@@ -19,7 +19,11 @@
     <h1>Make your own name keyring.</h1>
     <p>Pick a shape and size, then colour your name keyring.</p>
   </div>
-  <div class="nameplate-workspace">
+  <nav class="keyring-product-nav" aria-label="Custom product type">
+    <a href="#name-tag" data-keyring-product="name-tag" aria-current="true">Name keyring</a>
+    <a href="#name-clicker" data-keyring-product="name-clicker">Name clicker</a>
+  </nav>
+  <div class="nameplate-workspace" id="name-tag" data-keyring-panel>
     <figure class="nameplate-stage">
       <div class="plate-view-header">
         <span class="eyebrow">LIVE 3D PREVIEW</span>
@@ -37,11 +41,28 @@
       </svg>
       </div>
       <p class="plate-view-hint" id="plate-view-hint" hidden>Drag to rotate · Pinch to zoom</p>
-      <p id="plate-preview-status" role="status" data-loading="Generating outlines…" data-error="This text cannot form a complete base. Try a shorter name or a different base shape."></p>
+      <p id="plate-preview-status" role="status" data-loading="Generating outlines…" data-error="This text cannot form a complete base. Try a shorter name or a different shape."></p>
       <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="Model dimensions"></p>
       <figcaption>Design preview. Final colours and dimensions depend on production specifications.</figcaption>
     </figure>
     <form id="nameplate-form" class="nameplate-form">
+      <section class="keyring-shared" aria-labelledby="keyring-shared-title">
+        <h2 id="keyring-shared-title">Name and font</h2>
+        <div class="nameplate-field">
+          <label for="plate-name">Name text</label>
+          <input id="plate-name" name="nameText" maxlength="20" placeholder="Your name" required pattern=".*\S.*" autocomplete="off">
+        </div>
+        <div class="nameplate-field">
+          <label for="plate-style">Letter style</label>
+          <select id="plate-style" name="style">
+            <option value="huninn">Huninn · Chinese and English</option>
+            <option value="sans-tc">Traditional Chinese · Sans Serif</option>
+            <option value="serif-tc">Traditional Chinese · Serif</option>
+            <option value="sans-sc">Simplified Chinese · Sans Serif</option>
+            <option value="serif-sc">Simplified Chinese · Serif</option>
+          </select>
+        </div>
+      </section>
       <div class="keyring-step-panel">
       <ol class="keyring-steps" aria-label="Customisation steps">
         <li aria-current="step"><span>01</span> Style and size</li>
@@ -50,7 +71,7 @@
       <section class="keyring-step" id="keyring-design">
         <h2 tabindex="-1">Style and size</h2>
         <fieldset class="keyring-shapes">
-          <legend>Base shape</legend>
+          <legend>Shape</legend>
           <label><input type="radio" name="shape" value="contour" checked>
             <img class="keyring-template" src="../assets/keyring/contour.svg" alt=""><span>Letter contour</span>
           </label>
@@ -118,23 +139,36 @@
         </div>
       </section>
       </div>
-      <section class="keyring-shared" aria-labelledby="keyring-shared-title">
-        <h2 id="keyring-shared-title">Name and font</h2>
+    </form>
+  </div>
+  <div class="nameplate-workspace" id="name-clicker" data-keyring-panel hidden>
+    <figure class="nameplate-stage clicker-stage">
+      <span class="eyebrow">CLICKER CONCEPT</span>
+      <div class="clicker-rail" id="clicker-rail" aria-label="Interactive key preview"></div>
+      <figcaption>Press the preview keys to see how your name fits.</figcaption>
+    </figure>
+    <form class="nameplate-form" id="clicker-form">
+      <div class="keyring-step-panel">
+        <div><span class="eyebrow">OGS / PRESS &amp; PLAY</span><h2>Name clicker</h2></div>
         <div class="nameplate-field">
-          <label for="plate-name">Name text</label>
-          <input id="plate-name" name="nameText" maxlength="20" placeholder="Your name" required pattern=".*\S.*" autocomplete="off">
-        </div>
-        <div class="nameplate-field">
-          <label for="plate-style">Letter style</label>
-          <select id="plate-style" name="style">
-            <option value="huninn">Huninn · Chinese and English</option>
-            <option value="sans-tc">Traditional Chinese · Sans Serif</option>
-            <option value="serif-tc">Traditional Chinese · Serif</option>
-            <option value="sans-sc">Simplified Chinese · Sans Serif</option>
-            <option value="serif-sc">Simplified Chinese · Serif</option>
+          <label for="clicker-count">01 · Number of keys</label>
+          <select id="clicker-count" name="keyCount">
+            <option value="1">1 key</option><option value="2">2 keys</option>
+            <option value="3" selected>3 keys</option><option value="4">4 keys</option>
           </select>
         </div>
-      </section>
+        <fieldset id="clicker-labels" class="clicker-labels" data-key-label="Key">
+          <legend>02 · Text on each key</legend>
+          <template id="clicker-label-template">
+            <label class="nameplate-field"><span></span><input maxlength="8" autocomplete="off"></label>
+          </template>
+        </fieldset>
+        <div class="clicker-colors">
+          <div class="nameplate-field"><label for="clicker-base">03 · Base colour</label><select id="clicker-base" name="base"></select></div>
+          <div class="nameplate-field"><label for="clicker-cap">Keycap colour</label><select id="clicker-cap" name="cap"></select></div>
+        </div>
+        <p class="nameplate-order-note">Interactive mock-up. Switches and keycap fit still need a print test.</p>
+      </div>
     </form>
   </div>
 </main>

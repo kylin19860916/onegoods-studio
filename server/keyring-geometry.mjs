@@ -86,26 +86,26 @@ function motifPlate(shape, width, height) {
 
   // Leave a smaller name band so the motif remains distinct from the base silhouette.
   const emblemWidth = height * 0.9;
-  const bandX = emblemWidth * 0.51;
+  const bandInset = emblemWidth * 0.51;
   const bandHeight = height * 0.64;
   const bounds = [0, 1].map(axis => {
     const values = points.map(point => point[axis]);
     return [Math.min(...values), Math.max(...values)];
   });
   const emblem = points.map(([x, y]) => ({
-    X: Math.round((x - bounds[0][0]) / (bounds[0][1] - bounds[0][0]) * emblemWidth * units),
+    X: Math.round((width - emblemWidth + (x - bounds[0][0]) / (bounds[0][1] - bounds[0][0]) * emblemWidth) * units),
     Y: Math.round((y - bounds[1][0]) / (bounds[1][1] - bounds[1][0]) * height * units),
   }));
   if (!Clipper.Orientation(emblem)) emblem.reverse();
-  const band = roundedPlate(width - bandX, bandHeight, bandHeight / 2).map(point => ({
-    X: point.X + Math.round(bandX * units),
+  const band = roundedPlate(width - bandInset, bandHeight, bandHeight / 2).map(point => ({
+    X: point.X,
     Y: point.Y + Math.round((height - bandHeight) / 2 * units),
   }));
   return {
     paths: polygons([emblem, band]).flat(),
-    holeX: Math.round(emblemWidth * 0.44 * units),
-    holeY: Math.round(height * 0.51 * units),
-    textLeft: emblemWidth * 0.86,
+    holeX: Math.round(5.8 * units),
+    holeY: Math.round(height / 2 * units),
+    textRight: emblemWidth * 0.86,
     textHeight: bandHeight - 4,
   };
 }
@@ -173,8 +173,8 @@ function buildKeyring(font, name, spec) {
   const motif = motifShapes.has(shape) ? motifPlate(shape, widthMm, heightMm) : null;
   const outerRadius = holeMm / 2 + rimMm;
   const ringExtension = 2 * outerRadius - rimMm;
-  const textLeft = motif?.textLeft ?? 12;
-  const plateTextWidth = motif ? widthMm - textLeft - 6 : widthMm - 20;
+  const textLeft = 12;
+  const plateTextWidth = motif ? widthMm - textLeft - motif.textRight : widthMm - 20;
   const availableWidth = isContour ? widthMm - ringExtension - 2 * rimMm : plateTextWidth;
   const availableHeight = isContour ? heightMm - 2 * outerRadius - 2 * rimMm : (motif?.textHeight ?? heightMm - 7);
   const scale = Math.min(availableWidth / (maxX - minX), availableHeight / (maxY - minY));
