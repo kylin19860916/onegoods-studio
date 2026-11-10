@@ -1,60 +1,178 @@
-(() => {
-  const form = document.querySelector('#nameplate-form');
-  if (!form) return;
+import { parseKeyringFont, generateKeyring } from '../server/keyring-geometry.mjs';
+import { createKeyringViewer } from './keyring-viewer.js';
 
-  const { nameText, palette, shape } = form.elements;
-  const preview = document.querySelector('#plate-preview');
-  const lettering = document.querySelector('#plate-lettering');
-  const face = document.querySelector('#plate-text');
-  const summary = document.querySelector('#plate-summary');
-  const status = document.querySelector('#plate-status');
-  const palettes = {
-    lavender: ['#a087c1', '#745895', '#fffcf5', '#493461'],
-    honey: ['#f2c879', '#ba873c', '#292331', '#755a3d'],
-    charcoal: ['#393142', '#211a2b', '#fffcf5', '#a087c1'],
-  };
+const form = document.querySelector('#nameplate-form');
+const { nameText, style, shape, mode, baseColor, textColor, useAccent, accentColor } = form.elements;
+const preview = document.querySelector('#plate-preview');
+const position = document.querySelector('#plate-position');
+const canvas = document.querySelector('#plate-canvas');
+const host = document.querySelector('#plate-view');
+const reset = document.querySelector('#plate-reset-view');
+const viewer = createKeyringViewer(canvas, host, reset);
+if (viewer) {
+  canvas.hidden = false;
+  preview.setAttribute('hidden', '');
+  reset.hidden = false;
+  document.querySelector('#plate-view-hint').hidden = false;
+}
+const previewStatus = document.querySelector('#plate-preview-status');
+const exportStatus = document.querySelector('#plate-status');
+const next = document.querySelector('#keyring-next');
+const generate = document.querySelector('#keyring-generate');
+const designStep = document.querySelector('#keyring-design');
+const colorsStep = document.querySelector('#keyring-colors');
+const multiColors = document.querySelector('#keyring-multiple-colors');
+const accent = document.querySelector('#keyring-accent');
+const progress = document.querySelectorAll('.keyring-steps li');
+const swatches = document.querySelector('#plate-swatch-options');
+for (const select of form.querySelectorAll('[data-swatch]')) {
+  select.append(swatches.content.cloneNode(true));
+  select.value = select.dataset.default;
+}
+const download = document.querySelector('#plate-download');
 
-  function render() {
-    const name = nameText.value.trim();
-    face.textContent = name || nameText.placeholder;
-    lettering.setAttribute('font-size', '66');
-    const width = face.getComputedTextLength();
-    if (width > 510) lettering.setAttribute('font-size', String(66 * 510 / width));
+const fonts = {
+  huninn: 'Huninn-Regular.woff',
+  'sans-tc': 'NotoSansTC-Bold.woff',
+  'serif-tc': 'NotoSerifTC-Bold.woff',
+  'sans-sc': 'NotoSansSC-Bold.woff',
+  'serif-sc': 'NotoSerifSC-Bold.woff',
+};
+const spec = { widthMm: 65, heightMm: 27, baseMm: 3, letteringMm: 1, holeMm: 4, rimMm: 1.8 };
+let currentFont;
+let fontPromise;
+let previewVersion = 0;
+let timer;
 
-    const [base, side, ink, shadow] = palettes[palette.value];
-    for (const [part, color] of Object.entries({ base, side, ink, shadow })) {
+function loadFont(key) {
+  if (key === currentFont && fontPromise) return fontPromise;
+  currentFont = key;
+  const pending = fetch('/assets/fonts/keyring/' + fonts[key])
+    .then(response => {
+      if (!response.ok) throw new Error('Font unavailable');
+      return response.arrayBuffer();
+    })
+    .then(bytes => parseKeyringFont(new Uint8Array(bytes)))
+    .catch(error => {
+      if (fontPromise === pending) fontPromise = undefined;
+      throw error;
+    });
+  fontPromise = pending;
+  return pending;
+}
+
+function shade(color) {
+  const parts = color.slice(1).match(/../g);
+  return '#' + parts.map(part => Math.round(parseInt(part, 16) * 0.72).toString(16).padStart(2, '0')).join('');
+}
+
+function showStep(step) {
+  const editingColors = step === 1;
+  designStep.hidden = editingColors;
+  colorsStep.hidden = !editingColors;
+  progress.forEach((item, index) => {
+    if (index === step) item.setAttribute('aria-current', 'step');
+    else item.removeAttribute('aria-current');
+  });
+  (editingColors ? colorsStep : designStep).querySelector('h2').focus();
+}
+
+async function render(version) {
+  previewStatus.textContent = previewStatus.dataset.loading;
+  try {
+    const font = await loadFont(style.value);
+    if (version !== previewVersion) return;
+    const base = baseColor.value;
+    const ink = mode.value === 'single' ? base : textColor.value;
+    const third = mode.value === 'dual' && useAccent.checked ? accentColor.value : undefined;
+    const model = generateKeyring(font, nameText.value.trim() || nameText.placeholder, {
+      ...spec, shape: shape.value, baseColor: base, textColor: ink, accentColor: third,
+    });
+    const colors = { base, side: third || shade(base), ink, shadow: shade(ink) };
+    for (const [part, color] of Object.entries(colors)) {
       preview.style.setProperty('--plate-' + part, color);
     }
-    for (const layer of preview.querySelectorAll('rect')) {
-      layer.setAttribute('rx', shape.value === 'pill' ? '75' : '24');
-    }
-
-    summary.value = name ? [
-      nameText.labels[0].textContent.trim() + '：' + name,
-      shape.labels[0].textContent.trim() + '：' + shape.selectedOptions[0].textContent,
-      palette.labels[0].textContent.trim() + '：' + palette.selectedOptions[0].textContent,
-    ].join('\n') : '';
-    status.textContent = '';
+    const [x, y, width, height] = model.preview.viewBox;
+    position.setAttribute('transform', `translate(${45 - x - width / 2} ${20 - y - height / 2})`);
+    preview.querySelectorAll('[data-outline]').forEach(path => {
+      path.setAttribute('d', model.preview[path.dataset.outline]);
+    });
+    viewer?.setMeshes(model.meshes);
+    previewStatus.textContent = '';
+    next.disabled = generate.disabled = !nameText.value.trim();
+  } catch {
+    if (version !== previewVersion) return;
+    viewer?.setMeshes([]);
+    preview.querySelectorAll('[data-outline]').forEach(path => path.removeAttribute('d'));
+    previewStatus.textContent = previewStatus.dataset.error;
   }
+}
 
-  form.addEventListener('input', render);
-  form.addEventListener('change', render);
-  form.addEventListener('submit', async event => {
-    event.preventDefault();
-    if (!summary.value) {
-      nameText.focus();
-      return;
-    }
+function queuePreview() {
+  const version = ++previewVersion;
+  next.disabled = generate.disabled = true;
+  multiColors.hidden = mode.value === 'single';
+  accent.hidden = !useAccent.checked;
+  for (const select of form.querySelectorAll('[data-swatch]')) {
+    select.style.borderInlineStart = '5px solid ' + select.value;
+  }
+  download.hidden = true;
+  download.removeAttribute('href');
+  exportStatus.textContent = '';
+  clearTimeout(timer);
+  timer = setTimeout(() => render(version), 120);
+}
+
+function exportImage() {
+  if (viewer) {
     try {
-      await navigator.clipboard.writeText(summary.value);
-      status.textContent = status.dataset.copied;
+      download.href = viewer.image();
+      download.hidden = false;
+      exportStatus.textContent = exportStatus.dataset.ready;
     } catch {
-      summary.focus();
-      summary.select();
-      status.textContent = status.dataset.manual;
+      exportStatus.textContent = exportStatus.dataset.error;
     }
+    return;
+  }
+  const version = previewVersion;
+  const svg = preview.cloneNode(true);
+  svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  svg.setAttribute('width', '1350');
+  svg.setAttribute('height', '645');
+  const originalPaths = preview.querySelectorAll('path');
+  svg.querySelectorAll('path').forEach((path, index) => {
+    path.setAttribute('fill', getComputedStyle(originalPaths[index]).fill);
   });
+  const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' }));
+  const image = new Image();
+  image.onload = () => {
+    URL.revokeObjectURL(url);
+    if (version !== previewVersion) return;
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1350;
+      canvas.height = 645;
+      canvas.getContext('2d').drawImage(image, 0, 0);
+      download.href = canvas.toDataURL('image/png');
+      download.hidden = false;
+      exportStatus.textContent = exportStatus.dataset.ready;
+    } catch {
+      exportStatus.textContent = exportStatus.dataset.error;
+    }
+  };
+  image.onerror = () => {
+    URL.revokeObjectURL(url);
+    if (version === previewVersion) exportStatus.textContent = exportStatus.dataset.error;
+  };
+  image.src = url;
+}
 
-  render();
-  document.fonts.ready.then(render);
-})();
+form.addEventListener('input', queuePreview);
+document.querySelector('#keyring-back').addEventListener('click', () => showStep(0));
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  if (!designStep.hidden) {
+    if (!next.disabled) showStep(1);
+  } else if (!generate.disabled) exportImage();
+});
+queuePreview();

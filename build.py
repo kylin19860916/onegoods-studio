@@ -1,13 +1,13 @@
 """Build static, independently readable Traditional Chinese, Simplified and English pages."""
 from pathlib import Path
-import json, re, hashlib
+import json, re, hashlib, subprocess
 
 root = Path(__file__).resolve().parent
 src, dist = root / 'src', root / 'public'
 translations = json.loads((src / 'translations.json').read_text())
 pattern = re.compile('|'.join(re.escape(k) for k in sorted(translations, key=len, reverse=True)))
 origin = 'https://onegoods.studio'
-build_id = hashlib.sha256(b''.join(p.read_bytes() for p in sorted(src.glob('*')) if p.is_file())).hexdigest()[:12]
+build_id = hashlib.sha256(b''.join(p.read_bytes() for p in sorted(src.glob('*')) if p.is_file()) + (root / 'server' / 'keyring-geometry.mjs').read_bytes()).hexdigest()[:12]
 locales = [('zh-Hant', '', 0), ('zh-Hans', 'zh-cn', None), ('en', 'en', 1)]
 
 for lang, folder, column in locales:
@@ -40,7 +40,9 @@ for lang, folder, column in locales:
             nav = f'<nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="{switch_label}">{current_label}<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options">' + ''.join(options) + '</div></details></nav>'
             text = text.replace('</header>', nav + '</header>')
             prefix = '../' if folder else ''
-            text = text.replace('<script src="app.js"', f'<script src="{prefix}locale.js" defer></script><script src="app.js"')
+            for script_name in ('app.js', f'{prefix}nameplate.js'):
+                tag = f'<script src="{script_name}"'
+                text = text.replace(tag, f'<script src="{prefix}locale.js" defer></script>' + tag)
         if lang == 'en':
             text = text.replace('makerworld.com/zh/', 'makerworld.com/en/')
         for asset in ['style.css', 'app.js', 'locale.js', 'nameplate.js']:
@@ -52,7 +54,11 @@ for lang, folder, column in locales:
     (target / 'app.js').write_text(script)
 (dist / 'style.css').write_text((src / 'style.css').read_text())
 (dist / 'locale.js').write_text((src / 'locale.js').read_text())
-(dist / 'nameplate.js').write_text((src / 'nameplate.js').read_text())
+subprocess.run([
+    str(root / 'node_modules' / '.bin' / 'esbuild'), 'src/nameplate.js',
+    '--bundle', '--platform=browser', '--format=iife', '--minify', '--legal-comments=eof',
+    '--outfile=public/nameplate.js',
+], cwd=root, check=True)
 print(f'Built 3 locales × {len(list(src.glob("*.html")))} routes, localized product data and metadata.')
 
 # Shared admin assets are private-data free; record access is enforced by the server.

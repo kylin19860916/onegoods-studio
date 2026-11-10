@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#a087c1">
   <title>客制名牌 — One Goods Studio</title>
-  <meta name="description" content="输入名字、选择款式和配色，即时预览你的 3D 打印名牌。">
+  <meta name="description" content="输入名字，选好字体和底板，再为你的钥匙圈配色。">
   <link rel="icon" href="assets/icon.png">
   <link rel="stylesheet" href="style.css">
   <script src="nameplate.js" defer></script>
@@ -15,52 +15,105 @@
 
 <main class="section nameplate-page">
   <div class="nameplate-heading">
-    <span class="eyebrow">OGS / NAMEPLATE STUDIO</span>
-    <h1>客制你的名牌。</h1>
-    <p>输入名字、选择款式和配色，即时预览你的 3D 打印名牌。</p>
+    <span class="eyebrow">OGS / KEYRING STUDIO</span>
+    <h1>客制你的姓名钥匙圈。</h1>
+    <p>输入名字，选好字体和底板，再为你的钥匙圈配色。</p>
   </div>
   <div class="nameplate-workspace">
     <figure class="nameplate-stage">
-      <span class="eyebrow">LIVE PREVIEW</span>
-      <svg id="plate-preview" viewBox="0 0 660 240" role="img" aria-label="名牌即时预览">
-        <rect class="plate-side" x="30" y="52" width="600" height="152" rx="24"/>
-        <rect class="plate-base" x="30" y="38" width="600" height="152" rx="24"/>
-        <g id="plate-lettering" font-size="66" font-weight="800" text-anchor="middle">
-          <use href="#plate-text" y="5" class="plate-shadow" aria-hidden="true"/>
-          <text id="plate-text" x="330" y="116" dominant-baseline="central">你的名字</text>
+      <div class="plate-view-header">
+        <span class="eyebrow">LIVE 3D PREVIEW</span>
+        <button class="text-button" id="plate-reset-view" type="button" hidden>重置视角</button>
+      </div>
+      <div class="plate-view" id="plate-view" tabindex="0" aria-label="3D 钥匙圈预览，拖动或使用方向键旋转">
+        <canvas id="plate-canvas" hidden></canvas>
+      <svg id="plate-preview" viewBox="0 0 90 43" role="img" aria-label="名牌即时预览" fill-rule="evenodd">
+        <g id="plate-position">
+          <path data-outline="base" class="plate-contour-side" transform="translate(0 1.4)"/>
+          <path data-outline="base" class="plate-contour"/>
+          <path data-outline="lettering" class="plate-shadow" transform="translate(0 .5)"/>
+          <path data-outline="lettering" class="plate-face"/>
         </g>
       </svg>
+      </div>
+      <p class="plate-view-hint" id="plate-view-hint" hidden>拖动旋转 · 捏合缩放</p>
+      <p id="plate-preview-status" role="status" data-loading="正在生成轮廓…" data-error="这组文字无法生成完整底板，请缩短姓名或换一种底板造型。"></p>
       <figcaption>画面为设计示意，实际成品颜色与尺寸依制作确认为准。</figcaption>
     </figure>
     <form id="nameplate-form" class="nameplate-form">
-      <h2>设定你的名牌</h2>
-      <div class="nameplate-field">
-        <label for="plate-name">名牌文字</label>
-        <input id="plate-name" name="nameText" maxlength="20" placeholder="你的名字" required autocomplete="off">
-      </div>
-      <div class="nameplate-options">
+      <ol class="keyring-steps" aria-label="客制步骤">
+        <li aria-current="step"><span>01</span> 名字与造型</li>
+        <li><span>02</span> 选颜色</li>
+      </ol>
+      <section class="keyring-step" id="keyring-design">
+        <h2 tabindex="-1">名字与造型</h2>
         <div class="nameplate-field">
-          <label for="plate-shape">外形款式</label>
-          <select id="plate-shape" name="shape">
-            <option value="rounded">圆角方形</option>
-            <option value="pill">胶囊形</option>
-          </select>
+          <label for="plate-name">姓名文字</label>
+          <input id="plate-name" name="nameText" maxlength="20" placeholder="你的名字" required pattern=".*\S.*" autocomplete="off">
         </div>
         <div class="nameplate-field">
-          <label for="plate-palette">名牌配色</label>
-          <select id="plate-palette" name="palette">
-            <option value="lavender">薰衣草紫 × 奶油白</option>
-            <option value="honey">蜂蜜金 × 深灰</option>
-            <option value="charcoal">炭灰 × 奶油白</option>
+          <label for="plate-style">字形风格</label>
+          <select id="plate-style" name="style">
+            <option value="huninn">粉圆 · 中英文</option>
+            <option value="sans-tc">繁体黑体 · Sans Serif</option>
+            <option value="serif-tc">繁体宋体 · Serif</option>
+            <option value="sans-sc">简体黑体 · Sans Serif</option>
+            <option value="serif-sc">简体宋体 · Serif</option>
           </select>
         </div>
-      </div>
-      <div class="nameplate-field">
-        <label for="plate-summary">客制内容</label>
-        <textarea id="plate-summary" rows="3" readonly></textarea>
-      </div>
-      <button class="button yellow" type="submit">复制客制内容</button>
-      <p id="plate-status" role="status" data-copied="已复制客制内容。" data-manual="已选取客制内容，请手动复制。"></p>
+        <fieldset class="keyring-shapes">
+          <legend>底板造型</legend>
+          <label><input type="radio" name="shape" value="contour" checked>
+            <img class="keyring-template" src="assets/keyring/contour.svg" alt=""><span>随字轮廓</span>
+          </label>
+          <label><input type="radio" name="shape" value="capsule">
+            <img class="keyring-template" src="assets/keyring/capsule.svg" alt=""><span>胶囊底板</span>
+          </label>
+          <label><input type="radio" name="shape" value="rounded">
+            <img class="keyring-template" src="assets/keyring/rounded.svg" alt=""><span>圆角底板</span>
+          </label>
+        </fieldset>
+        <p class="nameplate-order-note">统一预览规格：最长 65 mm，底板与凸字总厚 4 mm。</p>
+        <button class="button yellow" id="keyring-next" type="submit" disabled>下一步：选颜色</button>
+      </section>
+      <section class="keyring-step" id="keyring-colors" hidden>
+        <h2 tabindex="-1">选颜色</h2>
+        <fieldset class="keyring-print-mode">
+          <legend>打印方式</legend>
+          <label><input type="radio" name="mode" value="single"> 单色</label>
+          <label><input type="radio" name="mode" value="dual" checked> 双色</label>
+        </fieldset>
+        <div class="nameplate-field">
+          <label for="plate-base-color">颜色 1 · 底板</label>
+          <select id="plate-base-color" name="baseColor" data-swatch data-default="#a087c1"></select>
+        </div>
+        <div id="keyring-multiple-colors">
+          <div class="nameplate-field">
+            <label for="plate-text-color">颜色 2 · 凸字</label>
+            <select id="plate-text-color" name="textColor" data-swatch data-default="#fffcf5"></select>
+          </div>
+          <label class="keyring-add-color"><input type="checkbox" name="useAccent"> 增加颜色 3</label>
+          <div class="nameplate-field" id="keyring-accent" hidden>
+            <label for="plate-accent-color">颜色 3 · 底板侧边</label>
+            <select id="plate-accent-color" name="accentColor" data-swatch data-default="#f2c879"></select>
+          </div>
+        </div>
+        <template id="plate-swatch-options">
+          <option value="#a087c1">薰衣草紫</option>
+          <option value="#fffcf5">奶油白</option>
+          <option value="#f2c879">蜂蜜金</option>
+          <option value="#393142">炭灰</option>
+          <option value="#b8d6bd">薄荷绿</option>
+          <option value="#efb39e">蜜桃粉</option>
+        </template>
+        <div class="nameplate-actions">
+          <button class="button cream" id="keyring-back" type="button">上一步</button>
+          <button class="button yellow" id="keyring-generate" type="submit" disabled>生成预览图</button>
+          <a class="button cream" id="plate-download" download="OGS-keyring-preview.png" hidden>下载 PNG</a>
+          <p id="plate-status" role="status" data-error="预览图生成失败，请再试一次。" data-ready="预览图已生成。"></p>
+          <p class="nameplate-order-note">正式售价与賣貨便商品连结确认后开放送单。</p>
+        </div>
+      </section>
     </form>
   </div>
 </main>

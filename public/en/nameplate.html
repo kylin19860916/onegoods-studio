@@ -5,62 +5,115 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#a087c1">
   <title>Custom nameplate — One Goods Studio</title>
-  <meta name="description" content="Enter a name and choose a shape and colours to preview your 3D-printed nameplate.">
+  <meta name="description" content="Enter a name, pick a font and base, then colour your keyring.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=c3a84e79ccc7">
-  <script src="../nameplate.js?v=c3a84e79ccc7" defer></script>
+  <link rel="stylesheet" href="../style.css?v=5b48a938fdfd">
+  <script src="../locale.js?v=5b48a938fdfd" defer></script><script src="../nameplate.js?v=5b48a938fdfd" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="nameplate.html" aria-current="page">Custom nameplate</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="nameplate.html" aria-current="page">Custom nameplate</a><a href="about.html">About OGS</a></nav>
 
 <main class="section nameplate-page">
   <div class="nameplate-heading">
-    <span class="eyebrow">OGS / NAMEPLATE STUDIO</span>
-    <h1>Make it yours.</h1>
-    <p>Enter a name and choose a shape and colours to preview your 3D-printed nameplate.</p>
+    <span class="eyebrow">OGS / KEYRING STUDIO</span>
+    <h1>Make your own name keyring.</h1>
+    <p>Enter a name, pick a font and base, then colour your keyring.</p>
   </div>
   <div class="nameplate-workspace">
     <figure class="nameplate-stage">
-      <span class="eyebrow">LIVE PREVIEW</span>
-      <svg id="plate-preview" viewBox="0 0 660 240" role="img" aria-label="Live nameplate preview">
-        <rect class="plate-side" x="30" y="52" width="600" height="152" rx="24"/>
-        <rect class="plate-base" x="30" y="38" width="600" height="152" rx="24"/>
-        <g id="plate-lettering" font-size="66" font-weight="800" text-anchor="middle">
-          <use href="#plate-text" y="5" class="plate-shadow" aria-hidden="true"/>
-          <text id="plate-text" x="330" y="116" dominant-baseline="central">Your name</text>
+      <div class="plate-view-header">
+        <span class="eyebrow">LIVE 3D PREVIEW</span>
+        <button class="text-button" id="plate-reset-view" type="button" hidden>Reset view</button>
+      </div>
+      <div class="plate-view" id="plate-view" tabindex="0" aria-label="3D keyring preview. Drag or use the arrow keys to rotate.">
+        <canvas id="plate-canvas" hidden></canvas>
+      <svg id="plate-preview" viewBox="0 0 90 43" role="img" aria-label="Live nameplate preview" fill-rule="evenodd">
+        <g id="plate-position">
+          <path data-outline="base" class="plate-contour-side" transform="translate(0 1.4)"/>
+          <path data-outline="base" class="plate-contour"/>
+          <path data-outline="lettering" class="plate-shadow" transform="translate(0 .5)"/>
+          <path data-outline="lettering" class="plate-face"/>
         </g>
       </svg>
+      </div>
+      <p class="plate-view-hint" id="plate-view-hint" hidden>Drag to rotate · Pinch to zoom</p>
+      <p id="plate-preview-status" role="status" data-loading="Generating outlines…" data-error="This text cannot form a complete base. Try a shorter name or a different base shape."></p>
       <figcaption>Design preview. Final colours and dimensions depend on production specifications.</figcaption>
     </figure>
     <form id="nameplate-form" class="nameplate-form">
-      <h2>Design your nameplate</h2>
-      <div class="nameplate-field">
-        <label for="plate-name">Nameplate text</label>
-        <input id="plate-name" name="nameText" maxlength="20" placeholder="Your name" required autocomplete="off">
-      </div>
-      <div class="nameplate-options">
+      <ol class="keyring-steps" aria-label="Customisation steps">
+        <li aria-current="step"><span>01</span> Name and shape</li>
+        <li><span>02</span> Choose colours</li>
+      </ol>
+      <section class="keyring-step" id="keyring-design">
+        <h2 tabindex="-1">Name and shape</h2>
         <div class="nameplate-field">
-          <label for="plate-shape">Shape</label>
-          <select id="plate-shape" name="shape">
-            <option value="rounded">Rounded rectangle</option>
-            <option value="pill">Capsule</option>
-          </select>
+          <label for="plate-name">Name text</label>
+          <input id="plate-name" name="nameText" maxlength="20" placeholder="Your name" required pattern=".*\S.*" autocomplete="off">
         </div>
         <div class="nameplate-field">
-          <label for="plate-palette">Colour palette</label>
-          <select id="plate-palette" name="palette">
-            <option value="lavender">Lavender × Cream</option>
-            <option value="honey">Honey × Charcoal</option>
-            <option value="charcoal">Charcoal × Cream</option>
+          <label for="plate-style">Letter style</label>
+          <select id="plate-style" name="style">
+            <option value="huninn">Huninn · Chinese and English</option>
+            <option value="sans-tc">Traditional Chinese · Sans Serif</option>
+            <option value="serif-tc">Traditional Chinese · Serif</option>
+            <option value="sans-sc">Simplified Chinese · Sans Serif</option>
+            <option value="serif-sc">Simplified Chinese · Serif</option>
           </select>
         </div>
-      </div>
-      <div class="nameplate-field">
-        <label for="plate-summary">Customisation details</label>
-        <textarea id="plate-summary" rows="3" readonly></textarea>
-      </div>
-      <button class="button yellow" type="submit">Copy customisation</button>
-      <p id="plate-status" role="status" data-copied="Customisation copied." data-manual="Details selected. Copy them to your clipboard."></p>
+        <fieldset class="keyring-shapes">
+          <legend>Base shape</legend>
+          <label><input type="radio" name="shape" value="contour" checked>
+            <img class="keyring-template" src="../assets/keyring/contour.svg" alt=""><span>Letter contour</span>
+          </label>
+          <label><input type="radio" name="shape" value="capsule">
+            <img class="keyring-template" src="../assets/keyring/capsule.svg" alt=""><span>Capsule</span>
+          </label>
+          <label><input type="radio" name="shape" value="rounded">
+            <img class="keyring-template" src="../assets/keyring/rounded.svg" alt=""><span>Rounded rectangle</span>
+          </label>
+        </fieldset>
+        <p class="nameplate-order-note">Standard preview size: up to 65 mm long and 4 mm thick.</p>
+        <button class="button yellow" id="keyring-next" type="submit" disabled>Next: Choose colours</button>
+      </section>
+      <section class="keyring-step" id="keyring-colors" hidden>
+        <h2 tabindex="-1">Choose colours</h2>
+        <fieldset class="keyring-print-mode">
+          <legend>Print colours</legend>
+          <label><input type="radio" name="mode" value="single"> One colour</label>
+          <label><input type="radio" name="mode" value="dual" checked> Two colours</label>
+        </fieldset>
+        <div class="nameplate-field">
+          <label for="plate-base-color">Colour 1 · Base</label>
+          <select id="plate-base-color" name="baseColor" data-swatch data-default="#a087c1"></select>
+        </div>
+        <div id="keyring-multiple-colors">
+          <div class="nameplate-field">
+            <label for="plate-text-color">Colour 2 · Raised lettering</label>
+            <select id="plate-text-color" name="textColor" data-swatch data-default="#fffcf5"></select>
+          </div>
+          <label class="keyring-add-color"><input type="checkbox" name="useAccent"> Add a third colour</label>
+          <div class="nameplate-field" id="keyring-accent" hidden>
+            <label for="plate-accent-color">Colour 3 · Base edge</label>
+            <select id="plate-accent-color" name="accentColor" data-swatch data-default="#f2c879"></select>
+          </div>
+        </div>
+        <template id="plate-swatch-options">
+          <option value="#a087c1">Lavender</option>
+          <option value="#fffcf5">Cream</option>
+          <option value="#f2c879">Honey gold</option>
+          <option value="#393142">Charcoal</option>
+          <option value="#b8d6bd">Mint</option>
+          <option value="#efb39e">Peach</option>
+        </template>
+        <div class="nameplate-actions">
+          <button class="button cream" id="keyring-back" type="button">Back</button>
+          <button class="button yellow" id="keyring-generate" type="submit" disabled>Generate preview</button>
+          <a class="button cream" id="plate-download" download="OGS-keyring-preview.png" hidden>Download PNG</a>
+          <p id="plate-status" role="status" data-error="Could not generate the preview. Try again." data-ready="Preview ready."></p>
+          <p class="nameplate-order-note">Ordering will open once the price and 7-ELEVEN listing are confirmed.</p>
+        </div>
+      </section>
     </form>
   </div>
 </main>

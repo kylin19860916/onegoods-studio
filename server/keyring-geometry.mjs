@@ -1,0 +1,201 @@
+import opentype from 'opentype.js';
+import ClipperLib from 'clipper-lib';
+import earcut from 'earcut';
+import { strToU8, zipSync } from 'fflate';
+
+const units = 1000;
+const core = 'http://schemas.microsoft.com/3dmanufacturing/core/2015/02';
+const { Clipper, ClipperOffset, PolyTree, PolyType, PolyFillType, ClipType, JoinType, EndType } = ClipperLib;
+
+export function parseKeyringFont(bytes) {
+  return opentype.parse(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+}
+
+function flatten(commands) {
+  const contours = [];
+  let ring = [];
+  const point = (x, y) => [x, -y];
+  for (const command of commands) {
+    const { type, x, y, x1, y1, x2, y2 } = command;
+    if (type === 'M') {
+      ring = [point(x, y)];
+    } else if (type === 'L') {
+      ring.push(point(x, y));
+    } else if (type === 'C' || type === 'Q') {
+      const start = ring.at(-1);
+      const end = point(x, y);
+      const p1 = point(x1, y1);
+      const p2 = type === 'C' ? point(x2, y2) : end;
+      const length = Math.hypot(p1[0] - start[0], p1[1] - start[1])
+        + Math.hypot(p2[0] - p1[0], p2[1] - p1[1]) + Math.hypot(end[0] - p2[0], end[1] - p2[1]);
+      const segments = Math.max(4, Math.min(64, Math.ceil(length / 2)));
+      for (let i = 1; i <= segments; i++) {
+        const t = i / segments;
+        const u = 1 - t;
+        ring.push(start.map((v, axis) => type === 'C'
+          ? u ** 3 * v + 3 * u ** 2 * t * p1[axis] + 3 * u * t ** 2 * p2[axis] + t ** 3 * end[axis]
+          : u ** 2 * v + 2 * u * t * p1[axis] + t ** 2 * end[axis]));
+      }
+    } else if (type === 'Z' && ring.length > 2) {
+      contours.push(ring);
+      ring = [];
+    }
+  }
+  return contours;
+}
+
+function polygons(subject, clip = [], operation = ClipType.ctUnion) {
+  const engine = new Clipper();
+  engine.StrictlySimple = true;
+  engine.AddPaths(subject, PolyType.ptSubject, true);
+  if (clip.length) engine.AddPaths(clip, PolyType.ptClip, true);
+  const result = new PolyTree();
+  engine.Execute(operation, result, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
+  return ClipperLib.JS.PolyTreeToExPolygons(result).map(({ outer, holes }) => [outer, ...holes]);
+}
+
+function circle(x, y, radius) {
+  return Array.from({ length: 64 }, (_, i) => {
+    const a = 2 * Math.PI * i / 64;
+    return { X: Math.round(x + radius * Math.cos(a)), Y: Math.round(y + radius * Math.sin(a)) };
+  });
+}
+
+function roundedPlate(width, height, radius) {
+  const corners = [[width - radius, radius], [width - radius, height - radius], [radius, height - radius], [radius, radius]];
+  return corners.flatMap(([x, y], corner) => Array.from({ length: 17 }, (_, i) => {
+    const angle = (corner - 1) * Math.PI / 2 + i * Math.PI / 32;
+    return { X: Math.round((x + radius * Math.cos(angle)) * units), Y: Math.round((y + radius * Math.sin(angle)) * units) };
+  }));
+}
+
+function pathData(polys) {
+  return polys.flatMap(poly => poly.map(ring =>
+    ring.map(({ X, Y }, i) => `${i ? 'L' : 'M'}${X / units} ${-Y / units}`).join(' ') + 'Z'
+  )).join(' ');
+}
+
+function extrude(polys, bottom, top) {
+  const vertices = [];
+  const triangles = [];
+  for (const rings of polys) {
+    const points = rings.flat();
+    const holes = rings.slice(1).map((_, i) => rings.slice(0, i + 1).reduce((sum, r) => sum + r.length, 0));
+    const caps = earcut(points.flatMap(({ X, Y }) => [X, Y]), holes);
+    const start = vertices.length;
+    const n = points.length;
+    vertices.push(...points.map(({ X, Y }) => [X / units, Y / units, bottom]));
+    vertices.push(...points.map(({ X, Y }) => [X / units, Y / units, top]));
+    for (let i = 0; i < caps.length; i += 3) {
+      const [a, b, c] = caps.slice(i, i + 3);
+      triangles.push([start + c, start + b, start + a], [start + n + a, start + n + b, start + n + c]);
+    }
+    let offset = 0;
+    for (const ring of rings) {
+      for (let i = 0; i < ring.length; i++) {
+        const a = start + offset + i;
+        const b = start + offset + (i + 1) % ring.length;
+        triangles.push([a, b, b + n], [a, b + n, a + n]);
+      }
+      offset += ring.length;
+    }
+  }
+  return { vertices, triangles };
+}
+
+class DisconnectedBaseError extends Error {}
+
+export function generateKeyring(font, name, spec) {
+  for (const extraRim of [0, 0.3, 0.6]) {
+    try {
+      return buildKeyring(font, name, { ...spec, rimMm: spec.rimMm + extraRim });
+    } catch (error) {
+      if (!(error instanceof DisconnectedBaseError) || extraRim === 0.6) throw error;
+    }
+  }
+}
+
+function buildKeyring(font, name, spec) {
+  const text = name.trim().normalize('NFC');
+  if (!text || [...text].length > 20 || /[\p{C}\u2028\u2029]/u.test(text)) throw new Error('請輸入 1–20 個可印文字。');
+  for (const character of text) {
+    if (character !== ' ' && !font.charToGlyphIndex(character)) throw new Error('有字元不在此款支援的字型中。');
+  }
+  const outlines = flatten(font.getPath(text, 0, 0, 100, { kerning: true }).commands);
+  const points = outlines.flat();
+  if (!points.length) throw new Error('找不到可列印的字形。');
+  const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const { widthMm, heightMm, baseMm, letteringMm, holeMm, rimMm, baseColor, textColor, accentColor, shape = 'contour' } = spec;
+  const isContour = shape === 'contour';
+  const outerRadius = holeMm / 2 + rimMm;
+  const ringExtension = 2 * outerRadius - rimMm;
+  const availableWidth = isContour ? widthMm - ringExtension - 2 * rimMm : widthMm - 20;
+  const availableHeight = isContour ? heightMm - 2 * outerRadius - 2 * rimMm : heightMm - 7;
+  const scale = Math.min(availableWidth / (maxX - minX), availableHeight / (maxY - minY));
+  if (!(scale > 0)) throw new Error('此尺寸無法容納掛孔和文字。');
+  const textX = isContour ? 0 : 12 + (availableWidth - (maxX - minX) * scale) / 2;
+  const textY = isContour ? 0 : (heightMm - (maxY - minY) * scale) / 2;
+  const lettering = polygons(outlines.map(ring => ring.map(([x, y]) => ({
+    X: Math.round(((x - minX) * scale + textX) * units),
+    Y: Math.round(((y - minY) * scale + textY) * units),
+  }))));
+
+  let basePaths, holeX, holeY;
+  if (isContour) {
+    const offset = new ClipperOffset(2, 7);
+    offset.AddPaths(lettering.flat(), JoinType.jtRound, EndType.etClosedPolygon);
+    const pad = [];
+    offset.Execute(pad, rimMm * units);
+    if (!pad.length) throw new Error('無法建立底板。');
+    const edge = pad.flat().reduce((a, b) => b.X < a.X ? b : a);
+    holeX = edge.X - (outerRadius - rimMm) * units;
+    holeY = edge.Y;
+    basePaths = polygons([...pad, circle(holeX, holeY, outerRadius * units)]).flat();
+  } else {
+    basePaths = [roundedPlate(widthMm, heightMm, shape === 'capsule' ? heightMm / 2 : 4)];
+    holeX = 5.8 * units;
+    holeY = heightMm / 2 * units;
+    if (polygons(lettering.flat(), basePaths, ClipType.ctDifference).length) {
+      throw new Error('文字超出底板，請縮短姓名。');
+    }
+  }
+
+  const drilled = polygons(basePaths, [circle(holeX, holeY, holeMm / 2 * units)], ClipType.ctDifference);
+  if (drilled.length !== 1) throw new DisconnectedBaseError('字形之間未連成完整底板，請縮短姓名或換款式。');
+  const stripeHeight = accentColor ? Math.min(0.8, baseMm / 2) : 0;
+  const meshes = [
+    { ...extrude(drilled, stripeHeight, baseMm), color: baseColor, name: 'Base' },
+    { ...extrude(lettering, baseMm, baseMm + letteringMm), color: textColor, name: 'Raised lettering' },
+  ];
+  if (stripeHeight) meshes.push({ ...extrude(drilled, 0, stripeHeight), color: accentColor, name: 'Base accent' });
+  const bounds = drilled.flat(2);
+  const left = Math.min(...bounds.map(p => p.X)) / units;
+  const right = Math.max(...bounds.map(p => p.X)) / units;
+  const low = Math.min(...bounds.map(p => p.Y)) / units;
+  const high = Math.max(...bounds.map(p => p.Y)) / units;
+  return {
+    meshes,
+    preview: { base: pathData(drilled), lettering: pathData(lettering), viewBox: [left - 2, -high - 2, right - left + 4, high - low + 4] },
+    dimensions: [right - left, high - low, baseMm + letteringMm],
+  };
+}
+
+export function writeKeyring3mf({ meshes }) {
+  const material = meshes.map(({ name, color }) => `<base name="${name}" displaycolor="${color.toUpperCase()}"/>`).join('');
+  const objects = meshes.map(({ name, vertices, triangles }, index) =>
+    `<object id="${index + 2}" name="${name}" type="model" pid="1" pindex="${index}"><mesh><vertices>`
+    + vertices.map(([x, y, z]) => `<vertex x="${x}" y="${y}" z="${z}"/>`).join('')
+    + '</vertices><triangles>'
+    + triangles.map(([a, b, c]) => `<triangle v1="${a}" v2="${b}" v3="${c}"/>`).join('')
+    + '</triangles></mesh></object>'
+  ).join('');
+  const assembly = meshes.length + 2;
+  const components = meshes.map((_, index) => `<component objectid="${index + 2}"/>`).join('');
+  return zipSync({
+    '[Content_Types].xml': strToU8('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>'),
+    '_rels/.rels': strToU8('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>'),
+    '3D/3dmodel.model': strToU8(`<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="zh-TW" xmlns="${core}"><resources><basematerials id="1">${material}</basematerials>${objects}<object id="${assembly}" type="model" name="OGS Name Keyring"><components>${components}</components></object></resources><build><item objectid="${assembly}"/></build></model>`),
+  });
+}
