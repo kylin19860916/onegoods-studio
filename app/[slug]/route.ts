@@ -1,2 +1,2 @@
-const pages=new Set(['products','product','design-files','about','checkout','index']);
+const pages=new Set(['products','product','design-files','about','checkout','index','nameplate']);
 export async function GET(request:Request){const u=new URL(request.url),slug=u.pathname.replace(/^\/+|\/+$/g,'');if(pages.has(slug)){u.pathname='/'+slug+'.html';return Response.redirect(u,302);}return new Response('<meta charset="utf-8"><h1>找不到這個頁面</h1><a href="/">返回首頁</a>',{status:404,headers:{'Content-Type':'text/html;charset=utf-8'}});}

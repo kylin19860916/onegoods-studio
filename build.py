@@ -19,7 +19,7 @@ for lang, folder, column in locales:
         text = translate(page.read_text()).replace('lang="zh-Hans"', f'lang="{lang}"')
         if folder:
             text = text.replace('href="assets/', 'href="../assets/').replace('src="assets/', 'src="../assets/')
-            text = text.replace('href="style.css"', 'href="../style.css"')
+            text = text.replace('href="style.css"', 'href="../style.css"').replace('src="nameplate.js"', 'src="../nameplate.js"')
         # All locale pages have static content and metadata even without JavaScript.
         canonical = f'{origin}/{folder + "/" if folder else ""}{page.name}'
         text = re.sub(r'<link rel="canonical"[^>]*>', '', text)
@@ -43,7 +43,7 @@ for lang, folder, column in locales:
             text = text.replace('<script src="app.js"', f'<script src="{prefix}locale.js" defer></script><script src="app.js"')
         if lang == 'en':
             text = text.replace('makerworld.com/zh/', 'makerworld.com/en/')
-        for asset in ['style.css', 'app.js', 'locale.js']:
+        for asset in ['style.css', 'app.js', 'locale.js', 'nameplate.js']:
             text = re.sub(r'((?:src|href)="[^"?]*' + re.escape(asset) + r')(")', lambda m: m[1] + "?v=" + build_id + m[2], text)
         (target / page.name).write_text(text)
     script = translate((src / 'app.js').read_text())
@@ -52,7 +52,8 @@ for lang, folder, column in locales:
     (target / 'app.js').write_text(script)
 (dist / 'style.css').write_text((src / 'style.css').read_text())
 (dist / 'locale.js').write_text((src / 'locale.js').read_text())
-print('Built 3 locales × 6 routes, localized product data and metadata.')
+(dist / 'nameplate.js').write_text((src / 'nameplate.js').read_text())
+print(f'Built 3 locales × {len(list(src.glob("*.html")))} routes, localized product data and metadata.')
 
 # Shared admin assets are private-data free; record access is enforced by the server.
 import shutil

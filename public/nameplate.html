@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#a087c1">
+  <title>客製名牌 — One Goods Studio</title>
+  <meta name="description" content="輸入名字、選擇款式和配色，即時預覽你的 3D 列印名牌。">
+  <link rel="icon" href="assets/icon.png">
+  <link rel="stylesheet" href="style.css?v=c3a84e79ccc7">
+  <script src="nameplate.js?v=c3a84e79ccc7" defer></script>
+<link rel="canonical" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
+<body data-page="nameplate">
+<header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客製名牌</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="en/nameplate.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客製名牌</a><a href="about.html">關於 OGS</a></nav>
+
+<main class="section nameplate-page">
+  <div class="nameplate-heading">
+    <span class="eyebrow">OGS / NAMEPLATE STUDIO</span>
+    <h1>客製你的名牌。</h1>
+    <p>輸入名字、選擇款式和配色，即時預覽你的 3D 列印名牌。</p>
+  </div>
+  <div class="nameplate-workspace">
+    <figure class="nameplate-stage">
+      <span class="eyebrow">LIVE PREVIEW</span>
+      <svg id="plate-preview" viewBox="0 0 660 240" role="img" aria-label="名牌即時預覽">
+        <rect class="plate-side" x="30" y="52" width="600" height="152" rx="24"/>
+        <rect class="plate-base" x="30" y="38" width="600" height="152" rx="24"/>
+        <g id="plate-lettering" font-size="66" font-weight="800" text-anchor="middle">
+          <use href="#plate-text" y="5" class="plate-shadow" aria-hidden="true"/>
+          <text id="plate-text" x="330" y="116" dominant-baseline="central">你的名字</text>
+        </g>
+      </svg>
+      <figcaption>畫面為設計示意，實際成品顏色與尺寸依製作確認為準。</figcaption>
+    </figure>
+    <form id="nameplate-form" class="nameplate-form">
+      <h2>設定你的名牌</h2>
+      <div class="nameplate-field">
+        <label for="plate-name">名牌文字</label>
+        <input id="plate-name" name="nameText" maxlength="20" placeholder="你的名字" required autocomplete="off">
+      </div>
+      <div class="nameplate-options">
+        <div class="nameplate-field">
+          <label for="plate-shape">外形款式</label>
+          <select id="plate-shape" name="shape">
+            <option value="rounded">圓角方形</option>
+            <option value="pill">膠囊形</option>
+          </select>
+        </div>
+        <div class="nameplate-field">
+          <label for="plate-palette">名牌配色</label>
+          <select id="plate-palette" name="palette">
+            <option value="lavender">薰衣草紫 × 奶油白</option>
+            <option value="honey">蜂蜜金 × 深灰</option>
+            <option value="charcoal">炭灰 × 奶油白</option>
+          </select>
+        </div>
+      </div>
+      <div class="nameplate-field">
+        <label for="plate-summary">客製內容</label>
+        <textarea id="plate-summary" rows="3" readonly></textarea>
+      </div>
+      <button class="button yellow" type="submit">複製客製內容</button>
+      <p id="plate-status" role="status" data-copied="已複製客製內容。" data-manual="已選取客製內容，請手動複製。"></p>
+    </form>
+  </div>
+</main>
+<footer><div class="footer-brand">One Goods Studio<span>紓壓、有趣，自成一格。</span></div><div><a href="index.html">首頁</a><a href="products.html">好物</a><a href="nameplate.html">客製名牌</a><a href="about.html">關於 OGS</a></div><small>© 2026 One Goods Studio</small></footer>
+</body>
+</html>
