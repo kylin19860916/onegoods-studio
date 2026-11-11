@@ -67,13 +67,13 @@
             <option value="wenkai">霞鹜文楷 · 繁体</option>
             <option value="kuaile">站酷快乐 · 简体</option></optgroup>
             <optgroup label="英文字型">
-              <option value="lucky" data-sample="Angela">Luckiest Guy</option>
-              <option value="nunito" data-sample="Angela">Nunito Black</option>
-              <option value="lobster" data-sample="Angela">Lobster</option>
-              <option value="lilita" data-sample="Angela">Lilita One</option>
-              <option value="chewy" data-sample="Angela">Chewy</option>
-              <option value="yellowtail" data-sample="Angela">Yellowtail</option>
-              <option value="blackops" data-sample="Angela">Black Ops One</option>
+              <option value="lucky" data-sample="One Goods">Luckiest Guy</option>
+              <option value="nunito" data-sample="One Goods">Nunito Black</option>
+              <option value="lobster" data-sample="One Goods">Lobster</option>
+              <option value="lilita" data-sample="One Goods">Lilita One</option>
+              <option value="chewy" data-sample="One Goods">Chewy</option>
+              <option value="yellowtail" data-sample="One Goods">Yellowtail</option>
+              <option value="blackops" data-sample="One Goods">Black Ops One</option>
             </optgroup>
           </select>
         </div>
@@ -155,34 +155,52 @@
     </form>
   </div>
   <div class="nameplate-workspace" id="name-clicker" data-keyring-panel hidden>
-    <figure class="nameplate-stage clicker-stage">
-      <span class="eyebrow">CLICKER CONCEPT</span>
-      <div class="clicker-rail" id="clicker-rail" aria-label="按键互动示意"></div>
-      <figcaption>点按预览中的按键，看看姓名怎样分在各格。</figcaption>
+    <figure class="keyring-preview">
+      <div class="nameplate-stage keyring-preview-frame">
+        <div class="plate-view-header"><span class="eyebrow">LIVE 3D PREVIEW</span><button class="text-button" type="button" id="clicker-reset">重置视角</button></div>
+        <div class="plate-view" id="clicker-view" tabindex="0" aria-label="3D 按压款预览，可拖动旋转与缩放"><canvas id="clicker-canvas"></canvas></div>
+      </div>
+      <div class="keyring-preview-meta">
+        <p class="plate-view-hint">拖动旋转 · 捏合缩放 · 点按键帽</p>
+        <p id="clicker-status" role="status" data-unsupported="所选字体不支持这些文字，请更换字体或姓名。" data-error="3D 预览载入失败，请再试一次。" data-no-webgl="目前浏览器无法显示 3D，请使用支持 WebGL 的浏览器。"></p>
+        <figcaption>画面为设计示意，实际成品颜色与尺寸依制作确认为准。</figcaption>
+      </div>
     </figure>
     <form class="nameplate-form" id="clicker-form">
       <div class="keyring-step-panel">
         <div><span class="eyebrow">OGS / PRESS &amp; PLAY</span><h2>姓名按压款</h2></div>
-        <fieldset class="clicker-count-control">
-          <legend>01 · 按键格数</legend>
-          <div class="clicker-count-stepper">
-            <button type="button" id="clicker-remove" aria-label="减少一格">−</button>
-            <output id="clicker-count" aria-live="polite">2</output>
-            <button type="button" id="clicker-add" aria-label="增加一格">+</button>
+        <fieldset class="clicker-key-editor">
+          <legend>按键与文字</legend>
+          <div id="clicker-labels" class="clicker-labels" data-key-label="按键" data-font-label="字型">
+            <template id="clicker-label-template">
+              <div class="nameplate-field clicker-letter-slot">
+                <button class="clicker-slot-key" type="button"></button>
+                <input autocomplete="off" autocapitalize="off" spellcheck="false">
+                <div class="nameplate-field clicker-font-field"><label>字形风格</label></div>
+              </div>
+            </template>
+            <div class="clicker-inline-controls">
+              <button type="button" id="clicker-add" aria-label="增加一格">+</button>
+              <button type="button" id="clicker-remove" aria-label="减少一格">−</button>
+            </div>
           </div>
         </fieldset>
-        <fieldset id="clicker-labels" class="clicker-labels" data-key-label="按键">
-          <legend>02 · 每格文字</legend>
-          <template id="clicker-label-template">
-            <label class="nameplate-field clicker-letter-slot"><span aria-hidden="true"></span><input autocomplete="off" autocapitalize="off" spellcheck="false"></label>
-          </template>
-        </fieldset>
         <p class="nameplate-order-note">每格限一个字，可输入中文或英文字母。</p>
-        <div class="clicker-colors">
-          <div class="nameplate-field"><label for="clicker-base">03 · 底座颜色</label><select id="clicker-base" name="base"></select></div>
-          <div class="nameplate-field"><label for="clicker-cap">键帽颜色</label><select id="clicker-cap" name="cap"></select></div>
-          <div class="nameplate-field"><label for="clicker-ink">文字颜色</label><select id="clicker-ink" name="ink"></select></div>
-        </div>
+        <section class="clicker-colors" aria-labelledby="clicker-colors-heading">
+          <h3 id="clicker-colors-heading">配色</h3>
+          <details class="clicker-colour-section" open>
+            <summary><span>底座颜色</span><span class="clicker-colour-current" data-clicker-current="base"><i aria-hidden="true"></i><span></span></span></summary>
+            <div class="nameplate-field"><label for="clicker-base">底座颜色</label><select id="clicker-base" name="base"></select></div>
+          </details>
+          <details class="clicker-colour-section" open>
+            <summary><span>键帽颜色</span><span class="clicker-colour-current" data-clicker-current="cap"><i aria-hidden="true"></i><span></span></span></summary>
+            <div class="nameplate-field"><label for="clicker-cap">键帽颜色</label><select id="clicker-cap" name="cap"></select></div>
+          </details>
+          <details class="clicker-colour-section" open>
+            <summary><span>文字颜色</span><span class="clicker-colour-current" data-clicker-current="ink"><i aria-hidden="true"></i><span></span></span></summary>
+            <div class="nameplate-field"><label for="clicker-ink">文字颜色</label><select id="clicker-ink" name="ink"></select></div>
+          </details>
+        </section>
         <p class="nameplate-order-note">按压款为互动示意，实际轴体与键帽结构待试印确认。</p>
       </div>
     </form>

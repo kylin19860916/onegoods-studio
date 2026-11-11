@@ -1,14 +1,34 @@
 import { expandChoices } from './keyring-choices.js';
+import { keyringFonts, setupFontPicker } from './keyring-font-picker.js';
+import { parseKeyringFont } from '../server/keyring-geometry.mjs';
+import { createClickerViewer } from './clicker-viewer.js';
+
+const fontCache = new Map();
+function loadFont(key) {
+  if (!fontCache.has(key)) {
+    const pending = fetch('/assets/fonts/keyring/' + keyringFonts[key]).then(response => {
+      if (!response.ok) throw new Error('Font unavailable');
+      return response.arrayBuffer();
+    }).then(buffer => parseKeyringFont(new Uint8Array(buffer))).catch(error => {
+      fontCache.delete(key);
+      throw error;
+    });
+    fontCache.set(key, pending);
+    if (fontCache.size > 5) fontCache.delete(fontCache.keys().next().value);
+  }
+  return fontCache.get(key);
+}
 
 export function setupClicker() {
   const links = [...document.querySelectorAll('[data-keyring-product]')];
   const panels = [...document.querySelectorAll('[data-keyring-panel]')];
   const form = document.querySelector('#clicker-form');
-  const rail = document.querySelector('#clicker-rail');
   const labels = document.querySelector('#clicker-labels');
   const template = document.querySelector('#clicker-label-template');
   const swatches = document.querySelector('#plate-swatch-options');
-
+  const controls = labels.querySelector('.clicker-inline-controls');
+  const status = document.querySelector('#clicker-status');
+  const viewer = createClickerViewer(document.querySelector('#clicker-canvas'), document.querySelector('#clicker-view'), document.querySelector('#clicker-reset'));
   const defaults = { base: '#393142', cap: '#a087c1', ink: '#fffcf5' };
   for (const name of Object.keys(defaults)) {
     const select = form.elements[name];
@@ -17,65 +37,73 @@ export function setupClicker() {
     expandChoices(select, { colours: true });
   }
   const { base, cap, ink } = form.elements;
-  const countDisplay = document.querySelector('#clicker-count');
   const remove = document.querySelector('#clicker-remove');
   const add = document.querySelector('#clicker-add');
   let count = 2;
+  let version = 0;
   const maximum = 4;
   const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-
-  const keys = Array.from({ length: 4 }, (_, index) => {
+  const keys = Array.from({ length: maximum }, (_, index) => {
     const row = template.content.cloneNode(true).firstElementChild;
     const label = labels.dataset.keyLabel + ' ' + (index + 1);
-    row.querySelector('span').textContent = label;
-    labels.append(row);
     const input = row.querySelector('input');
     input.setAttribute('aria-label', label);
+    const button = row.querySelector('.clicker-slot-key');
+    button.setAttribute('aria-label', label);
+    button.addEventListener('click', () => viewer?.press(index));
+    const font = document.querySelector('#plate-style').cloneNode(true);
+    font.id = 'clicker-font-' + (index + 1);
+    font.name = 'keyFont' + index;
+    font.value = 'huninn';
+    row.querySelector('.clicker-font-field').append(font);
+    labels.insertBefore(row, controls);
+    setupFontPicker(font);
     function updateLetter() {
       input.value = segmenter.segment(input.value.trim())[Symbol.iterator]().next().value?.segment || '';
-      render();
     }
-    input.addEventListener('input', event => {
-      if (!event.isComposing) updateLetter();
-    });
-    input.addEventListener('compositionend', updateLetter);
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'clicker-key';
-    button.addEventListener('click', () => {
-      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        button.getAnimations().forEach(animation => animation.cancel());
-        button.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(5px)' }, { transform: 'translateY(0)' }], 180);
-      }
-    });
-    rail.append(button);
-    return { row, input, button, label };
+    input.addEventListener('input', event => { if (!event.isComposing) updateLetter(); });
+    input.addEventListener('compositionend', () => { updateLetter(); render(); });
+    return { row, input, button, font, label };
   });
 
-  function render() {
-    countDisplay.value = String(count);
+  async function render() {
+    const currentVersion = ++version;
     remove.disabled = count === 1;
     add.disabled = count === maximum;
-    labels.style.setProperty('--clicker-count', String(count));
-    rail.style.setProperty('--clicker-count', String(count));
-    rail.style.setProperty('--clicker-base', base.value);
-    rail.style.setProperty('--clicker-cap', cap.value);
-    rail.style.setProperty('--clicker-ink', ink.value);
     labels.style.setProperty('--clicker-cap', cap.value);
     labels.style.setProperty('--clicker-ink', ink.value);
+    for (const [name, field] of Object.entries({ base, cap, ink })) {
+      const current = form.querySelector('[data-clicker-current="' + name + '"]');
+      const selected = form.querySelector('input[name="' + name + '"]:checked');
+      current.querySelector('i').style.backgroundColor = field.value;
+      current.querySelector('span').textContent = selected.closest('label').querySelector('span').textContent;
+    }
     for (const [index, key] of keys.entries()) {
-      const visible = index < count;
-      key.row.hidden = key.button.hidden = !visible;
-      const text = key.input.value.trim();
-      key.row.querySelector('span').textContent = text || String(index + 1);
-      key.button.textContent = text || String(index + 1);
-      key.button.setAttribute('aria-label', text ? key.label + ' · ' + text : key.label);
+      key.row.hidden = index >= count;
+      key.button.textContent = key.input.value.trim() || String(index + 1);
+      key.button.style.fontFamily = '"OGS Full ' + key.font.value + '"';
+    }
+    if (!viewer) { status.textContent = status.dataset.noWebgl; return; }
+    try {
+      const entries = await Promise.all(keys.slice(0, count).map(async key => ({
+        text: key.input.value.trim() || '', font: await loadFont(key.font.value),
+      })));
+      if (currentVersion !== version) return;
+      let unsupported = false;
+      for (const entry of entries) {
+        if ([...entry.text].some(char => !entry.font.charToGlyphIndex(char))) {
+          entry.text = '';
+          unsupported = true;
+        }
+      }
+      viewer.update({ keys: entries, base: base.value, cap: cap.value, ink: ink.value });
+      status.textContent = unsupported ? status.dataset.unsupported : '';
+    } catch {
+      if (currentVersion === version) status.textContent = status.dataset.error;
     }
   }
-
   remove.addEventListener('click', () => { count = Math.max(1, count - 1); render(); });
   add.addEventListener('click', () => { count = Math.min(maximum, count + 1); render(); });
-
   function showProduct() {
     const selected = location.hash === '#name-clicker' ? 'name-clicker' : 'name-tag';
     for (const panel of panels) panel.hidden = panel.id !== selected;
@@ -84,7 +112,6 @@ export function setupClicker() {
       else link.removeAttribute('aria-current');
     }
   }
-
   form.addEventListener('input', event => { if (!event.isComposing) render(); });
   form.addEventListener('submit', event => event.preventDefault());
   window.addEventListener('hashchange', showProduct);

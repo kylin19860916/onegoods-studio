@@ -184,14 +184,15 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .keyring-product-nav a[aria-current="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
 .nameplate-page [data-keyring-panel][hidden]{display:none}
 .nameplate-page [data-keyring-panel]{scroll-margin-top:105px}
-.clicker-stage{display:grid;gap:16px}
-.clicker-rail{display:grid;grid-template-columns:repeat(var(--clicker-count,3),minmax(0,1fr));width:min(100%,420px);margin:40px auto;gap:8px;padding:12px 10px 16px;background:var(--clicker-base,#393142);border-radius:14px;box-shadow:0 7px #29233155}
-.clicker-key{display:grid;place-items:center;min-width:0;min-height:56px;padding:6px 3px;border:0;border-radius:9px;background:var(--clicker-cap,#a087c1);color:var(--clicker-ink,#fffcf5);box-shadow:0 5px #29233190;font:inherit;font-size:clamp(12px,2vw,20px);font-weight:750;overflow-wrap:anywhere;cursor:pointer}
-.clicker-key:active{transform:translateY(4px)}
-.clicker-key[hidden]{display:none}
-.clicker-labels{border:0;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-width:0}
-.clicker-labels legend{font-size:14px;margin-bottom:8px}
 .clicker-colors{display:grid;gap:18px}
+.clicker-colors h3{font-size:18px;margin:0}
+.clicker-colour-section{border:0;border-top:1px solid #29233125;padding-top:12px}
+.clicker-colour-section>summary{display:flex;align-items:center;gap:10px;padding:0 0 12px;font-size:14px}
+.clicker-colour-section>summary::after{content:'⌄';position:static;font-size:18px}
+.clicker-colour-section[open]>summary::after{content:'⌃'}
+.clicker-colour-current{display:flex;align-items:center;gap:6px;margin-inline-start:auto;font-size:12px;color:#6a6073}
+.clicker-colour-current i{display:block;width:18px;height:18px;border:1px solid #29233140;border-radius:50%}
+.clicker-colour-section .keyring-colour-options legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .keyring-steps li{padding:0}
 .keyring-steps button{width:100%;height:100%;padding:10px;border:0;background:transparent;color:inherit;font:inherit;text-align:start;cursor:pointer;border-radius:5px}
 .keyring-steps button:focus-visible{outline:2px solid #80609e;outline-offset:3px}
@@ -203,22 +204,12 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .nameplate-field .keyring-choice input{position:absolute;opacity:0;width:1px;min-height:0;height:1px;padding:0}
 .keyring-colour-chip{flex:0 0 22px;width:22px;height:22px;border:1px solid #29233155;border-radius:50%}
 .keyring-choice span{overflow-wrap:anywhere}
-.clicker-count-control{border:0;padding:0;margin:0;min-width:0}
-.clicker-count-control legend{margin-bottom:8px;font-size:14px}
-.clicker-count-stepper{display:inline-flex;align-items:center;gap:16px;padding:5px;border:1px solid #29233140;border-radius:8px}
-.clicker-count-stepper button{width:38px;height:38px;border:0;border-radius:5px;background:#efe9f5;color:var(--ink);font:inherit;font-size:24px;cursor:pointer}
-.clicker-count-stepper button:disabled{opacity:.35;cursor:default}
-.clicker-count-stepper output{min-width:24px;text-align:center;font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
 .clicker-labels{grid-template-columns:repeat(var(--clicker-count,2),minmax(0,1fr));gap:10px}
-.clicker-letter-slot{justify-items:center;gap:12px}
-.clicker-letter-slot>span{display:grid;place-items:center;width:46px;height:46px;border-radius:8px;background:var(--clicker-cap,#a087c1);color:var(--clicker-ink,#fffcf5);box-shadow:0 4px #29233170;font-size:22px;font-weight:700}
-.clicker-letter-slot>input{max-width:70px;text-align:center;font-size:20px}
-.keyring-font-picker{position:relative;min-width:0}
+.keyring-font-picker{position:relative;min-width:0;border:0}
 .keyring-font-picker summary{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 14px;border:1px solid #29233155;border-radius:7px;cursor:pointer;list-style:none;background:#fffdf8}
 .keyring-font-picker summary::-webkit-details-marker{display:none}
-.keyring-font-picker summary::after{content:'⌄';grid-column:2;grid-row:1/3;align-self:center;font-size:20px}
+.keyring-font-picker summary::after{content:'⌄';position:static;grid-column:2;grid-row:1;align-self:center;font-size:20px}
 .keyring-font-picker[open]>summary::after{content:'⌃'}
-.keyring-font-picker summary>small{grid-column:1;font-size:12px;color:#6a6073}
 .keyring-font-sample{display:block;font-size:27px;line-height:1.5;font-weight:400;font-synthesis:none}
 .keyring-font-picker summary:focus-visible{outline:2px solid #80609e;outline-offset:3px}
 .keyring-font-menu{position:absolute;top:calc(100% + 6px);inset-inline:0;z-index:3;max-height:390px;overflow:auto;overscroll-behavior:contain;padding:12px;background:var(--paper);border:1px solid #29233140;border-radius:8px;box-shadow:0 8px 24px #29233120}
@@ -228,8 +219,7 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .keyring-font-menu label:has(input:checked){background:#efe9f5;border-color:#80609e}
 .keyring-font-menu label:has(input:focus-visible){outline:2px solid #80609e;outline-offset:2px}
 .nameplate-field .keyring-font-menu input{position:absolute;opacity:0;width:1px;height:1px;min-height:0;padding:0}
-.keyring-font-menu small{font-size:11px;color:#6a6073;overflow-wrap:anywhere}
-.keyring-font-menu .keyring-font-sample{font-size:24px}
+.keyring-font-menu .keyring-font-sample{font-size:clamp(18px,1.7vw,24px);white-space:nowrap}
 .nameplate-field:has(.keyring-colour-options){container-type:inline-size}
 .keyring-colour-options{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px 6px}
 .keyring-colour-options .keyring-choice{display:flex;flex-direction:column;justify-content:start;gap:9px;padding:6px 0;border:0;border-radius:0;min-height:0;text-align:center;font-size:12px}
@@ -251,17 +241,50 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .keyring-preview-meta figcaption{font-size:11px;line-height:1.6;color:#6a6073}
 @media(max-width:760px){.keyring-preview{position:static}.keyring-preview-frame .plate-view-header{inset:14px 14px auto}}
 
-@font-face{font-family:"OGS Preview huninn";src:url("assets/fonts/keyring/huninn-preview.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview sans-tc";src:url("assets/fonts/keyring/sans-tc-preview.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview serif-tc";src:url("assets/fonts/keyring/serif-tc-preview.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview sans-sc";src:url("assets/fonts/keyring/sans-sc-preview.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview serif-sc";src:url("assets/fonts/keyring/serif-sc-preview.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview wenkai";src:url("assets/fonts/keyring/wenkai-preview.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview kuaile";src:url("assets/fonts/keyring/kuaile-preview.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview lucky";src:url("assets/fonts/keyring/lucky-preview.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview nunito";src:url("assets/fonts/keyring/nunito-preview.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview lobster";src:url("assets/fonts/keyring/lobster-preview.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview lilita";src:url("assets/fonts/keyring/lilita-preview.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview chewy";src:url("assets/fonts/keyring/chewy-preview.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview yellowtail";src:url("assets/fonts/keyring/yellowtail-preview.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview blackops";src:url("assets/fonts/keyring/blackops-preview.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview huninn";src:url("assets/fonts/keyring/huninn-preview-69028fe2ac.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview sans-tc";src:url("assets/fonts/keyring/sans-tc-preview-23c8715623.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview serif-tc";src:url("assets/fonts/keyring/serif-tc-preview-675c5815ec.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview sans-sc";src:url("assets/fonts/keyring/sans-sc-preview-33e1dabe2c.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview serif-sc";src:url("assets/fonts/keyring/serif-sc-preview-e51e7df8a5.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview wenkai";src:url("assets/fonts/keyring/wenkai-preview-d854480d6b.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview kuaile";src:url("assets/fonts/keyring/kuaile-preview-5a13798e43.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview lucky";src:url("assets/fonts/keyring/lucky-preview-e716d987f1.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview nunito";src:url("assets/fonts/keyring/nunito-preview-83c1cf846c.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview lobster";src:url("assets/fonts/keyring/lobster-preview-6d0bf5ea2a.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview lilita";src:url("assets/fonts/keyring/lilita-preview-6fb718ef9f.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview chewy";src:url("assets/fonts/keyring/chewy-preview-496a43a814.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview yellowtail";src:url("assets/fonts/keyring/yellowtail-preview-55dfa3510c.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview blackops";src:url("assets/fonts/keyring/blackops-preview-f246249a74.woff2") format("woff2");font-display:swap}
+
+.clicker-key-editor{border:0;padding:0;margin:0;min-width:0;position:relative}
+.clicker-key-editor>legend{font-size:14px;padding:0;margin-bottom:12px}
+.clicker-labels{display:flex;justify-content:flex-start;align-items:flex-start;flex-wrap:wrap;gap:10px}
+.clicker-letter-slot{flex:0 0 76px;width:76px;justify-items:stretch;gap:10px;min-width:0}
+.nameplate-form .clicker-slot-key{justify-self:start;width:76px;height:60px;padding:0;border:1px solid #29233130;border-radius:9px;background:var(--clicker-cap,#a087c1);color:var(--clicker-ink,#fffcf5);box-shadow:0 4px #29233165;font-size:24px;font-weight:400;line-height:1.2}
+.clicker-slot-key:active{transform:translateY(3px);box-shadow:0 1px #29233165}
+.clicker-letter-slot>input{max-width:none;width:100%;text-align:center;font-size:20px}
+.clicker-inline-controls{display:flex;flex-direction:column;gap:8px;flex:0 0 34px}
+.clicker-inline-controls button{width:34px;height:34px;padding:0;border:1px solid #29233130;border-radius:6px;background:#efe9f5;font-size:22px;line-height:1}
+.clicker-inline-controls button:disabled{opacity:.3;cursor:default}
+.clicker-font-field>label{position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden;white-space:nowrap}
+.clicker-font-field .keyring-font-picker{position:static}
+.clicker-font-field .keyring-font-picker summary{padding:5px;gap:2px;grid-template-columns:minmax(0,1fr) auto}
+.clicker-font-field .keyring-font-picker summary::after{font-size:12px}
+.clicker-font-field .keyring-font-picker summary .keyring-font-sample{font-size:11px;white-space:nowrap;overflow:hidden}
+.clicker-font-field .keyring-font-menu{top:calc(100% + 6px);inset-inline:0;z-index:4}
+#clicker-status{font-size:13px;color:#6a6073;margin:0}
+#clicker-status:empty{display:none}
+@font-face{font-family:"OGS Full huninn";src:url("assets/fonts/keyring/Huninn-Regular.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full sans-tc";src:url("assets/fonts/keyring/NotoSansTC-Bold.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full serif-tc";src:url("assets/fonts/keyring/NotoSerifTC-Bold.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full sans-sc";src:url("assets/fonts/keyring/NotoSansSC-Bold.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full serif-sc";src:url("assets/fonts/keyring/NotoSerifSC-Bold.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full wenkai";src:url("assets/fonts/keyring/wenkai.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full kuaile";src:url("assets/fonts/keyring/kuaile.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full lucky";src:url("assets/fonts/keyring/lucky.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full nunito";src:url("assets/fonts/keyring/nunito.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full lobster";src:url("assets/fonts/keyring/lobster.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full lilita";src:url("assets/fonts/keyring/lilita.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full chewy";src:url("assets/fonts/keyring/chewy.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full yellowtail";src:url("assets/fonts/keyring/yellowtail.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full blackops";src:url("assets/fonts/keyring/blackops.woff") format("woff");font-display:swap}

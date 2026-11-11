@@ -14,8 +14,7 @@ export function setupFontPicker(select) {
   picker.className = 'keyring-font-picker';
   const summary = document.createElement('summary');
   const selected = document.createElement('span');
-  const selectedName = document.createElement('small');
-  summary.append(selected, selectedName);
+  summary.append(selected);
   picker.append(summary);
   const menu = document.createElement('div');
   menu.className = 'keyring-font-menu';
@@ -25,13 +24,12 @@ export function setupFontPicker(select) {
     const element = document.createElement('span');
     element.className = 'keyring-font-sample';
     element.style.fontFamily = '"OGS Preview ' + option.value + '"';
-    element.textContent = option.dataset.sample || '林予曦';
+    element.textContent = option.dataset.sample || '玩好物';
     return element;
   }
   function update() {
     const option = select.selectedOptions[0];
     selected.replaceChildren(sample(option));
-    selectedName.textContent = option.textContent;
     radios.forEach(input => { input.checked = input.value === select.value; });
   }
   for (const group of select.querySelectorAll('optgroup')) {
@@ -43,13 +41,11 @@ export function setupFontPicker(select) {
       const label = document.createElement('label');
       const input = document.createElement('input');
       input.type = 'radio';
-      input.name = 'fontPreviewChoice';
+      input.name = select.name + 'PreviewChoice';
       input.value = option.value;
       input.setAttribute('aria-label', option.textContent);
       radios.push(input);
-      const name = document.createElement('small');
-      name.textContent = option.textContent;
-      label.append(input, sample(option), name);
+      label.append(input, sample(option));
       field.append(label);
       input.addEventListener('input', event => {
         event.stopPropagation();
@@ -73,7 +69,7 @@ export function setupFontPicker(select) {
   });
   const caption = select.parentElement.querySelector('label');
   caption.removeAttribute('for');
-  caption.id = 'plate-style-label';
+  caption.id = select.id + '-label';
   summary.setAttribute('aria-labelledby', caption.id);
   select.hidden = true;
   select.after(picker);

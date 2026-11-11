@@ -1,4 +1,9 @@
 {
+  "按键与文字": ["按鍵與文字", "Keys and letters"],
+  "3D 按压款预览，可拖动旋转与缩放": ["3D 按壓款預覽，可拖動旋轉與縮放", "3D clicker preview. Drag to rotate and zoom."],
+  "拖动旋转 · 捏合缩放 · 点按键帽": ["拖動旋轉 · 捏合縮放 · 點按鍵帽", "Drag to rotate · Pinch to zoom · Tap a keycap"],
+  "3D 预览载入失败，请再试一次。": ["3D 預覽載入失敗，請再試一次。", "Could not load the 3D preview. Please try again."],
+  "目前浏览器无法显示 3D，请使用支持 WebGL 的浏览器。": ["目前瀏覽器無法顯示 3D，請使用支援 WebGL 的瀏覽器。", "This browser cannot show the 3D preview. Please use a WebGL-capable browser."],
   "所选字体不支持这些文字，请更换字体或姓名。": ["所選字型不支援這些文字，請更換字型或姓名。", "This font does not support these characters. Choose another font or name."],
   "中文字型": ["中文字型", "Chinese fonts"],
   "英文字型": ["英文字型", "English fonts"],
