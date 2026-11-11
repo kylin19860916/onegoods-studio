@@ -7,8 +7,8 @@
   <title>客制名牌 — One Goods Studio</title>
   <meta name="description" content="选一款造型和尺寸，为你的名字配上喜欢的颜色。">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=5cdec4d49a15">
-  <script src="../locale.js?v=5cdec4d49a15" defer></script><script src="../nameplate.js?v=5cdec4d49a15" defer></script>
+  <link rel="stylesheet" href="../style.css?v=1750f1c013c9">
+  <script src="../locale.js?v=1750f1c013c9" defer></script><script src="../nameplate.js?v=1750f1c013c9" defer></script>
 <link rel="canonical" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首页"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主导航"><a href="index.html">首页</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客制名牌</a><a href="about.html">关于 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切换语言，当前：简体中文">简<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans" aria-current="true">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主导航"><a href="index.html">首页</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客制名牌</a><a href="about.html">关于 OGS</a></nav>
@@ -116,26 +116,19 @@
       </section>
       <section class="keyring-step" id="keyring-colors" hidden>
         <h2 tabindex="-1">选颜色</h2>
-        <fieldset class="keyring-print-mode">
-          <legend>打印方式</legend>
-          <label><input type="radio" name="mode" value="single"> 单色</label>
-          <label><input type="radio" name="mode" value="dual" checked> 双色</label>
-        </fieldset>
-        <div class="nameplate-field">
-          <label for="plate-base-color">颜色 1 · 底板</label>
-          <select id="plate-base-color" name="baseColor" data-swatch data-default="#a087c1"></select>
-        </div>
-        <div id="keyring-multiple-colors">
-          <div class="nameplate-field">
-            <label for="plate-text-color">颜色 2 · 凸字</label>
-            <select id="plate-text-color" name="textColor" data-swatch data-default="#fffcf5"></select>
-          </div>
-          <label class="keyring-add-color"><input type="checkbox" name="useAccent"> 增加颜色 3</label>
-          <div class="nameplate-field" id="keyring-accent" hidden>
-            <label for="plate-accent-color">颜色 3 · 底板侧边</label>
-            <select id="plate-accent-color" name="accentColor" data-swatch data-default="#f2c879"></select>
-          </div>
-        </div>
+        <details class="keyring-colour-section" open>
+          <summary><span>Outline Color</span><span class="clicker-colour-current" data-keyring-current="baseColor"><i aria-hidden="true"></i><span></span></span></summary>
+          <div class="nameplate-field"><label for="plate-base-color">Outline Color</label><select id="plate-base-color" name="baseColor" data-swatch data-default="#a087c1"></select></div>
+        </details>
+        <details class="keyring-colour-section" open>
+          <summary><span>凸字颜色</span><span class="clicker-colour-current" data-keyring-current="textColor"><i aria-hidden="true"></i><span></span></span></summary>
+          <div class="nameplate-field"><label for="plate-text-color">凸字颜色</label><select id="plate-text-color" name="textColor" data-swatch data-default="#fffcf5"></select></div>
+        </details>
+        <label class="keyring-add-color"><input type="checkbox" name="useAccent"> 增加底板颜色</label>
+        <details class="keyring-colour-section" id="keyring-accent" open hidden>
+          <summary><span>底板颜色</span><span class="clicker-colour-current" data-keyring-current="accentColor"><i aria-hidden="true"></i><span></span></span></summary>
+          <div class="nameplate-field"><label for="plate-accent-color">底板颜色</label><select id="plate-accent-color" name="accentColor" data-swatch data-default="#f2c879"></select></div>
+        </details>
         <template id="plate-swatch-options">
           <option value="#a087c1">薰衣草紫</option>
           <option value="#fffcf5">奶油白</option>
@@ -157,11 +150,12 @@
   <div class="nameplate-workspace" id="name-clicker" data-keyring-panel hidden>
     <figure class="keyring-preview">
       <div class="nameplate-stage keyring-preview-frame">
-        <div class="plate-view-header"><span class="eyebrow">LIVE 3D PREVIEW</span><button class="text-button" type="button" id="clicker-reset">重置视角</button></div>
+        <div class="plate-view-header"><span class="eyebrow">LIVE 3D PREVIEW</span><div class="plate-view-tools"><button class="text-button" type="button" id="clicker-inspect" aria-pressed="false" data-inspect="检视键轴" data-assemble="显示键帽">检视键轴</button><button class="text-button" type="button" id="clicker-reset">重置视角</button></div></div>
         <div class="plate-view" id="clicker-view" tabindex="0" aria-label="3D 按压款预览，可拖动旋转与缩放"><canvas id="clicker-canvas"></canvas></div>
       </div>
       <div class="keyring-preview-meta">
         <p class="plate-view-hint">拖动旋转 · 捏合缩放 · 点按键帽</p>
+        <p class="keyring-dimensions" id="clicker-dimensions" data-label="模型尺寸"></p>
         <p id="clicker-status" role="status" data-unsupported="所选字体不支持这些文字，请更换字体或姓名。" data-error="3D 预览载入失败，请再试一次。" data-no-webgl="目前浏览器无法显示 3D，请使用支持 WebGL 的浏览器。"></p>
         <figcaption>画面为设计示意，实际成品颜色与尺寸依制作确认为准。</figcaption>
       </div>
@@ -188,15 +182,15 @@
         <p class="nameplate-order-note">每格限一个字，可输入中文或英文字母。</p>
         <section class="clicker-colors" aria-labelledby="clicker-colors-heading">
           <h3 id="clicker-colors-heading">配色</h3>
-          <details class="clicker-colour-section" open>
+          <details class="keyring-colour-section" open>
             <summary><span>底座颜色</span><span class="clicker-colour-current" data-clicker-current="base"><i aria-hidden="true"></i><span></span></span></summary>
             <div class="nameplate-field"><label for="clicker-base">底座颜色</label><select id="clicker-base" name="base"></select></div>
           </details>
-          <details class="clicker-colour-section" open>
+          <details class="keyring-colour-section" open>
             <summary><span>键帽颜色</span><span class="clicker-colour-current" data-clicker-current="cap"><i aria-hidden="true"></i><span></span></span></summary>
             <div class="nameplate-field"><label for="clicker-cap">键帽颜色</label><select id="clicker-cap" name="cap"></select></div>
           </details>
-          <details class="clicker-colour-section" open>
+          <details class="keyring-colour-section" open>
             <summary><span>文字颜色</span><span class="clicker-colour-current" data-clicker-current="ink"><i aria-hidden="true"></i><span></span></span></summary>
             <div class="nameplate-field"><label for="clicker-ink">文字颜色</label><select id="clicker-ink" name="ink"></select></div>
           </details>

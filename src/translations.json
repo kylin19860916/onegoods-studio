@@ -1,4 +1,9 @@
 {
+  "检视键轴": ["檢視鍵軸", "View switches"],
+  "显示键帽": ["顯示鍵帽", "Show keycaps"],
+  "增加底板颜色": ["增加底板顏色", "Add base colour"],
+  "凸字颜色": ["凸字顏色", "Lettering colour"],
+  "底板颜色": ["底板顏色", "Base colour"],
   "按键与文字": ["按鍵與文字", "Keys and letters"],
   "3D 按压款预览，可拖动旋转与缩放": ["3D 按壓款預覽，可拖動旋轉與縮放", "3D clicker preview. Drag to rotate and zoom."],
   "拖动旋转 · 捏合缩放 · 点按键帽": ["拖動旋轉 · 捏合縮放 · 點按鍵帽", "Drag to rotate · Pinch to zoom · Tap a keycap"],

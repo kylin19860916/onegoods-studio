@@ -45,7 +45,10 @@ export function setupFontPicker(select) {
       input.value = option.value;
       input.setAttribute('aria-label', option.textContent);
       radios.push(input);
-      label.append(input, sample(option));
+      const badge = document.createElement('span');
+      badge.className = 'keyring-font-language';
+      badge.textContent = option.dataset.sample ? 'English' : '中文';
+      label.append(input, sample(option), badge);
       field.append(label);
       input.addEventListener('input', event => {
         event.stopPropagation();

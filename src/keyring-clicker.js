@@ -28,7 +28,7 @@ export function setupClicker() {
   const swatches = document.querySelector('#plate-swatch-options');
   const controls = labels.querySelector('.clicker-inline-controls');
   const status = document.querySelector('#clicker-status');
-  const viewer = createClickerViewer(document.querySelector('#clicker-canvas'), document.querySelector('#clicker-view'), document.querySelector('#clicker-reset'));
+  const viewer = createClickerViewer(document.querySelector('#clicker-canvas'), document.querySelector('#clicker-view'), document.querySelector('#clicker-reset'), document.querySelector('#clicker-inspect'));
   const defaults = { base: '#393142', cap: '#a087c1', ink: '#fffcf5' };
   for (const name of Object.keys(defaults)) {
     const select = form.elements[name];
@@ -96,7 +96,9 @@ export function setupClicker() {
           unsupported = true;
         }
       }
-      viewer.update({ keys: entries, base: base.value, cap: cap.value, ink: ink.value });
+      const size = viewer.update({ keys: entries, base: base.value, cap: cap.value, ink: ink.value });
+      const dimensions = document.querySelector('#clicker-dimensions');
+      dimensions.textContent = dimensions.dataset.label + ' · ' + size.map(n => Number(n.toFixed(1))).join(' × ') + ' mm';
       status.textContent = unsupported ? status.dataset.unsupported : '';
     } catch {
       if (currentVersion === version) status.textContent = status.dataset.error;

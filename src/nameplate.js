@@ -23,7 +23,6 @@ const exportStatus = document.querySelector('#plate-status');
 const generate = document.querySelector('#keyring-generate');
 const designStep = document.querySelector('#keyring-design');
 const colorsStep = document.querySelector('#keyring-colors');
-const multiColors = document.querySelector('#keyring-multiple-colors');
 const accent = document.querySelector('#keyring-accent');
 const progress = document.querySelectorAll('.keyring-steps li');
 const swatches = document.querySelector('#plate-swatch-options');
@@ -32,7 +31,7 @@ for (const select of form.querySelectorAll('[data-swatch]')) {
   select.value = select.dataset.default;
   expandChoices(select, { colours: true });
 }
-const { nameText, style, shape, size, mode, baseColor, textColor, useAccent, accentColor } = form.elements;
+const { nameText, style, shape, size, baseColor, textColor, useAccent, accentColor } = form.elements;
 const download = document.querySelector('#plate-download');
 const payment = document.querySelector('#plate-payment');
 
@@ -84,8 +83,8 @@ async function render(version) {
     const font = await loadFont(style.value);
     if (version !== previewVersion) return;
     const base = baseColor.value;
-    const ink = mode.value === 'single' ? base : textColor.value;
-    const third = mode.value === 'dual' && useAccent.checked ? accentColor.value : undefined;
+    const ink = textColor.value;
+    const third = useAccent.checked ? accentColor.value : undefined;
     const [widthMm, heightMm] = sizes[size.value];
     const model = generateKeyring(font, nameText.value.trim() || nameText.placeholder, {
       ...spec, widthMm, heightMm, shape: shape.value, baseColor: base, textColor: ink, accentColor: third,
@@ -116,8 +115,13 @@ async function render(version) {
 function queuePreview() {
   const version = ++previewVersion;
   generate.disabled = true;
-  multiColors.hidden = mode.value === 'single';
   accent.hidden = !useAccent.checked;
+  for (const [name, field] of Object.entries({ baseColor, textColor, accentColor })) {
+    const current = form.querySelector('[data-keyring-current="' + name + '"]');
+    const selected = form.querySelector('input[name="' + name + '"]:checked');
+    current.querySelector('i').style.backgroundColor = field.value;
+    current.querySelector('span').textContent = selected.closest('label').querySelector('span').textContent;
+  }
   download.hidden = true;
   payment.hidden = true;
   generate.hidden = false;

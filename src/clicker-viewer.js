@@ -1,8 +1,9 @@
 import {
-  AmbientLight, BoxGeometry, DirectionalLight, ExtrudeGeometry, Group,
+  AmbientLight, BoxGeometry, CylinderGeometry, DirectionalLight, ExtrudeGeometry, Group,
   Mesh, MeshStandardMaterial, OrthographicCamera, Path, Raycaster, Scene,
   Shape, ShapePath, Vector2, WebGLRenderer,
 } from 'three';
+import { MX, MX_CASE, mxStack } from './cherry-mx-spec.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 function rounded(width, height, radius, offsetX = 0) {
@@ -43,7 +44,7 @@ function lettering(font, text) {
   return geometry;
 }
 
-export function createClickerViewer(canvas, host, reset) {
+export function createClickerViewer(canvas, host, reset, inspect) {
   let renderer;
   try { renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true }); }
   catch { return null; }
@@ -57,19 +58,28 @@ export function createClickerViewer(canvas, host, reset) {
   scene.add(light, fill);
   const camera = new OrthographicCamera(-48, 48, 48, -48, 0.1, 600);
   camera.up.set(0, 0, 1);
-  camera.position.set(24, -65, 95);
+  camera.position.set(26, -76, 72);
   const controls = new OrbitControls(camera, canvas);
   controls.enablePan = false;
   controls.minZoom = 0.65;
   controls.maxZoom = 2.5;
-  controls.target.set(0, 0, 4);
+  controls.target.set(0, 0, 11);
   controls.update();
   controls.saveState();
   let worldWidth = 96;
   let keyGroups = [];
+  let capGroups = [];
+  let showCaps = true;
   const animations = new Map();
   const render = () => renderer.render(scene, camera);
   controls.addEventListener('change', render);
+  inspect.addEventListener('click', () => {
+    showCaps = !showCaps;
+    capGroups.forEach(group => { group.visible = showCaps; });
+    inspect.textContent = showCaps ? inspect.dataset.inspect : inspect.dataset.assemble;
+    inspect.setAttribute('aria-pressed', String(!showCaps));
+    render();
+  });
   reset.addEventListener('click', () => controls.reset());
   function resize() {
     const w = host.clientWidth, h = host.clientHeight;
@@ -91,7 +101,7 @@ export function createClickerViewer(canvas, host, reset) {
     const start = performance.now();
     function tick(now) {
       const phase = Math.min(1, (now - start) / 260);
-      group.position.z = -Math.sin(phase * Math.PI) * 2.1;
+      group.position.z = -Math.sin(phase * Math.PI) * MX.travel;
       render();
       if (phase < 1) animations.set(group, requestAnimationFrame(tick));
       else { group.position.z = 0; animations.delete(group); }
@@ -123,18 +133,18 @@ export function createClickerViewer(canvas, host, reset) {
     });
     assembly.clear();
     keyGroups = [];
+    capGroups = [];
+    const stack = mxStack();
     const width = keys.length * 22 + 14;
-    worldWidth = Math.max(88, width + 22);
+    worldWidth = Math.max(88, width + 26);
     const centers = keys.map((_, index) => -width / 2 + 20 + index * 22);
-    function bodyShape(withSockets) {
+    function bodyShape(type) {
       const shape = rounded(width, 28, 4);
       const ring = new Path();
       ring.absarc(-width / 2 + 5.3, 0, 2.3, 0, Math.PI * 2, true);
       shape.holes.push(ring);
-      if (withSockets) for (const x of centers) {
-        const hole = rounded(18, 18, 1.2, x);
-        shape.holes.push(hole);
-      }
+      if (type === 'plate') for (const x of centers) shape.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3, x));
+      if (type === 'walls') shape.holes.push(rounded(width - 12.8, 28 - MX_CASE.wall * 2, 2, 4.6));
       return shape;
     }
     function add(geometry, colour, z, parent = assembly) {
@@ -143,30 +153,66 @@ export function createClickerViewer(canvas, host, reset) {
       parent.add(mesh);
       return mesh;
     }
-    add(new ExtrudeGeometry(bodyShape(false), { depth: 1, bevelEnabled: false, curveSegments: 16 }), base, 0);
-    add(new ExtrudeGeometry(bodyShape(true), { depth: 2.2, bevelEnabled: false, curveSegments: 16 }), base, 1);
+    const extrude = (shape, height) => new ExtrudeGeometry(shape, { depth: height, bevelEnabled: false, curveSegments: 16 });
+    add(extrude(bodyShape('floor'), MX_CASE.floor), base, 0);
+    add(extrude(bodyShape('walls'), stack.plateBottom - MX_CASE.floor), base, MX_CASE.floor);
+    add(extrude(bodyShape('plate'), MX_CASE.plate), base, stack.plateBottom);
+    function cross(width, arm) {
+      const shape = new Shape(), h = width / 2, a = arm / 2;
+      const points = [[-a,-h],[a,-h],[a,-a],[h,-a],[h,a],[a,a],[a,h],[-a,h],[-a,a],[-h,a],[-h,-a],[-a,-a]];
+      points.forEach(([x,y], index) => index ? shape.lineTo(x,y) : shape.moveTo(x,y));
+      shape.closePath();
+      return shape;
+    }
     for (const [index, entry] of keys.entries()) {
       const x = centers[index];
-      const housing = add(new BoxGeometry(15.5, 15.5, 2.8), '#c4bbc9', 4);
-      housing.position.x = x;
-      const core = add(new BoxGeometry(8, 8, 2.2), '#70637d', 5.4);
-      core.position.x = x;
-      const group = new Group();
-      group.position.x = x;
-      assembly.add(group);
-      keyGroups.push(group);
-      const capMesh = add(new ExtrudeGeometry(rounded(16.2, 16.2, 2.4), {
-        depth: 2.5, bevelEnabled: true, bevelThickness: 0.7, bevelSize: 0.7,
-        bevelSegments: 3, curveSegments: 12,
-      }), cap, 6.4, group);
-      capMesh.userData.keyIndex = index;
-      const glyph = lettering(entry.font, entry.text);
-      if (glyph) {
-        const letter = add(glyph, ink, 9.65, group);
-        letter.userData.keyIndex = index;
+      function fixed(geometry, colour, z) { const mesh = add(geometry, colour, z); mesh.position.x = x; return mesh; }
+      fixed(extrude(rounded(14,14,0.6), MX.lowerBody), '#25242a', stack.bodyBottom);
+      fixed(extrude(rounded(MX.width,MX.width,0.7),0.8), '#343239', stack.mountTop);
+      const shell = rounded(14.8,14.8,1.2);
+      shell.holes.push(rounded(6.2,6.2,0.5));
+      const shellHeight = stack.housingTop - stack.mountTop - 0.8;
+      const shellGeometry = extrude(shell,shellHeight);
+      const positions = shellGeometry.attributes.position;
+      for (let i=0;i<positions.count;i++) {
+        const factor = 1 - 0.15 * positions.getZ(i) / shellHeight;
+        positions.setXY(i,positions.getX(i)*factor,positions.getY(i)*factor);
       }
+      shellGeometry.computeVertexNormals();
+      fixed(shellGeometry,'#49464f',stack.mountTop+0.8);
+      for (const side of [-1,1]) {
+        const clip = fixed(new BoxGeometry(0.8,3,1.2),'#35333b',stack.plateBottom-0.6);
+        clip.position.x += side * 7.1;
+      }
+      for (const [px,py] of [[-3.8,-2.5],[2.5,-5]]) {
+        const pinGeometry = new CylinderGeometry(0.35,0.25,MX.pins,8);
+        pinGeometry.rotateX(Math.PI/2);
+        const pin = fixed(pinGeometry,'#bba768',stack.bodyBottom-MX.pins/2);
+        pin.position.x+=px;pin.position.y=py;pin.material.metalness=0.8;
+      }
+      const postGeometry = new CylinderGeometry(1.9,1.6,MX.pins,12);
+      postGeometry.rotateX(Math.PI/2);
+      fixed(postGeometry,'#25242a',stack.bodyBottom-MX.pins/2);
+      const group = new Group();
+      group.position.x=x;assembly.add(group);keyGroups.push(group);
+      const stem = add(extrude(cross(4,1.2),MX.stem),'#cf4b52',stack.housingTop,group);
+      stem.userData.keyIndex=index;
+      const capGroup = new Group();
+      capGroup.visible=showCaps;group.add(capGroup);capGroups.push(capGroup);
+      const skirt = rounded(MX_CASE.capWidth,MX_CASE.capWidth,2.4);
+      skirt.holes.push(rounded(16,16,1.4));
+      add(extrude(skirt,stack.roofBottom-stack.skirtBottom),cap,stack.skirtBottom,capGroup).userData.keyIndex=index;
+      const roof = add(new ExtrudeGeometry(rounded(17.6,17.6,2),{
+        depth:MX_CASE.roof-0.4,bevelEnabled:true,bevelThickness:0.2,bevelSize:0.4,bevelSegments:3,curveSegments:12,
+      }),cap,stack.roofBottom+0.2,capGroup);
+      roof.userData.keyIndex=index;
+      const socket = rounded(6,6,0.6);socket.holes.push(cross(4.2,1.5));
+      add(extrude(socket,stack.roofBottom-(stack.stemTop-2.8)),cap,stack.stemTop-2.8,capGroup).userData.keyIndex=index;
+      const glyph=lettering(entry.font,entry.text);
+      if(glyph) add(glyph,ink,stack.capTop,capGroup).userData.keyIndex=index;
     }
     resize();
+    return [width,28,stack.capTop+0.65];
   }
   resize();
   return { update, press };

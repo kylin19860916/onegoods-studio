@@ -7,8 +7,8 @@
   <title>Custom nameplate — One Goods Studio</title>
   <meta name="description" content="Pick a shape and size, then colour your name keyring.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=5cdec4d49a15">
-  <script src="../locale.js?v=5cdec4d49a15" defer></script><script src="../nameplate.js?v=5cdec4d49a15" defer></script>
+  <link rel="stylesheet" href="../style.css?v=1750f1c013c9">
+  <script src="../locale.js?v=1750f1c013c9" defer></script><script src="../nameplate.js?v=1750f1c013c9" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="nameplate.html" aria-current="page">Custom nameplate</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="nameplate.html" aria-current="page">Custom nameplate</a><a href="about.html">About OGS</a></nav>
@@ -116,26 +116,19 @@
       </section>
       <section class="keyring-step" id="keyring-colors" hidden>
         <h2 tabindex="-1">Choose colours</h2>
-        <fieldset class="keyring-print-mode">
-          <legend>Print colours</legend>
-          <label><input type="radio" name="mode" value="single"> One colour</label>
-          <label><input type="radio" name="mode" value="dual" checked> Two colours</label>
-        </fieldset>
-        <div class="nameplate-field">
-          <label for="plate-base-color">Colour 1 · Base</label>
-          <select id="plate-base-color" name="baseColor" data-swatch data-default="#a087c1"></select>
-        </div>
-        <div id="keyring-multiple-colors">
-          <div class="nameplate-field">
-            <label for="plate-text-color">Colour 2 · Raised lettering</label>
-            <select id="plate-text-color" name="textColor" data-swatch data-default="#fffcf5"></select>
-          </div>
-          <label class="keyring-add-color"><input type="checkbox" name="useAccent"> Add a third colour</label>
-          <div class="nameplate-field" id="keyring-accent" hidden>
-            <label for="plate-accent-color">Colour 3 · Base edge</label>
-            <select id="plate-accent-color" name="accentColor" data-swatch data-default="#f2c879"></select>
-          </div>
-        </div>
+        <details class="keyring-colour-section" open>
+          <summary><span>Outline Color</span><span class="clicker-colour-current" data-keyring-current="baseColor"><i aria-hidden="true"></i><span></span></span></summary>
+          <div class="nameplate-field"><label for="plate-base-color">Outline Color</label><select id="plate-base-color" name="baseColor" data-swatch data-default="#a087c1"></select></div>
+        </details>
+        <details class="keyring-colour-section" open>
+          <summary><span>Lettering colour</span><span class="clicker-colour-current" data-keyring-current="textColor"><i aria-hidden="true"></i><span></span></span></summary>
+          <div class="nameplate-field"><label for="plate-text-color">Lettering colour</label><select id="plate-text-color" name="textColor" data-swatch data-default="#fffcf5"></select></div>
+        </details>
+        <label class="keyring-add-color"><input type="checkbox" name="useAccent"> Add base colour</label>
+        <details class="keyring-colour-section" id="keyring-accent" open hidden>
+          <summary><span>Base colour</span><span class="clicker-colour-current" data-keyring-current="accentColor"><i aria-hidden="true"></i><span></span></span></summary>
+          <div class="nameplate-field"><label for="plate-accent-color">Base colour</label><select id="plate-accent-color" name="accentColor" data-swatch data-default="#f2c879"></select></div>
+        </details>
         <template id="plate-swatch-options">
           <option value="#a087c1">Lavender</option>
           <option value="#fffcf5">Cream</option>
@@ -157,11 +150,12 @@
   <div class="nameplate-workspace" id="name-clicker" data-keyring-panel hidden>
     <figure class="keyring-preview">
       <div class="nameplate-stage keyring-preview-frame">
-        <div class="plate-view-header"><span class="eyebrow">LIVE 3D PREVIEW</span><button class="text-button" type="button" id="clicker-reset">Reset view</button></div>
+        <div class="plate-view-header"><span class="eyebrow">LIVE 3D PREVIEW</span><div class="plate-view-tools"><button class="text-button" type="button" id="clicker-inspect" aria-pressed="false" data-inspect="View switches" data-assemble="Show keycaps">View switches</button><button class="text-button" type="button" id="clicker-reset">Reset view</button></div></div>
         <div class="plate-view" id="clicker-view" tabindex="0" aria-label="3D clicker preview. Drag to rotate and zoom."><canvas id="clicker-canvas"></canvas></div>
       </div>
       <div class="keyring-preview-meta">
         <p class="plate-view-hint">Drag to rotate · Pinch to zoom · Tap a keycap</p>
+        <p class="keyring-dimensions" id="clicker-dimensions" data-label="Model dimensions"></p>
         <p id="clicker-status" role="status" data-unsupported="This font does not support these characters. Choose another font or name." data-error="Could not load the 3D preview. Please try again." data-no-webgl="This browser cannot show the 3D preview. Please use a WebGL-capable browser."></p>
         <figcaption>Design preview. Final colours and dimensions depend on production specifications.</figcaption>
       </div>
@@ -188,15 +182,15 @@
         <p class="nameplate-order-note">One character per key: Chinese or an English letter.</p>
         <section class="clicker-colors" aria-labelledby="clicker-colors-heading">
           <h3 id="clicker-colors-heading">Finish</h3>
-          <details class="clicker-colour-section" open>
+          <details class="keyring-colour-section" open>
             <summary><span>Base colour</span><span class="clicker-colour-current" data-clicker-current="base"><i aria-hidden="true"></i><span></span></span></summary>
             <div class="nameplate-field"><label for="clicker-base">Base colour</label><select id="clicker-base" name="base"></select></div>
           </details>
-          <details class="clicker-colour-section" open>
+          <details class="keyring-colour-section" open>
             <summary><span>Keycap colour</span><span class="clicker-colour-current" data-clicker-current="cap"><i aria-hidden="true"></i><span></span></span></summary>
             <div class="nameplate-field"><label for="clicker-cap">Keycap colour</label><select id="clicker-cap" name="cap"></select></div>
           </details>
-          <details class="clicker-colour-section" open>
+          <details class="keyring-colour-section" open>
             <summary><span>Text colour</span><span class="clicker-colour-current" data-clicker-current="ink"><i aria-hidden="true"></i><span></span></span></summary>
             <div class="nameplate-field"><label for="clicker-ink">Text colour</label><select id="clicker-ink" name="ink"></select></div>
           </details>
