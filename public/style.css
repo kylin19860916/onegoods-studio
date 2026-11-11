@@ -205,7 +205,16 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .keyring-choice span{overflow-wrap:anywhere}
 #clicker-count{grid-template-columns:repeat(4,minmax(0,1fr))}
 #clicker-count .keyring-choice{justify-content:center;padding-inline:4px}
-#plate-style .keyring-choice{font-size:13px}
+.nameplate-field:has(.keyring-colour-options){container-type:inline-size}
+.keyring-colour-options{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px 6px}
+.keyring-colour-options .keyring-choice{display:flex;flex-direction:column;justify-content:start;gap:9px;padding:6px 0;border:0;border-radius:0;min-height:0;text-align:center;font-size:12px}
+.keyring-colour-options .keyring-choice:has(input:checked){background:transparent;box-shadow:none;font-weight:700}
+.keyring-colour-options .keyring-colour-chip{flex:0 0 36px;width:36px;height:36px}
+.keyring-colour-options .keyring-choice:has(input:checked) .keyring-colour-chip{outline:2px solid #80609e;outline-offset:3px}
+.keyring-colour-options .keyring-choice:has(input:focus-visible){outline:none}
+.keyring-colour-options .keyring-choice:has(input:focus-visible) .keyring-colour-chip{outline:3px solid var(--ink);outline-offset:4px}
+.keyring-colour-options .keyring-choice:hover .keyring-colour-chip{box-shadow:0 0 0 3px #80609e30}
+@container(max-width:330px){.keyring-colour-options{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .keyring-preview{margin:0;position:sticky;top:105px;min-width:0}
 .keyring-preview-frame{position:relative;top:auto;padding:0;overflow:hidden}
 .keyring-preview-frame .plate-view{aspect-ratio:1;margin:0}

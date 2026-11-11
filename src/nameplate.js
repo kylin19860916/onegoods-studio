@@ -31,7 +31,6 @@ for (const select of form.querySelectorAll('[data-swatch]')) {
   select.value = select.dataset.default;
   expandChoices(select, { colours: true });
 }
-expandChoices(form.elements.style);
 const { nameText, style, shape, size, mode, baseColor, textColor, useAccent, accentColor } = form.elements;
 const download = document.querySelector('#plate-download');
 const payment = document.querySelector('#plate-payment');

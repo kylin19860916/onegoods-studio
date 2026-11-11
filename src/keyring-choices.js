@@ -2,7 +2,7 @@
 export function expandChoices(select, { colours = false } = {}) {
   const caption = select.parentElement.querySelector('label');
   const group = document.createElement('fieldset');
-  group.className = 'keyring-choice-group';
+  group.className = 'keyring-choice-group' + (colours ? ' keyring-colour-options' : '');
   group.id = select.id;
   const legend = document.createElement('legend');
   legend.textContent = caption.textContent;
