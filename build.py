@@ -19,7 +19,8 @@ for lang, folder, column in locales:
         text = translate(page.read_text()).replace('lang="zh-Hans"', f'lang="{lang}"')
         if folder:
             text = text.replace('href="assets/', 'href="../assets/').replace('src="assets/', 'src="../assets/')
-            text = text.replace('href="style.css"', 'href="../style.css"').replace('src="nameplate.js"', 'src="../nameplate.js"')
+            for asset in ('href="style.css"', 'src="nameplate.js"', 'src="locale.js"'):
+                text = text.replace(asset, asset.replace('="', '="../'))
         # All locale pages have static content and metadata even without JavaScript.
         canonical = f'{origin}/{folder + "/" if folder else ""}{page.name}'
         text = re.sub(r'<link rel="canonical"[^>]*>', '', text)

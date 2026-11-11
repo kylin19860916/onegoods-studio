@@ -20,7 +20,7 @@ function loadFont(key) {
 }
 
 export function setupClicker() {
-  const links = [...document.querySelectorAll('[data-keyring-product]')];
+  const headings = document.querySelectorAll('[data-keyring-intro]');
   const panels = [...document.querySelectorAll('[data-keyring-panel]')];
   const form = document.querySelector('#clicker-form');
   const labels = document.querySelector('#clicker-labels');
@@ -132,12 +132,10 @@ export function setupClicker() {
   remove.addEventListener('click', () => { count = Math.max(1, count - 1); render(); });
   add.addEventListener('click', () => { count = Math.min(maximum, count + 1); render(); });
   function showProduct() {
-    const selected = location.hash === '#name-clicker' ? 'name-clicker' : 'name-tag';
+    const requested = location.hash.slice(1) || new URLSearchParams(location.search).get('style');
+    const selected = requested === 'name-clicker' ? 'name-clicker' : 'name-tag';
     for (const panel of panels) panel.hidden = panel.id !== selected;
-    for (const link of links) {
-      if (link.dataset.keyringProduct === selected) link.setAttribute('aria-current', 'true');
-      else link.removeAttribute('aria-current');
-    }
+    for (const heading of headings) heading.hidden = heading.dataset.keyringIntro !== selected;
   }
   form.addEventListener('input', event => { if (!event.isComposing) render(); });
   form.addEventListener('submit', event => event.preventDefault());
