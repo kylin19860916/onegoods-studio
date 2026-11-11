@@ -7,8 +7,8 @@
   <title>客製名牌 — One Goods Studio</title>
   <meta name="description" content="選一款造型和尺寸，為你的名字配上喜歡的顏色。">
   <link rel="icon" href="assets/icon.png">
-  <link rel="stylesheet" href="style.css?v=e877c3e598c1">
-  <script src="locale.js?v=e877c3e598c1" defer></script><script src="nameplate.js?v=e877c3e598c1" defer></script>
+  <link rel="stylesheet" href="style.css?v=c98a00c58e56">
+  <script src="locale.js?v=c98a00c58e56" defer></script><script src="nameplate.js?v=c98a00c58e56" defer></script>
 <link rel="canonical" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客製名牌</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="en/nameplate.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客製名牌</a><a href="about.html">關於 OGS</a></nav>
@@ -20,11 +20,12 @@
     <p>選一款造型和尺寸，為你的名字配上喜歡的顏色。</p>
   </div>
   <nav class="keyring-product-nav" aria-label="客製類型">
-    <a href="#name-tag" data-keyring-product="name-tag" aria-current="true">姓名鑰匙圈</a>
-    <a href="#name-clicker" data-keyring-product="name-clicker">姓名按壓款</a>
+    <a href="#name-tag" data-keyring-product="name-tag" aria-current="true">鑰匙圈款</a>
+    <a href="#name-clicker" data-keyring-product="name-clicker">按壓款</a>
   </nav>
   <div class="nameplate-workspace" id="name-tag" data-keyring-panel>
-    <figure class="nameplate-stage">
+    <figure class="keyring-preview">
+      <div class="nameplate-stage keyring-preview-frame">
       <div class="plate-view-header">
         <span class="eyebrow">LIVE 3D PREVIEW</span>
         <button class="text-button" id="plate-reset-view" type="button" hidden>重置視角</button>
@@ -40,10 +41,13 @@
         </g>
       </svg>
       </div>
+      </div>
+      <div class="keyring-preview-meta">
       <p class="plate-view-hint" id="plate-view-hint" hidden>拖曳旋轉 · 捏合縮放</p>
       <p id="plate-preview-status" role="status" data-loading="正在生成輪廓…" data-error="這組文字無法生成完整底板，請縮短姓名或換一種造型。"></p>
       <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="模型尺寸"></p>
       <figcaption>畫面為設計示意，實際成品顏色與尺寸依製作確認為準。</figcaption>
+      </div>
     </figure>
     <form id="nameplate-form" class="nameplate-form">
       <section class="keyring-shared" aria-labelledby="keyring-shared-title">
@@ -65,8 +69,8 @@
       </section>
       <div class="keyring-step-panel">
       <ol class="keyring-steps" aria-label="客製步驟">
-        <li aria-current="step"><span>01</span> 款式與尺寸</li>
-        <li><span>02</span> 選顏色</li>
+        <li aria-current="step"><button type="button" data-keyring-step="0" aria-controls="keyring-design"><span>01</span> 款式與尺寸</button></li>
+        <li><button type="button" data-keyring-step="1" aria-controls="keyring-colors"><span>02</span> 選顏色</button></li>
       </ol>
       <section class="keyring-step" id="keyring-design">
         <h2 tabindex="-1">款式與尺寸</h2>
@@ -98,7 +102,6 @@
           <label><input type="radio" name="size" value="large"><strong>大型</strong><small>80 × 33.2 mm</small></label>
         </fieldset>
         <p class="nameplate-order-note">以上為長寬上限。隨字輪廓的實際尺寸會依字形調整。</p>
-        <button class="button yellow" id="keyring-next" type="submit" disabled>下一步：選顏色</button>
       </section>
       <section class="keyring-step" id="keyring-colors" hidden>
         <h2 tabindex="-1">選顏色</h2>
@@ -130,14 +133,13 @@
           <option value="#b8d6bd">薄荷綠</option>
           <option value="#efb39e">蜜桃粉</option>
         </template>
-        <div class="nameplate-actions">
-          <button class="button cream" id="keyring-back" type="button">上一步</button>
-          <button class="button yellow" id="keyring-generate" type="submit" disabled>生成預覽圖</button>
-          <a class="button cream" id="plate-download" download="OGS-keyring-preview.png" hidden>下載 PNG</a>
-          <p id="plate-status" role="status" data-error="預覽圖生成失敗，請再試一次。" data-ready="預覽圖已生成。"></p>
-          <p class="nameplate-order-note">正式售價與賣貨便商品連結確認後開放送單。</p>
-        </div>
       </section>
+        <div class="nameplate-actions">
+          <button class="button yellow" id="keyring-generate" type="submit" disabled>提交確認</button>
+          <a class="button cream" id="plate-download" download="OGS-keyring-preview.png" hidden>下載 PNG</a>
+          <button class="button yellow" id="plate-payment" type="button" disabled hidden>前往付款</button>
+          <p id="plate-status" role="status" data-error="預覽圖生成失敗，請再試一次。" data-ready="已確認。可下載 PNG，付款暫未開放。"></p>
+        </div>
       </div>
     </form>
   </div>
@@ -166,6 +168,7 @@
         <div class="clicker-colors">
           <div class="nameplate-field"><label for="clicker-base">03 · 底座顏色</label><select id="clicker-base" name="base"></select></div>
           <div class="nameplate-field"><label for="clicker-cap">鍵帽顏色</label><select id="clicker-cap" name="cap"></select></div>
+          <div class="nameplate-field"><label for="clicker-ink">文字顏色</label><select id="clicker-ink" name="ink"></select></div>
         </div>
         <p class="nameplate-order-note">按壓款為互動示意，實際軸體與鍵帽結構待試印確認。</p>
       </div>

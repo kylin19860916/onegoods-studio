@@ -1,9 +1,9 @@
 import { parseKeyringFont, generateKeyring } from '../server/keyring-geometry.mjs';
 import { createKeyringViewer } from './keyring-viewer.js';
 import { setupClicker } from './keyring-clicker.js';
+import { expandChoices } from './keyring-choices.js';
 
 const form = document.querySelector('#nameplate-form');
-const { nameText, style, shape, size, mode, baseColor, textColor, useAccent, accentColor } = form.elements;
 const preview = document.querySelector('#plate-preview');
 const position = document.querySelector('#plate-position');
 const canvas = document.querySelector('#plate-canvas');
@@ -19,7 +19,6 @@ if (viewer) {
 const previewStatus = document.querySelector('#plate-preview-status');
 const dimensions = document.querySelector('#keyring-dimensions');
 const exportStatus = document.querySelector('#plate-status');
-const next = document.querySelector('#keyring-next');
 const generate = document.querySelector('#keyring-generate');
 const designStep = document.querySelector('#keyring-design');
 const colorsStep = document.querySelector('#keyring-colors');
@@ -30,8 +29,12 @@ const swatches = document.querySelector('#plate-swatch-options');
 for (const select of form.querySelectorAll('[data-swatch]')) {
   select.append(swatches.content.cloneNode(true));
   select.value = select.dataset.default;
+  expandChoices(select, { colours: true });
 }
+expandChoices(form.elements.style);
+const { nameText, style, shape, size, mode, baseColor, textColor, useAccent, accentColor } = form.elements;
 const download = document.querySelector('#plate-download');
+const payment = document.querySelector('#plate-payment');
 
 const fonts = {
   huninn: 'Huninn-Regular.woff',
@@ -105,7 +108,7 @@ async function render(version) {
     const numbers = model.dimensions.map(value => Number(value.toFixed(1)));
     dimensions.textContent = dimensions.dataset.label + ' · ' + numbers.join(' × ') + ' mm';
     previewStatus.textContent = '';
-    next.disabled = generate.disabled = !nameText.value.trim();
+    generate.disabled = !nameText.value.trim();
   } catch {
     if (version !== previewVersion) return;
     viewer?.setMeshes([]);
@@ -117,13 +120,12 @@ async function render(version) {
 
 function queuePreview() {
   const version = ++previewVersion;
-  next.disabled = generate.disabled = true;
+  generate.disabled = true;
   multiColors.hidden = mode.value === 'single';
   accent.hidden = !useAccent.checked;
-  for (const select of form.querySelectorAll('[data-swatch]')) {
-    select.style.borderInlineStart = '5px solid ' + select.value;
-  }
   download.hidden = true;
+  payment.hidden = true;
+  generate.hidden = false;
   download.removeAttribute('href');
   exportStatus.textContent = '';
   clearTimeout(timer);
@@ -135,6 +137,8 @@ function exportImage() {
     try {
       download.href = viewer.image();
       download.hidden = false;
+      payment.hidden = false;
+      generate.hidden = true;
       exportStatus.textContent = exportStatus.dataset.ready;
     } catch {
       exportStatus.textContent = exportStatus.dataset.error;
@@ -162,6 +166,8 @@ function exportImage() {
       canvas.getContext('2d').drawImage(image, 0, 0);
       download.href = canvas.toDataURL('image/png');
       download.hidden = false;
+      payment.hidden = false;
+      generate.hidden = true;
       exportStatus.textContent = exportStatus.dataset.ready;
     } catch {
       exportStatus.textContent = exportStatus.dataset.error;
@@ -175,12 +181,12 @@ function exportImage() {
 }
 
 form.addEventListener('input', queuePreview);
-document.querySelector('#keyring-back').addEventListener('click', () => showStep(0));
+document.querySelectorAll('[data-keyring-step]').forEach(button => {
+  button.addEventListener('click', () => showStep(Number(button.dataset.keyringStep)));
+});
 form.addEventListener('submit', event => {
   event.preventDefault();
-  if (!designStep.hidden) {
-    if (!next.disabled) showStep(1);
-  } else if (!generate.disabled) exportImage();
+  if (!generate.disabled) exportImage();
 });
 queuePreview();
 

@@ -7,8 +7,8 @@
   <title>Custom nameplate — One Goods Studio</title>
   <meta name="description" content="Pick a shape and size, then colour your name keyring.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=e877c3e598c1">
-  <script src="../locale.js?v=e877c3e598c1" defer></script><script src="../nameplate.js?v=e877c3e598c1" defer></script>
+  <link rel="stylesheet" href="../style.css?v=c98a00c58e56">
+  <script src="../locale.js?v=c98a00c58e56" defer></script><script src="../nameplate.js?v=c98a00c58e56" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="nameplate.html" aria-current="page">Custom nameplate</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="nameplate.html" aria-current="page">Custom nameplate</a><a href="about.html">About OGS</a></nav>
@@ -20,11 +20,12 @@
     <p>Pick a shape and size, then colour your name keyring.</p>
   </div>
   <nav class="keyring-product-nav" aria-label="Custom product type">
-    <a href="#name-tag" data-keyring-product="name-tag" aria-current="true">Name keyring</a>
-    <a href="#name-clicker" data-keyring-product="name-clicker">Name clicker</a>
+    <a href="#name-tag" data-keyring-product="name-tag" aria-current="true">Keyrings</a>
+    <a href="#name-clicker" data-keyring-product="name-clicker">Clickers</a>
   </nav>
   <div class="nameplate-workspace" id="name-tag" data-keyring-panel>
-    <figure class="nameplate-stage">
+    <figure class="keyring-preview">
+      <div class="nameplate-stage keyring-preview-frame">
       <div class="plate-view-header">
         <span class="eyebrow">LIVE 3D PREVIEW</span>
         <button class="text-button" id="plate-reset-view" type="button" hidden>Reset view</button>
@@ -40,10 +41,13 @@
         </g>
       </svg>
       </div>
+      </div>
+      <div class="keyring-preview-meta">
       <p class="plate-view-hint" id="plate-view-hint" hidden>Drag to rotate · Pinch to zoom</p>
       <p id="plate-preview-status" role="status" data-loading="Generating outlines…" data-error="This text cannot form a complete base. Try a shorter name or a different shape."></p>
       <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="Model dimensions"></p>
       <figcaption>Design preview. Final colours and dimensions depend on production specifications.</figcaption>
+      </div>
     </figure>
     <form id="nameplate-form" class="nameplate-form">
       <section class="keyring-shared" aria-labelledby="keyring-shared-title">
@@ -65,8 +69,8 @@
       </section>
       <div class="keyring-step-panel">
       <ol class="keyring-steps" aria-label="Customisation steps">
-        <li aria-current="step"><span>01</span> Style and size</li>
-        <li><span>02</span> Choose colours</li>
+        <li aria-current="step"><button type="button" data-keyring-step="0" aria-controls="keyring-design"><span>01</span> Style and size</button></li>
+        <li><button type="button" data-keyring-step="1" aria-controls="keyring-colors"><span>02</span> Choose colours</button></li>
       </ol>
       <section class="keyring-step" id="keyring-design">
         <h2 tabindex="-1">Style and size</h2>
@@ -98,7 +102,6 @@
           <label><input type="radio" name="size" value="large"><strong>Large</strong><small>80 × 33.2 mm</small></label>
         </fieldset>
         <p class="nameplate-order-note">These are maximum dimensions. The contour shape adapts to the lettering.</p>
-        <button class="button yellow" id="keyring-next" type="submit" disabled>Next: Choose colours</button>
       </section>
       <section class="keyring-step" id="keyring-colors" hidden>
         <h2 tabindex="-1">Choose colours</h2>
@@ -130,14 +133,13 @@
           <option value="#b8d6bd">Mint</option>
           <option value="#efb39e">Peach</option>
         </template>
-        <div class="nameplate-actions">
-          <button class="button cream" id="keyring-back" type="button">Back</button>
-          <button class="button yellow" id="keyring-generate" type="submit" disabled>Generate preview</button>
-          <a class="button cream" id="plate-download" download="OGS-keyring-preview.png" hidden>Download PNG</a>
-          <p id="plate-status" role="status" data-error="Could not generate the preview. Try again." data-ready="Preview ready."></p>
-          <p class="nameplate-order-note">Ordering will open once the price and 7-ELEVEN listing are confirmed.</p>
-        </div>
       </section>
+        <div class="nameplate-actions">
+          <button class="button yellow" id="keyring-generate" type="submit" disabled>Confirm design</button>
+          <a class="button cream" id="plate-download" download="OGS-keyring-preview.png" hidden>Download PNG</a>
+          <button class="button yellow" id="plate-payment" type="button" disabled hidden>Proceed to payment</button>
+          <p id="plate-status" role="status" data-error="Could not generate the preview. Try again." data-ready="Design confirmed. Download your PNG; payment is not open yet."></p>
+        </div>
       </div>
     </form>
   </div>
@@ -166,6 +168,7 @@
         <div class="clicker-colors">
           <div class="nameplate-field"><label for="clicker-base">03 · Base colour</label><select id="clicker-base" name="base"></select></div>
           <div class="nameplate-field"><label for="clicker-cap">Keycap colour</label><select id="clicker-cap" name="cap"></select></div>
+          <div class="nameplate-field"><label for="clicker-ink">Text colour</label><select id="clicker-ink" name="ink"></select></div>
         </div>
         <p class="nameplate-order-note">Interactive mock-up. Switches and keycap fit still need a print test.</p>
       </div>

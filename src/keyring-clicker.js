@@ -1,3 +1,5 @@
+import { expandChoices } from './keyring-choices.js';
+
 export function setupClicker() {
   const links = [...document.querySelectorAll('[data-keyring-product]')];
   const panels = [...document.querySelectorAll('[data-keyring-panel]')];
@@ -7,11 +9,15 @@ export function setupClicker() {
   const template = document.querySelector('#clicker-label-template');
   const swatches = document.querySelector('#plate-swatch-options');
 
-  const { keyCount, base, cap } = form.elements;
-  base.append(swatches.content.cloneNode(true));
-  cap.append(swatches.content.cloneNode(true));
-  base.value = '#393142';
-  cap.value = '#a087c1';
+  const defaults = { base: '#393142', cap: '#a087c1', ink: '#fffcf5' };
+  for (const name of Object.keys(defaults)) {
+    const select = form.elements[name];
+    select.append(swatches.content.cloneNode(true));
+    select.value = defaults[name];
+    expandChoices(select, { colours: true });
+  }
+  expandChoices(form.elements.keyCount);
+  const { keyCount, base, cap, ink } = form.elements;
 
   const keys = Array.from({ length: 4 }, (_, index) => {
     const row = template.content.cloneNode(true).firstElementChild;
@@ -37,7 +43,7 @@ export function setupClicker() {
     rail.style.setProperty('--clicker-count', String(count));
     rail.style.setProperty('--clicker-base', base.value);
     rail.style.setProperty('--clicker-cap', cap.value);
-    rail.style.setProperty('--clicker-ink', ['#393142', '#a087c1'].includes(cap.value) ? '#fffcf5' : '#292331');
+    rail.style.setProperty('--clicker-ink', ink.value);
     for (const [index, key] of keys.entries()) {
       const visible = index < count;
       key.row.hidden = key.button.hidden = !visible;

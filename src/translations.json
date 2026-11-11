@@ -1,4 +1,10 @@
 {
+  "钥匙圈款": ["鑰匙圈款", "Keyrings"],
+  ">按压款</a>": [">按壓款</a>", ">Clickers</a>"],
+  "文字颜色": ["文字顏色", "Text colour"],
+  "提交确认": ["提交確認", "Confirm design"],
+  "前往付款": ["前往付款", "Proceed to payment"],
+  "已确认。可下载 PNG，付款暂未开放。": ["已確認。可下載 PNG，付款暫未開放。", "Design confirmed. Download your PNG; payment is not open yet."],
   ">造型</legend>": [">造型</legend>", ">Shape</legend>"],
   "这组文字无法生成完整底板，请缩短姓名或换一种造型。": ["這組文字無法生成完整底板，請縮短姓名或換一種造型。", "This text cannot form a complete base. Try a shorter name or a different shape."],
   "客制类型": ["客製類型", "Custom product type"],
