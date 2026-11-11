@@ -78,42 +78,45 @@ async function createOrder(request: Request, store: Store) {
   return json(receipt(concurrent));
 }
 
-function checkoutPage(order: Order, error = '', status = 200) {
+function checkoutPage(order: Order) {
   const tierLabel = order.tier === 'test-a' ? 'A 檔' : 'B 檔';
   const confirmation = order.mock_reference
-    ? `<h2>測試單已成立</h2><p>模擬賣貨便單號 <strong>${order.mock_reference}</strong></p><p>可在 OGS 後台用客製編號搜尋，再輸入這個單號與商品金額完成配對。</p><a class="button yellow" href="/admin#clicker-orders">前往 OGS 後台</a>`
-    : `<form method="post" class="nameplate-form"><label class="nameplate-field">訂單備註<input name="ogsCode" required maxlength="18" autocomplete="off" placeholder="貼上 OGS 客製編號"></label><button class="button yellow">送出模擬賣貨便訂單</button></form>`;
-  const copyCode = order.mock_reference ? `<strong>${order.id}</strong>` : `
-    <label for="checkout-code">OGS 客製編號</label>
-    <div class="home-hero-actions">
-      <span class="nameplate-field"><input id="checkout-code" value="${order.id}" readonly></span>
-      <button class="button custom-button" id="copy-code" type="button">複製客製編號</button>
-    </div>
-    <p id="copy-code-status" role="status"></p>
-    <script>
-      document.getElementById('copy-code').addEventListener('click', async () => {
-        const code = document.getElementById('checkout-code');
-        const status = document.getElementById('copy-code-status');
-        try {
-          await navigator.clipboard.writeText(code.value);
-          status.textContent = '已複製，可貼到訂單備註。';
-        } catch {
-          code.select();
-          status.textContent = '請手動複製已選取的編號。';
-        }
-      });
-    </script>`;
-  return new Response(`<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>賣貨便下單模擬 · OGS</title><link rel="stylesheet" href="/style.css"><main class="section nameplate-page"><div class="nameplate-heading"><a class="custom-back" href="/nameplate?style=name-clicker&amp;test-order=1">返回客製測試</a><h1>賣貨便模擬結帳 · ${tierLabel}</h1><p>${testOnly}</p></div><div class="nameplate-form">${order.mock_reference ? `<p>OGS 客製編號 ${copyCode}</p>` : copyCode}<p>測試商品金額 <strong>NT$${order.amount}</strong></p>${error ? `<p role="alert">${error}</p>` : ''}${confirmation}</div></main></html>`, {
-    status, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', 'X-Content-Type-Options': 'nosniff' },
+    ? `<h2>測試單已成立</h2>
+       <p>模擬賣貨便單號 <strong>${order.mock_reference}</strong></p>
+       <p>可在 OGS 後台用客製編號搜尋，再輸入這個單號與商品金額完成配對。</p>
+       <a class="button yellow" href="/admin#clicker-orders">前往 OGS 後台</a>`
+    : `<form method="post" class="nameplate-form">
+         <button class="button yellow" type="submit">送出模擬賣貨便訂單</button>
+       </form>`;
+  return new Response(`<!doctype html><html lang="zh-Hant">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>賣貨便下單模擬 · OGS</title>
+      <link rel="stylesheet" href="/style.css">
+    </head>
+    <body>
+      <main class="section nameplate-page">
+        <div class="nameplate-heading">
+          <a class="custom-back" href="/nameplate?style=name-clicker&amp;test-order=1">返回客製測試</a>
+          <h1>賣貨便模擬結帳 · ${tierLabel}</h1>
+          <p>${testOnly}</p>
+        </div>
+        <div class="nameplate-form">
+          <p>OGS 客製編號 <strong>${order.id}</strong></p>
+          <p>測試商品金額 <strong>NT$${order.amount}</strong></p>
+          ${confirmation}
+        </div>
+      </main>
+    </body>
+  </html>`, {
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', 'X-Content-Type-Options': 'nosniff' },
   });
 }
 
 async function simulateCheckout(request: Request, store: Store, order: Order) {
   if (request.method === 'GET' || order.mock_reference) return checkoutPage(order);
-  const form = await request.formData();
-  if (String(form.get('ogsCode')).trim().toUpperCase() !== order.id) {
-    return checkoutPage(order, '客製編號不符，請貼上此筆訂單的 OGS 編號。', 400);
-  }
+  // The authenticated checkout route already resolved the order and verified its tier.
   await store.DB.prepare('UPDATE clicker_orders SET mock_reference=? WHERE id=? AND mock_reference IS NULL')
     .bind(code('TEST-MYSHIP-'), order.id).run();
   return Response.redirect(request.url, 303);

@@ -58,10 +58,15 @@ for text, tier, amount, other_tier, other_amount in [
     status, page = request(checkout)
     assert status == 200 and f'NT${amount}'.encode() in page
     assert f'{tier[-1].upper()} 檔'.encode() in page
-    assert request(checkout, 'POST', b'ogsCode=WRONG')[0] == 400
-    status, page = request(checkout, 'POST', ('ogsCode=' + order['id']).encode())
-    assert status == 200
+    assert order['id'].encode() in page
+    assert b'name="ogsCode"' not in page and b'id="copy-code"' not in page
+    assert b'TEST-MYSHIP-' not in page  # Opening checkout does not place an order.
+    assert request(checkout, 'POST', b'', origin='https://other.example')[0] == 403
+    status, page = request(checkout, 'POST', b'')
+    assert status == 200 and order['id'].encode() in page
     reference = re.search(rb'TEST-MYSHIP-[A-F0-9]{12}', page).group().decode()
+    status, retry_page = request(checkout, 'POST', b'ogsCode=WRONG')
+    assert status == 200 and reference.encode() in retry_page  # Resubmission keeps the same reference.
     list_path = '/api/admin/clicker-orders?q=' + order['id']
     items = json.loads(request(list_path)[1])['items']
     assert len(items) == 1 and items[0]['design']['text'] == text
