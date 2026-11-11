@@ -7,8 +7,8 @@
   <title>Custom nameplate — One Goods Studio</title>
   <meta name="description" content="Pick a shape and size, then colour your name keyring.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=f55ba912b6c6">
-  <script src="../locale.js?v=f55ba912b6c6" defer></script><script src="../nameplate.js?v=f55ba912b6c6" defer></script>
+  <link rel="stylesheet" href="../style.css?v=2df0fe6a41f0">
+  <script src="../locale.js?v=2df0fe6a41f0" defer></script><script src="../nameplate.js?v=2df0fe6a41f0" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="nameplate.html" aria-current="page">Custom nameplate</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="nameplate.html" aria-current="page">Custom nameplate</a><a href="about.html">About OGS</a></nav>
@@ -44,7 +44,7 @@
       </div>
       <div class="keyring-preview-meta">
       <p class="plate-view-hint" id="plate-view-hint" hidden>Drag to rotate · Pinch to zoom</p>
-      <p id="plate-preview-status" role="status" data-loading="Generating outlines…" data-error="This text cannot form a complete base. Try a shorter name or a different shape."></p>
+      <p id="plate-preview-status" role="status" data-loading="Generating outlines…" data-error="This text cannot form a complete base. Try a shorter name or a different shape." data-unsupported="This font does not support these characters. Choose another font or name."></p>
       <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="Model dimensions"></p>
       <figcaption>Design preview. Final colours and dimensions depend on production specifications.</figcaption>
       </div>
@@ -59,11 +59,22 @@
         <div class="nameplate-field">
           <label for="plate-style">Letter style</label>
           <select id="plate-style" name="style">
-            <option value="huninn">Huninn · Chinese and English</option>
+            <optgroup label="Chinese fonts"><option value="huninn">Huninn · Chinese and English</option>
             <option value="sans-tc">Traditional Chinese · Sans Serif</option>
             <option value="serif-tc">Traditional Chinese · Serif</option>
             <option value="sans-sc">Simplified Chinese · Sans Serif</option>
             <option value="serif-sc">Simplified Chinese · Serif</option>
+            <option value="wenkai">LXGW WenKai · Traditional Chinese</option>
+            <option value="kuaile">ZCOOL KuaiLe · Simplified Chinese</option></optgroup>
+            <optgroup label="English fonts">
+              <option value="lucky" data-sample="Angela">Luckiest Guy</option>
+              <option value="nunito" data-sample="Angela">Nunito Black</option>
+              <option value="lobster" data-sample="Angela">Lobster</option>
+              <option value="lilita" data-sample="Angela">Lilita One</option>
+              <option value="chewy" data-sample="Angela">Chewy</option>
+              <option value="yellowtail" data-sample="Angela">Yellowtail</option>
+              <option value="blackops" data-sample="Angela">Black Ops One</option>
+            </optgroup>
           </select>
         </div>
       </section>
@@ -152,19 +163,21 @@
     <form class="nameplate-form" id="clicker-form">
       <div class="keyring-step-panel">
         <div><span class="eyebrow">OGS / PRESS &amp; PLAY</span><h2>Name clicker</h2></div>
-        <div class="nameplate-field">
-          <label for="clicker-count">01 · Number of keys</label>
-          <select id="clicker-count" name="keyCount">
-            <option value="1">1 key</option><option value="2">2 keys</option>
-            <option value="3" selected>3 keys</option><option value="4">4 keys</option>
-          </select>
-        </div>
+        <fieldset class="clicker-count-control">
+          <legend>01 · Number of keys</legend>
+          <div class="clicker-count-stepper">
+            <button type="button" id="clicker-remove" aria-label="Remove one key">−</button>
+            <output id="clicker-count" aria-live="polite">2</output>
+            <button type="button" id="clicker-add" aria-label="Add one key">+</button>
+          </div>
+        </fieldset>
         <fieldset id="clicker-labels" class="clicker-labels" data-key-label="Key">
           <legend>02 · Text on each key</legend>
           <template id="clicker-label-template">
-            <label class="nameplate-field"><span></span><input maxlength="8" autocomplete="off"></label>
+            <label class="nameplate-field clicker-letter-slot"><span aria-hidden="true"></span><input autocomplete="off" autocapitalize="off" spellcheck="false"></label>
           </template>
         </fieldset>
+        <p class="nameplate-order-note">One character per key: Chinese or an English letter.</p>
         <div class="clicker-colors">
           <div class="nameplate-field"><label for="clicker-base">03 · Base colour</label><select id="clicker-base" name="base"></select></div>
           <div class="nameplate-field"><label for="clicker-cap">Keycap colour</label><select id="clicker-cap" name="cap"></select></div>

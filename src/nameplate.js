@@ -2,6 +2,7 @@ import { parseKeyringFont, generateKeyring } from '../server/keyring-geometry.mj
 import { createKeyringViewer } from './keyring-viewer.js';
 import { setupClicker } from './keyring-clicker.js';
 import { expandChoices } from './keyring-choices.js';
+import { keyringFonts, setupFontPicker } from './keyring-font-picker.js';
 
 const form = document.querySelector('#nameplate-form');
 const preview = document.querySelector('#plate-preview');
@@ -35,13 +36,8 @@ const { nameText, style, shape, size, mode, baseColor, textColor, useAccent, acc
 const download = document.querySelector('#plate-download');
 const payment = document.querySelector('#plate-payment');
 
-const fonts = {
-  huninn: 'Huninn-Regular.woff',
-  'sans-tc': 'NotoSansTC-Bold.woff',
-  'serif-tc': 'NotoSerifTC-Bold.woff',
-  'sans-sc': 'NotoSansSC-Bold.woff',
-  'serif-sc': 'NotoSerifSC-Bold.woff',
-};
+const fonts = keyringFonts;
+setupFontPicker(form.elements.style);
 const sizes = { small: [50, 20.8], medium: [65, 27], large: [80, 33.2] };
 const spec = { baseMm: 3, letteringMm: 1, holeMm: 4, rimMm: 1.8 };
 let currentFont;
@@ -108,12 +104,12 @@ async function render(version) {
     dimensions.textContent = dimensions.dataset.label + ' · ' + numbers.join(' × ') + ' mm';
     previewStatus.textContent = '';
     generate.disabled = !nameText.value.trim();
-  } catch {
+  } catch (error) {
     if (version !== previewVersion) return;
     viewer?.setMeshes([]);
     dimensions.textContent = '';
     preview.querySelectorAll('[data-outline]').forEach(path => path.removeAttribute('d'));
-    previewStatus.textContent = previewStatus.dataset.error;
+    previewStatus.textContent = error.message === '有字元不在此款支援的字型中。' ? previewStatus.dataset.unsupported : previewStatus.dataset.error;
   }
 }
 

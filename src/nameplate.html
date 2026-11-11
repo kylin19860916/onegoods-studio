@@ -44,7 +44,7 @@
       </div>
       <div class="keyring-preview-meta">
       <p class="plate-view-hint" id="plate-view-hint" hidden>拖动旋转 · 捏合缩放</p>
-      <p id="plate-preview-status" role="status" data-loading="正在生成轮廓…" data-error="这组文字无法生成完整底板，请缩短姓名或换一种造型。"></p>
+      <p id="plate-preview-status" role="status" data-loading="正在生成轮廓…" data-error="这组文字无法生成完整底板，请缩短姓名或换一种造型。" data-unsupported="所选字体不支持这些文字，请更换字体或姓名。"></p>
       <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="模型尺寸"></p>
       <figcaption>画面为设计示意，实际成品颜色与尺寸依制作确认为准。</figcaption>
       </div>
@@ -59,11 +59,22 @@
         <div class="nameplate-field">
           <label for="plate-style">字形风格</label>
           <select id="plate-style" name="style">
-            <option value="huninn">粉圆 · 中英文</option>
+            <optgroup label="中文字型"><option value="huninn">粉圆 · 中英文</option>
             <option value="sans-tc">繁体黑体 · Sans Serif</option>
             <option value="serif-tc">繁体宋体 · Serif</option>
             <option value="sans-sc">简体黑体 · Sans Serif</option>
             <option value="serif-sc">简体宋体 · Serif</option>
+            <option value="wenkai">霞鹜文楷 · 繁体</option>
+            <option value="kuaile">站酷快乐 · 简体</option></optgroup>
+            <optgroup label="英文字型">
+              <option value="lucky" data-sample="Angela">Luckiest Guy</option>
+              <option value="nunito" data-sample="Angela">Nunito Black</option>
+              <option value="lobster" data-sample="Angela">Lobster</option>
+              <option value="lilita" data-sample="Angela">Lilita One</option>
+              <option value="chewy" data-sample="Angela">Chewy</option>
+              <option value="yellowtail" data-sample="Angela">Yellowtail</option>
+              <option value="blackops" data-sample="Angela">Black Ops One</option>
+            </optgroup>
           </select>
         </div>
       </section>
@@ -152,19 +163,21 @@
     <form class="nameplate-form" id="clicker-form">
       <div class="keyring-step-panel">
         <div><span class="eyebrow">OGS / PRESS &amp; PLAY</span><h2>姓名按压款</h2></div>
-        <div class="nameplate-field">
-          <label for="clicker-count">01 · 按键格数</label>
-          <select id="clicker-count" name="keyCount">
-            <option value="1">1 格</option><option value="2">2 格</option>
-            <option value="3" selected>3 格</option><option value="4">4 格</option>
-          </select>
-        </div>
+        <fieldset class="clicker-count-control">
+          <legend>01 · 按键格数</legend>
+          <div class="clicker-count-stepper">
+            <button type="button" id="clicker-remove" aria-label="减少一格">−</button>
+            <output id="clicker-count" aria-live="polite">2</output>
+            <button type="button" id="clicker-add" aria-label="增加一格">+</button>
+          </div>
+        </fieldset>
         <fieldset id="clicker-labels" class="clicker-labels" data-key-label="按键">
           <legend>02 · 每格文字</legend>
           <template id="clicker-label-template">
-            <label class="nameplate-field"><span></span><input maxlength="8" autocomplete="off"></label>
+            <label class="nameplate-field clicker-letter-slot"><span aria-hidden="true"></span><input autocomplete="off" autocapitalize="off" spellcheck="false"></label>
           </template>
         </fieldset>
+        <p class="nameplate-order-note">每格限一个字，可输入中文或英文字母。</p>
         <div class="clicker-colors">
           <div class="nameplate-field"><label for="clicker-base">03 · 底座颜色</label><select id="clicker-base" name="base"></select></div>
           <div class="nameplate-field"><label for="clicker-cap">键帽颜色</label><select id="clicker-cap" name="cap"></select></div>

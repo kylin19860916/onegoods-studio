@@ -7,8 +7,8 @@
   <title>客製名牌 — One Goods Studio</title>
   <meta name="description" content="選一款造型和尺寸，為你的名字配上喜歡的顏色。">
   <link rel="icon" href="assets/icon.png">
-  <link rel="stylesheet" href="style.css?v=f55ba912b6c6">
-  <script src="locale.js?v=f55ba912b6c6" defer></script><script src="nameplate.js?v=f55ba912b6c6" defer></script>
+  <link rel="stylesheet" href="style.css?v=2df0fe6a41f0">
+  <script src="locale.js?v=2df0fe6a41f0" defer></script><script src="nameplate.js?v=2df0fe6a41f0" defer></script>
 <link rel="canonical" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客製名牌</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="en/nameplate.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客製名牌</a><a href="about.html">關於 OGS</a></nav>
@@ -44,7 +44,7 @@
       </div>
       <div class="keyring-preview-meta">
       <p class="plate-view-hint" id="plate-view-hint" hidden>拖曳旋轉 · 捏合縮放</p>
-      <p id="plate-preview-status" role="status" data-loading="正在生成輪廓…" data-error="這組文字無法生成完整底板，請縮短姓名或換一種造型。"></p>
+      <p id="plate-preview-status" role="status" data-loading="正在生成輪廓…" data-error="這組文字無法生成完整底板，請縮短姓名或換一種造型。" data-unsupported="所選字型不支援這些文字，請更換字型或姓名。"></p>
       <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="模型尺寸"></p>
       <figcaption>畫面為設計示意，實際成品顏色與尺寸依製作確認為準。</figcaption>
       </div>
@@ -59,11 +59,22 @@
         <div class="nameplate-field">
           <label for="plate-style">字形風格</label>
           <select id="plate-style" name="style">
-            <option value="huninn">粉圓 · 中英文</option>
+            <optgroup label="中文字型"><option value="huninn">粉圓 · 中英文</option>
             <option value="sans-tc">繁體黑體 · Sans Serif</option>
             <option value="serif-tc">繁體宋體 · Serif</option>
             <option value="sans-sc">簡體黑體 · Sans Serif</option>
             <option value="serif-sc">簡體宋體 · Serif</option>
+            <option value="wenkai">霞鶩文楷 · 繁體</option>
+            <option value="kuaile">站酷快樂 · 簡體</option></optgroup>
+            <optgroup label="英文字型">
+              <option value="lucky" data-sample="Angela">Luckiest Guy</option>
+              <option value="nunito" data-sample="Angela">Nunito Black</option>
+              <option value="lobster" data-sample="Angela">Lobster</option>
+              <option value="lilita" data-sample="Angela">Lilita One</option>
+              <option value="chewy" data-sample="Angela">Chewy</option>
+              <option value="yellowtail" data-sample="Angela">Yellowtail</option>
+              <option value="blackops" data-sample="Angela">Black Ops One</option>
+            </optgroup>
           </select>
         </div>
       </section>
@@ -152,19 +163,21 @@
     <form class="nameplate-form" id="clicker-form">
       <div class="keyring-step-panel">
         <div><span class="eyebrow">OGS / PRESS &amp; PLAY</span><h2>姓名按壓款</h2></div>
-        <div class="nameplate-field">
-          <label for="clicker-count">01 · 按鍵格數</label>
-          <select id="clicker-count" name="keyCount">
-            <option value="1">1 格</option><option value="2">2 格</option>
-            <option value="3" selected>3 格</option><option value="4">4 格</option>
-          </select>
-        </div>
+        <fieldset class="clicker-count-control">
+          <legend>01 · 按鍵格數</legend>
+          <div class="clicker-count-stepper">
+            <button type="button" id="clicker-remove" aria-label="減少一格">−</button>
+            <output id="clicker-count" aria-live="polite">2</output>
+            <button type="button" id="clicker-add" aria-label="增加一格">+</button>
+          </div>
+        </fieldset>
         <fieldset id="clicker-labels" class="clicker-labels" data-key-label="按鍵">
           <legend>02 · 每格文字</legend>
           <template id="clicker-label-template">
-            <label class="nameplate-field"><span></span><input maxlength="8" autocomplete="off"></label>
+            <label class="nameplate-field clicker-letter-slot"><span aria-hidden="true"></span><input autocomplete="off" autocapitalize="off" spellcheck="false"></label>
           </template>
         </fieldset>
+        <p class="nameplate-order-note">每格限一個字，可輸入中文或英文字母。</p>
         <div class="clicker-colors">
           <div class="nameplate-field"><label for="clicker-base">03 · 底座顏色</label><select id="clicker-base" name="base"></select></div>
           <div class="nameplate-field"><label for="clicker-cap">鍵帽顏色</label><select id="clicker-cap" name="cap"></select></div>

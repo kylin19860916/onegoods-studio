@@ -16,8 +16,13 @@ export function setupClicker() {
     select.value = defaults[name];
     expandChoices(select, { colours: true });
   }
-  expandChoices(form.elements.keyCount);
-  const { keyCount, base, cap, ink } = form.elements;
+  const { base, cap, ink } = form.elements;
+  const countDisplay = document.querySelector('#clicker-count');
+  const remove = document.querySelector('#clicker-remove');
+  const add = document.querySelector('#clicker-add');
+  let count = 2;
+  const maximum = 4;
+  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
 
   const keys = Array.from({ length: 4 }, (_, index) => {
     const row = template.content.cloneNode(true).firstElementChild;
@@ -25,6 +30,15 @@ export function setupClicker() {
     row.querySelector('span').textContent = label;
     labels.append(row);
     const input = row.querySelector('input');
+    input.setAttribute('aria-label', label);
+    function updateLetter() {
+      input.value = segmenter.segment(input.value.trim())[Symbol.iterator]().next().value?.segment || '';
+      render();
+    }
+    input.addEventListener('input', event => {
+      if (!event.isComposing) updateLetter();
+    });
+    input.addEventListener('compositionend', updateLetter);
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'clicker-key';
@@ -39,19 +53,28 @@ export function setupClicker() {
   });
 
   function render() {
-    const count = Number(keyCount.value);
+    countDisplay.value = String(count);
+    remove.disabled = count === 1;
+    add.disabled = count === maximum;
+    labels.style.setProperty('--clicker-count', String(count));
     rail.style.setProperty('--clicker-count', String(count));
     rail.style.setProperty('--clicker-base', base.value);
     rail.style.setProperty('--clicker-cap', cap.value);
     rail.style.setProperty('--clicker-ink', ink.value);
+    labels.style.setProperty('--clicker-cap', cap.value);
+    labels.style.setProperty('--clicker-ink', ink.value);
     for (const [index, key] of keys.entries()) {
       const visible = index < count;
       key.row.hidden = key.button.hidden = !visible;
       const text = key.input.value.trim();
+      key.row.querySelector('span').textContent = text || String(index + 1);
       key.button.textContent = text || String(index + 1);
       key.button.setAttribute('aria-label', text ? key.label + ' · ' + text : key.label);
     }
   }
+
+  remove.addEventListener('click', () => { count = Math.max(1, count - 1); render(); });
+  add.addEventListener('click', () => { count = Math.min(maximum, count + 1); render(); });
 
   function showProduct() {
     const selected = location.hash === '#name-clicker' ? 'name-clicker' : 'name-tag';
@@ -62,7 +85,7 @@ export function setupClicker() {
     }
   }
 
-  form.addEventListener('input', render);
+  form.addEventListener('input', event => { if (!event.isComposing) render(); });
   form.addEventListener('submit', event => event.preventDefault());
   window.addEventListener('hashchange', showProduct);
   render();

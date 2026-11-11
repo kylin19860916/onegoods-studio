@@ -1,4 +1,12 @@
 {
+  "所选字体不支持这些文字，请更换字体或姓名。": ["所選字型不支援這些文字，請更換字型或姓名。", "This font does not support these characters. Choose another font or name."],
+  "中文字型": ["中文字型", "Chinese fonts"],
+  "英文字型": ["英文字型", "English fonts"],
+  "霞鹜文楷 · 繁体": ["霞鶩文楷 · 繁體", "LXGW WenKai · Traditional Chinese"],
+  "站酷快乐 · 简体": ["站酷快樂 · 簡體", "ZCOOL KuaiLe · Simplified Chinese"],
+  "减少一格": ["減少一格", "Remove one key"],
+  "增加一格": ["增加一格", "Add one key"],
+  "每格限一个字，可输入中文或英文字母。": ["每格限一個字，可輸入中文或英文字母。", "One character per key: Chinese or an English letter."],
   "钥匙圈款": ["鑰匙圈款", "Keyrings"],
   ">按压款</a>": [">按壓款</a>", ">Clickers</a>"],
   "文字颜色": ["文字顏色", "Text colour"],
