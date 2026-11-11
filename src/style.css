@@ -393,6 +393,5 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .clicker-order-test :is(h3,h4,p) { margin: 0; }
 .clicker-order-test :is(p,output) { font-size: 14px; line-height: 1.6; }
 .clicker-order-test output { font-weight: 700; overflow-wrap: anywhere; }
-.clicker-order-test #clicker-order-controls,
-.clicker-order-test #clicker-order-receipt { display: grid; gap: 10px; }
+.clicker-order-test #clicker-order-controls { display: grid; gap: 10px; }
 .clicker-order-test [role="status"]:empty { display: none; }

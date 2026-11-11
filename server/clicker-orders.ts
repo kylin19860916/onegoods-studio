@@ -1,14 +1,11 @@
 import { isAdmin, json, HttpError } from './catalog';
 import { generateClicker3mf, type ClickerDesign } from './clicker-print';
+import { quoteClickerTest } from '../src/clicker-test-pricing.js';
 import { keyringFonts } from '../src/keyring-font-picker.js';
 
-const tiers = [
-  { id: 'test-a', label: '測試價位 A', amount: 299 },
-  { id: 'test-b', label: '測試價位 B', amount: 399 },
-];
 const palette = new Set(['#a087c1', '#fffcf5', '#f2c879', '#393142', '#b8d6bd', '#efb39e']);
 const prefix = '/api/clicker-orders/test';
-const orderRoute = /^\/api\/clicker-orders\/test\/(OGS-T-[A-F0-9]{12})\/checkout$/;
+const orderRoute = /^\/api\/clicker-orders\/test\/(OGS-T-[A-F0-9]{12})\/checkout(?:\/(test-[ab]))?$/;
 const adminRoute = /^\/api\/admin\/clicker-orders\/(OGS-T-[A-F0-9]{12})\/(match|3mf)$/;
 const testOnly = '測試流程 · 不會付款或出貨';
 
@@ -23,23 +20,21 @@ type Order = {
   matched_at: string | null;
 };
 type Store = { DB: D1Database; BUCKET: R2Bucket; ASSETS: Fetcher };
-type Payload = { requestId?: unknown; text?: unknown; font?: unknown; colors?: Partial<ClickerDesign['colors']>; tier?: unknown };
+type Payload = { requestId?: unknown; text?: unknown; font?: unknown; colors?: Partial<ClickerDesign['colors']> };
 const fileKey = (id: string) => 'clicker-test/' + id + '.3mf';
 const code = (prefix: string) => prefix + crypto.randomUUID().replaceAll('-', '').slice(0, 12).toUpperCase();
 const fail = (message: string, status = 400): never => { throw new HttpError(status, message); };
 
 function validate(body: Payload) {
-  const text = typeof body?.text === 'string' ? body.text.trim().normalize('NFC') : '';
+  const quote = quoteClickerTest(body?.text);
   const font = body?.font;
-  const tier = tiers.find(option => option.id === body?.tier);
-  if (!text || !/^[\p{L}\p{N} .’'-]{1,16}$/u.test(text)) return fail('請填寫 1–16 個可列印的字元。');
+  if (!quote) return fail('請填寫 1–16 個可列印的字元。');
   if (typeof font !== 'string' || !Object.hasOwn(keyringFonts, font)) return fail('請選擇可用的字型。');
-  if (!tier) return fail('請選擇一個測試價位。');
   if (typeof body.requestId !== 'string' || !/^[a-f0-9-]{36}$/.test(body.requestId)) return fail('提交編號不正確，請重新整理。');
   const colors = { border: body.colors?.border ?? '', fill: body.colors?.fill ?? '', ink: body.colors?.ink ?? '' };
   if (Object.values(colors).some(value => !palette.has(value))) return fail('請選擇可用的顏色。');
-  const design: ClickerDesign = { text, font: font as ClickerDesign['font'], colors };
-  return { design, tier, requestId: body.requestId };
+  const design: ClickerDesign = { text: quote.text, font: font as ClickerDesign['font'], colors };
+  return { design, tier: quote.tier, requestId: body.requestId };
 }
 
 async function requestJson(request: Request) {
@@ -50,7 +45,7 @@ async function requestJson(request: Request) {
 }
 
 function receipt(row: Pick<Order, 'id' | 'tier' | 'amount'>) {
-  return { id: row.id, tier: row.tier, amount: row.amount, checkoutUrl: prefix + '/' + row.id + '/checkout' };
+  return { id: row.id, tier: row.tier, amount: row.amount, checkoutUrl: prefix + '/' + row.id + '/checkout/' + row.tier };
 }
 
 async function createOrder(request: Request, store: Store) {
@@ -59,7 +54,7 @@ async function createOrder(request: Request, store: Store) {
   const lookup = store.DB.prepare('SELECT * FROM clicker_orders WHERE request_id=?').bind(requestId);
   const existing = await lookup.first<Order>();
   if (existing) {
-    if (existing.design !== snapshot || existing.tier !== tier.id) return fail('此確認已提交，請重新確認變更後的設計。', 409);
+    if (existing.design !== snapshot) return fail('此確認已提交，請重新確認變更後的設計。', 409);
     return json(receipt(existing));
   }
   const fontUrl = new URL('/assets/fonts/keyring/' + keyringFonts[design.font], request.url);
@@ -79,15 +74,36 @@ async function createOrder(request: Request, store: Store) {
   }
   await store.BUCKET.delete(fileKey(id));
   const concurrent = await lookup.first<Order>();
-  if (!concurrent || concurrent.design !== snapshot || concurrent.tier !== tier.id) return fail('此確認已提交，請重新確認設計。', 409);
+  if (!concurrent || concurrent.design !== snapshot) return fail('此確認已提交，請重新確認設計。', 409);
   return json(receipt(concurrent));
 }
 
 function checkoutPage(order: Order, error = '', status = 200) {
+  const tierLabel = order.tier === 'test-a' ? 'A 檔' : 'B 檔';
   const confirmation = order.mock_reference
     ? `<h2>測試單已成立</h2><p>模擬賣貨便單號 <strong>${order.mock_reference}</strong></p><p>可在 OGS 後台用客製編號搜尋，再輸入這個單號與商品金額完成配對。</p><a class="button yellow" href="/admin#clicker-orders">前往 OGS 後台</a>`
     : `<form method="post" class="nameplate-form"><label class="nameplate-field">訂單備註<input name="ogsCode" required maxlength="18" autocomplete="off" placeholder="貼上 OGS 客製編號"></label><button class="button yellow">送出模擬賣貨便訂單</button></form>`;
-  return new Response(`<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>賣貨便下單模擬 · OGS</title><link rel="stylesheet" href="/style.css"><main class="section nameplate-page"><div class="nameplate-heading"><a class="custom-back" href="/nameplate?style=name-clicker&amp;test-order=1">返回客製測試</a><h1>賣貨便下單模擬</h1><p>${testOnly}</p></div><div class="nameplate-form"><p>OGS 客製編號 <strong>${order.id}</strong></p><p>測試商品金額 <strong>NT$${order.amount}</strong></p>${error ? `<p role="alert">${error}</p>` : ''}${confirmation}</div></main></html>`, {
+  const copyCode = order.mock_reference ? `<strong>${order.id}</strong>` : `
+    <label for="checkout-code">OGS 客製編號</label>
+    <div class="home-hero-actions">
+      <span class="nameplate-field"><input id="checkout-code" value="${order.id}" readonly></span>
+      <button class="button custom-button" id="copy-code" type="button">複製客製編號</button>
+    </div>
+    <p id="copy-code-status" role="status"></p>
+    <script>
+      document.getElementById('copy-code').addEventListener('click', async () => {
+        const code = document.getElementById('checkout-code');
+        const status = document.getElementById('copy-code-status');
+        try {
+          await navigator.clipboard.writeText(code.value);
+          status.textContent = '已複製，可貼到訂單備註。';
+        } catch {
+          code.select();
+          status.textContent = '請手動複製已選取的編號。';
+        }
+      });
+    </script>`;
+  return new Response(`<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>賣貨便下單模擬 · OGS</title><link rel="stylesheet" href="/style.css"><main class="section nameplate-page"><div class="nameplate-heading"><a class="custom-back" href="/nameplate?style=name-clicker&amp;test-order=1">返回客製測試</a><h1>賣貨便模擬結帳 · ${tierLabel}</h1><p>${testOnly}</p></div><div class="nameplate-form">${order.mock_reference ? `<p>OGS 客製編號 ${copyCode}</p>` : copyCode}<p>測試商品金額 <strong>NT$${order.amount}</strong></p>${error ? `<p role="alert">${error}</p>` : ''}${confirmation}</div></main></html>`, {
     status, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', 'X-Content-Type-Options': 'nosniff' },
   });
 }
@@ -121,7 +137,7 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
     const url = new URL(request.url);
     const path = url.pathname;
     if (request.method !== 'GET' && request.headers.get('Origin') !== url.origin) return fail('請在本網站內操作。', 403);
-    if (path === prefix && request.method === 'GET') return json({ tiers });
+    if (path === prefix && request.method === 'GET') return json({ test: true });
     if (!env.DB || !env.BUCKET) throw new Error('Order storage is not configured');
     const store = env as Store;
     if (path === prefix && request.method === 'POST') return await createOrder(request, store);
@@ -140,7 +156,10 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
     if (!id) return json({ error: '找不到此功能。' }, 404);
     const order = await store.DB.prepare('SELECT * FROM clicker_orders WHERE id=?').bind(id).first<Order>();
     if (!order) return json({ error: '找不到客製訂單。' }, 404);
-    if (checkout && ['GET', 'POST'].includes(request.method)) return await simulateCheckout(request, store, order);
+    if (checkout && ['GET', 'POST'].includes(request.method)) {
+      if (checkout[2] && checkout[2] !== order.tier) return fail('此測試結帳連結與客製訂單價位不符。', 404);
+      return await simulateCheckout(request, store, order);
+    }
     if (admin?.[2] === 'match' && request.method === 'PUT') return await matchOrder(request, store, order);
     if (admin?.[2] === '3mf' && request.method === 'GET') {
       const file = await store.BUCKET.get(fileKey(id));

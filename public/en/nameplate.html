@@ -7,8 +7,8 @@
   <title>Custom nameplate — One Goods Studio</title>
   <meta name="description" content="Pick a shape and size, then colour your name keyring.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=1a670b12231d">
-  <script src="../locale.js?v=1a670b12231d" defer></script><script src="../nameplate.js?v=1a670b12231d" defer></script>
+  <link rel="stylesheet" href="../style.css?v=21c2bffd6a8e">
+  <script src="../locale.js?v=21c2bffd6a8e" defer></script><script src="../nameplate.js?v=21c2bffd6a8e" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav>
@@ -225,26 +225,17 @@
             </details>
           </section>
           <section class="keyring-config-card clicker-order-test" id="clicker-order-test" hidden
-            data-name-required="Enter a name or text first." data-generating="Creating the test order and 3MF…"
-            data-copied="Customization code copied." data-copy-fallback="Select and copy the code manually.">
+            data-name-required="Enter printable text to see the test price."
+            data-quote="Test tier {tier} · NT${amount}"
+            data-generating="Creating the test order and 3MF…"
+            data-changed="Your design changed. Confirm it again to continue.">
             <h3>Custom order test</h3>
             <p>Internal test. No payment or shipment.</p>
             <a id="clicker-order-login" class="custom-back" href="/signin-with-chatgpt?return_to=%2Fnameplate%3Fstyle%3Dname-clicker%26test-order%3D1" hidden>Sign in to test</a>
             <div id="clicker-order-controls" hidden>
-              <label class="nameplate-field" for="clicker-order-tier">Test price tier
-                <select id="clicker-order-tier"></select>
-              </label>
-              <button class="button yellow" type="submit">Confirm design and create test order</button>
-            </div>
-            <div id="clicker-order-receipt" hidden>
-              <h4 tabindex="-1">Design confirmed</h4>
-              <p>Customization code <output></output></p>
-              <p>Test product price <strong data-order-amount></strong></p>
-              <p>Go to the mock MyShip checkout and enter the code in the order note.</p>
-              <div class="home-hero-actions">
-                <button type="button" class="button custom-button">Copy customization code</button>
-                <a class="button yellow">Go to mock MyShip checkout</a>
-              </div>
+              <p>Test tiers: 1–3 characters for A, 4–16 for B. Spaces are excluded.</p>
+              <output id="clicker-order-price" aria-live="polite"></output>
+              <button class="button yellow" type="submit" disabled>Confirm design and go to mock checkout</button>
             </div>
             <p role="status" class="nameplate-order-note"></p>
           </section>

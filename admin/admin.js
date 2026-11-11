@@ -104,7 +104,7 @@ function renderClickerOrder(order) {
     <div class="order-swatches">${orderSwatch('外框', design.colors.border)}${orderSwatch('內底', design.colors.fill)}${orderSwatch('凸字', design.colors.ink)}</div>
     ${matchedReference ? `<p>模擬賣貨便單號 <strong>${esc(matchedReference)}</strong> · ${esc(orderDate.format(new Date(matchedAt)))}</p>` : ''}
     ${matchForm}
-    <div class="order-toolbar"><a class="text-action" href="/api/admin/clicker-orders/${esc(id)}/3mf" download>下載 3MF</a>${checkoutCreated ? '' : `<a class="text-action" href="/api/clicker-orders/test/${esc(id)}/checkout">繼續模擬下單</a>`}</div>
+    <div class="order-toolbar"><a class="text-action" href="/api/admin/clicker-orders/${esc(id)}/3mf" download>下載 3MF</a>${checkoutCreated ? '' : `<a class="text-action" href="/api/clicker-orders/test/${esc(id)}/checkout/${esc(tier)}">繼續模擬下單</a>`}</div>
     </article>`;
 }
 

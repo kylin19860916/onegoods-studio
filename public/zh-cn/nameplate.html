@@ -7,8 +7,8 @@
   <title>客制名牌 — One Goods Studio</title>
   <meta name="description" content="选一款造型和尺寸，为你的名字配上喜欢的颜色。">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=1a670b12231d">
-  <script src="../locale.js?v=1a670b12231d" defer></script><script src="../nameplate.js?v=1a670b12231d" defer></script>
+  <link rel="stylesheet" href="../style.css?v=21c2bffd6a8e">
+  <script src="../locale.js?v=21c2bffd6a8e" defer></script><script src="../nameplate.js?v=21c2bffd6a8e" defer></script>
 <link rel="canonical" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首页"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主导航"><a href="index.html">首页</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客制</a><a href="about.html">关于 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切换语言，当前：简体中文">简<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans" aria-current="true">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主导航"><a href="index.html">首页</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客制</a><a href="about.html">关于 OGS</a></nav>
@@ -225,26 +225,17 @@
             </details>
           </section>
           <section class="keyring-config-card clicker-order-test" id="clicker-order-test" hidden
-            data-name-required="请先填写姓名或文字。" data-generating="正在建立测试订单及 3MF…"
-            data-copied="已复制客制编号。" data-copy-fallback="请选取编号并手动复制。">
+            data-name-required="请输入可列印的姓名或文字，即可查看测试金额。"
+            data-quote="测试价位 {tier} 档 · NT${amount}"
+            data-generating="正在建立测试订单及 3MF…"
+            data-changed="配置已变更，请重新确认后下单。">
             <h3>客制订单测试</h3>
             <p>仅供内部测试，不会付款或出货。</p>
             <a id="clicker-order-login" class="custom-back" href="/signin-with-chatgpt?return_to=%2Fnameplate%3Fstyle%3Dname-clicker%26test-order%3D1" hidden>登入测试</a>
             <div id="clicker-order-controls" hidden>
-              <label class="nameplate-field" for="clicker-order-tier">测试价位
-                <select id="clicker-order-tier"></select>
-              </label>
-              <button class="button yellow" type="submit">确认设计并建立测试订单</button>
-            </div>
-            <div id="clicker-order-receipt" hidden>
-              <h4 tabindex="-1">客制内容已确认</h4>
-              <p>客制编号 <output></output></p>
-              <p>测试商品金额 <strong data-order-amount></strong></p>
-              <p>前往模拟賣貨便结账，将编号填入订单备注。</p>
-              <div class="home-hero-actions">
-                <button type="button" class="button custom-button">复制客制编号</button>
-                <a class="button yellow">前往賣貨便模拟</a>
-              </div>
+              <p>测试分档：1–3 个字符为 A 档，4–16 个字符为 B 档，空格不计。</p>
+              <output id="clicker-order-price" aria-live="polite"></output>
+              <button class="button yellow" type="submit" disabled>确认设计并前往模拟结账</button>
             </div>
             <p role="status" class="nameplate-order-note"></p>
           </section>
