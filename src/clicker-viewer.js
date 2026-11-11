@@ -3,7 +3,7 @@ import {
   Mesh, MeshStandardMaterial, OrthographicCamera, Path, Raycaster, Scene,
   Shape, ShapePath, Vector2, WebGLRenderer,
 } from 'three';
-import { MX, MX_CASE, mxStack } from './cherry-mx-spec.js';
+import { MX, MX_CASE, MX_RECESS, mxStack } from './cherry-mx-spec.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 function rounded(width, height, radius, offsetX = 0) {
@@ -100,10 +100,11 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     if (animations.has(group)) cancelAnimationFrame(animations.get(group));
     const start = performance.now();
     function tick(now) {
-      const phase = Math.min(1, (now - start) / 260);
-      group.position.z = -Math.sin(phase * Math.PI) * MX.travel;
+      const elapsed = now - start;
+      const depth = Math.max(0, Math.min(1, elapsed / 90, (400 - elapsed) / 170));
+      group.position.z = -depth * MX.travel;
       render();
-      if (phase < 1) animations.set(group, requestAnimationFrame(tick));
+      if (elapsed < 400) animations.set(group, requestAnimationFrame(tick));
       else { group.position.z = 0; animations.delete(group); }
     }
     animations.set(group, requestAnimationFrame(tick));
@@ -117,8 +118,8 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     const rect = canvas.getBoundingClientRect();
     pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -(event.clientY - rect.top) / rect.height * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
-    const hit = raycaster.intersectObjects(keyGroups, true)[0];
-    if (hit) press(hit.object.userData.keyIndex);
+    const hit = raycaster.intersectObject(assembly, true).find(({ object }) => object.parent.visible);
+    if (hit?.object.userData.keyIndex !== undefined) press(hit.object.userData.keyIndex);
     down = undefined;
   });
   host.addEventListener('keydown', event => {
@@ -138,15 +139,8 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     const width = keys.length * 22 + 14;
     worldWidth = Math.max(88, width + 26);
     const centers = keys.map((_, index) => -width / 2 + 20 + index * 22);
-    function bodyShape(type) {
-      const shape = rounded(width, 28, 4);
-      const ring = new Path();
-      ring.absarc(-width / 2 + 5.3, 0, 2.3, 0, Math.PI * 2, true);
-      shape.holes.push(ring);
-      if (type === 'plate') for (const x of centers) shape.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3, x));
-      if (type === 'walls') shape.holes.push(rounded(width - 12.8, 28 - MX_CASE.wall * 2, 2, 4.6));
-      return shape;
-    }
+    const bodyWidth = width - 10;
+    const body = () => rounded(bodyWidth, 28, 4, 5);
     function add(geometry, colour, z, parent = assembly) {
       const mesh = new Mesh(geometry, new MeshStandardMaterial({ color: colour, roughness: 0.6, metalness: 0.02 }));
       mesh.position.z = z;
@@ -154,9 +148,25 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       return mesh;
     }
     const extrude = (shape, height) => new ExtrudeGeometry(shape, { depth: height, bevelEnabled: false, curveSegments: 16 });
-    add(extrude(bodyShape('floor'), MX_CASE.floor), base, 0);
-    add(extrude(bodyShape('walls'), stack.plateBottom - MX_CASE.floor), base, MX_CASE.floor);
-    add(extrude(bodyShape('plate'), MX_CASE.plate), base, stack.plateBottom);
+    const walls = body();
+    walls.holes.push(rounded(bodyWidth - 2 * MX_CASE.wall, 28 - 2 * MX_CASE.wall, 2, 5));
+    const plate = body();
+    const rim = body();
+    const wellWidth = MX_CASE.capWidth + 2 * MX_RECESS.sideClearance;
+    for (const x of centers) {
+      plate.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3, x));
+      rim.holes.push(rounded(wellWidth, wellWidth, 2.4 + MX_RECESS.sideClearance, x));
+    }
+    add(extrude(body(), MX_CASE.floor), base, 0);
+    add(extrude(walls, stack.plateBottom - MX_CASE.floor), base, MX_CASE.floor);
+    add(extrude(plate, MX_CASE.plate), base, stack.plateBottom);
+    add(extrude(rim, stack.rimTop - stack.mountTop), base, stack.mountTop);
+
+    const ear = rounded(12, 13, 3.8, -width / 2 + 6);
+    const ring = new Path();
+    ring.absarc(-width / 2 + 4.8, 0, MX_RECESS.earHoleDiameter / 2, 0, Math.PI * 2, true);
+    ear.holes.push(ring);
+    add(extrude(ear, MX_RECESS.earThickness), base, 3.7);
     function cross(width, arm) {
       const shape = new Shape(), h = width / 2, a = arm / 2;
       const points = [[-a,-h],[a,-h],[a,-a],[h,-a],[h,a],[a,a],[a,h],[-a,h],[-a,a],[-h,a],[-h,-a],[-a,-a]];
@@ -206,7 +216,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
         depth:MX_CASE.roof-0.4,bevelEnabled:true,bevelThickness:0.2,bevelSize:0.4,bevelSegments:3,curveSegments:12,
       }),cap,stack.roofBottom+0.2,capGroup);
       roof.userData.keyIndex=index;
-      const socket = rounded(6,6,0.6);socket.holes.push(cross(4.2,1.5));
+      const socket = rounded(5,5,0.6);socket.holes.push(cross(4.2,1.5));
       add(extrude(socket,stack.roofBottom-(stack.stemTop-2.8)),cap,stack.stemTop-2.8,capGroup).userData.keyIndex=index;
       const glyph=lettering(entry.font,entry.text);
       if(glyph) add(glyph,ink,stack.capTop,capGroup).userData.keyIndex=index;

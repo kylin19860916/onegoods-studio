@@ -48,22 +48,25 @@ export function setupClicker() {
     const label = labels.dataset.keyLabel + ' ' + (index + 1);
     const input = row.querySelector('input');
     input.setAttribute('aria-label', label);
-    const button = row.querySelector('.clicker-slot-key');
-    button.setAttribute('aria-label', label);
-    button.addEventListener('click', () => viewer?.press(index));
     const font = document.querySelector('#plate-style').cloneNode(true);
     font.id = 'clicker-font-' + (index + 1);
     font.name = 'keyFont' + index;
     font.value = 'huninn';
     row.querySelector('.clicker-font-field').append(font);
     labels.insertBefore(row, controls);
-    setupFontPicker(font);
+    const fontCaption = row.querySelector('.clicker-font-field label');
+    const triggerText = fontCaption.textContent;
+    fontCaption.textContent = label + ' · ' + triggerText;
+    setupFontPicker(font, { triggerText });
     function updateLetter() {
       input.value = segmenter.segment(input.value.trim())[Symbol.iterator]().next().value?.segment || '';
     }
     input.addEventListener('input', event => { if (!event.isComposing) updateLetter(); });
     input.addEventListener('compositionend', () => { updateLetter(); render(); });
-    return { row, input, button, font, label };
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Enter' && !event.isComposing) viewer?.press(index);
+    });
+    return { row, input, font };
   });
 
   async function render() {
@@ -80,8 +83,7 @@ export function setupClicker() {
     }
     for (const [index, key] of keys.entries()) {
       key.row.hidden = index >= count;
-      key.button.textContent = key.input.value.trim() || String(index + 1);
-      key.button.style.fontFamily = '"OGS Full ' + key.font.value + '"';
+      key.input.style.fontFamily = '"OGS Full ' + key.font.value + '"';
     }
     if (!viewer) { status.textContent = status.dataset.noWebgl; return; }
     try {

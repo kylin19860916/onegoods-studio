@@ -9,7 +9,7 @@ export const keyringFonts = {
   lilita: 'lilita.woff', chewy: 'chewy.woff', yellowtail: 'yellowtail.woff', blackops: 'blackops.woff',
 };
 
-export function setupFontPicker(select) {
+export function setupFontPicker(select, { triggerText } = {}) {
   const picker = document.createElement('details');
   picker.className = 'keyring-font-picker';
   const summary = document.createElement('summary');
@@ -29,7 +29,12 @@ export function setupFontPicker(select) {
   }
   function update() {
     const option = select.selectedOptions[0];
-    selected.replaceChildren(sample(option));
+    if (triggerText) {
+      selected.textContent = triggerText;
+      summary.title = option.textContent;
+    } else {
+      selected.replaceChildren(sample(option));
+    }
     radios.forEach(input => { input.checked = input.value === select.value; });
   }
   for (const group of select.querySelectorAll('optgroup')) {

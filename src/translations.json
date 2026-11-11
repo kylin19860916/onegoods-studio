@@ -1,4 +1,6 @@
 {
+  "<label>字型</label>": ["<label>字型</label>", "<label>Font</label>"],
+  "placeholder=\"字\"": ["placeholder=\"字\"", "placeholder=\"A\""],
   "检视键轴": ["檢視鍵軸", "View switches"],
   "显示键帽": ["顯示鍵帽", "Show keycaps"],
   "增加底板颜色": ["增加底板顏色", "Add base colour"],
