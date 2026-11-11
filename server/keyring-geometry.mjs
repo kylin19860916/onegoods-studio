@@ -69,6 +69,65 @@ function roundedPlate(width, height, radius) {
   }));
 }
 
+export function nameClickerContours(font, text) {
+  const glyphs = text ? font.getPaths(text, 0, 0, 100, { kerning: true }).map(path => flatten(path.commands)) : [];
+  const points = glyphs.flat(2);
+  let letters = [];
+  function offsetPaths(paths, distance, end = EndType.etClosedPolygon) {
+    if (!paths.length) return [];
+    const offset = new ClipperOffset(2, 35);
+    offset.AddPaths(paths, JoinType.jtRound, end);
+    const result = [];
+    offset.Execute(result, distance * units);
+    return result;
+  }
+  if (points.length) {
+    const xs = points.map(([x]) => x);
+    const ys = points.map(([, y]) => y);
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const scale = Math.min(88 / (maxX - minX), 21 / (maxY - minY));
+    const holeAreas = shapes => shapes.flatMap(([, ...holes]) => holes.map(hole => Math.abs(Clipper.Area(hole)))).sort((a, b) => a - b);
+    letters = glyphs.flatMap(glyph => {
+      const original = polygons(glyph.map(ring => ring.map(([x, y]) => ({
+        X: Math.round((x - (minX + maxX) / 2) * scale * units),
+        Y: Math.round((y - (minY + maxY) / 2) * scale * units),
+      }))));
+      const holes = holeAreas(original);
+      // Dense glyphs need smaller offsets to keep their strokes and counters legible.
+      for (const stroke of [0.53, 0.34, 0.18, 0.08]) {
+        const bold = polygons(offsetPaths(original.flat(), stroke));
+        const remaining = holeAreas(bold);
+        if (bold.length === original.length && remaining.length === holes.length
+            && remaining.every((area, i) => area >= 0.45 * holes[i])) return bold;
+      }
+      return original;
+    });
+    letters = polygons(letters.flat());
+  }
+
+  // Close the back under each glyph and keep the switch pocket supported at the centre.
+  const mount = roundedPlate(16.4, 16.4, 4).map(({ X, Y }) => ({ X: X - 8200, Y: Y - 8200 }));
+  const islands = polygons([mount, ...offsetPaths(letters.map(([outer]) => outer), 1.15)]);
+  const anchors = islands.map(([outer]) => outer.reduce((a, b) => Math.abs(b.Y) < Math.abs(a.Y) ? b : a));
+  const connections = anchors.filter(point => point.Y !== 0).map(point => [point, { X: point.X, Y: 0 }]);
+  const anchorXs = [0, ...anchors.map(point => point.X)];
+  const left = Math.min(...anchorXs), right = Math.max(...anchorXs);
+  if (left !== right) connections.push([{ X: left, Y: 0 }, { X: right, Y: 0 }]);
+  const solid = polygons([...islands.map(([outer]) => outer), ...offsetPaths(connections, 1.1, EndType.etOpenRound)]);
+  const rounded = polygons(offsetPaths(offsetPaths(solid.map(([outer]) => outer), 0.75), -0.75));
+  const contour = rounded.map(([outer]) => outer);
+  const toMm = ring => ring.map(({ X, Y }) => [X / units, Y / units]);
+  return {
+    lettering: letters.map(rings => rings.map(toMm)),
+    profile(margin) {
+      const rings = polygons(offsetPaths(contour, margin));
+      if (rings.length !== 1) throw new Error('Name clicker contour is disconnected');
+      return toMm(rings[0][0]);
+    },
+  };
+}
+
 const motifShapes = new Set(['heart', 'star', 'flower']);
 
 function motifPlate(shape, width, height) {

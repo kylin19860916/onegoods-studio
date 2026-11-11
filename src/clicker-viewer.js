@@ -22,7 +22,7 @@ function rounded(width, height, radius, offsetX = 0) {
   return path;
 }
 
-function lettering(font, text, width = 12, height = 12, depth = 0.65) {
+function lettering(font, text) {
   if (!font || !text) return null;
   const path = new ShapePath();
   for (const command of font.getPath(text, 0, 0, 16).commands) {
@@ -36,10 +36,10 @@ function lettering(font, text, width = 12, height = 12, depth = 0.65) {
   }
   const shapes = path.toShapes();
   if (!shapes.length) return null;
-  const geometry = new ExtrudeGeometry(shapes, { depth, bevelEnabled: false, curveSegments: 12 });
+  const geometry = new ExtrudeGeometry(shapes, { depth: 0.65, bevelEnabled: false, curveSegments: 12 });
   geometry.computeBoundingBox();
   const box = geometry.boundingBox;
-  const scale = Math.min(width / (box.max.x - box.min.x), height / (box.max.y - box.min.y));
+  const scale = Math.min(12 / (box.max.x - box.min.x), 12 / (box.max.y - box.min.y));
   geometry.translate(-(box.max.x + box.min.x) / 2, -(box.max.y + box.min.y) / 2, 0);
   geometry.scale(scale, scale, 1);
   return geometry;
@@ -189,35 +189,44 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       return capGroup;
     }
     if (style === 'name') {
-      const entry = keys[0];
-      const glyph = lettering(entry.font, entry.text, 88, 17, 1.15);
-      const { profile, left } = nameClickerOutline(glyph);
+      const { font, text } = keys[0];
+      const { profile, lettering } = nameClickerOutline(font, text);
       const caseColour = new Color(base).multiplyScalar(0.62);
-      const wall = profile(5.1);
-      wall.holes.push(profile(3.1));
-      const plate = profile(5.1);
+      const shellMargin = 3.3;
+      const rimTop = stack.skirtBottom + 1.25;
+      const faceMargin = 1.75;
+      const wall = profile(shellMargin);
+      wall.holes.push(profile(1.6));
+      const plate = profile(shellMargin);
       plate.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3));
-      const rim = profile(5.1);
-      rim.holes.push(profile(3.55));
-      add(extrude(profile(5.1), MX_CASE.floor), caseColour, 0);
+      const rim = profile(shellMargin);
+      rim.holes.push(profile(faceMargin + MX_RECESS.sideClearance));
+      const floor = profile(shellMargin);
+      add(extrude(floor, MX_CASE.floor), caseColour, 0);
       add(extrude(wall, stack.plateBottom - MX_CASE.floor), caseColour, MX_CASE.floor);
       add(extrude(plate, MX_CASE.plate), caseColour, stack.plateBottom);
-      add(extrude(rim, stack.rimTop - stack.mountTop), caseColour, stack.mountTop);
+      add(extrude(rim, rimTop - stack.mountTop), caseColour, stack.mountTop);
 
-      const earX = left[0] - 7.7;
+      const left = floor.getPoints().reduce((a, b) => b.x < a.x ? b : a);
+      const earX = left.x - 2.6;
       const ear = rounded(12, 13, 3.8, earX);
       const hole = new Path();
       hole.absarc(earX - 1.2, 0, MX_RECESS.earHoleDiameter / 2, 0, 2 * Math.PI, true);
       ear.holes.push(hole);
-      add(extrude(ear, MX_RECESS.earThickness), caseColour, 3.7).position.y = left[1];
+      add(extrude(ear, MX_RECESS.earThickness), caseColour, 3.7).position.y = left.y;
 
       const face = mountSwitch(0, 0);
-      const skirt = profile(3);
-      skirt.holes.push(profile(1));
+      const skirt = profile(faceMargin);
+      skirt.holes.push(profile(0.25));
       add(extrude(skirt, stack.roofBottom - stack.skirtBottom), base, stack.skirtBottom, face).userData.keyIndex = 0;
-      add(extrude(profile(3), MX_CASE.roof), base, stack.roofBottom, face).userData.keyIndex = 0;
-      add(extrude(profile(1.1), 0.45), cap, stack.capTop, face).userData.keyIndex = 0;
-      if (glyph) add(glyph, ink, stack.capTop + 0.45, face).userData.keyIndex = 0;
+      add(extrude(profile(faceMargin), MX_CASE.roof), base, stack.roofBottom, face).userData.keyIndex = 0;
+      add(extrude(profile(0.35), 0.45), cap, stack.capTop, face).userData.keyIndex = 0;
+      if (lettering.length) {
+        const glyphs = new ExtrudeGeometry(lettering, {
+          depth: 1.25, bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.08, bevelSegments: 2,
+        });
+        add(glyphs, ink, stack.capTop + 0.55, face).userData.keyIndex = 0;
+      }
       const socket = rounded(5, 5, 0.6);
       socket.holes.push(cross(4.2, 1.5));
       const socketBottom = stack.stemTop - 2.8;
