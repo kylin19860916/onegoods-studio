@@ -39,10 +39,13 @@ colors = {'border': '#f2c879', 'fill': '#efb39e', 'ink': '#fffcf5'}
 results = []
 for text, tier, amount, other_tier, other_amount in [
     ('玩好物', 'test-a', 299, 'test-b', 399),
-    ('好物工作', 'test-b', 399, 'test-a', 299),
+    ('玩好物工作', 'test-b', 399, 'test-a', 299),
+    ('Brittany', 'test-b', 399, 'test-a', 299),
 ]:
     payload = {'requestId': str(uuid.uuid4()), 'text': text, 'font': 'huninn', 'colors': colors}
     assert request(endpoint, 'POST', payload, origin='https://other.example')[0] == 403
+    for over_limit in ['玩好物工作室', 'ABCDEFGHI', '玩好物工ABC']:
+        assert request(endpoint, 'POST', {**payload, 'text': over_limit})[0] == 400
     # An old client or a forged request cannot override the server-calculated tier or amount.
     status, raw = request(endpoint, 'POST', {**payload, 'tier': other_tier, 'amount': 1})
     assert status == 201, raw
@@ -90,7 +93,7 @@ for text, tier, amount, other_tier, other_amount in [
         models = ET.fromstring(project.read('Metadata/model_settings.config'))
         assert [p.attrib['value'] for p in models.findall('.//part/metadata[@key="extruder"]')] == ['1', '1', '2', '3']
     output = os.environ.get('OGS_TEST_EXPORT')
-    if output and tier == 'test-b':
+    if output and text == '玩好物工作':
         Path(output).write_bytes(file)
     results.append({'order': order['id'], 'tier': tier, 'testPrice': amount, 'simulatedMyShipOrder': reference})
 

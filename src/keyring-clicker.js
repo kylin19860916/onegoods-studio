@@ -1,3 +1,4 @@
+import { exceedsClickerTextLimit } from './clicker-test-pricing.js';
 import { setupClickerOrderTest } from './clicker-order-test.js';
 import { expandChoices } from './keyring-choices.js';
 import { keyringFonts, setupFontPicker } from './keyring-font-picker.js';
@@ -44,6 +45,7 @@ export function setupClicker() {
   const basicSettings = document.querySelector('#clicker-basic-settings');
   const nameSettings = document.querySelector('#clicker-name-settings');
   const hint = document.querySelector('#clicker-hint');
+  const textLimit = document.querySelector('#clicker-name-limit-error');
   const nameFont = document.querySelector('#plate-style').cloneNode(true);
   nameFont.id = 'clicker-name-font';
   nameFont.name = 'clickerNameFont';
@@ -103,6 +105,11 @@ export function setupClicker() {
       key.row.hidden = index >= count;
       key.input.style.fontFamily = '"OGS Full ' + key.font.value + '"';
     }
+    const tooLong = wholeName && exceedsClickerTextLimit(clickerName.value);
+    textLimit.hidden = !tooLong;
+    clickerName.setAttribute('aria-invalid', String(tooLong));
+    clickerName.setCustomValidity(tooLong ? textLimit.textContent : '');
+    if (tooLong) return;
     if (!viewer) { status.textContent = status.dataset.noWebgl; return; }
     try {
       const sources = wholeName
@@ -138,6 +145,7 @@ export function setupClicker() {
     for (const panel of panels) panel.hidden = panel.id !== selected;
     for (const heading of headings) heading.hidden = heading.dataset.keyringIntro !== selected;
   }
+  clickerName.addEventListener('compositionend', render);
   form.addEventListener('input', event => { if (!event.isComposing) render(); });
   form.addEventListener('submit', event => event.preventDefault());
   window.addEventListener('hashchange', showProduct);

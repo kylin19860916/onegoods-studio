@@ -1,4 +1,4 @@
-import { quoteClickerTest } from './clicker-test-pricing.js';
+import { exceedsClickerTextLimit, quoteClickerTest } from './clicker-test-pricing.js';
 
 const endpoint = '/api/clicker-orders/test';
 
@@ -36,10 +36,11 @@ export function setupClickerOrderTest(form, readDesign) {
   }
 
   function renderQuote() {
-    const quote = quoteClickerTest(readDesign()?.text);
+    const text = readDesign()?.text;
+    const quote = quoteClickerTest(text);
     price.textContent = quote
       ? panel.dataset.quote.replace('{tier}', quote.tier.code).replace('{amount}', String(quote.tier.amount))
-      : panel.dataset.nameRequired;
+      : exceedsClickerTextLimit(text) ? '' : panel.dataset.nameRequired;
     submit.disabled = submitting || !quote;
   }
 

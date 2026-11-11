@@ -395,3 +395,5 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .clicker-order-test output { font-weight: 700; overflow-wrap: anywhere; }
 .clicker-order-test #clicker-order-controls { display: grid; gap: 10px; }
 .clicker-order-test [role="status"]:empty { display: none; }
+
+.clicker-name-limit-error { color: #8b2636; font-size: 13px; line-height: 1.5; }

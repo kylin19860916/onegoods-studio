@@ -1,6 +1,6 @@
 import { isAdmin, json, HttpError } from './catalog';
 import { generateClicker3mf, type ClickerDesign } from './clicker-print';
-import { quoteClickerTest } from '../src/clicker-test-pricing.js';
+import { exceedsClickerTextLimit, quoteClickerTest } from '../src/clicker-test-pricing.js';
 import { keyringFonts } from '../src/keyring-font-picker.js';
 
 const palette = new Set(['#a087c1', '#fffcf5', '#f2c879', '#393142', '#b8d6bd', '#efb39e']);
@@ -26,9 +26,10 @@ const code = (prefix: string) => prefix + crypto.randomUUID().replaceAll('-', ''
 const fail = (message: string, status = 400): never => { throw new HttpError(status, message); };
 
 function validate(body: Payload) {
+  if (exceedsClickerTextLimit(body?.text)) return fail('文字超過長度上限。中文最多 5 字，英文最多 8 個字母。');
   const quote = quoteClickerTest(body?.text);
   const font = body?.font;
-  if (!quote) return fail('請填寫 1–16 個可列印的字元。');
+  if (!quote) return fail('請填寫可列印的姓名或文字。');
   if (typeof font !== 'string' || !Object.hasOwn(keyringFonts, font)) return fail('請選擇可用的字型。');
   if (typeof body.requestId !== 'string' || !/^[a-f0-9-]{36}$/.test(body.requestId)) return fail('提交編號不正確，請重新整理。');
   const colors = { border: body.colors?.border ?? '', fill: body.colors?.fill ?? '', ink: body.colors?.ink ?? '' };

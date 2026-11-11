@@ -7,8 +7,8 @@
   <title>客製名牌 — One Goods Studio</title>
   <meta name="description" content="選一款造型和尺寸，為你的名字配上喜歡的顏色。">
   <link rel="icon" href="assets/icon.png">
-  <link rel="stylesheet" href="style.css?v=21c2bffd6a8e">
-  <script src="locale.js?v=21c2bffd6a8e" defer></script><script src="nameplate.js?v=21c2bffd6a8e" defer></script>
+  <link rel="stylesheet" href="style.css?v=a20c1c3d3420">
+  <script src="locale.js?v=a20c1c3d3420" defer></script><script src="nameplate.js?v=a20c1c3d3420" defer></script>
 <link rel="canonical" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客製</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="en/nameplate.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客製</a><a href="about.html">關於 OGS</a></nav>
@@ -206,7 +206,9 @@
         <div class="clicker-style-settings" id="clicker-name-settings" hidden>
           <div class="nameplate-field">
             <label for="clicker-name-text">姓名或文字</label>
-            <input id="clicker-name-text" name="clickerName" maxlength="16" placeholder="好物" autocomplete="off" spellcheck="false">
+            <input id="clicker-name-text" name="clickerName" maxlength="16" placeholder="好物" autocomplete="off" spellcheck="false" aria-describedby="clicker-name-limit clicker-name-limit-error">
+            <small class="nameplate-order-note" id="clicker-name-limit">中文最多 5 字，英文最多 8 個字母。中英混排按比例合計，空格不計。</small>
+            <small class="clicker-name-limit-error" id="clicker-name-limit-error" role="status" hidden>文字超過長度上限，請縮短後再試。</small>
           </div>
           <div class="nameplate-field" id="clicker-name-font-field"><label for="clicker-name-font">整組字型</label></div>
           <section class="clicker-colors" aria-labelledby="clicker-name-colors-heading">
@@ -233,7 +235,7 @@
             <p>僅供內部測試，不會付款或出貨。</p>
             <a id="clicker-order-login" class="custom-back" href="/signin-with-chatgpt?return_to=%2Fnameplate%3Fstyle%3Dname-clicker%26test-order%3D1" hidden>登入測試</a>
             <div id="clicker-order-controls" hidden>
-              <p>測試分檔：1–3 個字元為 A 檔，4–16 個字元為 B 檔，空格不計。</p>
+              <p>測試分檔：1–3 個字元為 A 檔，4 個字元以上為 B 檔，空格不計。</p>
               <output id="clicker-order-price" aria-live="polite"></output>
               <button class="button yellow" type="submit" disabled>確認設計並前往模擬結帳</button>
             </div>
