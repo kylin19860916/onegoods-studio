@@ -1,3 +1,4 @@
+import { setupClickerOrderTest } from './clicker-order-test.js';
 import { expandChoices } from './keyring-choices.js';
 import { keyringFonts, setupFontPicker } from './keyring-font-picker.js';
 import { parseKeyringFont } from '../server/keyring-geometry.mjs';
@@ -140,6 +141,11 @@ export function setupClicker() {
   form.addEventListener('input', event => { if (!event.isComposing) render(); });
   form.addEventListener('submit', event => event.preventDefault());
   window.addEventListener('hashchange', showProduct);
+  setupClickerOrderTest(form, () => ({
+    text: clickerName.value.trim(),
+    font: nameFont.value,
+    colors: { border: nameBorder.value, fill: nameFill.value, ink: nameInk.value },
+  }));
   render();
   showProduct();
 }

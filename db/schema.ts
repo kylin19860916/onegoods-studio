@@ -18,3 +18,15 @@ export const catalogCategories = sqliteTable('catalog_categories', {
  id:text('id').primaryKey(), name:text('name').notNull(), nameEn:text('name_en').notNull().default(''), nameZhHans:text('name_zh_hans').notNull().default(''),
  sortOrder:integer('sort_order').notNull().default(0), active:integer('active').notNull().default(1), revision:integer('revision').notNull().default(1), updatedAt:text('updated_at').notNull(),
 });
+
+export const clickerOrders = sqliteTable('clicker_orders', {
+ id: text('id').primaryKey(),
+ requestId: text('request_id').notNull().unique(),
+ design: text('design').notNull(),
+ tier: text('tier').notNull(),
+ amount: integer('amount').notNull(),
+ createdAt: text('created_at').notNull(),
+ mockReference: text('mock_reference').unique(),
+ matchedReference: text('matched_reference').unique(),
+ matchedAt: text('matched_at'),
+});

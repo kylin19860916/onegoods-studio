@@ -7,8 +7,8 @@
   <title>客製名牌 — One Goods Studio</title>
   <meta name="description" content="選一款造型和尺寸，為你的名字配上喜歡的顏色。">
   <link rel="icon" href="assets/icon.png">
-  <link rel="stylesheet" href="style.css?v=78fdfba9846b">
-  <script src="locale.js?v=78fdfba9846b" defer></script><script src="nameplate.js?v=78fdfba9846b" defer></script>
+  <link rel="stylesheet" href="style.css?v=1a670b12231d">
+  <script src="locale.js?v=1a670b12231d" defer></script><script src="nameplate.js?v=1a670b12231d" defer></script>
 <link rel="canonical" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客製</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="en/nameplate.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客製</a><a href="about.html">關於 OGS</a></nav>
@@ -223,6 +223,30 @@
               <summary><span>外框顏色</span><span class="clicker-colour-current" data-clicker-current="nameBorder"><i aria-hidden="true"></i><span></span></span></summary>
               <div class="nameplate-field"><label for="clicker-name-border">外框顏色</label><select id="clicker-name-border" name="nameBorder"></select></div>
             </details>
+          </section>
+          <section class="keyring-config-card clicker-order-test" id="clicker-order-test" hidden
+            data-name-required="請先填寫姓名或文字。" data-generating="正在建立測試訂單及 3MF…"
+            data-copied="已複製客製編號。" data-copy-fallback="請選取編號並手動複製。">
+            <h3>客製訂單測試</h3>
+            <p>僅供內部測試，不會付款或出貨。</p>
+            <a id="clicker-order-login" class="custom-back" href="/signin-with-chatgpt?return_to=%2Fnameplate%3Fstyle%3Dname-clicker%26test-order%3D1" hidden>登入測試</a>
+            <div id="clicker-order-controls" hidden>
+              <label class="nameplate-field" for="clicker-order-tier">測試價位
+                <select id="clicker-order-tier"></select>
+              </label>
+              <button class="button yellow" type="submit">確認設計並建立測試訂單</button>
+            </div>
+            <div id="clicker-order-receipt" hidden>
+              <h4 tabindex="-1">客製內容已確認</h4>
+              <p>客製編號 <output></output></p>
+              <p>測試商品金額 <strong data-order-amount></strong></p>
+              <p>前往模擬賣貨便結帳，將編號填入訂單備註。</p>
+              <div class="home-hero-actions">
+                <button type="button" class="button custom-button">複製客製編號</button>
+                <a class="button yellow">前往賣貨便模擬</a>
+              </div>
+            </div>
+            <p role="status" class="nameplate-order-note"></p>
           </section>
         </div>
         <p class="nameplate-order-note">按壓款為互動示意，實際軸體與鍵帽結構待試印確認。</p>

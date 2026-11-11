@@ -19,7 +19,7 @@ function syncCategoryOptions(selected=state.current?.category){
 function categoryField(name){return $('#category-form').elements.namedItem(name);}
 function editCategory(c=null){state.categoryCurrent=c?structuredClone(c):null;state.categoryDirty=false;$('#category-form').reset();categoryField('name').value=c?.name||'';categoryField('nameEn').value=c?.nameEn||'';categoryField('nameZhHans').value=c?.nameZhHans||'';categoryField('sortOrder').value=c?.sortOrder??Math.max(0,...state.categories.map(c=>c.sortOrder))+10;categoryField('active').checked=c?.active??true;$('#category-editor-title').textContent=c?'編輯分類':'新增分類';renderCategories();}
 function renderCategories(){if(!$('#category-list'))return;$('#category-list').innerHTML=state.categories.map(c=>{const used=state.items.filter(p=>p.kind==='physical'&&p.category===c.id).length;return `<article class="category-row ${state.categoryCurrent?.id===c.id?'selected':''}"><div><h3>${esc(c.name)}<span class="badge ${c.active?'published':'archived'}">${c.active?'啟用中':'已停用'}</span></h3><small>${used} 筆商品（含草稿與封存） · 順序 ${c.sortOrder}</small></div><button type="button" data-category-edit="${esc(c.id)}" aria-label="編輯分類 ${esc(c.name)}">編輯</button></article>`;}).join('')||'<p class="help">還沒有分類，從右側新增第一個分類。</p>';}
-function showCategories(){if(!canLeave()||state.busy)return;state.dirty=false;state.current=null;$('#editor-view').hidden=true;$('#catalog-view').hidden=true;$('#categories-view').hidden=false;$('#new-item').hidden=true;document.querySelectorAll('[data-kind]').forEach(b=>b.classList.remove('active'));$('#manage-categories').classList.add('active');$('#page-title').textContent='分類管理';$('#page-description').textContent='依照你的商品系列，自由整理分類。';editCategory();}
+function showCategories(){if(!canLeave()||state.busy)return;hideClickerOrders();state.dirty=false;state.current=null;$('#editor-view').hidden=true;$('#catalog-view').hidden=true;$('#categories-view').hidden=false;$('#new-item').hidden=true;document.querySelectorAll('[data-kind]').forEach(b=>b.classList.remove('active'));$('#manage-categories').classList.add('active');$('#page-title').textContent='分類管理';$('#page-description').textContent='依照你的商品系列，自由整理分類。';editCategory();}
 async function saveCategory(){if(state.busy||!$('#category-form').reportValidity())return;const current=state.categoryCurrent,body={name:categoryField('name').value,nameEn:categoryField('nameEn').value,nameZhHans:categoryField('nameZhHans').value,sortOrder:Number(categoryField('sortOrder').value),active:categoryField('active').checked,revision:current?.revision};setBusy(true);try{const {item}=await api('categories'+(current?'/'+current.id:''),{method:current?'PUT':'POST',body:JSON.stringify(body)});state.categoryDirty=false;await refresh();editCategory(item);notify('分類已儲存，商品選單與篩選已同步更新。');}catch(e){notify(e.message,true);}finally{setBusy(false);}}
 $('#manage-categories').onclick=showCategories;$('#new-category').onclick=()=>{if(canLeave())editCategory();};$('#category-form').addEventListener('input',()=>state.categoryDirty=true);$('#category-form').onsubmit=e=>{e.preventDefault();saveCategory();};$('#category-list').onclick=e=>{const b=e.target.closest('[data-category-edit]');if(b&&canLeave())editCategory(state.categories.find(c=>c.id===b.dataset.categoryEdit));};
 const normalize=v=>String(v??'').normalize('NFKC').toLocaleLowerCase().replace(/\s+/g,' ').trim();
@@ -39,7 +39,7 @@ function renderList(){
  $('#catalog-list').innerHTML=items.length?(f.status==='all'?['published','draft','archived'].map(status=>{const group=items.filter(p=>p.status===status);return group.length?`<section class="status-group" aria-label="${statusLabels[status]}"><h2>${statusLabels[status]}<span>${group.length} 筆</span></h2>${group.map(card).join('')}</section>`:'';}).join(''):items.map(card).join('')):`<div class="empty"><h2>沒有符合條件的資料</h2><p>目前查看「${statusLabels[f.status]}」。可以調整搜尋或篩選，或查看其他狀態。</p><button type="button" data-show-all>查看所有資料</button></div>`;
 }
 function canLeave(){return !(state.dirty||state.categoryDirty)||confirm('還有尚未儲存的修改，要離開這筆資料嗎？');}
-function showList(){state.dirty=false;state.categoryDirty=false;state.current=null;$('#categories-view').hidden=true;$('#editor-view').hidden=true;$('#catalog-view').hidden=false;$('#new-item').hidden=false;renderList();}
+function showList(){hideClickerOrders();state.dirty=false;state.categoryDirty=false;state.current=null;$('#categories-view').hidden=true;$('#editor-view').hidden=true;$('#catalog-view').hidden=false;$('#new-item').hidden=false;renderList();}
 function selectKind(kind){if(!canLeave())return;state.kind=kind;syncFilters();$('#manage-categories').classList.remove('active');document.querySelectorAll('[data-kind]').forEach(b=>b.classList.toggle('active',b.dataset.kind===kind));$('#page-title').textContent=kind==='physical'?'實體商品':'設計檔案';$('#page-description').textContent=kind==='physical'?'從一個點子，整理成準備亮相的小物。':'把原創設計、版本與製作說明，整理在同一處。';$('#new-item').textContent=kind==='physical'?'新增實體商品':'新增設計檔案';showList();}
 function blank(){return {id:'ogs-'+Date.now().toString(36),kind:state.kind,category:state.kind==='design'?'file':state.categories.find(c=>c.active)?.id||'',status:'draft',saleStatus:'coming_soon',name:'',tagline:'',description:'',detail:'',price:null,color:'#eee8f4',sortOrder:(Math.max(0,...state.items.map(p=>p.sortOrder))+10),images:[],specs:[],fileIds:[],translations:{en:{},'zh-Hans':{}},purchaseUrl:'',shopeeUrl:'',makerworldUrl:state.kind==='design'?'https://makerworld.com/zh/@OGStudio':'',version:'',license:'',printingNotes:'',included:'',internalNotes:'',isPlaceholder:false,keynadeFacts:false};}
 function field(name){return form.elements.namedItem(name);}
@@ -56,4 +56,87 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)r
 $('#new-item').onclick=()=>openEditor(blank(),true);$('#back-list').onclick=()=>{if(canLeave())showList();};$('#search').oninput=()=>{state.filters[state.kind].query=$('#search').value;renderList();};for(const [id,key]of [['category','category'],['record','record'],['sale','sale'],['sort','sort']])$('#'+id+'-filter').onchange=()=>{state.filters[state.kind][key]=$('#'+id+'-filter').value;renderList();};$('#reset-filters').onclick=resetFilters;$('#refresh').onclick=()=>refresh().then(()=>notify('列表已更新。')).catch(e=>notify(e.message,true));$('#add-spec').onclick=()=>{state.current.specs=collect().specs;state.current.specs.push({label:'',value:''});state.dirty=true;renderSpecs();};$('#image-upload').onchange=e=>upload(e.target,'image');$('#design-upload').onchange=e=>upload(e.target,'design');$('#archive-item').onclick=()=>{if(confirm('封存後會從官網移除，之後仍可恢復。要封存嗎？')){field('status').value='archived';state.dirty=true;save();}};$('#view-public').onclick=()=>window.open(state.current.kind==='design'?'/design-files.html':'/product.html?id='+encodeURIComponent(state.current.id),'_blank','noopener');
 $('#backup').onclick=async()=>{try{const [{items},{items:categories}]=await Promise.all([api('catalog'),api('categories')]);const blob=new Blob([JSON.stringify({brand:'One Goods Studio',exportedAt:new Date().toISOString(),items,categories},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='OGS-catalog-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){notify(e.message,true);}};
 window.addEventListener('beforeunload',e=>{if(state.dirty||state.categoryDirty){e.preventDefault();e.returnValue='';}});
-(async()=>{try{const session=await api('session');$('#account').textContent=session.email;await api('initialize',{method:'POST',body:'{}'});await refresh();}catch(e){notify(e.message,true);$('#list-summary').textContent='資料未能載入。';}})();
+(async()=>{try{const session=await api('session');$('#account').textContent=session.email;await api('initialize',{method:'POST',body:'{}'});await refresh();if(location.hash==='#clicker-orders')showClickerOrders();}catch(e){notify(e.message,true);$('#list-summary').textContent='資料未能載入。';}})();
+
+const orderList = $('#clicker-order-list');
+const orderSearch = $('#clicker-order-search');
+const orderView = $('#clicker-orders-view');
+const orderNav = $('#manage-clicker-orders');
+const orderColors = {'#a087c1':'薰衣草紫','#fffcf5':'奶油白','#f2c879':'蜂蜜金','#393142':'炭灰','#b8d6bd':'薄荷綠','#efb39e':'蜜桃粉'};
+const orderFonts = {huninn:'粉圓','sans-tc':'繁體黑體','serif-tc':'繁體宋體','sans-sc':'簡體黑體','serif-sc':'簡體宋體',wenkai:'文楷',kuaile:'快樂體',lucky:'Luckiest Guy',nunito:'Nunito',lobster:'Lobster',lilita:'Lilita One',chewy:'Chewy',yellowtail:'Yellowtail',blackops:'Black Ops One'};
+const orderDate = new Intl.DateTimeFormat('zh-TW', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Taipei' });
+let orderSearchVersion = 0;
+
+function hideClickerOrders() {
+  orderView.hidden = true;
+  orderNav.classList.remove('active');
+  if (location.hash === '#clicker-orders') history.replaceState(null, '', location.pathname + location.search);
+}
+
+function showClickerOrders() {
+  if (!canLeave() || state.busy) return;
+  state.dirty = false;
+  state.categoryDirty = false;
+  state.current = null;
+  for (const id of ['catalog-view', 'categories-view', 'editor-view', 'new-item']) $('#' + id).hidden = true;
+  document.querySelectorAll('.nav-item').forEach(button => button.classList.toggle('active', button === orderNav));
+  $('#page-title').textContent = '客製訂單';
+  $('#page-description').textContent = '核對客製內容、配對賣貨便單號並下載 3MF。目前僅開放內部測試。';
+  history.replaceState(null, '', '#clicker-orders');
+  orderView.hidden = false;
+  loadClickerOrders();
+}
+
+function orderSwatch(label, color) {
+  const name = orderColors[color];
+  return `<span class="order-swatch"><i aria-hidden="true" style="background:${name ? color : 'transparent'}"></i>${label} ${esc(name || color)}</span>`;
+}
+
+function renderClickerOrder(order) {
+  const { id, design, tier, amount, checkoutCreated, matchedReference, matchedAt } = order;
+  const status = matchedReference ? '已配對（測試）' : checkoutCreated ? '待配對' : '待模擬下單';
+  const matchForm = checkoutCreated && !matchedReference
+    ? `<form class="order-match" data-match-order="${esc(id)}"><label>模擬賣貨便單號<input name="reference" required maxlength="24" autocomplete="off"></label><label>商品金額（不含運）<input name="amount" type="number" min="1" step="1" required></label><button class="primary">確認配對</button><span role="status"></span></form>`
+    : '';
+  return `<article class="panel clicker-order-item"><div class="panel-title"><h2>${esc(design.text)}</h2><span class="badge">${status}</span></div>
+    <p><strong>${esc(id)}</strong> · 三色厚字款 · ${esc(orderDate.format(new Date(order.createdAt)))}</p>
+    <p>字型 ${esc(orderFonts[design.font] || design.font)} · 測試價位 ${tier === 'test-a' ? 'A' : 'B'} · NT$${amount}</p>
+    <div class="order-swatches">${orderSwatch('外框', design.colors.border)}${orderSwatch('內底', design.colors.fill)}${orderSwatch('凸字', design.colors.ink)}</div>
+    ${matchedReference ? `<p>模擬賣貨便單號 <strong>${esc(matchedReference)}</strong> · ${esc(orderDate.format(new Date(matchedAt)))}</p>` : ''}
+    ${matchForm}
+    <div class="order-toolbar"><a class="text-action" href="/api/admin/clicker-orders/${esc(id)}/3mf" download>下載 3MF</a>${checkoutCreated ? '' : `<a class="text-action" href="/api/clicker-orders/test/${esc(id)}/checkout">繼續模擬下單</a>`}</div>
+    </article>`;
+}
+
+async function loadClickerOrders() {
+  const version = ++orderSearchVersion;
+  orderList.textContent = '正在讀取客製訂單…';
+  try {
+    const { items } = await api('clicker-orders?q=' + encodeURIComponent(orderSearch.elements.query.value.trim()));
+    if (version === orderSearchVersion) orderList.innerHTML = items.length ? items.map(renderClickerOrder).join('') : '<p>沒有符合的客製訂單。</p>';
+  } catch (error) {
+    if (version === orderSearchVersion) orderList.textContent = error.message;
+  }
+}
+
+orderNav.onclick = showClickerOrders;
+orderSearch.onsubmit = event => { event.preventDefault(); loadClickerOrders(); };
+orderList.addEventListener('submit', async event => {
+  event.preventDefault();
+  const form = event.target;
+  if (!form.reportValidity()) return;
+  const button = form.querySelector('button');
+  const status = form.querySelector('[role="status"]');
+  button.disabled = true;
+  try {
+    await api('clicker-orders/' + form.dataset.matchOrder + '/match', {
+      method: 'PUT',
+      body: JSON.stringify({ reference: form.elements.reference.value, amount: Number(form.elements.amount.value) }),
+    });
+    notify('測試單已配對。');
+    await loadClickerOrders();
+  } catch (error) {
+    status.textContent = error.message;
+    button.disabled = false;
+  }
+});

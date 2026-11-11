@@ -4,6 +4,7 @@ import hostingConfig from "./.openai/hosting.json";
 import { readExecutionProfile } from "./scripts/execution-profile.mjs";
 import { configureToolEnvironment } from "./scripts/tool-environment.mjs";
 import { sites } from "./scripts/vite/sites-vite-plugin";
+import { manifoldWorker } from "./scripts/vite/manifold-worker-plugin.mjs";
 import { connectorPreview } from "./scripts/vite/connector-preview-plugin.mjs";
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
@@ -18,6 +19,7 @@ const managedLinux = readExecutionProfile() === "managed-linux";
 const localBindingConfig = {
   main: "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
+  assets: { binding: "ASSETS" },
   d1_databases: d1
     ? [
         {
@@ -52,7 +54,9 @@ export default defineConfig(async ({ command }) => {
         ? { watch: { useFsEvents: false, usePolling: true } }
         : {}),
     },
+    optimizeDeps: { exclude: ["manifold-3d"] },
     plugins: [
+      manifoldWorker(),
       vinext(),
       sites({ mockAuth: !managedLinux }),
       connectorPreview(),

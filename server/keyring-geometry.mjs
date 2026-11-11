@@ -288,7 +288,7 @@ function buildKeyring(font, name, spec) {
   };
 }
 
-export function writeKeyring3mf({ meshes }) {
+export function writeKeyring3mf({ meshes, assemblyName = 'OGS Name Keyring', bambuProfile = null }) {
   const material = meshes.map(({ name, color }) => `<base name="${name}" displaycolor="${color.toUpperCase()}"/>`).join('');
   const objects = meshes.map(({ name, vertices, triangles }, index) =>
     `<object id="${index + 2}" name="${name}" type="model" pid="1" pindex="${index}"><mesh><vertices>`
@@ -299,9 +299,25 @@ export function writeKeyring3mf({ meshes }) {
   ).join('');
   const assembly = meshes.length + 2;
   const components = meshes.map((_, index) => `<component objectid="${index + 2}"/>`).join('');
-  return zipSync({
-    '[Content_Types].xml': strToU8('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>'),
+  const bambuNamespace = bambuProfile ? ' xmlns:BambuStudio="http://schemas.bambulab.com/package/2021"' : '';
+  const metadata = bambuProfile ? '<metadata name="Application">BambuStudio-02.09.01.70</metadata><metadata name="BambuStudio:3mfVersion">1</metadata>' : '';
+  const placement = bambuProfile ? ' transform="1 0 0 0 1 0 0 0 1 124 103 0" printable="1"' : '';
+  const files = {
+    '[Content_Types].xml': strToU8('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>' + (bambuProfile ? '<Default Extension="config" ContentType="application/octet-stream"/>' : '') + '</Types>'),
     '_rels/.rels': strToU8('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>'),
-    '3D/3dmodel.model': strToU8(`<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="zh-TW" xmlns="${core}"><resources><basematerials id="1">${material}</basematerials>${objects}<object id="${assembly}" type="model" name="OGS Name Keyring"><components>${components}</components></object></resources><build><item objectid="${assembly}"/></build></model>`),
-  });
+    '3D/3dmodel.model': strToU8(`<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xml:lang="zh-TW" xmlns="${core}"${bambuNamespace}>${metadata}<resources><basematerials id="1">${material}</basematerials>${objects}<object id="${assembly}" type="model" name="${assemblyName}"><components>${components}</components></object></resources><build><item objectid="${assembly}"${placement}/></build></model>`),
+  };
+  if (bambuProfile) {
+    const meta = (key, value) => `<metadata key="${key}" value="${value}"/>`;
+    const parts = meshes.map(({ name, filament }, i) =>
+      `<part id="${i + 2}" subtype="normal_part">${meta('name', name)}${meta('extruder', filament)}</part>`
+    ).join('');
+    files['Metadata/model_settings.config'] = strToU8(
+      `<config><object id="${assembly}">${meta('name', assemblyName)}${meta('extruder', 1)}${parts}</object>`
+      + `<plate>${meta('plater_id', 1)}${meta('filament_map_mode', 'Auto For Flush')}${meta('filament_maps', '1 1 1')}${meta('filament_volume_maps', '0 0 0')}`
+      + `<model_instance>${meta('object_id', assembly)}${meta('instance_id', 0)}${meta('identify_id', 1)}</model_instance></plate><assemble/></config>`
+    );
+    files['Metadata/project_settings.config'] = strToU8(JSON.stringify(bambuProfile));
+  }
+  return zipSync(files);
 }

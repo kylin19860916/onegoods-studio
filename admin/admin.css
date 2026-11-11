@@ -9,3 +9,27 @@
 @media(max-width:700px){header{flex-direction:column;align-items:stretch;gap:16px}#new-item{align-self:flex-start;white-space:nowrap}.status-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.status-tabs button{text-align:left}}
 
 .category-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,1fr);gap:25px;margin-top:25px}.category-row{display:flex;justify-content:space-between;align-items:center;gap:15px;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:12px}.category-row.selected{border-color:var(--purple);box-shadow:inset 3px 0 var(--purple)}.category-row h3{margin:0 0 7px;overflow-wrap:anywhere}.category-row small{color:var(--muted);font-size:11px}.category-row>div{min-width:0}.category-row button{flex-shrink:0}.category-editor{align-self:start}.category-editor #save-category{width:100%;margin-top:10px}@media(max-width:1000px){.category-grid{grid-template-columns:1fr}}@media(max-width:700px){aside nav{flex-wrap:wrap}.nav-item{min-width:120px}.category-grid{gap:20px}.category-row{padding:13px;gap:10px}}
+
+.order-toolbar,
+.order-toolbar form,
+.order-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.order-toolbar { justify-content: space-between; }
+.order-toolbar form { flex: 1; }
+.order-toolbar .search { flex: 1; min-width: 170px; }
+.order-toolbar a { display: inline-block; text-decoration: none; }
+.clicker-order-item { padding: 20px; }
+.clicker-order-item h2, .clicker-order-item p { margin: 0; }
+.clicker-order-item > * + * { margin-top: 12px; }
+.order-swatch { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
+.order-swatch i { width: 16px; height: 16px; border: 1px solid #29233155; border-radius: 50%; }
+.order-match { display: grid; grid-template-columns: 1fr minmax(130px, 0.5fr) auto; align-items: end; gap: 10px; }
+.order-match [role="status"]:empty { display: none; }
+.order-match [role="status"] { grid-column: 1 / -1; color: #8b2636; }
+@media (max-width: 700px) {
+  .order-match { grid-template-columns: minmax(0, 1fr); }
+}
