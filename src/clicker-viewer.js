@@ -7,9 +7,9 @@ import { MX, MX_CAP_SOCKET, MX_CASE, MX_NAME_FACE, MX_RECESS, mxStack } from './
 import { nameClickerOutline } from './name-clicker-outline.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-function rounded(width, height, radius, offsetX = 0) {
+function rounded(width, height, radius, offsetX = 0, offsetY = 0) {
   const path = new Shape();
-  const x = -width / 2 + offsetX, y = -height / 2;
+  const x = -width / 2 + offsetX, y = -height / 2 + offsetY;
   path.moveTo(x + radius, y);
   path.lineTo(x + width - radius, y);
   path.quadraticCurveTo(x + width, y, x + width, y + radius);
@@ -215,8 +215,8 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       const bottom = stack.stemTop - engagement;
       add(extrude(socket, stack.roofBottom - bottom), colour, bottom, parent).userData.keyIndex = index;
     }
-    function mountSwitch(x, index) {
-      function fixed(geometry, colour, z) { const mesh = add(geometry, colour, z); mesh.position.x = x; return mesh; }
+    function mountSwitch(x, index, y = 0) {
+      function fixed(geometry, colour, z) { const mesh = add(geometry, colour, z); mesh.position.x = x; mesh.position.y = y; return mesh; }
       fixed(extrude(rounded(14,14,0.6), MX.lowerBody), '#25242a', stack.bodyBottom);
       fixed(extrude(rounded(MX.width,MX.width,0.7),0.8), '#343239', stack.mountTop);
       const shell = rounded(14.8,14.8,1.2);
@@ -244,7 +244,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       postGeometry.rotateX(Math.PI/2);
       fixed(postGeometry,'#25242a',stack.bodyBottom-MX.pins/2);
       const group = new Group();
-      group.position.x=x;assembly.add(group);keyGroups.push(group);
+      group.position.x=x;group.position.y=y;assembly.add(group);keyGroups.push(group);
       const stem = add(extrude(cross(4,1.2),MX.stem),'#cf4b52',stack.housingTop,group);
       stem.userData.keyIndex=index;
       const capGroup = new Group();
@@ -253,16 +253,14 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     }
     if (style === 'name') {
       const { font, text } = keys[0];
-      const { profile, lettering } = nameClickerOutline(font, text);
+      const { profile, lettering, mountY, skirt, rim } = nameClickerOutline(font, text);
       const caseColour = new Color(base).multiplyScalar(0.62);
-      const { shellMargin, innerWallMargin, faceMargin, insetMargin, innerSkirtMargin, insetHeight, letteringHeight } = MX_NAME_FACE;
+      const { shellMargin, innerWallMargin, faceMargin, insetMargin, insetHeight, letteringHeight } = MX_NAME_FACE;
       const rimTop = stack.skirtBottom + 1.25;
       const wall = profile(shellMargin);
       wall.holes.push(profile(innerWallMargin));
       const plate = profile(shellMargin);
-      plate.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3));
-      const rim = profile(shellMargin);
-      rim.holes.push(profile(faceMargin + MX_RECESS.sideClearance));
+      plate.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3, 0, mountY));
       const floor = profile(shellMargin);
       add(extrude(floor, MX_CASE.floor), caseColour, 0);
       add(extrude(wall, stack.plateBottom - MX_CASE.floor), caseColour, MX_CASE.floor);
@@ -277,9 +275,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       ear.holes.push(hole);
       add(extrude(ear, MX_RECESS.earThickness), caseColour, 3.7).position.y = left.y;
 
-      const face = mountSwitch(0, 0);
-      const skirt = profile(faceMargin);
-      skirt.holes.push(profile(innerSkirtMargin));
+      const face = mountSwitch(0, 0, mountY);
       add(extrude(skirt, stack.roofBottom - stack.skirtBottom), base, stack.skirtBottom, face).userData.keyIndex = 0;
       add(extrude(profile(faceMargin), MX_CASE.roof), base, stack.roofBottom, face).userData.keyIndex = 0;
       add(extrude(profile(insetMargin), insetHeight), cap, stack.capTop, face).userData.keyIndex = 0;

@@ -19,6 +19,7 @@ for (const key of Object.keys(keyringFonts)) {
     if ([...text].some(char => char !== ' ' && !font.charToGlyphIndex(char))) continue;
     const model = nameClickerContours(font, text);
     const preview = nameClickerOutline(font, text);
+    assert.equal(preview.mountY, model.mountY);
     for (const margin of [MX_NAME_FACE.shellMargin, MX_NAME_FACE.faceMargin, MX_NAME_FACE.insetMargin]) {
       const shape = preview.profile(margin).getPoints().map(({ x, y }) => [x, y]);
       assert.deepEqual(shape.slice(0, -1), model.profile(margin), key + ' ' + text);
@@ -27,6 +28,10 @@ for (const key of Object.keys(keyringFonts)) {
       // The old prototype's outer mounting pads filled these points above a and x.
       const inset = model.profile(MX_NAME_FACE.insetMargin);
       const shell = model.profile(MX_NAME_FACE.shellMargin);
+      assert.equal(model.mountY, -0.5);
+      assert(!contains(inset, 0, 7.5));
+      assert(!contains(inset, 4, 8));
+      assert(contains(inset, 0, 4));
       for (const x of [14, 22]) {
         assert(!contains(inset, x, 8));
         assert(!contains(shell, x, 10));

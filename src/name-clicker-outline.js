@@ -12,12 +12,18 @@ function draw(path, points) {
 
 export function nameClickerOutline(font, text) {
   const contours = nameClickerContours(font, text);
-  return {
-    profile: margin => draw(new Shape(), contours.profile(margin)),
-    lettering: contours.lettering.map(([outer, ...holes]) => {
+  function shapes(parts) {
+    return parts.map(([outer, ...holes]) => {
       const shape = draw(new Shape(), outer);
       shape.holes = holes.map(hole => draw(new Path(), hole));
       return shape;
-    }),
+    });
+  }
+  return {
+    mountY: contours.mountY,
+    profile: margin => draw(new Shape(), contours.profile(margin)),
+    lettering: shapes(contours.lettering),
+    skirt: shapes(contours.skirt),
+    rim: shapes(contours.rim),
   };
 }

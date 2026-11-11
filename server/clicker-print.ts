@@ -63,7 +63,7 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
   const join = (parts: Manifold[]) => own(Solid.union(parts));
   const stack = mxStack();
   try {
-    const { shellMargin, innerWallMargin, faceMargin, insetMargin, innerSkirtMargin, insetHeight, letteringHeight } = MX_NAME_FACE;
+    const { shellMargin, innerWallMargin, faceMargin, insetMargin, insetHeight, letteringHeight } = MX_NAME_FACE;
     const shellPoints = contours.profile(shellMargin) as [number, number][];
     const shell = section([shellPoints]);
     const inner = section([contours.profile(insetMargin)]);
@@ -81,10 +81,11 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const dividerStrips = contours.dividerXs.map((x: number) =>
       own(box(MX_BASE_DIVIDER.thickness, dividerSpan).translate([x, 0])));
     const { clearance, wall: wellWall } = MX_SWITCH_WELL;
-    const wellVoid = box(clearance, clearance);
-    const wellExterior = box(clearance + 2 * wellWall, clearance + 2 * wellWall);
+    const atMount = (shape: CrossSection) => own(shape.translate([0, contours.mountY]));
+    const wellVoid = atMount(box(clearance, clearance));
+    const wellExterior = atMount(box(clearance + 2 * wellWall, clearance + 2 * wellWall));
     const wellFrame = own(Section.intersection(shell, cut(wellExterior, wellVoid)));
-    const opening = roundedBox(MX_CASE.opening, MX_CASE.opening, 0.3);
+    const opening = atMount(roundedBox(MX_CASE.opening, MX_CASE.opening, 0.3));
     const dividers = dividerStrips.length ? cut(
       own(Section.intersection(underPlate, own(Section.union(dividerStrips)))),
       wellVoid,
@@ -95,7 +96,7 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
       slab(wellFrame, MX_CASE.floor, stack.plateBottom),
       ...(dividers && !dividers.isEmpty() ? [slab(dividers, MX_CASE.floor, stack.plateBottom)] : []),
       slab(cut(shell, opening), stack.plateBottom, stack.mountTop),
-      slab(cut(shell, section([contours.profile(faceMargin + MX_RECESS.sideClearance)])), stack.mountTop, stack.skirtBottom + 1.25),
+      slab(section(contours.rim.flat()), stack.mountTop, stack.skirtBottom + 1.25),
       slab(ear, 3.7, 3.7 + MX_RECESS.earThickness),
     ]);
     const base = own(Solid.difference(caseWithEar, slab(hole, 3.6, 3.8 + MX_RECESS.earThickness)));
@@ -104,9 +105,9 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const boss = own(Section.circle(outerDiameter / 2, 64));
     const cross = own(Section.union(box(crossSpan, crossArm), box(crossArm, crossSpan)));
     const movingCap = join([
-      slab(cut(face, section([contours.profile(innerSkirtMargin)])), stack.skirtBottom, stack.roofBottom),
+      slab(section(contours.skirt.flat()), stack.skirtBottom, stack.roofBottom),
       slab(face, stack.roofBottom, stack.capTop),
-      slab(cut(boss, cross), socketStart, stack.roofBottom),
+      slab(atMount(cut(boss, cross)), socketStart, stack.roofBottom),
     ]);
     const insetTop = stack.capTop + insetHeight;
     // Lay the case and the moving assembly separately on the print plate.
@@ -121,7 +122,7 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
         filament: 1,
         color: design.colors.border,
         subtype: 'support_blocker',
-        solid: slab(box(clearance + 0.3, clearance + 0.3), MX_CASE.floor - 0.15, stack.mountTop + 0.05),
+        solid: slab(atMount(box(clearance + 0.3, clearance + 0.3)), MX_CASE.floor - 0.15, stack.mountTop + 0.05),
       },
     ];
     const meshes = parts.map(({ name, color, filament, solid, subtype }) => {

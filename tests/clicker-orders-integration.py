@@ -58,32 +58,32 @@ def mesh_section(model, namespace, name, z):
     return inside
 
 
-def check_cap_socket(model, namespace, centers=(0,)):
+def check_cap_socket(model, namespace, centers=(0,), mount_y=0):
     for z in (0.58, 1.39, 3.62):
         inside = mesh_section(model, namespace, 'Moving cap', z)
         for center in centers:
             for degrees in range(0, 360, 5):
                 angle = math.radians(degrees)
-                assert inside(center + 2.98 * math.cos(angle), 39 + 2.98 * math.sin(angle))
-                assert not inside(center + 3.02 * math.cos(angle), 39 + 3.02 * math.sin(angle))
+                assert inside(center + 2.98 * math.cos(angle), 39 + mount_y + 2.98 * math.sin(angle))
+                assert not inside(center + 3.02 * math.cos(angle), 39 + mount_y + 3.02 * math.sin(angle))
             for x, y in ((0, 0), (1.93, 0), (-1.93, 0), (0, 1.93), (0, -1.93)):
-                assert not inside(center + x, 39 + y)
+                assert not inside(center + x, 39 + mount_y + y)
             for x, y in ((1, 1), (-1, -1), (-1, 1), (1, -1)):
-                assert inside(center + x, 39 + y)
+                assert inside(center + x, 39 + mount_y + y)
 
 
-def check_switch_well(model, namespace, centers=(0,)):
+def check_switch_well(model, namespace, centers=(0,), mount_y=0):
     for z in (1.7, 1.9, 5.5, 9.2, 9.4):
         inside = mesh_section(model, namespace, 'Case', z)
         for center in centers:
-            assert inside(center, 0) == (z < 1.8)
+            assert inside(center, mount_y) == (z < 1.8)
             for sign in (-1, 1):
                 for along in (-8.25, -6.2, -3.1, 0, 3.1, 6.2, 8.25):
-                    assert inside(center + sign * 8.85, along), (center, z, 'x', sign, along)
-                    assert inside(center + along, sign * 8.85), (center, z, 'y', sign, along)
+                    assert inside(center + sign * 8.85, mount_y + along), (center, z, 'x', sign, along)
+                    assert inside(center + along, mount_y + sign * 8.85), (center, z, 'y', sign, along)
                     if 1.8 < z < 9.3:
-                        assert not inside(center + sign * 8.45, along)
-                        assert not inside(center + along, sign * 8.45)
+                        assert not inside(center + sign * 8.45, mount_y + along)
+                        assert not inside(center + along, mount_y + sign * 8.45)
 
 
 assert request(endpoint, client=anonymous)[0] == 401
@@ -142,11 +142,17 @@ for text, tier, amount, other_tier, other_amount in [
         model = ET.fromstring(project.read('3D/3dmodel.model'))
         assert model.attrib['unit'] == 'millimeter'
         assert len(model.findall('.//m:mesh', namespace)) == 5
-        check_switch_well(model, namespace)
-        check_cap_socket(model, namespace)
+        blocker = model.find('.//m:object[@name="Exclude supports inside MX well 1"]', namespace)
+        ys = [float(v.attrib['y']) for v in blocker.findall('.//m:vertex', namespace)]
+        mount_y = (min(ys) + max(ys)) / 2
+        check_switch_well(model, namespace, mount_y=mount_y)
+        check_cap_socket(model, namespace, mount_y=mount_y)
         if text == 'Max':
+            assert math.isclose(mount_y, -0.5)
             inset = mesh_section(model, namespace, 'Inset', 5.65)
             shell = mesh_section(model, namespace, 'Case', 10.0)
+            assert not inset(0, 46.5) and not inset(4, 47)
+            assert inset(0, 43)
             for x in (14, 22):
                 assert not inset(x, 47) and not shell(x, 10)
                 assert inset(x, 39)
