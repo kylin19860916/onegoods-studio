@@ -29,14 +29,26 @@ export function setupClicker() {
   const controls = labels.querySelector('.clicker-inline-controls');
   const status = document.querySelector('#clicker-status');
   const viewer = createClickerViewer(document.querySelector('#clicker-canvas'), document.querySelector('#clicker-view'), document.querySelector('#clicker-reset'), document.querySelector('#clicker-inspect'));
-  const defaults = { base: '#393142', cap: '#a087c1', ink: '#fffcf5' };
+  const defaults = {
+    base: '#393142', cap: '#a087c1', ink: '#fffcf5',
+    nameInk: '#fffcf5', nameFill: '#efb39e', nameBorder: '#f2c879',
+  };
   for (const name of Object.keys(defaults)) {
     const select = form.elements[name];
     select.append(swatches.content.cloneNode(true));
     select.value = defaults[name];
     expandChoices(select, { colours: true });
   }
-  const { base, cap, ink } = form.elements;
+  const { base, cap, ink, clickerStyle, clickerName, nameInk, nameFill, nameBorder } = form.elements;
+  const basicSettings = document.querySelector('#clicker-basic-settings');
+  const nameSettings = document.querySelector('#clicker-name-settings');
+  const hint = document.querySelector('#clicker-hint');
+  const nameFont = document.querySelector('#plate-style').cloneNode(true);
+  nameFont.id = 'clicker-name-font';
+  nameFont.name = 'clickerNameFont';
+  nameFont.value = 'huninn';
+  document.querySelector('#clicker-name-font-field').append(nameFont);
+  setupFontPicker(nameFont);
   const remove = document.querySelector('#clicker-remove');
   const add = document.querySelector('#clicker-add');
   let count = 2;
@@ -71,11 +83,16 @@ export function setupClicker() {
 
   async function render() {
     const currentVersion = ++version;
+    const style = clickerStyle.value;
+    const wholeName = style === 'name';
+    basicSettings.hidden = wholeName;
+    nameSettings.hidden = !wholeName;
+    hint.textContent = hint.dataset[style];
     remove.disabled = count === 1;
     add.disabled = count === maximum;
     labels.style.setProperty('--clicker-cap', cap.value);
     labels.style.setProperty('--clicker-ink', ink.value);
-    for (const [name, field] of Object.entries({ base, cap, ink })) {
+    for (const [name, field] of Object.entries({ base, cap, ink, nameInk, nameFill, nameBorder })) {
       const current = form.querySelector('[data-clicker-current="' + name + '"]');
       const selected = form.querySelector('input[name="' + name + '"]:checked');
       current.querySelector('i').style.backgroundColor = field.value;
@@ -87,18 +104,24 @@ export function setupClicker() {
     }
     if (!viewer) { status.textContent = status.dataset.noWebgl; return; }
     try {
-      const entries = await Promise.all(keys.slice(0, count).map(async key => ({
-        text: key.input.value.trim() || '', font: await loadFont(key.font.value),
+      const sources = wholeName
+        ? [{ text: clickerName.value.trim() || nameFont.selectedOptions[0].dataset.sample || clickerName.placeholder, font: nameFont.value }]
+        : keys.slice(0, count).map(key => ({ text: key.input.value.trim(), font: key.font.value }));
+      const entries = await Promise.all(sources.map(async entry => ({
+        text: entry.text.normalize('NFC'), font: await loadFont(entry.font),
       })));
       if (currentVersion !== version) return;
       let unsupported = false;
       for (const entry of entries) {
-        if ([...entry.text].some(char => !entry.font.charToGlyphIndex(char))) {
+        if ([...entry.text].some(char => char !== ' ' && !entry.font.charToGlyphIndex(char))) {
           entry.text = '';
           unsupported = true;
         }
       }
-      const size = viewer.update({ keys: entries, base: base.value, cap: cap.value, ink: ink.value });
+      const palette = wholeName
+        ? { base: nameBorder.value, cap: nameFill.value, ink: nameInk.value }
+        : { base: base.value, cap: cap.value, ink: ink.value };
+      const size = viewer.update({ keys: entries, style, ...palette });
       const dimensions = document.querySelector('#clicker-dimensions');
       dimensions.textContent = dimensions.dataset.label + ' · ' + size.map(n => Number(n.toFixed(1))).join(' × ') + ' mm';
       status.textContent = unsupported ? status.dataset.unsupported : '';

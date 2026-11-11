@@ -1,4 +1,13 @@
 {
+  "按压款式": ["按壓款式", "Clicker style"],
+  "基础键帽款": ["基礎鍵帽款", "Classic keycaps"],
+  "三色厚字款": ["三色厚字款", "Three-colour nameplate"],
+  "姓名或文字": ["姓名或文字", "Name or text"],
+  "整组字型": ["整組字型", "Name font"],
+  "内底颜色": ["內底顏色", "Inner colour"],
+  "外框颜色": ["外框顏色", "Border colour"],
+  "placeholder=\"好物\"": ["placeholder=\"好物\"", "placeholder=\"OGS\""],
+  "拖动旋转 · 捏合缩放 · 点按姓名面板": ["拖動旋轉 · 捏合縮放 · 點按姓名面板", "Drag to rotate · Pinch to zoom · Tap nameplate"],
   "<label>字型</label>": ["<label>字型</label>", "<label>Font</label>"],
   "placeholder=\"字\"": ["placeholder=\"字\"", "placeholder=\"A\""],
   "检视键轴": ["檢視鍵軸", "View switches"],

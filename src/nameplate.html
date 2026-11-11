@@ -154,7 +154,7 @@
         <div class="plate-view" id="clicker-view" tabindex="0" aria-label="3D 按压款预览，可拖动旋转与缩放"><canvas id="clicker-canvas"></canvas></div>
       </div>
       <div class="keyring-preview-meta">
-        <p class="plate-view-hint">拖动旋转 · 捏合缩放 · 点按键帽</p>
+        <p class="plate-view-hint" id="clicker-hint" data-basic="拖动旋转 · 捏合缩放 · 点按键帽" data-name="拖动旋转 · 捏合缩放 · 点按姓名面板">拖动旋转 · 捏合缩放 · 点按键帽</p>
         <p class="keyring-dimensions" id="clicker-dimensions" data-label="模型尺寸"></p>
         <p id="clicker-status" role="status" data-unsupported="所选字体不支持这些文字，请更换字体或姓名。" data-error="3D 预览载入失败，请再试一次。" data-no-webgl="目前浏览器无法显示 3D，请使用支持 WebGL 的浏览器。"></p>
         <figcaption>画面为设计示意，实际成品颜色与尺寸依制作确认为准。</figcaption>
@@ -163,6 +163,12 @@
     <form class="nameplate-form" id="clicker-form">
       <div class="keyring-step-panel">
         <div><span class="eyebrow">OGS / PRESS &amp; PLAY</span><h2>姓名按压款</h2></div>
+        <fieldset class="clicker-style-picker">
+          <legend>按压款式</legend>
+          <label><input type="radio" name="clickerStyle" value="basic" checked> 基础键帽款</label>
+          <label><input type="radio" name="clickerStyle" value="name"> 三色厚字款</label>
+        </fieldset>
+        <div class="clicker-style-settings" id="clicker-basic-settings">
         <fieldset class="clicker-key-editor">
           <legend>按键与文字</legend>
           <div id="clicker-labels" class="clicker-labels" data-key-label="按键" data-font-label="字型">
@@ -194,6 +200,29 @@
             <div class="nameplate-field"><label for="clicker-ink">文字颜色</label><select id="clicker-ink" name="ink"></select></div>
           </details>
         </section>
+        </div>
+        <div class="clicker-style-settings" id="clicker-name-settings" hidden>
+          <div class="nameplate-field">
+            <label for="clicker-name-text">姓名或文字</label>
+            <input id="clicker-name-text" name="clickerName" maxlength="16" placeholder="好物" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="nameplate-field" id="clicker-name-font-field"><label for="clicker-name-font">整组字型</label></div>
+          <section class="clicker-colors" aria-labelledby="clicker-name-colors-heading">
+            <h3 id="clicker-name-colors-heading">配色</h3>
+            <details class="keyring-colour-section" open>
+              <summary><span>文字颜色</span><span class="clicker-colour-current" data-clicker-current="nameInk"><i aria-hidden="true"></i><span></span></span></summary>
+              <div class="nameplate-field"><label for="clicker-name-ink">文字颜色</label><select id="clicker-name-ink" name="nameInk"></select></div>
+            </details>
+            <details class="keyring-colour-section" open>
+              <summary><span>内底颜色</span><span class="clicker-colour-current" data-clicker-current="nameFill"><i aria-hidden="true"></i><span></span></span></summary>
+              <div class="nameplate-field"><label for="clicker-name-fill">内底颜色</label><select id="clicker-name-fill" name="nameFill"></select></div>
+            </details>
+            <details class="keyring-colour-section" open>
+              <summary><span>外框颜色</span><span class="clicker-colour-current" data-clicker-current="nameBorder"><i aria-hidden="true"></i><span></span></span></summary>
+              <div class="nameplate-field"><label for="clicker-name-border">外框颜色</label><select id="clicker-name-border" name="nameBorder"></select></div>
+            </details>
+          </section>
+        </div>
         <p class="nameplate-order-note">按压款为互动示意，实际轴体与键帽结构待试印确认。</p>
       </div>
     </form>

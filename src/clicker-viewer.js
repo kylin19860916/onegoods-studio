@@ -1,9 +1,10 @@
 import {
-  AmbientLight, BoxGeometry, CylinderGeometry, DirectionalLight, ExtrudeGeometry, Group,
+  AmbientLight, Box3, BoxGeometry, Color, CylinderGeometry, DirectionalLight, ExtrudeGeometry, Group,
   Mesh, MeshStandardMaterial, OrthographicCamera, Path, Raycaster, Scene,
   Shape, ShapePath, Vector2, WebGLRenderer,
 } from 'three';
 import { MX, MX_CASE, MX_RECESS, mxStack } from './cherry-mx-spec.js';
+import { nameClickerOutline } from './name-clicker-outline.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 function rounded(width, height, radius, offsetX = 0) {
@@ -21,7 +22,7 @@ function rounded(width, height, radius, offsetX = 0) {
   return path;
 }
 
-function lettering(font, text) {
+function lettering(font, text, width = 12, height = 12, depth = 0.65) {
   if (!font || !text) return null;
   const path = new ShapePath();
   for (const command of font.getPath(text, 0, 0, 16).commands) {
@@ -35,10 +36,10 @@ function lettering(font, text) {
   }
   const shapes = path.toShapes();
   if (!shapes.length) return null;
-  const geometry = new ExtrudeGeometry(shapes, { depth: 0.65, bevelEnabled: false, curveSegments: 12 });
+  const geometry = new ExtrudeGeometry(shapes, { depth, bevelEnabled: false, curveSegments: 12 });
   geometry.computeBoundingBox();
   const box = geometry.boundingBox;
-  const scale = Math.min(12 / (box.max.x - box.min.x), 12 / (box.max.y - box.min.y));
+  const scale = Math.min(width / (box.max.x - box.min.x), height / (box.max.y - box.min.y));
   geometry.translate(-(box.max.x + box.min.x) / 2, -(box.max.y + box.min.y) / 2, 0);
   geometry.scale(scale, scale, 1);
   return geometry;
@@ -126,7 +127,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     if (event.key === ' ' || event.key === 'Enter') { event.preventDefault(); press(0); }
   });
 
-  function update({ keys, base, cap, ink }) {
+  function update({ keys, base, cap, ink, style }) {
     for (const request of animations.values()) cancelAnimationFrame(request);
     animations.clear();
     assembly.traverse(object => {
@@ -135,12 +136,8 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     assembly.clear();
     keyGroups = [];
     capGroups = [];
+    assembly.position.x = 0;
     const stack = mxStack();
-    const width = keys.length * 22 + 14;
-    worldWidth = Math.max(88, width + 26);
-    const centers = keys.map((_, index) => -width / 2 + 20 + index * 22);
-    const bodyWidth = width - 10;
-    const body = () => rounded(bodyWidth, 28, 4, 5);
     function add(geometry, colour, z, parent = assembly) {
       const mesh = new Mesh(geometry, new MeshStandardMaterial({ color: colour, roughness: 0.6, metalness: 0.02 }));
       mesh.position.z = z;
@@ -148,25 +145,6 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       return mesh;
     }
     const extrude = (shape, height) => new ExtrudeGeometry(shape, { depth: height, bevelEnabled: false, curveSegments: 16 });
-    const walls = body();
-    walls.holes.push(rounded(bodyWidth - 2 * MX_CASE.wall, 28 - 2 * MX_CASE.wall, 2, 5));
-    const plate = body();
-    const rim = body();
-    const wellWidth = MX_CASE.capWidth + 2 * MX_RECESS.sideClearance;
-    for (const x of centers) {
-      plate.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3, x));
-      rim.holes.push(rounded(wellWidth, wellWidth, 2.4 + MX_RECESS.sideClearance, x));
-    }
-    add(extrude(body(), MX_CASE.floor), base, 0);
-    add(extrude(walls, stack.plateBottom - MX_CASE.floor), base, MX_CASE.floor);
-    add(extrude(plate, MX_CASE.plate), base, stack.plateBottom);
-    add(extrude(rim, stack.rimTop - stack.mountTop), base, stack.mountTop);
-
-    const ear = rounded(12, 13, 3.8, -width / 2 + 6);
-    const ring = new Path();
-    ring.absarc(-width / 2 + 4.8, 0, MX_RECESS.earHoleDiameter / 2, 0, Math.PI * 2, true);
-    ear.holes.push(ring);
-    add(extrude(ear, MX_RECESS.earThickness), base, 3.7);
     function cross(width, arm) {
       const shape = new Shape(), h = width / 2, a = arm / 2;
       const points = [[-a,-h],[a,-h],[a,-a],[h,-a],[h,a],[a,a],[a,h],[-a,h],[-a,a],[-h,a],[-h,-a],[-a,-a]];
@@ -174,8 +152,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       shape.closePath();
       return shape;
     }
-    for (const [index, entry] of keys.entries()) {
-      const x = centers[index];
+    function mountSwitch(x, index) {
       function fixed(geometry, colour, z) { const mesh = add(geometry, colour, z); mesh.position.x = x; return mesh; }
       fixed(extrude(rounded(14,14,0.6), MX.lowerBody), '#25242a', stack.bodyBottom);
       fixed(extrude(rounded(MX.width,MX.width,0.7),0.8), '#343239', stack.mountTop);
@@ -209,6 +186,76 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       stem.userData.keyIndex=index;
       const capGroup = new Group();
       capGroup.visible=showCaps;group.add(capGroup);capGroups.push(capGroup);
+      return capGroup;
+    }
+    if (style === 'name') {
+      const entry = keys[0];
+      const glyph = lettering(entry.font, entry.text, 88, 17, 1.15);
+      const { profile, left } = nameClickerOutline(glyph);
+      const caseColour = new Color(base).multiplyScalar(0.62);
+      const wall = profile(5.1);
+      wall.holes.push(profile(3.1));
+      const plate = profile(5.1);
+      plate.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3));
+      const rim = profile(5.1);
+      rim.holes.push(profile(3.55));
+      add(extrude(profile(5.1), MX_CASE.floor), caseColour, 0);
+      add(extrude(wall, stack.plateBottom - MX_CASE.floor), caseColour, MX_CASE.floor);
+      add(extrude(plate, MX_CASE.plate), caseColour, stack.plateBottom);
+      add(extrude(rim, stack.rimTop - stack.mountTop), caseColour, stack.mountTop);
+
+      const earX = left[0] - 7.7;
+      const ear = rounded(12, 13, 3.8, earX);
+      const hole = new Path();
+      hole.absarc(earX - 1.2, 0, MX_RECESS.earHoleDiameter / 2, 0, 2 * Math.PI, true);
+      ear.holes.push(hole);
+      add(extrude(ear, MX_RECESS.earThickness), caseColour, 3.7).position.y = left[1];
+
+      const face = mountSwitch(0, 0);
+      const skirt = profile(3);
+      skirt.holes.push(profile(1));
+      add(extrude(skirt, stack.roofBottom - stack.skirtBottom), base, stack.skirtBottom, face).userData.keyIndex = 0;
+      add(extrude(profile(3), MX_CASE.roof), base, stack.roofBottom, face).userData.keyIndex = 0;
+      add(extrude(profile(1.1), 0.45), cap, stack.capTop, face).userData.keyIndex = 0;
+      if (glyph) add(glyph, ink, stack.capTop + 0.45, face).userData.keyIndex = 0;
+      const socket = rounded(5, 5, 0.6);
+      socket.holes.push(cross(4.2, 1.5));
+      const socketBottom = stack.stemTop - 2.8;
+      add(extrude(socket, stack.roofBottom - socketBottom), base, socketBottom, face).userData.keyIndex = 0;
+      const bounds = new Box3().setFromObject(assembly);
+      const width = bounds.max.x - bounds.min.x;
+      const height = bounds.max.y - bounds.min.y;
+      assembly.position.x = -(bounds.max.x + bounds.min.x) / 2;
+      worldWidth = Math.max(70, width + 24, height + 24);
+      resize();
+      return [width, height, bounds.max.z];
+    }
+    const width = keys.length * 22 + 14;
+    worldWidth = Math.max(88, width + 26);
+    const centers = keys.map((_, index) => -width / 2 + 20 + index * 22);
+    const bodyWidth = width - 10;
+    const body = () => rounded(bodyWidth, 28, 4, 5);
+    const walls = body();
+    walls.holes.push(rounded(bodyWidth - 2 * MX_CASE.wall, 28 - 2 * MX_CASE.wall, 2, 5));
+    const plate = body();
+    const rim = body();
+    const wellWidth = MX_CASE.capWidth + 2 * MX_RECESS.sideClearance;
+    for (const x of centers) {
+      plate.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3, x));
+      rim.holes.push(rounded(wellWidth, wellWidth, 2.4 + MX_RECESS.sideClearance, x));
+    }
+    add(extrude(body(), MX_CASE.floor), base, 0);
+    add(extrude(walls, stack.plateBottom - MX_CASE.floor), base, MX_CASE.floor);
+    add(extrude(plate, MX_CASE.plate), base, stack.plateBottom);
+    add(extrude(rim, stack.rimTop - stack.mountTop), base, stack.mountTop);
+
+    const ear = rounded(12, 13, 3.8, -width / 2 + 6);
+    const ring = new Path();
+    ring.absarc(-width / 2 + 4.8, 0, MX_RECESS.earHoleDiameter / 2, 0, Math.PI * 2, true);
+    ear.holes.push(ring);
+    add(extrude(ear, MX_RECESS.earThickness), base, 3.7);
+    for (const [index, entry] of keys.entries()) {
+      const capGroup = mountSwitch(centers[index], index);
       const skirt = rounded(MX_CASE.capWidth,MX_CASE.capWidth,2.4);
       skirt.holes.push(rounded(16,16,1.4));
       add(extrude(skirt,stack.roofBottom-stack.skirtBottom),cap,stack.skirtBottom,capGroup).userData.keyIndex=index;

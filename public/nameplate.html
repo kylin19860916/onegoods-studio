@@ -7,8 +7,8 @@
   <title>客製名牌 — One Goods Studio</title>
   <meta name="description" content="選一款造型和尺寸，為你的名字配上喜歡的顏色。">
   <link rel="icon" href="assets/icon.png">
-  <link rel="stylesheet" href="style.css?v=c1854589050e">
-  <script src="locale.js?v=c1854589050e" defer></script><script src="nameplate.js?v=c1854589050e" defer></script>
+  <link rel="stylesheet" href="style.css?v=3462d4566adf">
+  <script src="locale.js?v=3462d4566adf" defer></script><script src="nameplate.js?v=3462d4566adf" defer></script>
 <link rel="canonical" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客製名牌</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="en/nameplate.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="nameplate.html" aria-current="page">客製名牌</a><a href="about.html">關於 OGS</a></nav>
@@ -154,7 +154,7 @@
         <div class="plate-view" id="clicker-view" tabindex="0" aria-label="3D 按壓款預覽，可拖動旋轉與縮放"><canvas id="clicker-canvas"></canvas></div>
       </div>
       <div class="keyring-preview-meta">
-        <p class="plate-view-hint">拖動旋轉 · 捏合縮放 · 點按鍵帽</p>
+        <p class="plate-view-hint" id="clicker-hint" data-basic="拖動旋轉 · 捏合縮放 · 點按鍵帽" data-name="拖動旋轉 · 捏合縮放 · 點按姓名面板">拖動旋轉 · 捏合縮放 · 點按鍵帽</p>
         <p class="keyring-dimensions" id="clicker-dimensions" data-label="模型尺寸"></p>
         <p id="clicker-status" role="status" data-unsupported="所選字型不支援這些文字，請更換字型或姓名。" data-error="3D 預覽載入失敗，請再試一次。" data-no-webgl="目前瀏覽器無法顯示 3D，請使用支援 WebGL 的瀏覽器。"></p>
         <figcaption>畫面為設計示意，實際成品顏色與尺寸依製作確認為準。</figcaption>
@@ -163,6 +163,12 @@
     <form class="nameplate-form" id="clicker-form">
       <div class="keyring-step-panel">
         <div><span class="eyebrow">OGS / PRESS &amp; PLAY</span><h2>姓名按壓款</h2></div>
+        <fieldset class="clicker-style-picker">
+          <legend>按壓款式</legend>
+          <label><input type="radio" name="clickerStyle" value="basic" checked> 基礎鍵帽款</label>
+          <label><input type="radio" name="clickerStyle" value="name"> 三色厚字款</label>
+        </fieldset>
+        <div class="clicker-style-settings" id="clicker-basic-settings">
         <fieldset class="clicker-key-editor">
           <legend>按鍵與文字</legend>
           <div id="clicker-labels" class="clicker-labels" data-key-label="按鍵" data-font-label="字型">
@@ -194,6 +200,29 @@
             <div class="nameplate-field"><label for="clicker-ink">文字顏色</label><select id="clicker-ink" name="ink"></select></div>
           </details>
         </section>
+        </div>
+        <div class="clicker-style-settings" id="clicker-name-settings" hidden>
+          <div class="nameplate-field">
+            <label for="clicker-name-text">姓名或文字</label>
+            <input id="clicker-name-text" name="clickerName" maxlength="16" placeholder="好物" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="nameplate-field" id="clicker-name-font-field"><label for="clicker-name-font">整組字型</label></div>
+          <section class="clicker-colors" aria-labelledby="clicker-name-colors-heading">
+            <h3 id="clicker-name-colors-heading">配色</h3>
+            <details class="keyring-colour-section" open>
+              <summary><span>文字顏色</span><span class="clicker-colour-current" data-clicker-current="nameInk"><i aria-hidden="true"></i><span></span></span></summary>
+              <div class="nameplate-field"><label for="clicker-name-ink">文字顏色</label><select id="clicker-name-ink" name="nameInk"></select></div>
+            </details>
+            <details class="keyring-colour-section" open>
+              <summary><span>內底顏色</span><span class="clicker-colour-current" data-clicker-current="nameFill"><i aria-hidden="true"></i><span></span></span></summary>
+              <div class="nameplate-field"><label for="clicker-name-fill">內底顏色</label><select id="clicker-name-fill" name="nameFill"></select></div>
+            </details>
+            <details class="keyring-colour-section" open>
+              <summary><span>外框顏色</span><span class="clicker-colour-current" data-clicker-current="nameBorder"><i aria-hidden="true"></i><span></span></span></summary>
+              <div class="nameplate-field"><label for="clicker-name-border">外框顏色</label><select id="clicker-name-border" name="nameBorder"></select></div>
+            </details>
+          </section>
+        </div>
         <p class="nameplate-order-note">按壓款為互動示意，實際軸體與鍵帽結構待試印確認。</p>
       </div>
     </form>
