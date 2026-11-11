@@ -3,7 +3,7 @@ import {
   Mesh, MeshStandardMaterial, OrthographicCamera, Path, Raycaster, Scene,
   Shape, ShapePath, Vector2, WebGLRenderer,
 } from 'three';
-import { MX, MX_CAP_SOCKET, MX_CASE, MX_RECESS, mxStack } from './cherry-mx-spec.js';
+import { MX, MX_CAP_SOCKET, MX_CASE, MX_NAME_FACE, MX_RECESS, mxStack } from './cherry-mx-spec.js';
 import { nameClickerOutline } from './name-clicker-outline.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -255,11 +255,10 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       const { font, text } = keys[0];
       const { profile, lettering } = nameClickerOutline(font, text);
       const caseColour = new Color(base).multiplyScalar(0.62);
-      const shellMargin = 3.3;
+      const { shellMargin, innerWallMargin, faceMargin, insetMargin, innerSkirtMargin, insetHeight, letteringHeight } = MX_NAME_FACE;
       const rimTop = stack.skirtBottom + 1.25;
-      const faceMargin = 1.75;
       const wall = profile(shellMargin);
-      wall.holes.push(profile(1.6));
+      wall.holes.push(profile(innerWallMargin));
       const plate = profile(shellMargin);
       plate.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3));
       const rim = profile(shellMargin);
@@ -280,15 +279,12 @@ export function createClickerViewer(canvas, host, reset, inspect) {
 
       const face = mountSwitch(0, 0);
       const skirt = profile(faceMargin);
-      skirt.holes.push(profile(0.25));
+      skirt.holes.push(profile(innerSkirtMargin));
       add(extrude(skirt, stack.roofBottom - stack.skirtBottom), base, stack.skirtBottom, face).userData.keyIndex = 0;
       add(extrude(profile(faceMargin), MX_CASE.roof), base, stack.roofBottom, face).userData.keyIndex = 0;
-      add(extrude(profile(0.35), 0.45), cap, stack.capTop, face).userData.keyIndex = 0;
+      add(extrude(profile(insetMargin), insetHeight), cap, stack.capTop, face).userData.keyIndex = 0;
       if (lettering.length) {
-        const glyphs = new ExtrudeGeometry(lettering, {
-          depth: 1.25, bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.08, bevelSegments: 2,
-        });
-        add(glyphs, ink, stack.capTop + 0.55, face).userData.keyIndex = 0;
+        add(extrude(lettering, letteringHeight), ink, stack.capTop + insetHeight, face).userData.keyIndex = 0;
       }
       addCapSocket(base, face, 0);
       const bounds = new Box3().setFromObject(assembly);

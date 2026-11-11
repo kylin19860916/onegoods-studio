@@ -11,6 +11,10 @@ export const MX_CAP_SOCKET = Object.freeze({ outerDiameter: 6, crossSpan: 4.2, c
 // Buried dividers bridge the case floor to the switch plate, leaving the switch clear.
 export const MX_BASE_DIVIDER = Object.freeze({ thickness: 1.4 });
 export const MX_SWITCH_WELL = Object.freeze({ clearance: MX.width + 1.6, wall: 1.4 });
+export const MX_NAME_FACE = Object.freeze({
+  shellMargin: 3.3, innerWallMargin: 1.6, faceMargin: 1.75,
+  insetMargin: 0.35, innerSkirtMargin: 0.25, insetHeight: 0.5, letteringHeight: 1.35,
+});
 export function mxStack() {
   const bodyBottom = MX_CASE.floor + MX_CASE.pinClearance + MX.pins;
   const mountTop = bodyBottom + MX.lowerBody;

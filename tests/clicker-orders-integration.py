@@ -91,6 +91,7 @@ assert json.loads(request(endpoint)[1])['test'] is True
 colors = {'border': '#f2c879', 'fill': '#efb39e', 'ink': '#fffcf5'}
 results = []
 for text, tier, amount, other_tier, other_amount in [
+    ('Max', 'test-a', 299, 'test-b', 399),
     ('玩好物', 'test-a', 299, 'test-b', 399),
     ('玩好物工作', 'test-b', 399, 'test-a', 299),
     ('Brittany', 'test-b', 399, 'test-a', 299),
@@ -143,6 +144,12 @@ for text, tier, amount, other_tier, other_amount in [
         assert len(model.findall('.//m:mesh', namespace)) == 5
         check_switch_well(model, namespace)
         check_cap_socket(model, namespace)
+        if text == 'Max':
+            inset = mesh_section(model, namespace, 'Inset', 5.65)
+            shell = mesh_section(model, namespace, 'Case', 10.0)
+            for x in (14, 22):
+                assert not inset(x, 47) and not shell(x, 10)
+                assert inset(x, 39)
         settings = json.loads(project.read('Metadata/project_settings.config'))
         assert settings['filament_colour'] == ['#F2C879', '#EFB39E', '#FFFCF5']
         models = ET.fromstring(project.read('Metadata/model_settings.config'))

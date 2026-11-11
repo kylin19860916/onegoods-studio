@@ -69,7 +69,7 @@ function roundedPlate(width, height, radius) {
   }));
 }
 
-export function nameClickerContours(font, text, switchCenters = [0]) {
+export function nameClickerContours(font, text) {
   const glyphs = text ? font.getPaths(text, 0, 0, 100, { kerning: true }).map(path => flatten(path.commands)) : [];
   const points = glyphs.flat(2);
   let letters = [];
@@ -123,10 +123,11 @@ export function nameClickerContours(font, text, switchCenters = [0]) {
     letters = polygons(letters.flat());
   }
 
-  // Close the back under each glyph and keep the switch pocket supported at the centre.
-  const mounts = switchCenters.map(x => roundedPlate(16.4, 16.4, 4)
-    .map(({ X, Y }) => ({ X: X - 8200 + Math.round(x * units), Y: Y - 8200 })));
-  const islands = polygons([...mounts, ...offsetPaths(letters.map(([outer]) => outer), 1.15)]);
+  // Only the center switch needs mounting clearance. Keep the side outline
+  // tied to the glyphs, even when prototyping different internal support layouts.
+  const mount = roundedPlate(16.4, 16.4, 4)
+    .map(({ X, Y }) => ({ X: X - 8200, Y: Y - 8200 }));
+  const islands = polygons([mount, ...offsetPaths(letters.map(([outer]) => outer), 1.15)]);
   const anchors = islands.map(([outer]) => outer.reduce((a, b) => Math.abs(b.Y) < Math.abs(a.Y) ? b : a));
   const connections = anchors.filter(point => point.Y !== 0).map(point => [point, { X: point.X, Y: 0 }]);
   const anchorXs = [0, ...anchors.map(point => point.X)];
