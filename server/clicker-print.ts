@@ -2,7 +2,7 @@ import createManifold, { type CrossSection, type Manifold, type ManifoldToplevel
 import wasm from 'manifold-3d/manifold.wasm?module';
 import { nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
 import { keyringFonts } from '../src/keyring-font-picker.js';
-import { MX_BASE_DIVIDER, MX_CAP_SOCKET, MX_CASE, MX_RECESS, mxStack } from '../src/cherry-mx-spec.js';
+import { MX_BASE_DIVIDER, MX_CAP_SOCKET, MX_CASE, MX_RECESS, MX_SWITCH_WELL, mxStack } from '../src/cherry-mx-spec.js';
 import { HttpError } from './catalog';
 import p2sTrialProfile from './clicker-p2s-profile.json';
 
@@ -34,13 +34,13 @@ function getKernel() {
   return kernel;
 }
 
-export async function generateClicker3mf(design: ClickerDesign, fontFile: Response) {
+export async function generateClicker3mf(design: ClickerDesign, fontFile: Response, switchCenters: number[] = [0]) {
   if (!fontFile.ok) throw new Error('Clicker font asset is unavailable');
   const font = parseKeyringFont(new Uint8Array(await fontFile.arrayBuffer()));
   if ([...design.text].some(character => character !== ' ' && !font.charToGlyphIndex(character))) {
     throw new HttpError(400, '目前的字型缺少這些文字，請更換字型或調整文字。');
   }
-  const contours = nameClickerContours(font, design.text);
+  const contours = nameClickerContours(font, design.text, switchCenters);
   const { CrossSection: Section, Manifold: Solid } = await getKernel();
   const allocated: Array<{ delete(): void }> = [];
   function own<T extends { delete(): void }>(value: T): T {
@@ -80,15 +80,22 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const dividerSpan = 2 * Math.max(...shellPoints.map(([, y]) => Math.abs(y)));
     const dividerStrips = contours.dividerXs.map((x: number) =>
       own(box(MX_BASE_DIVIDER.thickness, dividerSpan).translate([x, 0])));
+    const { clearance, wall: wellWall } = MX_SWITCH_WELL;
+    const atSwitches = (outline: CrossSection) => own(Section.union(switchCenters.map(x => own(outline.translate([x, 0])))));
+    const wellVoid = atSwitches(box(clearance, clearance));
+    const wellExterior = atSwitches(box(clearance + 2 * wellWall, clearance + 2 * wellWall));
+    const wellFrame = own(Section.intersection(shell, cut(wellExterior, wellVoid)));
+    const openings = atSwitches(roundedBox(MX_CASE.opening, MX_CASE.opening, 0.3));
     const dividers = dividerStrips.length ? cut(
       own(Section.intersection(underPlate, own(Section.union(dividerStrips)))),
-      box(MX_BASE_DIVIDER.switchClearance, MX_BASE_DIVIDER.switchClearance),
+      wellVoid,
     ) : null;
     const caseWithEar = join([
       slab(shell, 0, MX_CASE.floor),
-      slab(cut(shell, underPlate), MX_CASE.floor, stack.plateBottom),
+      slab(cut(cut(shell, underPlate), wellVoid), MX_CASE.floor, stack.plateBottom),
+      slab(wellFrame, MX_CASE.floor, stack.plateBottom),
       ...(dividers && !dividers.isEmpty() ? [slab(dividers, MX_CASE.floor, stack.plateBottom)] : []),
-      slab(cut(shell, roundedBox(MX_CASE.opening, MX_CASE.opening, 0.3)), stack.plateBottom, stack.mountTop),
+      slab(cut(shell, openings), stack.plateBottom, stack.mountTop),
       slab(cut(shell, section([contours.profile(faceMargin + MX_RECESS.sideClearance)])), stack.mountTop, stack.skirtBottom + 1.25),
       slab(ear, 3.7, 3.7 + MX_RECESS.earThickness),
     ]);
@@ -100,18 +107,26 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const movingCap = join([
       slab(cut(face, section([contours.profile(0.25)])), stack.skirtBottom, stack.roofBottom),
       slab(face, stack.roofBottom, stack.capTop),
-      slab(cut(boss, cross), socketStart, stack.roofBottom),
+      slab(atSwitches(cut(boss, cross)), socketStart, stack.roofBottom),
     ]);
     const insetTop = stack.capTop + 0.5;
     // Lay the case and the moving assembly separately on the print plate.
     const printOffset: [number, number, number] = [0, 39, -Math.min(socketStart, stack.skirtBottom)];
-    const parts = [
+    const parts: Array<{ name: string; filament: number; color: string; solid: Manifold; subtype?: 'support_blocker' }> = [
       { name: 'Case', filament: 1, color: design.colors.border, solid: base },
       { name: 'Moving cap', filament: 1, color: design.colors.border, solid: own(movingCap.translate(printOffset)) },
       { name: 'Inset', filament: 2, color: design.colors.fill, solid: own(slab(inner, stack.capTop, insetTop).translate(printOffset)) },
       { name: 'Raised lettering', filament: 3, color: design.colors.ink, solid: own(slab(glyphs, insetTop, insetTop + 1.35).translate(printOffset)) },
+      ...switchCenters.map((x, index) => ({
+        name: `Exclude supports inside MX well ${index + 1}`,
+        filament: 1,
+        color: design.colors.border,
+        subtype: 'support_blocker' as const,
+        solid: slab(own(box(clearance + 0.3, clearance + 0.3).translate([x, 0])),
+          MX_CASE.floor - 0.15, stack.mountTop + 0.05),
+      })),
     ];
-    const meshes = parts.map(({ name, color, filament, solid }) => {
+    const meshes = parts.map(({ name, color, filament, solid, subtype }) => {
       if (solid.isEmpty() || solid.status() !== 'NoError') throw new HttpError(400, '無法生成完整的模型，請調整文字或字型。');
       const { numProp, vertProperties, triVerts } = solid.getMesh();
       const vertices = Array.from({ length: vertProperties.length / numProp }, (_, index) => [
@@ -120,7 +135,7 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
       const triangles = Array.from({ length: triVerts.length / 3 }, (_, index) => [
         triVerts[index * 3], triVerts[index * 3 + 1], triVerts[index * 3 + 2],
       ]);
-      return { name, color, filament, vertices, triangles };
+      return { name, color, filament, vertices, triangles, subtype };
     });
     // The internal test uses the P2S/0.4 mm PLA profile from the validated sample.
     const filament_colour = [design.colors.border, design.colors.fill, design.colors.ink].map(color => color.toUpperCase());

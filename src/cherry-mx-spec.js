@@ -7,9 +7,10 @@ export const MX = Object.freeze({ width: 15.6, bodyHeight: 11.6, lowerBody: 5, s
 export const MX_CASE = Object.freeze({ floor: 1.8, pinClearance: 0.7, plate: 1.5, opening: 14.2, wall: 1.8, capWidth: 18.4, roof: 1.4 });
 export const MX_RECESS = Object.freeze({ sideClearance: 0.55, capRise: 0.8, earThickness: 3.2, earHoleDiameter: 5 });
 // Continuous circular boss with a female cross, fused to the keycap roof.
-export const MX_CAP_SOCKET = Object.freeze({ outerDiameter: 7, crossSpan: 4.2, crossArm: 1.5, engagement: 2.8 });
+export const MX_CAP_SOCKET = Object.freeze({ outerDiameter: 6, crossSpan: 4.2, crossArm: 1.5, engagement: 2.8 });
 // Buried dividers bridge the case floor to the switch plate, leaving the switch clear.
-export const MX_BASE_DIVIDER = Object.freeze({ thickness: 1.4, switchClearance: MX.width + 1.6 });
+export const MX_BASE_DIVIDER = Object.freeze({ thickness: 1.4 });
+export const MX_SWITCH_WELL = Object.freeze({ clearance: MX.width + 1.6, wall: 1.4 });
 export function mxStack() {
   const bodyBottom = MX_CASE.floor + MX_CASE.pinClearance + MX.pins;
   const mountTop = bodyBottom + MX.lowerBody;

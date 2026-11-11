@@ -69,7 +69,7 @@ function roundedPlate(width, height, radius) {
   }));
 }
 
-export function nameClickerContours(font, text) {
+export function nameClickerContours(font, text, switchCenters = [0]) {
   const glyphs = text ? font.getPaths(text, 0, 0, 100, { kerning: true }).map(path => flatten(path.commands)) : [];
   const points = glyphs.flat(2);
   let letters = [];
@@ -124,8 +124,9 @@ export function nameClickerContours(font, text) {
   }
 
   // Close the back under each glyph and keep the switch pocket supported at the centre.
-  const mount = roundedPlate(16.4, 16.4, 4).map(({ X, Y }) => ({ X: X - 8200, Y: Y - 8200 }));
-  const islands = polygons([mount, ...offsetPaths(letters.map(([outer]) => outer), 1.15)]);
+  const mounts = switchCenters.map(x => roundedPlate(16.4, 16.4, 4)
+    .map(({ X, Y }) => ({ X: X - 8200 + Math.round(x * units), Y: Y - 8200 })));
+  const islands = polygons([...mounts, ...offsetPaths(letters.map(([outer]) => outer), 1.15)]);
   const anchors = islands.map(([outer]) => outer.reduce((a, b) => Math.abs(b.Y) < Math.abs(a.Y) ? b : a));
   const connections = anchors.filter(point => point.Y !== 0).map(point => [point, { X: point.X, Y: 0 }]);
   const anchorXs = [0, ...anchors.map(point => point.X)];
@@ -434,10 +435,11 @@ function buildKeyring(font, name, spec) {
   };
 }
 
+/** @param {{meshes: Array<{name: string, color: string, vertices: number[][], triangles: number[][], filament?: number, subtype?: 'support_blocker'}>, assemblyName?: string, bambuProfile?: object | null}} options */
 export function writeKeyring3mf({ meshes, assemblyName = 'OGS Name Keyring', bambuProfile = null }) {
-  const material = meshes.map(({ name, color }) => `<base name="${name}" displaycolor="${color.toUpperCase()}"/>`).join('');
-  const objects = meshes.map(({ name, vertices, triangles }, index) =>
-    `<object id="${index + 2}" name="${name}" type="model" pid="1" pindex="${index}"><mesh><vertices>`
+  const material = meshes.filter(mesh => !mesh.subtype).map(({ name, color }) => `<base name="${name}" displaycolor="${color.toUpperCase()}"/>`).join('');
+  const objects = meshes.map(({ name, vertices, triangles, subtype }, index) =>
+    `<object id="${index + 2}" name="${name}" type="model"${subtype ? '' : ` pid="1" pindex="${index}"`}><mesh><vertices>`
     + vertices.map(([x, y, z]) => `<vertex x="${x}" y="${y}" z="${z}"/>`).join('')
     + '</vertices><triangles>'
     + triangles.map(([a, b, c]) => `<triangle v1="${a}" v2="${b}" v3="${c}"/>`).join('')
@@ -455,8 +457,8 @@ export function writeKeyring3mf({ meshes, assemblyName = 'OGS Name Keyring', bam
   };
   if (bambuProfile) {
     const meta = (key, value) => `<metadata key="${key}" value="${value}"/>`;
-    const parts = meshes.map(({ name, filament }, i) =>
-      `<part id="${i + 2}" subtype="normal_part">${meta('name', name)}${meta('extruder', filament)}</part>`
+    const parts = meshes.map(({ name, filament, subtype = 'normal_part' }, i) =>
+      `<part id="${i + 2}" subtype="${subtype}">${meta('name', name)}${subtype === 'normal_part' ? meta('extruder', filament) : ''}</part>`
     ).join('');
     files['Metadata/model_settings.config'] = strToU8(
       `<config><object id="${assembly}">${meta('name', assemblyName)}${meta('extruder', 1)}${parts}</object>`
