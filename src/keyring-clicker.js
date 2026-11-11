@@ -22,8 +22,6 @@ function loadFont(key) {
 }
 
 export function setupClicker() {
-  const headings = document.querySelectorAll('[data-keyring-intro]');
-  const panels = [...document.querySelectorAll('[data-keyring-panel]')];
   const form = document.querySelector('#clicker-form');
   const labels = document.querySelector('#clicker-labels');
   const template = document.querySelector('#clicker-label-template');
@@ -190,21 +188,13 @@ export function setupClicker() {
     render();
     keys[activeKey].input.focus({ preventScroll: true });
   });
-  function showProduct() {
-    const requested = location.hash.slice(1) || new URLSearchParams(location.search).get('style');
-    const selected = requested === 'name-clicker' ? 'name-clicker' : 'name-tag';
-    for (const panel of panels) panel.hidden = panel.id !== selected;
-    for (const heading of headings) heading.hidden = heading.dataset.keyringIntro !== selected;
-  }
   clickerName.addEventListener('compositionend', render);
   form.addEventListener('input', event => { if (!event.isComposing) render(); });
   form.addEventListener('submit', event => event.preventDefault());
-  window.addEventListener('hashchange', showProduct);
   setupClickerOrderTest(form, () => clickerStyle.value === 'name' ? {
     text: clickerName.value.trim(),
     font: nameFont.value,
     colors: { border: nameBorder.value, fill: nameFill.value, ink: nameInk.value },
   } : null);
   render();
-  showProduct();
 }

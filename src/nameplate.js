@@ -24,7 +24,11 @@ const generate = document.querySelector('#keyring-generate');
 const designStep = document.querySelector('#keyring-design');
 const colorsStep = document.querySelector('#keyring-colors');
 const accent = document.querySelector('#keyring-accent');
-const articulation = document.querySelector('#keyring-articulation');
+const headings = document.querySelectorAll('[data-keyring-intro]');
+const keyringPanel = document.querySelector('#name-tag');
+const clickerPanel = document.querySelector('#name-clicker');
+const nameTagOptions = form.querySelectorAll('[data-name-tag-only]');
+const articulatedOptions = form.querySelectorAll('[data-articulated-only]');
 const progress = document.querySelectorAll('.keyring-steps li');
 const swatches = document.querySelector('#plate-swatch-options');
 for (const select of form.querySelectorAll('[data-swatch]')) {
@@ -44,6 +48,7 @@ let currentFont;
 let fontPromise;
 let previewVersion = 0;
 let timer;
+let articulated = false;
 
 function loadFont(key) {
   if (key === currentFont && fontPromise) return fontPromise;
@@ -87,10 +92,9 @@ async function render(version) {
     const ink = textColor.value;
     const third = useAccent.checked ? accentColor.value : undefined;
     const [widthMm, heightMm] = sizes[size.value];
-    const articulated = shape.value === 'articulated';
     const name = nameText.value.trim() || (articulated ? 'OGS' : nameText.placeholder);
     const model = generateKeyring(font, name, {
-      ...spec, widthMm, heightMm, shape: shape.value, baseColor: base, textColor: ink, accentColor: third,
+      ...spec, widthMm, heightMm, shape: articulated ? 'articulated' : shape.value, baseColor: base, textColor: ink, accentColor: third,
       bend: articulated ? Number(bend.value) / 100 : 0,
     });
     const colors = { base, side: third || shade(base), ink, shadow: shade(ink) };
@@ -121,8 +125,7 @@ function queuePreview() {
   const version = ++previewVersion;
   generate.disabled = true;
   accent.hidden = !useAccent.checked;
-  articulation.hidden = shape.value !== 'articulated';
-  const tooLong = !articulation.hidden
+  const tooLong = articulated
     && articulatedNameCharacters(nameText.value.trim()).length > articulatedNameLimits[size.value];
   nameText.setCustomValidity(tooLong ? previewStatus.dataset.articulatedLength : '');
   for (const [name, field] of Object.entries({ baseColor, textColor, accentColor })) {
@@ -203,6 +206,21 @@ form.addEventListener('submit', event => {
   event.preventDefault();
   if (!generate.disabled) exportImage();
 });
-queuePreview();
+function showProduct() {
+  const styles = ['name-tag', 'name-clicker', 'name-articulated'];
+  const requested = location.hash.slice(1);
+  const queryStyle = new URLSearchParams(location.search).get('style');
+  const selected = styles.includes(requested) ? requested : styles.includes(queryStyle) ? queryStyle : 'name-tag';
+  articulated = selected === 'name-articulated';
+  keyringPanel.hidden = selected === 'name-clicker';
+  clickerPanel.hidden = !keyringPanel.hidden;
+  for (const heading of headings) heading.hidden = heading.dataset.keyringIntro !== selected;
+  for (const option of nameTagOptions) option.hidden = articulated;
+  for (const option of articulatedOptions) option.hidden = !articulated;
+  download.download = articulated ? 'OGS-articulated-preview.png' : 'OGS-keyring-preview.png';
+  if (!keyringPanel.hidden) queuePreview();
+}
 
+window.addEventListener('hashchange', showProduct);
+showProduct();
 setupClicker();

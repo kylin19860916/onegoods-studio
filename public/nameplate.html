@@ -7,8 +7,8 @@
   <title>客製名牌 — One Goods Studio</title>
   <meta name="description" content="選一款造型和尺寸，為你的名字配上喜歡的顏色。">
   <link rel="icon" href="assets/icon.png">
-  <link rel="stylesheet" href="style.css?v=68b020c76e02">
-  <script src="locale.js?v=68b020c76e02" defer></script><script src="nameplate.js?v=68b020c76e02" defer></script>
+  <link rel="stylesheet" href="style.css?v=e05e2b57534a">
+  <script src="locale.js?v=e05e2b57534a" defer></script><script src="nameplate.js?v=e05e2b57534a" defer></script>
 <link rel="canonical" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客製</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="en/nameplate.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客製</a><a href="about.html">關於 OGS</a></nav>
@@ -17,13 +17,18 @@
   <a class="custom-back" href="custom.html">返回客製款式</a>
   <div class="nameplate-heading" data-keyring-intro="name-tag">
     <span class="eyebrow">OGS / KEYRING STUDIO</span>
-    <h1>客製你的姓名鑰匙圈。</h1>
+    <h1>客製你的名牌。</h1>
     <p>選一款造型和尺寸，為你的名字配上喜歡的顏色。</p>
   </div>
   <div class="nameplate-heading" data-keyring-intro="name-clicker" hidden>
     <span class="eyebrow">OGS / PRESS &amp; PLAY</span>
     <h1>客製你的姓名按壓款。</h1>
     <p>選鍵帽款式，加入姓名和配色，試按你的 3D 預覽。</p>
+  </div>
+  <div class="nameplate-heading" data-keyring-intro="name-articulated" hidden>
+    <span class="eyebrow">OGS / KEYRING STUDIO</span>
+    <h1>客製你的關節字塊。</h1>
+    <p>輸入名字、選擇尺寸和配色，再試彎字塊。</p>
   </div>
   <div class="nameplate-workspace" id="name-tag" data-keyring-panel>
     <figure class="keyring-preview">
@@ -32,7 +37,7 @@
         <span class="eyebrow">LIVE 3D PREVIEW</span>
         <button class="text-button" id="plate-reset-view" type="button" hidden>重置視角</button>
       </div>
-      <div class="plate-view" id="plate-view" tabindex="0" aria-label="3D 鑰匙圈預覽，拖曳或使用方向鍵旋轉">
+      <div class="plate-view" id="plate-view" tabindex="0" aria-label="3D 預覽，拖曳或使用方向鍵旋轉">
         <canvas id="plate-canvas" hidden></canvas>
       <svg id="plate-preview" viewBox="0 0 90 43" role="img" aria-label="名牌即時預覽" fill-rule="evenodd">
         <g id="plate-position">
@@ -82,12 +87,12 @@
       </section>
       <div class="keyring-step-panel">
       <ol class="keyring-steps" aria-label="客製步驟">
-        <li aria-current="step"><button type="button" data-keyring-step="0" aria-controls="keyring-design"><span>01</span> 款式與尺寸</button></li>
+        <li aria-current="step"><button type="button" data-keyring-step="0" aria-controls="keyring-design"><span>01</span> <span data-name-tag-only>款式與尺寸</span><span data-articulated-only hidden>尺寸與彎折</span></button></li>
         <li><button type="button" data-keyring-step="1" aria-controls="keyring-colors"><span>02</span> 選顏色</button></li>
       </ol>
       <section class="keyring-step" id="keyring-design">
-        <h2 tabindex="-1">款式與尺寸</h2>
-        <fieldset class="keyring-shapes">
+        <h2 tabindex="-1"><span data-name-tag-only>款式與尺寸</span><span data-articulated-only hidden>尺寸與彎折</span></h2>
+        <fieldset class="keyring-shapes" data-name-tag-only>
           <legend>造型</legend>
           <label><input type="radio" name="shape" value="contour" checked>
             <img class="keyring-template" src="assets/keyring/contour.svg" alt=""><span>隨字輪廓</span>
@@ -98,18 +103,6 @@
           <label><input type="radio" name="shape" value="rounded">
             <img class="keyring-template" src="assets/keyring/rounded.svg" alt=""><span>圓角底板</span>
           </label>
-          <label><input type="radio" name="shape" value="heart">
-            <img class="keyring-template" src="assets/keyring/heart.svg" alt=""><span>愛心</span>
-          </label>
-          <label><input type="radio" name="shape" value="star">
-            <img class="keyring-template" src="assets/keyring/star.svg" alt=""><span>星星</span>
-          </label>
-          <label><input type="radio" name="shape" value="flower">
-            <img class="keyring-template" src="assets/keyring/flower.svg" alt=""><span>花朵</span>
-          </label>
-          <label><input type="radio" name="shape" value="articulated">
-            <img class="keyring-template" src="assets/keyring/articulated.svg" alt=""><span>關節字塊</span>
-          </label>
         </fieldset>
         <fieldset class="keyring-sizes">
           <legend>尺寸規格</legend>
@@ -117,8 +110,8 @@
           <label><input type="radio" name="size" value="medium" checked><strong>中型</strong><small>65 × 27 mm</small></label>
           <label><input type="radio" name="size" value="large"><strong>大型</strong><small>80 × 33.2 mm</small></label>
         </fieldset>
-        <p class="nameplate-order-note">以上為長寬上限。隨字輪廓的實際尺寸會依字形調整。</p>
-        <div class="keyring-articulation" id="keyring-articulation" hidden>
+        <p class="nameplate-order-note" data-name-tag-only>以上為長寬上限。隨字輪廓的實際尺寸會依字形調整。</p>
+        <div class="keyring-articulation" data-articulated-only hidden>
           <p class="nameplate-order-note">每個字一塊。小型最多 4 字，中型 6 字，大型 8 字，空格不計。</p>
           <label for="keyring-bend">試彎字塊</label>
           <input id="keyring-bend" name="bend" type="range" min="-100" max="100" value="35">
@@ -166,7 +159,7 @@
       <div class="keyring-preview-meta">
         <p class="plate-view-hint" id="clicker-hint" data-keys="拖動旋轉 · 捏合縮放 · 點按鍵帽" data-name="拖動旋轉 · 捏合縮放 · 點按姓名面板">拖動旋轉 · 捏合縮放 · 點按鍵帽</p>
         <p class="keyring-dimensions" id="clicker-dimensions" data-label="模型尺寸"></p>
-        <p id="clicker-status" role="status" data-unsupported="所選字型不支援這些文字，請更換字型或姓名。" data-articulated-length="目前尺寸放不下這些字塊，請縮短姓名或選擇更大的尺寸。" data-error="3D 預覽載入失敗，請再試一次。" data-no-webgl="目前瀏覽器無法顯示 3D，請使用支援 WebGL 的瀏覽器。"></p>
+        <p id="clicker-status" role="status" data-unsupported="所選字型不支援這些文字，請更換字型或姓名。" data-error="3D 預覽載入失敗，請再試一次。" data-no-webgl="目前瀏覽器無法顯示 3D，請使用支援 WebGL 的瀏覽器。"></p>
         <figcaption>畫面為設計示意，實際成品顏色與尺寸依製作確認為準。</figcaption>
       </div>
     </figure>

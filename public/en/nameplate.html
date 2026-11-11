@@ -7,8 +7,8 @@
   <title>Custom nameplate — One Goods Studio</title>
   <meta name="description" content="Pick a shape and size, then colour your name keyring.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=68b020c76e02">
-  <script src="../locale.js?v=68b020c76e02" defer></script><script src="../nameplate.js?v=68b020c76e02" defer></script>
+  <link rel="stylesheet" href="../style.css?v=e05e2b57534a">
+  <script src="../locale.js?v=e05e2b57534a" defer></script><script src="../nameplate.js?v=e05e2b57534a" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav>
@@ -17,13 +17,18 @@
   <a class="custom-back" href="custom.html">Back to custom styles</a>
   <div class="nameplate-heading" data-keyring-intro="name-tag">
     <span class="eyebrow">OGS / KEYRING STUDIO</span>
-    <h1>Make your own name keyring.</h1>
+    <h1>Make it yours.</h1>
     <p>Pick a shape and size, then colour your name keyring.</p>
   </div>
   <div class="nameplate-heading" data-keyring-intro="name-clicker" hidden>
     <span class="eyebrow">OGS / PRESS &amp; PLAY</span>
     <h1>Customize your name clicker.</h1>
     <p>Pick a keycap style, add your name and colours, and press the keys in the 3D preview.</p>
+  </div>
+  <div class="nameplate-heading" data-keyring-intro="name-articulated" hidden>
+    <span class="eyebrow">OGS / KEYRING STUDIO</span>
+    <h1>Customize your articulated letters.</h1>
+    <p>Enter your name, choose a size and colours, then bend the letters.</p>
   </div>
   <div class="nameplate-workspace" id="name-tag" data-keyring-panel>
     <figure class="keyring-preview">
@@ -82,12 +87,12 @@
       </section>
       <div class="keyring-step-panel">
       <ol class="keyring-steps" aria-label="Customisation steps">
-        <li aria-current="step"><button type="button" data-keyring-step="0" aria-controls="keyring-design"><span>01</span> Style and size</button></li>
+        <li aria-current="step"><button type="button" data-keyring-step="0" aria-controls="keyring-design"><span>01</span> <span data-name-tag-only>Style and size</span><span data-articulated-only hidden>Size and bending</span></button></li>
         <li><button type="button" data-keyring-step="1" aria-controls="keyring-colors"><span>02</span> Choose colours</button></li>
       </ol>
       <section class="keyring-step" id="keyring-design">
-        <h2 tabindex="-1">Style and size</h2>
-        <fieldset class="keyring-shapes">
+        <h2 tabindex="-1"><span data-name-tag-only>Style and size</span><span data-articulated-only hidden>Size and bending</span></h2>
+        <fieldset class="keyring-shapes" data-name-tag-only>
           <legend>Shape</legend>
           <label><input type="radio" name="shape" value="contour" checked>
             <img class="keyring-template" src="../assets/keyring/contour.svg" alt=""><span>Letter contour</span>
@@ -98,18 +103,6 @@
           <label><input type="radio" name="shape" value="rounded">
             <img class="keyring-template" src="../assets/keyring/rounded.svg" alt=""><span>Rounded rectangle</span>
           </label>
-          <label><input type="radio" name="shape" value="heart">
-            <img class="keyring-template" src="../assets/keyring/heart.svg" alt=""><span>Heart</span>
-          </label>
-          <label><input type="radio" name="shape" value="star">
-            <img class="keyring-template" src="../assets/keyring/star.svg" alt=""><span>Star</span>
-          </label>
-          <label><input type="radio" name="shape" value="flower">
-            <img class="keyring-template" src="../assets/keyring/flower.svg" alt=""><span>Flower</span>
-          </label>
-          <label><input type="radio" name="shape" value="articulated">
-            <img class="keyring-template" src="../assets/keyring/articulated.svg" alt=""><span>Articulated letters</span>
-          </label>
         </fieldset>
         <fieldset class="keyring-sizes">
           <legend>Size</legend>
@@ -117,8 +110,8 @@
           <label><input type="radio" name="size" value="medium" checked><strong>Medium</strong><small>65 × 27 mm</small></label>
           <label><input type="radio" name="size" value="large"><strong>Large</strong><small>80 × 33.2 mm</small></label>
         </fieldset>
-        <p class="nameplate-order-note">These are maximum dimensions. The contour shape adapts to the lettering.</p>
-        <div class="keyring-articulation" id="keyring-articulation" hidden>
+        <p class="nameplate-order-note" data-name-tag-only>These are maximum dimensions. The contour shape adapts to the lettering.</p>
+        <div class="keyring-articulation" data-articulated-only hidden>
           <p class="nameplate-order-note">One block per character. Small fits 4, medium 6, and large 8. Spaces do not count.</p>
           <label for="keyring-bend">Bend the letters</label>
           <input id="keyring-bend" name="bend" type="range" min="-100" max="100" value="35">
@@ -166,7 +159,7 @@
       <div class="keyring-preview-meta">
         <p class="plate-view-hint" id="clicker-hint" data-keys="Drag to rotate · Pinch to zoom · Tap a keycap" data-name="Drag to rotate · Pinch to zoom · Tap nameplate">Drag to rotate · Pinch to zoom · Tap a keycap</p>
         <p class="keyring-dimensions" id="clicker-dimensions" data-label="Model dimensions"></p>
-        <p id="clicker-status" role="status" data-unsupported="This font does not support these characters. Choose another font or name." data-articulated-length="These letters do not fit this size. Shorten the name or choose a larger size." data-error="Could not load the 3D preview. Please try again." data-no-webgl="This browser cannot show the 3D preview. Please use a WebGL-capable browser."></p>
+        <p id="clicker-status" role="status" data-unsupported="This font does not support these characters. Choose another font or name." data-error="Could not load the 3D preview. Please try again." data-no-webgl="This browser cannot show the 3D preview. Please use a WebGL-capable browser."></p>
         <figcaption>Design preview. Final colours and dimensions depend on production specifications.</figcaption>
       </div>
     </figure>
