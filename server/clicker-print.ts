@@ -2,7 +2,7 @@ import createManifold, { type CrossSection, type Manifold, type ManifoldToplevel
 import wasm from 'manifold-3d/manifold.wasm?module';
 import { nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
 import { keyringFonts } from '../src/keyring-font-picker.js';
-import { MX_CASE, MX_RECESS, mxStack } from '../src/cherry-mx-spec.js';
+import { MX_CAP_SOCKET, MX_CASE, MX_RECESS, mxStack } from '../src/cherry-mx-spec.js';
 import { HttpError } from './catalog';
 import p2sTrialProfile from './clicker-p2s-profile.json';
 
@@ -84,12 +84,14 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
       slab(ear, 3.7, 3.7 + MX_RECESS.earThickness),
     ]);
     const base = own(Solid.difference(caseWithEar, slab(hole, 3.6, 3.8 + MX_RECESS.earThickness)));
-    const socketStart = stack.stemTop - 2.8;
-    const cross = own(Section.union(box(4.2, 1.5), box(1.5, 4.2)));
+    const { outerDiameter, crossSpan, crossArm, engagement } = MX_CAP_SOCKET;
+    const socketStart = stack.stemTop - engagement;
+    const boss = own(Section.circle(outerDiameter / 2, 64));
+    const cross = own(Section.union(box(crossSpan, crossArm), box(crossArm, crossSpan)));
     const movingCap = join([
       slab(cut(face, section([contours.profile(0.25)])), stack.skirtBottom, stack.roofBottom),
       slab(face, stack.roofBottom, stack.capTop),
-      slab(cut(roundedBox(5, 5, 0.6), cross), socketStart, stack.roofBottom),
+      slab(cut(boss, cross), socketStart, stack.roofBottom),
     ]);
     const insetTop = stack.capTop + 0.5;
     // Lay the case and the moving assembly separately on the print plate.

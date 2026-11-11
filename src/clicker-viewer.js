@@ -3,7 +3,7 @@ import {
   Mesh, MeshStandardMaterial, OrthographicCamera, Path, Raycaster, Scene,
   Shape, ShapePath, Vector2, WebGLRenderer,
 } from 'three';
-import { MX, MX_CASE, MX_RECESS, mxStack } from './cherry-mx-spec.js';
+import { MX, MX_CAP_SOCKET, MX_CASE, MX_RECESS, mxStack } from './cherry-mx-spec.js';
 import { nameClickerOutline } from './name-clicker-outline.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -207,6 +207,14 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       shape.closePath();
       return shape;
     }
+    function addCapSocket(colour, parent, index) {
+      const { outerDiameter, crossSpan, crossArm, engagement } = MX_CAP_SOCKET;
+      const socket = new Shape();
+      socket.absarc(0, 0, outerDiameter / 2, 0, 2 * Math.PI, false);
+      socket.holes.push(cross(crossSpan, crossArm));
+      const bottom = stack.stemTop - engagement;
+      add(extrude(socket, stack.roofBottom - bottom), colour, bottom, parent).userData.keyIndex = index;
+    }
     function mountSwitch(x, index) {
       function fixed(geometry, colour, z) { const mesh = add(geometry, colour, z); mesh.position.x = x; return mesh; }
       fixed(extrude(rounded(14,14,0.6), MX.lowerBody), '#25242a', stack.bodyBottom);
@@ -282,10 +290,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
         });
         add(glyphs, ink, stack.capTop + 0.55, face).userData.keyIndex = 0;
       }
-      const socket = rounded(5, 5, 0.6);
-      socket.holes.push(cross(4.2, 1.5));
-      const socketBottom = stack.stemTop - 2.8;
-      add(extrude(socket, stack.roofBottom - socketBottom), base, socketBottom, face).userData.keyIndex = 0;
+      addCapSocket(base, face, 0);
       const bounds = new Box3().setFromObject(assembly);
       const width = bounds.max.x - bounds.min.x;
       const height = bounds.max.y - bounds.min.y;
@@ -337,8 +342,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       if (mechanical) taperKeycap(roofGeometry, roofBottom, stack);
       const roof = add(roofGeometry, keycapColour, roofBottom, capGroup);
       roof.userData.keyIndex=index;
-      const socket = rounded(5,5,0.6);socket.holes.push(cross(4.2,1.5));
-      add(extrude(socket,stack.roofBottom-(stack.stemTop-2.8)),keycapColour,stack.stemTop-2.8,capGroup).userData.keyIndex=index;
+      addCapSocket(keycapColour, capGroup, index);
       const glyph=lettering(entry.font,entry.text);
       if(glyph) add(glyph,letteringColour,stack.capTop,capGroup).userData.keyIndex=index;
     }

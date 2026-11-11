@@ -6,6 +6,8 @@ export const MX = Object.freeze({ width: 15.6, bodyHeight: 11.6, lowerBody: 5, s
 // Provisional case/keycap dimensions in mm; clearance needs physical trial printing.
 export const MX_CASE = Object.freeze({ floor: 1.8, pinClearance: 0.7, plate: 1.5, opening: 14.2, wall: 1.8, capWidth: 18.4, roof: 1.4 });
 export const MX_RECESS = Object.freeze({ sideClearance: 0.55, capRise: 0.8, earThickness: 3.2, earHoleDiameter: 5 });
+// Continuous circular boss with a female cross, fused to the keycap roof.
+export const MX_CAP_SOCKET = Object.freeze({ outerDiameter: 7, crossSpan: 4.2, crossArm: 1.5, engagement: 2.8 });
 export function mxStack() {
   const bodyBottom = MX_CASE.floor + MX_CASE.pinClearance + MX.pins;
   const mountTop = bodyBottom + MX.lowerBody;

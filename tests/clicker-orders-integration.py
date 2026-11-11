@@ -2,6 +2,7 @@
 import http.cookiejar
 import io
 import json
+import math
 import os
 import re
 from pathlib import Path
@@ -32,6 +33,39 @@ def request(path, method='GET', body=None, client=owner, origin=base):
             return response.status, response.read()
     except urllib.error.HTTPError as error:
         return error.code, error.read()
+
+def check_cap_socket(model, namespace):
+    # Slice through the projecting boss. The ring must be solid in every
+    # direction and the female cross must be open at the center and arm tips.
+    cap = model.find('.//m:object[@name="Moving cap"]/m:mesh', namespace)
+    vertices = [tuple(float(v.attrib[axis]) for axis in 'xyz') for v in cap.findall('m:vertices/m:vertex', namespace)]
+    triangles = [tuple(int(t.attrib[f'v{i}']) for i in range(1, 4)) for t in cap.findall('m:triangles/m:triangle', namespace)]
+    for z in (0.58, 1.39, 3.62):
+        segments = []
+        for triangle in triangles:
+            points = [vertices[index] for index in triangle]
+            section = []
+            for a, b in zip(points, points[1:] + points[:1]):
+                if (a[2] > z) != (b[2] > z):
+                    k = (z - a[2]) / (b[2] - a[2])
+                    section.append(tuple(a[i] + k * (b[i] - a[i]) for i in (0, 1)))
+            if len(section) == 2:
+                segments.append(section)
+
+        def inside(x, y):
+            hits = sum((a[1] > y) != (b[1] > y) and
+                       x < a[0] + (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1])
+                       for a, b in segments)
+            return bool(hits % 2)
+
+        for degrees in range(0, 360, 5):
+            angle = math.radians(degrees)
+            assert all(inside(radius * math.cos(angle), 39 + radius * math.sin(angle)) for radius in (2.35, 3.32))
+            assert not inside(3.63 * math.cos(angle), 39 + 3.63 * math.sin(angle))
+        for x, y in ((0, 0), (1.93, 0), (-1.93, 0), (0, 1.93), (0, -1.93)):
+            assert not inside(x, 39 + y)
+        for x, y in ((1, 1), (-1, -1), (-1, 1), (1, -1)):
+            assert inside(x, 39 + y)
 
 assert request(endpoint, client=anonymous)[0] == 401
 assert json.loads(request(endpoint)[1])['test'] is True
@@ -88,6 +122,7 @@ for text, tier, amount, other_tier, other_amount in [
         model = ET.fromstring(project.read('3D/3dmodel.model'))
         assert model.attrib['unit'] == 'millimeter'
         assert len(model.findall('.//m:mesh', namespace)) == 4
+        check_cap_socket(model, namespace)
         settings = json.loads(project.read('Metadata/project_settings.config'))
         assert settings['filament_colour'] == ['#F2C879', '#EFB39E', '#FFFCF5']
         models = ET.fromstring(project.read('Metadata/model_settings.config'))
@@ -97,4 +132,4 @@ for text, tier, amount, other_tier, other_amount in [
         Path(output).write_bytes(file)
     results.append({'order': order['id'], 'tier': tier, 'testPrice': amount, 'simulatedMyShipOrder': reference})
 
-print(json.dumps({'orders': results, 'checks': ['automatic pricing', 'correct checkout', 'order match', 'private 3MF download']}, ensure_ascii=False))
+print(json.dumps({'orders': results, 'checks': ['automatic pricing', 'correct checkout', 'order match', 'private 3MF download', 'continuous circular MX socket']}, ensure_ascii=False))
