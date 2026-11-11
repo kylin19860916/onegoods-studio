@@ -22,6 +22,48 @@ function rounded(width, height, radius, offsetX = 0) {
   return path;
 }
 
+function basicClickerBody(centers) {
+  const half = 12.4;
+  const corner = 5;
+  const waist = half - 3.2;
+  const left = centers[0] - half;
+  const right = centers.at(-1) + half;
+  const shape = new Shape();
+
+  function drawSide(sideCenters, direction) {
+    for (let index = 1; index < sideCenters.length; index++) {
+      const middle = (sideCenters[index - 1] + sideCenters[index]) / 2;
+      const start = middle - direction * 5.5;
+      const end = middle + direction * 5.5;
+      shape.lineTo(start, direction * half);
+      shape.bezierCurveTo(
+        start + direction * 2.7, direction * half,
+        middle - direction * 1.4, direction * waist,
+        middle, direction * waist,
+      );
+      shape.bezierCurveTo(
+        middle + direction * 1.4, direction * waist,
+        end - direction * 2.7, direction * half,
+        end, direction * half,
+      );
+    }
+  }
+
+  shape.moveTo(left + corner, half);
+  drawSide(centers, 1);
+  shape.lineTo(right - corner, half);
+  shape.quadraticCurveTo(right, half, right, half - corner);
+  shape.lineTo(right, -half + corner);
+  shape.quadraticCurveTo(right, -half, right - corner, -half);
+  drawSide([...centers].reverse(), -1);
+  shape.lineTo(left + corner, -half);
+  shape.quadraticCurveTo(left, -half, left, -half + corner);
+  shape.lineTo(left, half - corner);
+  shape.quadraticCurveTo(left, half, left + corner, half);
+  shape.closePath();
+  return shape;
+}
+
 function lettering(font, text) {
   if (!font || !text) return null;
   const path = new ShapePath();
@@ -239,17 +281,15 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       resize();
       return [width, height, bounds.max.z];
     }
-    const width = keys.length * 22 + 14;
-    worldWidth = Math.max(88, width + 26);
-    const centers = keys.map((_, index) => -width / 2 + 20 + index * 22);
-    const bodyWidth = width - 10;
-    const body = () => rounded(bodyWidth, 28, 4, 5);
+    const pitch = 22;
+    const centers = keys.map((_, index) => (index - (keys.length - 1) / 2) * pitch);
+    const body = () => basicClickerBody(centers);
     const walls = body();
-    walls.holes.push(rounded(bodyWidth - 2 * MX_CASE.wall, 28 - 2 * MX_CASE.wall, 2, 5));
     const plate = body();
     const rim = body();
     const wellWidth = MX_CASE.capWidth + 2 * MX_RECESS.sideClearance;
     for (const x of centers) {
+      walls.holes.push(rounded(18, 18, 2, x));
       plate.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3, x));
       rim.holes.push(rounded(wellWidth, wellWidth, 2.4 + MX_RECESS.sideClearance, x));
     }
@@ -258,9 +298,9 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     add(extrude(plate, MX_CASE.plate), base, stack.plateBottom);
     add(extrude(rim, stack.rimTop - stack.mountTop), base, stack.mountTop);
 
-    const ear = rounded(12, 13, 3.8, -width / 2 + 6);
+    const ear = rounded(12, 13, 3.8, centers[0] - 14);
     const ring = new Path();
-    ring.absarc(-width / 2 + 4.8, 0, MX_RECESS.earHoleDiameter / 2, 0, Math.PI * 2, true);
+    ring.absarc(centers[0] - 15.2, 0, MX_RECESS.earHoleDiameter / 2, 0, Math.PI * 2, true);
     ear.holes.push(ring);
     add(extrude(ear, MX_RECESS.earThickness), base, 3.7);
     for (const [index, entry] of keys.entries()) {
@@ -277,8 +317,13 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       const glyph=lettering(entry.font,entry.text);
       if(glyph) add(glyph,ink,stack.capTop,capGroup).userData.keyIndex=index;
     }
+    const bounds = new Box3().setFromObject(assembly);
+    const width = bounds.max.x - bounds.min.x;
+    const height = bounds.max.y - bounds.min.y;
+    assembly.position.x = -(bounds.max.x + bounds.min.x) / 2;
+    worldWidth = Math.max(88, width + 26);
     resize();
-    return [width,28,stack.capTop+0.65];
+    return [width, height, bounds.max.z];
   }
   resize();
   return { update, press };
