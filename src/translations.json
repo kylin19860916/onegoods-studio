@@ -1,4 +1,5 @@
 {
+  "机械键盘按键款": ["機械鍵盤按鍵款", "Mechanical keyboard keys"],
   "点选键帽即可输入，下面可调整该键的字型和颜色。每格限一个字。": ["點選鍵帽即可輸入，下方可調整該鍵的字型和顏色。每格限一個字。", "Select a keycap to type one character and set its font and colours below."],
   "设置按键": ["設定按鍵", "Customize key"],
   "中文最多 5 字，英文最多 8 个字母。中英混排按比例合计，空格不计。": ["中文最多 5 字，英文最多 8 個字母。中英混排按比例合計，空格不計。", "Up to 5 Chinese characters or 8 English letters. Mixed text is counted proportionally. Spaces are excluded."],

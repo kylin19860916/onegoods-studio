@@ -64,6 +64,19 @@ function basicClickerBody(centers) {
   return shape;
 }
 
+// The keyboard-style cap narrows from its skirt to the top face.
+function taperKeycap(geometry, bottom, stack) {
+  const positions = geometry.attributes.position;
+  const height = stack.capTop - stack.skirtBottom;
+  for (let index = 0; index < positions.count; index++) {
+    const rise = (positions.getZ(index) + bottom - stack.skirtBottom) / height;
+    const scale = 1 - 0.17 * rise;
+    positions.setXY(index, positions.getX(index) * scale, positions.getY(index) * scale);
+  }
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
 function lettering(font, text) {
   if (!font || !text) return null;
   const path = new ShapePath();
@@ -283,7 +296,11 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     }
     const pitch = 22;
     const centers = keys.map((_, index) => (index - (keys.length - 1) / 2) * pitch);
-    const body = () => basicClickerBody(centers);
+    const mechanical = style === 'mechanical';
+    const body = () => mechanical
+      ? rounded((centers.length - 1) * pitch + 24.8, 24.8, 3.8)
+      : basicClickerBody(centers);
+    const rimTop = mechanical ? stack.mountTop + 2.5 : stack.rimTop;
     const walls = body();
     const plate = body();
     const rim = body();
@@ -296,7 +313,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     add(extrude(body(), MX_CASE.floor), base, 0);
     add(extrude(walls, stack.plateBottom - MX_CASE.floor), base, MX_CASE.floor);
     add(extrude(plate, MX_CASE.plate), base, stack.plateBottom);
-    add(extrude(rim, stack.rimTop - stack.mountTop), base, stack.mountTop);
+    add(extrude(rim, rimTop - stack.mountTop), base, stack.mountTop);
 
     const ear = rounded(12, 13, 3.8, centers[0] - 14);
     const ring = new Path();
@@ -308,10 +325,17 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       const capGroup = mountSwitch(centers[index], index);
       const skirt = rounded(MX_CASE.capWidth,MX_CASE.capWidth,2.4);
       skirt.holes.push(rounded(16,16,1.4));
-      add(extrude(skirt,stack.roofBottom-stack.skirtBottom),keycapColour,stack.skirtBottom,capGroup).userData.keyIndex=index;
-      const roof = add(new ExtrudeGeometry(rounded(17.6,17.6,2),{
-        depth:MX_CASE.roof-0.4,bevelEnabled:true,bevelThickness:0.2,bevelSize:0.4,bevelSegments:3,curveSegments:12,
-      }),keycapColour,stack.roofBottom+0.2,capGroup);
+      const skirtGeometry = extrude(skirt, stack.roofBottom - stack.skirtBottom);
+      if (mechanical) taperKeycap(skirtGeometry, stack.skirtBottom, stack);
+      add(skirtGeometry, keycapColour, stack.skirtBottom, capGroup).userData.keyIndex = index;
+
+      const roofBottom = stack.roofBottom + 0.2;
+      const roofGeometry = new ExtrudeGeometry(rounded(17.6, 17.6, 2), {
+        depth: MX_CASE.roof - 0.4, bevelEnabled: true, bevelThickness: 0.2, bevelSize: 0.4,
+        bevelSegments: 3, curveSegments: 12,
+      });
+      if (mechanical) taperKeycap(roofGeometry, roofBottom, stack);
+      const roof = add(roofGeometry, keycapColour, roofBottom, capGroup);
       roof.userData.keyIndex=index;
       const socket = rounded(5,5,0.6);socket.holes.push(cross(4.2,1.5));
       add(extrude(socket,stack.roofBottom-(stack.stemTop-2.8)),keycapColour,stack.stemTop-2.8,capGroup).userData.keyIndex=index;

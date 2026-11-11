@@ -53,7 +53,7 @@ export function setupClicker() {
   const nameFill = setupColour(form.elements.nameFill, '#efb39e');
   const nameBorder = setupColour(form.elements.nameBorder, '#f2c879');
   const { clickerStyle, clickerName } = form.elements;
-  const basicSettings = document.querySelector('#clicker-basic-settings');
+  const perKeySettings = document.querySelector('#clicker-per-key-settings');
   const nameSettings = document.querySelector('#clicker-name-settings');
   const hint = document.querySelector('#clicker-hint');
   const textLimit = document.querySelector('#clicker-name-limit-error');
@@ -131,9 +131,9 @@ export function setupClicker() {
     const currentVersion = ++version;
     const style = clickerStyle.value;
     const wholeName = style === 'name';
-    basicSettings.hidden = wholeName;
+    perKeySettings.hidden = wholeName;
     nameSettings.hidden = !wholeName;
-    hint.textContent = hint.dataset[style];
+    hint.textContent = wholeName ? hint.dataset.name : hint.dataset.keys;
     remove.disabled = count === 1;
     add.disabled = count === maximum;
     for (const colour of [base, nameInk, nameFill, nameBorder]) colour.sync();
