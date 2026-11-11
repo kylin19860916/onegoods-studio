@@ -1,4 +1,4 @@
-import { articulatedNameCharacters, articulatedNameLimits, parseKeyringFont, generateKeyring } from '../server/keyring-geometry.mjs';
+import { articulatedNameCharacters, articulatedNameLimit, parseKeyringFont, generateKeyring } from '../server/keyring-geometry.mjs';
 import { createKeyringViewer } from './keyring-viewer.js';
 import { setupClicker } from './keyring-clicker.js';
 import { expandChoices } from './keyring-choices.js';
@@ -36,12 +36,13 @@ for (const select of form.querySelectorAll('[data-swatch]')) {
   select.value = select.dataset.default;
   expandChoices(select, { colours: true });
 }
-const { nameText, style, shape, size, baseColor, textColor, useAccent, accentColor, bend } = form.elements;
+const { nameText, style, shape, size, baseColor, textColor, useAccent, accentColor } = form.elements;
 const download = document.querySelector('#plate-download');
 const payment = document.querySelector('#plate-payment');
 
 const fonts = keyringFonts;
-setupFontPicker(form.elements.style);
+if (requestedProduct() === 'name-articulated') style.value = 'sans-tc';
+setupFontPicker(style);
 const sizes = { small: [50, 20.8], medium: [65, 27], large: [80, 33.2] };
 const spec = { baseMm: 3, letteringMm: 1, holeMm: 4, rimMm: 1.8 };
 let currentFont;
@@ -49,6 +50,7 @@ let fontPromise;
 let previewVersion = 0;
 let timer;
 let articulated = false;
+let currentStep = 0;
 
 function loadFont(key) {
   if (key === currentFont && fontPromise) return fontPromise;
@@ -72,15 +74,16 @@ function shade(color) {
   return '#' + parts.map(part => Math.round(parseInt(part, 16) * 0.72).toString(16).padStart(2, '0')).join('');
 }
 
-function showStep(step) {
-  const editingColors = step === 1;
+function showStep(step, focus = true) {
+  currentStep = step;
+  const editingColors = articulated || step === 1;
   designStep.hidden = editingColors;
   colorsStep.hidden = !editingColors;
   progress.forEach((item, index) => {
     if (index === step) item.setAttribute('aria-current', 'step');
     else item.removeAttribute('aria-current');
   });
-  (editingColors ? colorsStep : designStep).querySelector('h2').focus();
+  if (focus) (editingColors ? colorsStep : designStep).querySelector('h2').focus();
 }
 
 async function render(version) {
@@ -95,18 +98,19 @@ async function render(version) {
     const name = nameText.value.trim() || (articulated ? 'OGS' : nameText.placeholder);
     const model = generateKeyring(font, name, {
       ...spec, widthMm, heightMm, shape: articulated ? 'articulated' : shape.value, baseColor: base, textColor: ink, accentColor: third,
-      bend: articulated ? Number(bend.value) / 100 : 0,
     });
     const colors = { base, side: third || shade(base), ink, shadow: shade(ink) };
     for (const [part, color] of Object.entries(colors)) {
       preview.style.setProperty('--plate-' + part, color);
     }
     const [x, y, width, height] = model.preview.viewBox;
-    position.setAttribute('transform', `translate(${45 - x - width / 2} ${20 - y - height / 2})`);
+    preview.setAttribute('viewBox', articulated ? model.preview.viewBox.join(' ') : '0 0 90 43');
+    if (articulated) position.removeAttribute('transform');
+    else position.setAttribute('transform', `translate(${45 - x - width / 2} ${20 - y - height / 2})`);
     preview.querySelectorAll('[data-outline]').forEach(path => {
       path.setAttribute('d', model.preview[path.dataset.outline]);
     });
-    viewer?.setMeshes(model.meshes);
+    viewer?.setMeshes(model.meshes, { fit: articulated });
     const numbers = model.dimensions.map(value => Number(value.toFixed(1)));
     dimensions.textContent = dimensions.dataset.label + ' · ' + numbers.join(' × ') + ' mm';
     previewStatus.textContent = '';
@@ -126,7 +130,7 @@ function queuePreview() {
   generate.disabled = true;
   accent.hidden = !useAccent.checked;
   const tooLong = articulated
-    && articulatedNameCharacters(nameText.value.trim()).length > articulatedNameLimits[size.value];
+    && articulatedNameCharacters(nameText.value.trim()).length > articulatedNameLimit;
   nameText.setCustomValidity(tooLong ? previewStatus.dataset.articulatedLength : '');
   for (const [name, field] of Object.entries({ baseColor, textColor, accentColor })) {
     const current = form.querySelector('[data-keyring-current="' + name + '"]');
@@ -206,19 +210,31 @@ form.addEventListener('submit', event => {
   event.preventDefault();
   if (!generate.disabled) exportImage();
 });
-function showProduct() {
+function requestedProduct() {
   const styles = ['name-tag', 'name-clicker', 'name-articulated'];
   const requested = location.hash.slice(1);
   const queryStyle = new URLSearchParams(location.search).get('style');
-  const selected = styles.includes(requested) ? requested : styles.includes(queryStyle) ? queryStyle : 'name-tag';
+  if (styles.includes(requested)) return requested;
+  return styles.includes(queryStyle) ? queryStyle : 'name-tag';
+}
+
+function showProduct() {
+  const selected = requestedProduct();
   articulated = selected === 'name-articulated';
   keyringPanel.hidden = selected === 'name-clicker';
   clickerPanel.hidden = !keyringPanel.hidden;
   for (const heading of headings) heading.hidden = heading.dataset.keyringIntro !== selected;
   for (const option of nameTagOptions) option.hidden = articulated;
   for (const option of articulatedOptions) option.hidden = !articulated;
+  for (const group of form.querySelectorAll('.keyring-colour-section')) {
+    const label = group.querySelector(articulated ? 'summary [data-articulated-only]' : 'summary [data-name-tag-only]');
+    group.querySelector('legend').textContent = label.textContent;
+  }
   download.download = articulated ? 'OGS-articulated-preview.png' : 'OGS-keyring-preview.png';
-  if (!keyringPanel.hidden) queuePreview();
+  if (!keyringPanel.hidden) {
+    showStep(currentStep, false);
+    queuePreview();
+  }
 }
 
 window.addEventListener('hashchange', showProduct);

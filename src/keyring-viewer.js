@@ -34,11 +34,15 @@ export function createKeyringViewer(canvas, host, resetButton) {
   controls.addEventListener('change', render);
   resetButton.addEventListener('click', () => controls.reset());
 
+  let halfWidth = 45;
+
   function resize() {
     const width = host.clientWidth;
     const height = host.clientHeight;
     if (!width || !height) return;
-    camera.top = 45 * height / width;
+    camera.left = -halfWidth;
+    camera.right = halfWidth;
+    camera.top = halfWidth * height / width;
     camera.bottom = -camera.top;
     camera.updateProjectionMatrix();
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
@@ -59,7 +63,7 @@ export function createKeyringViewer(canvas, host, resetButton) {
     render();
   });
 
-  function setMeshes(meshes) {
+  function setMeshes(meshes, { fit = false } = {}) {
     for (const part of [...model.children]) {
       model.remove(part);
       part.geometry.dispose();
@@ -74,6 +78,9 @@ export function createKeyringViewer(canvas, host, resetButton) {
       const values = vertices.map(vertex => vertex[axis]);
       return (Math.min(...values) + Math.max(...values)) / 2;
     });
+    const radius = fit ? Math.max(...vertices.map(vertex =>
+      Math.hypot(...vertex.map((value, axis) => value - center[axis])))) : 0;
+    halfWidth = fit ? Math.max(21, radius * 1.17) : 45;
     for (const part of meshes) {
       const geometry = new BufferGeometry();
       const positions = part.vertices.flatMap(vertex => vertex.map((value, axis) => value - center[axis]));
@@ -82,7 +89,7 @@ export function createKeyringViewer(canvas, host, resetButton) {
       geometry.computeVertexNormals();
       model.add(new Mesh(geometry, new MeshStandardMaterial({ color: part.color, roughness: 0.72, flatShading: true })));
     }
-    render();
+    resize();
   }
 
   return {
