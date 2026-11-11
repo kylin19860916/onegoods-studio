@@ -42,8 +42,11 @@ export function manifoldWorker() {
       if (!id.split('?')[0].endsWith('/manifold-3d/manifold.js')) return;
       const bound = /function createJsInvoker\([\s\S]*?(?=function craftInvokerFunction)/;
       const value = /var __emval_create_invoker=[\s\S]*?(?=function __emval_equals)/;
-      if (!bound.test(source) || !value.test(source)) throw new Error('Manifold bindings changed; review Worker compatibility');
-      return source.replace(bound, boundInvoker).replace(value, valueInvoker);
+      const nodeRuntime = /var ENVIRONMENT_IS_NODE=[^;]+;/;
+      if (!bound.test(source) || !value.test(source) || !nodeRuntime.test(source)) throw new Error('Manifold bindings changed; review Worker compatibility');
+      // nodejs_compat exposes process, but the Worker has no Node filesystem.
+      return source.replace(nodeRuntime, 'var ENVIRONMENT_IS_NODE=false;')
+        .replace(bound, boundInvoker).replace(value, valueInvoker);
     },
   };
 }
