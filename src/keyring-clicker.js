@@ -31,17 +31,28 @@ export function setupClicker() {
   const controls = labels.querySelector('.clicker-inline-controls');
   const status = document.querySelector('#clicker-status');
   const viewer = createClickerViewer(document.querySelector('#clicker-canvas'), document.querySelector('#clicker-view'), document.querySelector('#clicker-reset'), document.querySelector('#clicker-inspect'));
-  const defaults = {
-    base: '#393142', cap: '#a087c1', ink: '#fffcf5',
-    nameInk: '#fffcf5', nameFill: '#efb39e', nameBorder: '#f2c879',
-  };
-  for (const name of Object.keys(defaults)) {
-    const select = form.elements[name];
+  function setupColour(select, initial) {
+    const field = select.parentElement;
+    const current = field.closest('details').querySelector('[data-clicker-current]');
     select.append(swatches.content.cloneNode(true));
-    select.value = defaults[name];
+    select.value = initial;
     expandChoices(select, { colours: true });
+
+    const selected = () => field.querySelector('input:checked');
+    return {
+      get value() { return selected().value; },
+      sync() {
+        const radio = selected();
+        current.querySelector('i').style.backgroundColor = radio.value;
+        current.querySelector('span').textContent = radio.closest('label').querySelector('span').textContent;
+      },
+    };
   }
-  const { base, cap, ink, clickerStyle, clickerName, nameInk, nameFill, nameBorder } = form.elements;
+  const base = setupColour(form.elements.base, '#393142');
+  const nameInk = setupColour(form.elements.nameInk, '#fffcf5');
+  const nameFill = setupColour(form.elements.nameFill, '#efb39e');
+  const nameBorder = setupColour(form.elements.nameBorder, '#f2c879');
+  const { clickerStyle, clickerName } = form.elements;
   const basicSettings = document.querySelector('#clicker-basic-settings');
   const nameSettings = document.querySelector('#clicker-name-settings');
   const hint = document.querySelector('#clicker-hint');
@@ -54,25 +65,49 @@ export function setupClicker() {
   setupFontPicker(nameFont);
   const remove = document.querySelector('#clicker-remove');
   const add = document.querySelector('#clicker-add');
+  const keySettings = document.querySelector('#clicker-key-settings');
+  const settingsTemplate = document.querySelector('#clicker-key-settings-template');
   let count = 2;
+  let activeKey = 0;
   let version = 0;
   const maximum = 4;
   const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
   const keys = Array.from({ length: maximum }, (_, index) => {
     const row = template.content.cloneNode(true).firstElementChild;
-    const label = labels.dataset.keyLabel + ' ' + (index + 1);
+    const settings = settingsTemplate.content.cloneNode(true).firstElementChild;
+    const number = index + 1;
+    const label = labels.dataset.keyLabel + ' ' + number;
     const input = row.querySelector('input');
+    const settingsTitle = settings.querySelector('[data-key-settings-title]');
+    settings.id = 'clicker-key-settings-' + number;
+    settingsTitle.id = settings.id + '-title';
+    settingsTitle.textContent = settingsTitle.dataset.label + ' ' + number;
+    settings.setAttribute('aria-labelledby', settingsTitle.id);
     input.setAttribute('aria-label', label);
+    input.setAttribute('aria-controls', settings.id);
+    row.querySelector('.clicker-slot-number').textContent = number;
+
     const font = document.querySelector('#plate-style').cloneNode(true);
-    font.id = 'clicker-font-' + (index + 1);
+    font.id = 'clicker-font-' + number;
     font.name = 'keyFont' + index;
     font.value = 'huninn';
-    row.querySelector('.clicker-font-field').append(font);
+    settings.querySelector('[data-key-font-field]').append(font);
     labels.insertBefore(row, controls);
-    const fontCaption = row.querySelector('.clicker-font-field label');
-    const triggerText = fontCaption.textContent;
-    fontCaption.textContent = label + ' · ' + triggerText;
-    setupFontPicker(font, { triggerText });
+    keySettings.append(settings);
+    setupFontPicker(font);
+
+    const cap = settings.querySelector('[data-key-cap]');
+    const ink = settings.querySelector('[data-key-ink]');
+    cap.id = cap.name = 'clicker-key-cap-' + number;
+    ink.id = ink.name = 'clicker-key-ink-' + number;
+    const capColour = setupColour(cap, '#a087c1');
+    const inkColour = setupColour(ink, '#fffcf5');
+    const selectKey = () => {
+      activeKey = index;
+      showKeySettings();
+    };
+    input.addEventListener('focus', selectKey);
+    input.addEventListener('click', selectKey);
     function updateLetter() {
       input.value = segmenter.segment(input.value.trim())[Symbol.iterator]().next().value?.segment || '';
     }
@@ -81,8 +116,16 @@ export function setupClicker() {
     input.addEventListener('keydown', event => {
       if (event.key === 'Enter' && !event.isComposing) viewer?.press(index);
     });
-    return { row, input, font };
+    return { row, input, font, settings, cap: capColour, ink: inkColour };
   });
+
+  function showKeySettings() {
+    for (const [index, key] of keys.entries()) {
+      key.row.hidden = index >= count;
+      key.row.classList.toggle('active', index === activeKey);
+      key.settings.hidden = index !== activeKey;
+    }
+  }
 
   async function render() {
     const currentVersion = ++version;
@@ -93,18 +136,15 @@ export function setupClicker() {
     hint.textContent = hint.dataset[style];
     remove.disabled = count === 1;
     add.disabled = count === maximum;
-    labels.style.setProperty('--clicker-cap', cap.value);
-    labels.style.setProperty('--clicker-ink', ink.value);
-    for (const [name, field] of Object.entries({ base, cap, ink, nameInk, nameFill, nameBorder })) {
-      const current = form.querySelector('[data-clicker-current="' + name + '"]');
-      const selected = form.querySelector('input[name="' + name + '"]:checked');
-      current.querySelector('i').style.backgroundColor = field.value;
-      current.querySelector('span').textContent = selected.closest('label').querySelector('span').textContent;
-    }
-    for (const [index, key] of keys.entries()) {
-      key.row.hidden = index >= count;
+    for (const colour of [base, nameInk, nameFill, nameBorder]) colour.sync();
+    for (const key of keys) {
       key.input.style.fontFamily = '"OGS Full ' + key.font.value + '"';
+      key.row.style.setProperty('--clicker-cap', key.cap.value);
+      key.row.style.setProperty('--clicker-ink', key.ink.value);
+      key.cap.sync();
+      key.ink.sync();
     }
+    showKeySettings();
     const tooLong = wholeName && exceedsClickerTextLimit(clickerName.value);
     textLimit.hidden = !tooLong;
     clickerName.setAttribute('aria-invalid', String(tooLong));
@@ -114,9 +154,11 @@ export function setupClicker() {
     try {
       const sources = wholeName
         ? [{ text: clickerName.value.trim() || nameFont.selectedOptions[0].dataset.sample || clickerName.placeholder, font: nameFont.value }]
-        : keys.slice(0, count).map(key => ({ text: key.input.value.trim(), font: key.font.value }));
+        : keys.slice(0, count).map(key => ({
+          text: key.input.value.trim(), font: key.font.value, cap: key.cap.value, ink: key.ink.value,
+        }));
       const entries = await Promise.all(sources.map(async entry => ({
-        text: entry.text.normalize('NFC'), font: await loadFont(entry.font),
+        ...entry, text: entry.text.normalize('NFC'), font: await loadFont(entry.font),
       })));
       if (currentVersion !== version) return;
       let unsupported = false;
@@ -128,7 +170,7 @@ export function setupClicker() {
       }
       const palette = wholeName
         ? { base: nameBorder.value, cap: nameFill.value, ink: nameInk.value }
-        : { base: base.value, cap: cap.value, ink: ink.value };
+        : { base: base.value };
       const size = viewer.update({ keys: entries, style, ...palette });
       const dimensions = document.querySelector('#clicker-dimensions');
       dimensions.textContent = dimensions.dataset.label + ' · ' + size.map(n => Number(n.toFixed(1))).join(' × ') + ' mm';
@@ -137,8 +179,17 @@ export function setupClicker() {
       if (currentVersion === version) status.textContent = status.dataset.error;
     }
   }
-  remove.addEventListener('click', () => { count = Math.max(1, count - 1); render(); });
-  add.addEventListener('click', () => { count = Math.min(maximum, count + 1); render(); });
+  remove.addEventListener('click', () => {
+    count = Math.max(1, count - 1);
+    activeKey = Math.min(activeKey, count - 1);
+    render();
+  });
+  add.addEventListener('click', () => {
+    count = Math.min(maximum, count + 1);
+    activeKey = count - 1;
+    render();
+    keys[activeKey].input.focus({ preventScroll: true });
+  });
   function showProduct() {
     const requested = location.hash.slice(1) || new URLSearchParams(location.search).get('style');
     const selected = requested === 'name-clicker' ? 'name-clicker' : 'name-tag';

@@ -171,37 +171,44 @@
           <label><input type="radio" name="clickerStyle" value="name"> 三色厚字款</label>
         </fieldset>
         <div class="clicker-style-settings" id="clicker-basic-settings">
-        <fieldset class="clicker-key-editor">
-          <legend>按键与文字</legend>
-          <div id="clicker-labels" class="clicker-labels" data-key-label="按键" data-font-label="字型">
-            <template id="clicker-label-template">
-              <div class="nameplate-field clicker-letter-slot">
-                <input class="clicker-slot-key" placeholder="字" autocomplete="off" autocapitalize="off" spellcheck="false">
-                <div class="nameplate-field clicker-font-field"><label>字型</label></div>
+          <fieldset class="clicker-key-editor">
+            <legend>按键与文字</legend>
+            <p class="nameplate-order-note">点选键帽即可输入，下面可调整该键的字型和颜色。每格限一个字。</p>
+            <div id="clicker-labels" class="clicker-labels" data-key-label="按键">
+              <template id="clicker-label-template">
+                <label class="nameplate-field clicker-letter-slot">
+                  <input class="clicker-slot-key" placeholder="字" autocomplete="off" autocapitalize="off" spellcheck="false">
+                  <span class="clicker-slot-number" aria-hidden="true"></span>
+                </label>
+              </template>
+              <div class="clicker-inline-controls">
+                <button type="button" id="clicker-add" aria-label="增加一格">+</button>
+                <button type="button" id="clicker-remove" aria-label="减少一格">−</button>
               </div>
-            </template>
-            <div class="clicker-inline-controls">
-              <button type="button" id="clicker-add" aria-label="增加一格">+</button>
-              <button type="button" id="clicker-remove" aria-label="减少一格">−</button>
             </div>
+          </fieldset>
+          <div id="clicker-key-settings">
+            <template id="clicker-key-settings-template">
+              <section class="clicker-key-settings" hidden>
+                <h3 data-key-settings-title data-label="设置按键"></h3>
+                <div class="nameplate-field" data-key-font-field><label>字型</label></div>
+                <details class="keyring-colour-section">
+                  <summary><span>键帽颜色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
+                  <div class="nameplate-field"><label>键帽颜色</label><select data-key-cap></select></div>
+                </details>
+                <details class="keyring-colour-section">
+                  <summary><span>文字颜色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
+                  <div class="nameplate-field"><label>文字颜色</label><select data-key-ink></select></div>
+                </details>
+              </section>
+            </template>
           </div>
-        </fieldset>
-        <p class="nameplate-order-note">每格限一个字，可输入中文或英文字母。</p>
-        <section class="clicker-colors" aria-labelledby="clicker-colors-heading">
-          <h3 id="clicker-colors-heading">配色</h3>
-          <details class="keyring-colour-section" open>
-            <summary><span>底座颜色</span><span class="clicker-colour-current" data-clicker-current="base"><i aria-hidden="true"></i><span></span></span></summary>
-            <div class="nameplate-field"><label for="clicker-base">底座颜色</label><select id="clicker-base" name="base"></select></div>
-          </details>
-          <details class="keyring-colour-section" open>
-            <summary><span>键帽颜色</span><span class="clicker-colour-current" data-clicker-current="cap"><i aria-hidden="true"></i><span></span></span></summary>
-            <div class="nameplate-field"><label for="clicker-cap">键帽颜色</label><select id="clicker-cap" name="cap"></select></div>
-          </details>
-          <details class="keyring-colour-section" open>
-            <summary><span>文字颜色</span><span class="clicker-colour-current" data-clicker-current="ink"><i aria-hidden="true"></i><span></span></span></summary>
-            <div class="nameplate-field"><label for="clicker-ink">文字颜色</label><select id="clicker-ink" name="ink"></select></div>
-          </details>
-        </section>
+          <section class="clicker-colors">
+            <details class="keyring-colour-section" open>
+              <summary><span>底座颜色</span><span class="clicker-colour-current" data-clicker-current="base"><i aria-hidden="true"></i><span></span></span></summary>
+              <div class="nameplate-field"><label for="clicker-base">底座颜色</label><select id="clicker-base" name="base"></select></div>
+            </details>
+          </section>
         </div>
         <div class="clicker-style-settings" id="clicker-name-settings" hidden>
           <div class="nameplate-field">

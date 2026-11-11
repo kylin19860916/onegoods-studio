@@ -304,18 +304,19 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     ear.holes.push(ring);
     add(extrude(ear, MX_RECESS.earThickness), base, 3.7);
     for (const [index, entry] of keys.entries()) {
+      const { cap: keycapColour, ink: letteringColour } = entry;
       const capGroup = mountSwitch(centers[index], index);
       const skirt = rounded(MX_CASE.capWidth,MX_CASE.capWidth,2.4);
       skirt.holes.push(rounded(16,16,1.4));
-      add(extrude(skirt,stack.roofBottom-stack.skirtBottom),cap,stack.skirtBottom,capGroup).userData.keyIndex=index;
+      add(extrude(skirt,stack.roofBottom-stack.skirtBottom),keycapColour,stack.skirtBottom,capGroup).userData.keyIndex=index;
       const roof = add(new ExtrudeGeometry(rounded(17.6,17.6,2),{
         depth:MX_CASE.roof-0.4,bevelEnabled:true,bevelThickness:0.2,bevelSize:0.4,bevelSegments:3,curveSegments:12,
-      }),cap,stack.roofBottom+0.2,capGroup);
+      }),keycapColour,stack.roofBottom+0.2,capGroup);
       roof.userData.keyIndex=index;
       const socket = rounded(5,5,0.6);socket.holes.push(cross(4.2,1.5));
-      add(extrude(socket,stack.roofBottom-(stack.stemTop-2.8)),cap,stack.stemTop-2.8,capGroup).userData.keyIndex=index;
+      add(extrude(socket,stack.roofBottom-(stack.stemTop-2.8)),keycapColour,stack.stemTop-2.8,capGroup).userData.keyIndex=index;
       const glyph=lettering(entry.font,entry.text);
-      if(glyph) add(glyph,ink,stack.capTop,capGroup).userData.keyIndex=index;
+      if(glyph) add(glyph,letteringColour,stack.capTop,capGroup).userData.keyIndex=index;
     }
     const bounds = new Box3().setFromObject(assembly);
     const width = bounds.max.x - bounds.min.x;
