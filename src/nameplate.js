@@ -1,4 +1,4 @@
-import { parseKeyringFont, generateKeyring } from '../server/keyring-geometry.mjs';
+import { articulatedNameCharacters, articulatedNameLimits, parseKeyringFont, generateKeyring } from '../server/keyring-geometry.mjs';
 import { createKeyringViewer } from './keyring-viewer.js';
 import { setupClicker } from './keyring-clicker.js';
 import { expandChoices } from './keyring-choices.js';
@@ -24,6 +24,7 @@ const generate = document.querySelector('#keyring-generate');
 const designStep = document.querySelector('#keyring-design');
 const colorsStep = document.querySelector('#keyring-colors');
 const accent = document.querySelector('#keyring-accent');
+const articulation = document.querySelector('#keyring-articulation');
 const progress = document.querySelectorAll('.keyring-steps li');
 const swatches = document.querySelector('#plate-swatch-options');
 for (const select of form.querySelectorAll('[data-swatch]')) {
@@ -31,7 +32,7 @@ for (const select of form.querySelectorAll('[data-swatch]')) {
   select.value = select.dataset.default;
   expandChoices(select, { colours: true });
 }
-const { nameText, style, shape, size, baseColor, textColor, useAccent, accentColor } = form.elements;
+const { nameText, style, shape, size, baseColor, textColor, useAccent, accentColor, bend } = form.elements;
 const download = document.querySelector('#plate-download');
 const payment = document.querySelector('#plate-payment');
 
@@ -86,8 +87,11 @@ async function render(version) {
     const ink = textColor.value;
     const third = useAccent.checked ? accentColor.value : undefined;
     const [widthMm, heightMm] = sizes[size.value];
-    const model = generateKeyring(font, nameText.value.trim() || nameText.placeholder, {
+    const articulated = shape.value === 'articulated';
+    const name = nameText.value.trim() || (articulated ? 'OGS' : nameText.placeholder);
+    const model = generateKeyring(font, name, {
       ...spec, widthMm, heightMm, shape: shape.value, baseColor: base, textColor: ink, accentColor: third,
+      bend: articulated ? Number(bend.value) / 100 : 0,
     });
     const colors = { base, side: third || shade(base), ink, shadow: shade(ink) };
     for (const [part, color] of Object.entries(colors)) {
@@ -108,7 +112,8 @@ async function render(version) {
     viewer?.setMeshes([]);
     dimensions.textContent = '';
     preview.querySelectorAll('[data-outline]').forEach(path => path.removeAttribute('d'));
-    previewStatus.textContent = error.message === '有字元不在此款支援的字型中。' ? previewStatus.dataset.unsupported : previewStatus.dataset.error;
+    if (error.message === '有字元不在此款支援的字型中。') previewStatus.textContent = previewStatus.dataset.unsupported;
+    else previewStatus.textContent = previewStatus.dataset.error;
   }
 }
 
@@ -116,6 +121,10 @@ function queuePreview() {
   const version = ++previewVersion;
   generate.disabled = true;
   accent.hidden = !useAccent.checked;
+  articulation.hidden = shape.value !== 'articulated';
+  const tooLong = !articulation.hidden
+    && articulatedNameCharacters(nameText.value.trim()).length > articulatedNameLimits[size.value];
+  nameText.setCustomValidity(tooLong ? previewStatus.dataset.articulatedLength : '');
   for (const [name, field] of Object.entries({ baseColor, textColor, accentColor })) {
     const current = form.querySelector('[data-keyring-current="' + name + '"]');
     const selected = form.querySelector('input[name="' + name + '"]:checked');
@@ -128,7 +137,14 @@ function queuePreview() {
   download.removeAttribute('href');
   exportStatus.textContent = '';
   clearTimeout(timer);
-  timer = setTimeout(() => render(version), 120);
+  if (tooLong) {
+    viewer?.setMeshes([]);
+    dimensions.textContent = '';
+    preview.querySelectorAll('[data-outline]').forEach(path => path.removeAttribute('d'));
+    previewStatus.textContent = nameText.validationMessage;
+  } else {
+    timer = setTimeout(() => render(version), 120);
+  }
 }
 
 function exportImage() {

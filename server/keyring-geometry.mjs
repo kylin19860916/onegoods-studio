@@ -205,6 +205,111 @@ function extrude(polys, bottom, top) {
 
 class DisconnectedBaseError extends Error {}
 
+export const articulatedNameLimits = Object.freeze({ small: 4, medium: 6, large: 8 });
+
+export function articulatedNameCharacters(name) {
+  return [...name.normalize('NFC').replace(/ +/g, '')];
+}
+
+function buildArticulatedKeyring(font, name, spec) {
+  const characters = articulatedNameCharacters(name);
+  const { widthMm, heightMm, holeMm, baseMm, letteringMm, baseColor, textColor, accentColor } = spec;
+  const gap = 2.8;
+  const eyeRadius = holeMm / 2 + 1.8;
+  const eyeWidth = 2 * eyeRadius;
+  const tileWidth = Math.min(15, (widthMm - eyeWidth - characters.length * gap) / characters.length);
+  if (tileWidth < 6) throw new Error('此尺寸無法容納字塊。');
+  const tileHeight = Math.min(heightMm, tileWidth + 3.5);
+  const tile = roundedPlate(tileWidth, tileHeight, Math.min(3, tileWidth / 3))
+    .map(({ X, Y }) => ({ X, Y: Y - Math.round(tileHeight * units / 2) }));
+  const eye = polygons([circle(eyeRadius * units, 0, eyeRadius * units)],
+    [circle(eyeRadius * units, 0, holeMm * units / 2)], ClipType.ctDifference);
+  const letterFaces = [];
+  const baseFaces = [...eye];
+  const meshes = [];
+  const stripeHeight = accentColor ? Math.min(0.8, baseMm / 2) : 0;
+  const turn = Math.max(-1, Math.min(1, spec.bend ?? 0))
+    * Math.min(17, 52 / characters.length) * Math.PI / 180;
+
+  function addMesh(rings, lower, upper, color, label) {
+    meshes.push({ ...extrude(rings, lower, upper), color, name: label });
+  }
+
+  function arm(from, to, bore = false) {
+    const low = Math.min(from, to);
+    const high = Math.max(from, to);
+    const halfHeight = 1.9 * units;
+    const stem = [
+      { X: low * units, Y: -halfHeight }, { X: high * units, Y: -halfHeight },
+      { X: high * units, Y: halfHeight }, { X: low * units, Y: halfHeight },
+    ];
+    return polygons([stem, circle(to * units, 0, 2.4 * units)],
+      bore ? [circle(to * units, 0, 1.25 * units)] : [], ClipType.ctDifference);
+  }
+
+  addMesh(eye, stripeHeight, baseMm, baseColor, 'Keyring eye');
+  if (stripeHeight) addMesh(eye, 0, stripeHeight, accentColor, 'Keyring eye accent');
+  const firstJoint = eyeWidth + gap / 2;
+  const eyeArm = arm(eyeWidth - 1.5, firstJoint, true);
+  addMesh(eyeArm, 0.25, 1.4, baseColor, 'Keyring hinge');
+  baseFaces.push(...eyeArm);
+
+  let jointX = firstJoint, jointY = 0;
+  const pitch = tileWidth + gap;
+  for (const [index, character] of characters.entries()) {
+    const angle = turn * (index + 1);
+    const cos = Math.cos(angle), sin = Math.sin(angle);
+    const transform = rings => rings.map(ring => ring.map(({ X, Y }) => ({
+      X: Math.round(jointX * units + (X + gap * units / 2) * cos - Y * sin),
+      Y: Math.round(jointY * units + (X + gap * units / 2) * sin + Y * cos),
+    })));
+    const face = [transform([tile])];
+    baseFaces.push(...face);
+    addMesh(face, stripeHeight, baseMm, baseColor, 'Letter block ' + (index + 1));
+    if (stripeHeight) addMesh(face, 0, stripeHeight, accentColor, 'Letter block accent ' + (index + 1));
+
+    const upperArm = arm(0.9, -gap / 2);
+    addMesh(upperArm.map(transform), 1.7, 2.85, baseColor, 'Upper hinge ' + (index + 1));
+    addMesh([transform([circle(-gap * units / 2, 0, units)])], 0.25, 1.7, baseColor, 'Hinge pin ' + (index + 1));
+    baseFaces.push(...upperArm.map(transform));
+    if (index + 1 < characters.length) {
+      const lowerArm = arm(tileWidth - 0.9, tileWidth + gap / 2, true).map(transform);
+      addMesh(lowerArm, 0.25, 1.4, baseColor, 'Lower hinge ' + (index + 1));
+      baseFaces.push(...lowerArm);
+    }
+
+    const outlines = flatten(font.getPath(character, 0, 0, 100).commands);
+    const points = outlines.flat();
+    if (!points.length) throw new Error('找不到可列印的字形。');
+    const xs = points.map(([x]) => x), ys = points.map(([, y]) => y);
+    const left = Math.min(...xs), right = Math.max(...xs);
+    const bottom = Math.min(...ys), top = Math.max(...ys);
+    const scale = Math.min((tileWidth - 2) / (right - left), (tileHeight - 4) / (top - bottom));
+    const letters = polygons(outlines.map(ring => ring.map(([x, y]) => ({
+      X: Math.round(((x - (left + right) / 2) * scale + tileWidth / 2) * units),
+      Y: Math.round((y - (bottom + top) / 2) * scale * units),
+    })))).map(transform);
+    letterFaces.push(...letters);
+    addMesh(letters, baseMm, baseMm + letteringMm, textColor, 'Raised letter ' + (index + 1));
+
+    jointX += pitch * cos;
+    jointY += pitch * sin;
+  }
+
+  const silhouettes = polygons(baseFaces.flat());
+  const boundary = silhouettes.flat(2);
+  const left = Math.min(...boundary.map(point => point.X)) / units;
+  const right = Math.max(...boundary.map(point => point.X)) / units;
+  const bottom = Math.min(...boundary.map(point => point.Y)) / units;
+  const top = Math.max(...boundary.map(point => point.Y)) / units;
+  return {
+    meshes,
+    preview: { base: pathData(silhouettes), lettering: pathData(letterFaces),
+      viewBox: [left - 2, -top - 2, right - left + 4, top - bottom + 4] },
+    dimensions: [eyeWidth + characters.length * pitch, Math.max(eyeWidth, tileHeight), baseMm + letteringMm],
+  };
+}
+
 export function generateKeyring(font, name, spec) {
   for (const extraRim of [0, 0.3, 0.6]) {
     try {
@@ -221,6 +326,7 @@ function buildKeyring(font, name, spec) {
   for (const character of text) {
     if (character !== ' ' && !font.charToGlyphIndex(character)) throw new Error('有字元不在此款支援的字型中。');
   }
+  if (spec.shape === 'articulated') return buildArticulatedKeyring(font, text, spec);
   const outlines = flatten(font.getPath(text, 0, 0, 100, { kerning: true }).commands);
   const points = outlines.flat();
   if (!points.length) throw new Error('找不到可列印的字形。');

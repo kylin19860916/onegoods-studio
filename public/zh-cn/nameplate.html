@@ -7,8 +7,8 @@
   <title>客制名牌 — One Goods Studio</title>
   <meta name="description" content="选一款造型和尺寸，为你的名字配上喜欢的颜色。">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=a2e8699d12bd">
-  <script src="../locale.js?v=a2e8699d12bd" defer></script><script src="../nameplate.js?v=a2e8699d12bd" defer></script>
+  <link rel="stylesheet" href="../style.css?v=68b020c76e02">
+  <script src="../locale.js?v=68b020c76e02" defer></script><script src="../nameplate.js?v=68b020c76e02" defer></script>
 <link rel="canonical" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首页"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主导航"><a href="index.html">首页</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客制</a><a href="about.html">关于 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切换语言，当前：简体中文">简<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans" aria-current="true">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主导航"><a href="index.html">首页</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客制</a><a href="about.html">关于 OGS</a></nav>
@@ -46,7 +46,7 @@
       </div>
       <div class="keyring-preview-meta">
       <p class="plate-view-hint" id="plate-view-hint" hidden>拖动旋转 · 捏合缩放</p>
-      <p id="plate-preview-status" role="status" data-loading="正在生成轮廓…" data-error="这组文字无法生成完整底板，请缩短姓名或换一种造型。" data-unsupported="所选字体不支持这些文字，请更换字体或姓名。"></p>
+      <p id="plate-preview-status" role="status" data-loading="正在生成轮廓…" data-error="这组文字无法生成完整底板，请缩短姓名或换一种造型。" data-unsupported="所选字体不支持这些文字，请更换字体或姓名。" data-articulated-length="当前尺寸放不下这些字块，请缩短姓名或选择更大的尺寸。"></p>
       <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="模型尺寸"></p>
       <figcaption>画面为设计示意，实际成品颜色与尺寸依制作确认为准。</figcaption>
       </div>
@@ -107,6 +107,9 @@
           <label><input type="radio" name="shape" value="flower">
             <img class="keyring-template" src="../assets/keyring/flower.svg" alt=""><span>花朵</span>
           </label>
+          <label><input type="radio" name="shape" value="articulated">
+            <img class="keyring-template" src="../assets/keyring/articulated.svg" alt=""><span>关节字块</span>
+          </label>
         </fieldset>
         <fieldset class="keyring-sizes">
           <legend>尺寸规格</legend>
@@ -115,6 +118,11 @@
           <label><input type="radio" name="size" value="large"><strong>大型</strong><small>80 × 33.2 mm</small></label>
         </fieldset>
         <p class="nameplate-order-note">以上为长宽上限。随字轮廓的实际尺寸会依字形调整。</p>
+        <div class="keyring-articulation" id="keyring-articulation" hidden>
+          <p class="nameplate-order-note">每个字一块。小型最多 4 字，中型 6 字，大型 8 字，空格不计。</p>
+          <label for="keyring-bend">试弯字块</label>
+          <input id="keyring-bend" name="bend" type="range" min="-100" max="100" value="35">
+        </div>
       </section>
       <section class="keyring-step" id="keyring-colors" hidden>
         <h2 tabindex="-1">选颜色</h2>
@@ -158,7 +166,7 @@
       <div class="keyring-preview-meta">
         <p class="plate-view-hint" id="clicker-hint" data-keys="拖动旋转 · 捏合缩放 · 点按键帽" data-name="拖动旋转 · 捏合缩放 · 点按姓名面板">拖动旋转 · 捏合缩放 · 点按键帽</p>
         <p class="keyring-dimensions" id="clicker-dimensions" data-label="模型尺寸"></p>
-        <p id="clicker-status" role="status" data-unsupported="所选字体不支持这些文字，请更换字体或姓名。" data-error="3D 预览载入失败，请再试一次。" data-no-webgl="目前浏览器无法显示 3D，请使用支持 WebGL 的浏览器。"></p>
+        <p id="clicker-status" role="status" data-unsupported="所选字体不支持这些文字，请更换字体或姓名。" data-articulated-length="当前尺寸放不下这些字块，请缩短姓名或选择更大的尺寸。" data-error="3D 预览载入失败，请再试一次。" data-no-webgl="目前浏览器无法显示 3D，请使用支持 WebGL 的浏览器。"></p>
         <figcaption>画面为设计示意，实际成品颜色与尺寸依制作确认为准。</figcaption>
       </div>
     </figure>

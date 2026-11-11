@@ -7,8 +7,8 @@
   <title>Custom nameplate — One Goods Studio</title>
   <meta name="description" content="Pick a shape and size, then colour your name keyring.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=a2e8699d12bd">
-  <script src="../locale.js?v=a2e8699d12bd" defer></script><script src="../nameplate.js?v=a2e8699d12bd" defer></script>
+  <link rel="stylesheet" href="../style.css?v=68b020c76e02">
+  <script src="../locale.js?v=68b020c76e02" defer></script><script src="../nameplate.js?v=68b020c76e02" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav>
@@ -46,7 +46,7 @@
       </div>
       <div class="keyring-preview-meta">
       <p class="plate-view-hint" id="plate-view-hint" hidden>Drag to rotate · Pinch to zoom</p>
-      <p id="plate-preview-status" role="status" data-loading="Generating outlines…" data-error="This text cannot form a complete base. Try a shorter name or a different shape." data-unsupported="This font does not support these characters. Choose another font or name."></p>
+      <p id="plate-preview-status" role="status" data-loading="Generating outlines…" data-error="This text cannot form a complete base. Try a shorter name or a different shape." data-unsupported="This font does not support these characters. Choose another font or name." data-articulated-length="These letters do not fit this size. Shorten the name or choose a larger size."></p>
       <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="Model dimensions"></p>
       <figcaption>Design preview. Final colours and dimensions depend on production specifications.</figcaption>
       </div>
@@ -107,6 +107,9 @@
           <label><input type="radio" name="shape" value="flower">
             <img class="keyring-template" src="../assets/keyring/flower.svg" alt=""><span>Flower</span>
           </label>
+          <label><input type="radio" name="shape" value="articulated">
+            <img class="keyring-template" src="../assets/keyring/articulated.svg" alt=""><span>Articulated letters</span>
+          </label>
         </fieldset>
         <fieldset class="keyring-sizes">
           <legend>Size</legend>
@@ -115,6 +118,11 @@
           <label><input type="radio" name="size" value="large"><strong>Large</strong><small>80 × 33.2 mm</small></label>
         </fieldset>
         <p class="nameplate-order-note">These are maximum dimensions. The contour shape adapts to the lettering.</p>
+        <div class="keyring-articulation" id="keyring-articulation" hidden>
+          <p class="nameplate-order-note">One block per character. Small fits 4, medium 6, and large 8. Spaces do not count.</p>
+          <label for="keyring-bend">Bend the letters</label>
+          <input id="keyring-bend" name="bend" type="range" min="-100" max="100" value="35">
+        </div>
       </section>
       <section class="keyring-step" id="keyring-colors" hidden>
         <h2 tabindex="-1">Choose colours</h2>
@@ -158,7 +166,7 @@
       <div class="keyring-preview-meta">
         <p class="plate-view-hint" id="clicker-hint" data-keys="Drag to rotate · Pinch to zoom · Tap a keycap" data-name="Drag to rotate · Pinch to zoom · Tap nameplate">Drag to rotate · Pinch to zoom · Tap a keycap</p>
         <p class="keyring-dimensions" id="clicker-dimensions" data-label="Model dimensions"></p>
-        <p id="clicker-status" role="status" data-unsupported="This font does not support these characters. Choose another font or name." data-error="Could not load the 3D preview. Please try again." data-no-webgl="This browser cannot show the 3D preview. Please use a WebGL-capable browser."></p>
+        <p id="clicker-status" role="status" data-unsupported="This font does not support these characters. Choose another font or name." data-articulated-length="These letters do not fit this size. Shorten the name or choose a larger size." data-error="Could not load the 3D preview. Please try again." data-no-webgl="This browser cannot show the 3D preview. Please use a WebGL-capable browser."></p>
         <figcaption>Design preview. Final colours and dimensions depend on production specifications.</figcaption>
       </div>
     </figure>
