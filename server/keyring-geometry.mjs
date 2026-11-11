@@ -73,6 +73,7 @@ export function nameClickerContours(font, text) {
   const glyphs = text ? font.getPaths(text, 0, 0, 100, { kerning: true }).map(path => flatten(path.commands)) : [];
   const points = glyphs.flat(2);
   let letters = [];
+  let dividerXs = [];
   function offsetPaths(paths, distance, end = EndType.etClosedPolygon) {
     if (!paths.length) return [];
     const offset = new ClipperOffset(2, 35);
@@ -87,6 +88,22 @@ export function nameClickerContours(font, text) {
     const minX = Math.min(...xs), maxX = Math.max(...xs);
     const minY = Math.min(...ys), maxY = Math.max(...ys);
     const scale = Math.min(88 / (maxX - minX), 21 / (maxY - minY));
+    const centerX = (minX + maxX) / 2;
+    const characters = [...text.normalize('NFC')];
+    const visible = characters.flatMap((character, index) => /\s/u.test(character) ? [] : [index]);
+    // Use the neighboring rendered glyph edges. If the font combines glyphs,
+    // preserve one divider per input boundary using the character advances.
+    const bounds = visible.map(index => {
+      const xs = glyphs[index]?.flat().map(([x]) => x) ?? [];
+      return xs.length ? [Math.min(...xs), Math.max(...xs)] : null;
+    });
+    const edgesMatch = characters.length === glyphs.length && bounds.every(Boolean);
+    const advance = index => font.getAdvanceWidth(characters.slice(0, index).join(''), 100, { kerning: true });
+    dividerXs = visible.slice(1).map((index, gap) => {
+      const x = edgesMatch ? (bounds[gap][1] + bounds[gap + 1][0]) / 2
+        : minX + (maxX - minX) * (advance(visible[gap] + 1) + advance(index)) / (2 * advance(characters.length));
+      return (x - centerX) * scale;
+    });
     const holeAreas = shapes => shapes.flatMap(([, ...holes]) => holes.map(hole => Math.abs(Clipper.Area(hole)))).sort((a, b) => a - b);
     letters = glyphs.flatMap(glyph => {
       const original = polygons(glyph.map(ring => ring.map(([x, y]) => ({
@@ -120,6 +137,7 @@ export function nameClickerContours(font, text) {
   const toMm = ring => ring.map(({ X, Y }) => [X / units, Y / units]);
   return {
     lettering: letters.map(rings => rings.map(toMm)),
+    dividerXs,
     profile(margin) {
       const rings = polygons(offsetPaths(contour, margin));
       if (rings.length !== 1) throw new Error('Name clicker contour is disconnected');

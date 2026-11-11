@@ -2,7 +2,7 @@ import createManifold, { type CrossSection, type Manifold, type ManifoldToplevel
 import wasm from 'manifold-3d/manifold.wasm?module';
 import { nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
 import { keyringFonts } from '../src/keyring-font-picker.js';
-import { MX_CAP_SOCKET, MX_CASE, MX_RECESS, mxStack } from '../src/cherry-mx-spec.js';
+import { MX_BASE_DIVIDER, MX_CAP_SOCKET, MX_CASE, MX_RECESS, mxStack } from '../src/cherry-mx-spec.js';
 import { HttpError } from './catalog';
 import p2sTrialProfile from './clicker-p2s-profile.json';
 
@@ -76,9 +76,18 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const earX = leftX - 2.6;
     const ear = own(roundedBox(12, 13, 3.8).translate([earX, leftY]));
     const hole = own(own(Section.circle(MX_RECESS.earHoleDiameter / 2, 64)).translate([earX - 1.2, leftY]));
+    const underPlate = section([contours.profile(1.6)]);
+    const dividerSpan = 2 * Math.max(...shellPoints.map(([, y]) => Math.abs(y)));
+    const dividerStrips = contours.dividerXs.map((x: number) =>
+      own(box(MX_BASE_DIVIDER.thickness, dividerSpan).translate([x, 0])));
+    const dividers = dividerStrips.length ? cut(
+      own(Section.intersection(underPlate, own(Section.union(dividerStrips)))),
+      box(MX_BASE_DIVIDER.switchClearance, MX_BASE_DIVIDER.switchClearance),
+    ) : null;
     const caseWithEar = join([
       slab(shell, 0, MX_CASE.floor),
-      slab(cut(shell, section([contours.profile(1.6)])), MX_CASE.floor, stack.plateBottom),
+      slab(cut(shell, underPlate), MX_CASE.floor, stack.plateBottom),
+      ...(dividers && !dividers.isEmpty() ? [slab(dividers, MX_CASE.floor, stack.plateBottom)] : []),
       slab(cut(shell, roundedBox(MX_CASE.opening, MX_CASE.opening, 0.3)), stack.plateBottom, stack.mountTop),
       slab(cut(shell, section([contours.profile(faceMargin + MX_RECESS.sideClearance)])), stack.mountTop, stack.skirtBottom + 1.25),
       slab(ear, 3.7, 3.7 + MX_RECESS.earThickness),
