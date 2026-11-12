@@ -34,6 +34,26 @@ def request(path, method='GET', body=None, client=owner, origin=base):
     except urllib.error.HTTPError as error:
         return error.code, error.read()
 
+SUPPORT_PRESET = {
+    'enable_support': '1',
+    'support_type': 'normal(auto)',
+    'support_style': 'grid',
+    'support_threshold_angle': '25',
+    'support_on_build_plate_only': '1',
+    'support_remove_small_overhang': '1',
+    'support_top_z_distance': '0.16',
+    'support_bottom_z_distance': '0.16',
+    'support_base_pattern': 'default',
+    'support_base_pattern_spacing': '2.5',
+    'support_angle': '0',
+    'support_interface_top_layers': '2',
+    'support_interface_bottom_layers': '5',
+    'support_interface_pattern': 'rectilinear_interlaced',
+    'support_interface_spacing': '0.35',
+    'support_expansion': '0',
+    'support_object_xy_distance': '0.35',
+}
+
 def mesh_section(model, namespace, name, z):
     mesh = model.find(f'.//m:object[@name="{name}"]/m:mesh', namespace)
     vertices = [tuple(float(v.attrib[axis]) for axis in 'xyz') for v in mesh.findall('m:vertices/m:vertex', namespace)]
@@ -161,7 +181,7 @@ for text, tier, amount, other_tier, other_amount in [
         cap_blocker = mesh_section(model, namespace, 'Exclude supports inside MX cap cross socket', 1.8)
         for x, y in ((0, 0), (2.1, 0.7), (-2.1, 0.7), (0.7, 2.1), (0.7, -2.1)):
             assert cap_blocker(x, 39 + mount_y + y)
-        for x, y in ((1.5, 1.5), (2.8, 0), (0, -2.8)):
+        for x, y in ((4.0, 4.0), (5.1, 0), (0, -5.1)):
             assert not cap_blocker(x, 39 + mount_y + y)
 
         if text == 'Max':
@@ -174,6 +194,7 @@ for text, tier, amount, other_tier, other_amount in [
                 assert not inset(x, 47) and not shell(x, 10)
                 assert inset(x, 39)
         settings = json.loads(project.read('Metadata/project_settings.config'))
+        assert {key: settings[key] for key in SUPPORT_PRESET} == SUPPORT_PRESET
         assert settings['filament_colour'] == ['#F2C879', '#EFB39E', '#FFFCF5']
         models = ET.fromstring(project.read('Metadata/model_settings.config'))
         assert len(models.findall('.//part[@subtype="support_blocker"]')) == 2

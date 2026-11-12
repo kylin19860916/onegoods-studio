@@ -112,8 +112,9 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const insetTop = stack.capTop + insetHeight;
     // Lay the case and the moving assembly separately on the print plate.
     const printOffset: [number, number, number] = [0, 39, -Math.min(socketStart, stack.skirtBottom)];
-    // Keep supports under the cap while excluding them from the female cross.
-    const crossClearance = atMount(own(cross.offset(0.15, 'Round', 2, 24)));
+    // Grid support can spill across the opening on its first layers. Give
+    // the socket a 5 mm exclusion radius without removing support elsewhere.
+    const crossClearance = atMount(own(Section.circle(5, 64)));
     const crossSupportBlocker = own(slab(crossClearance, -printOffset[2], stack.roofBottom + 0.15).translate(printOffset));
     const parts: Array<{ name: string; filament: number; color: string; solid: Manifold; subtype?: 'support_blocker' }> = [
       { name: 'Case', filament: 1, color: design.colors.border, solid: base },
