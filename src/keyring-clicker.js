@@ -29,12 +29,34 @@ export function setupClicker() {
   const controls = labels.querySelector('.clicker-inline-controls');
   const status = document.querySelector('#clicker-status');
   const viewer = createClickerViewer(document.querySelector('#clicker-canvas'), document.querySelector('#clicker-view'), document.querySelector('#clicker-reset'), document.querySelector('#clicker-inspect'));
+  form.addEventListener('toggle', event => {
+    const picker = event.target;
+    if (!picker.open || !picker.matches('.keyring-font-picker, [data-compact-colour]')) return;
+    for (const other of form.querySelectorAll('.keyring-font-picker[open], [data-compact-colour][open]')) {
+      if (other !== picker) other.open = false;
+    }
+  }, true);
   function setupColour(select, initial) {
     const field = select.parentElement;
-    const current = field.closest('details').querySelector('[data-clicker-current]');
+    const picker = field.closest('details');
+    const current = picker.querySelector('[data-clicker-current]');
     select.append(swatches.content.cloneNode(true));
     select.value = initial;
     expandChoices(select, { colours: true });
+    if (picker.hasAttribute('data-compact-colour')) {
+      const summary = picker.querySelector('summary');
+      const close = () => { picker.open = false; };
+      field.addEventListener('change', () => { close(); summary.focus(); });
+      picker.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && picker.open) { close(); summary.focus(); }
+      });
+      picker.addEventListener('focusout', event => {
+        if (event.relatedTarget && !picker.contains(event.relatedTarget)) close();
+      });
+      document.addEventListener('pointerdown', event => {
+        if (picker.open && !picker.contains(event.target)) close();
+      });
+    }
 
     const selected = () => field.querySelector('input:checked');
     return {
@@ -54,7 +76,6 @@ export function setupClicker() {
   const perKeySettings = document.querySelector('#clicker-per-key-settings');
   const nameSettings = document.querySelector('#clicker-name-settings');
   const hint = document.querySelector('#clicker-hint');
-  const styleNote = document.querySelector('#clicker-style-note');
   const textLimit = document.querySelector('#clicker-name-limit-error');
   const nameFont = document.querySelector('#plate-style').cloneNode(true);
   nameFont.id = 'clicker-name-font';
@@ -130,7 +151,6 @@ export function setupClicker() {
     const currentVersion = ++version;
     const style = clickerStyle.value;
     const wholeName = style === 'name';
-    styleNote.textContent = styleNote.dataset[style];
     perKeySettings.hidden = wholeName;
     nameSettings.hidden = !wholeName;
     hint.textContent = wholeName ? hint.dataset.name : hint.dataset.keys;

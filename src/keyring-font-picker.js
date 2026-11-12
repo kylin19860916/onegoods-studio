@@ -9,7 +9,7 @@ export const keyringFonts = {
   lilita: 'lilita.woff', chewy: 'chewy.woff', yellowtail: 'yellowtail.woff', blackops: 'blackops.woff',
 };
 
-export function setupFontPicker(select, { triggerText } = {}) {
+export function setupFontPicker(select) {
   const picker = document.createElement('details');
   picker.className = 'keyring-font-picker';
   const summary = document.createElement('summary');
@@ -24,17 +24,12 @@ export function setupFontPicker(select, { triggerText } = {}) {
     const element = document.createElement('span');
     element.className = 'keyring-font-sample';
     element.style.fontFamily = '"OGS Preview ' + option.value + '"';
-    element.textContent = option.dataset.sample || '玩好物';
+    element.textContent = option.textContent.trim();
     return element;
   }
   function update() {
     const option = select.selectedOptions[0];
-    if (triggerText) {
-      selected.textContent = triggerText;
-      summary.title = option.textContent;
-    } else {
-      selected.replaceChildren(sample(option));
-    }
+    selected.replaceChildren(sample(option));
     radios.forEach(input => { input.checked = input.value === select.value; });
   }
   for (const group of select.querySelectorAll('optgroup')) {
@@ -78,7 +73,8 @@ export function setupFontPicker(select, { triggerText } = {}) {
   const caption = select.parentElement.querySelector('label');
   caption.removeAttribute('for');
   caption.id = select.id + '-label';
-  summary.setAttribute('aria-labelledby', caption.id);
+  selected.id = select.id + '-selected-font';
+  summary.setAttribute('aria-labelledby', caption.id + ' ' + selected.id);
   select.hidden = true;
   select.after(picker);
   update();

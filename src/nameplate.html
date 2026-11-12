@@ -67,13 +67,13 @@
         <div class="nameplate-field">
           <label for="plate-style">字形风格</label>
           <select id="plate-style" name="style">
-            <optgroup label="中文字型"><option value="huninn">粉圆 · 中英文</option>
-            <option value="sans-tc">繁体黑体 · Sans Serif</option>
-            <option value="serif-tc">繁体宋体 · Serif</option>
-            <option value="sans-sc">简体黑体 · Sans Serif</option>
-            <option value="serif-sc">简体宋体 · Serif</option>
-            <option value="wenkai">霞鹜文楷 · 繁体</option>
-            <option value="kuaile">站酷快乐 · 简体</option></optgroup>
+            <optgroup label="中文字型"><option value="huninn">粉圓</option>
+            <option value="sans-tc">繁体黑体</option>
+            <option value="serif-tc">繁体宋体</option>
+            <option value="sans-sc">简体黑体</option>
+            <option value="serif-sc">简体宋体</option>
+            <option value="wenkai">霞鹜文楷</option>
+            <option value="kuaile">站酷快乐</option></optgroup>
             <optgroup label="英文字型">
               <option value="lucky" data-sample="One Goods">Luckiest Guy</option>
               <option value="nunito" data-sample="One Goods">Nunito Black</option>
@@ -168,15 +168,13 @@
           <label><input type="radio" name="clickerStyle" value="basic" checked> 独立字键款</label>
           <label><input type="radio" name="clickerStyle" value="name"> 连字按压款</label>
         </fieldset>
-        <p class="nameplate-order-note clicker-style-note" id="clicker-style-note" data-mechanical="键盘造型，每颗键独立按压。" data-basic="一个字一颗圆角键，嵌在底座里，各自下压。" data-name="整组姓名做成一片，三色分层，一起下压。">一个字一颗圆角键，嵌在底座里，各自下压。</p>
         <div class="clicker-style-settings" id="clicker-per-key-settings">
           <fieldset class="clicker-key-editor">
             <legend>按键与文字</legend>
-            <p class="nameplate-order-note">点选键帽即可输入，下面可调整该键的字型和颜色。每格限一个字。</p>
             <div id="clicker-labels" class="clicker-labels" data-key-label="按键">
               <template id="clicker-label-template">
                 <label class="nameplate-field clicker-letter-slot">
-                  <input class="clicker-slot-key" placeholder="字" autocomplete="off" autocapitalize="off" spellcheck="false">
+                  <input class="clicker-slot-key" placeholder="_" autocomplete="off" autocapitalize="off" spellcheck="false">
                   <span class="clicker-slot-number" aria-hidden="true"></span>
                 </label>
               </template>
@@ -191,14 +189,16 @@
               <section class="clicker-key-settings" hidden>
                 <h3 data-key-settings-title data-label="设置按键"></h3>
                 <div class="nameplate-field" data-key-font-field><label>字型</label></div>
-                <details class="keyring-colour-section">
-                  <summary><span>键帽颜色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
-                  <div class="nameplate-field"><label>键帽颜色</label><select data-key-cap></select></div>
-                </details>
-                <details class="keyring-colour-section">
-                  <summary><span>文字颜色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
-                  <div class="nameplate-field"><label>文字颜色</label><select data-key-ink></select></div>
-                </details>
+                <div class="clicker-key-colours">
+                  <details class="clicker-colour-picker" data-compact-colour>
+                    <summary><span>键帽颜色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
+                    <div class="nameplate-field clicker-colour-menu"><label>键帽颜色</label><select data-key-cap></select></div>
+                  </details>
+                  <details class="clicker-colour-picker" data-compact-colour>
+                    <summary><span>文字颜色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
+                    <div class="nameplate-field clicker-colour-menu"><label>文字颜色</label><select data-key-ink></select></div>
+                  </details>
+                </div>
               </section>
             </template>
           </div>
@@ -219,14 +219,16 @@
           <div class="nameplate-field" id="clicker-name-font-field"><label for="clicker-name-font">整组字型</label></div>
           <section class="clicker-colors" aria-labelledby="clicker-name-colors-heading">
             <h3 id="clicker-name-colors-heading">配色</h3>
-            <details class="keyring-colour-section" open>
-              <summary><span>文字颜色</span><span class="clicker-colour-current" data-clicker-current="nameInk"><i aria-hidden="true"></i><span></span></span></summary>
-              <div class="nameplate-field"><label for="clicker-name-ink">文字颜色</label><select id="clicker-name-ink" name="nameInk"></select></div>
-            </details>
-            <details class="keyring-colour-section" open>
-              <summary><span>内底颜色</span><span class="clicker-colour-current" data-clicker-current="nameFill"><i aria-hidden="true"></i><span></span></span></summary>
-              <div class="nameplate-field"><label for="clicker-name-fill">内底颜色</label><select id="clicker-name-fill" name="nameFill"></select></div>
-            </details>
+            <div class="clicker-key-colours">
+              <details class="clicker-colour-picker" data-compact-colour>
+                <summary><span>文字颜色</span><span class="clicker-colour-current" data-clicker-current="nameInk"><i aria-hidden="true"></i><span></span></span></summary>
+                <div class="nameplate-field clicker-colour-menu"><label for="clicker-name-ink">文字颜色</label><select id="clicker-name-ink" name="nameInk"></select></div>
+              </details>
+              <details class="clicker-colour-picker" data-compact-colour>
+                <summary><span>内底颜色</span><span class="clicker-colour-current" data-clicker-current="nameFill"><i aria-hidden="true"></i><span></span></span></summary>
+                <div class="nameplate-field clicker-colour-menu"><label for="clicker-name-fill">内底颜色</label><select id="clicker-name-fill" name="nameFill"></select></div>
+              </details>
+            </div>
             <details class="keyring-colour-section" open>
               <summary><span>外框颜色</span><span class="clicker-colour-current" data-clicker-current="nameBorder"><i aria-hidden="true"></i><span></span></span></summary>
               <div class="nameplate-field"><label for="clicker-name-border">外框颜色</label><select id="clicker-name-border" name="nameBorder"></select></div>
@@ -248,7 +250,6 @@
             <p role="status" class="nameplate-order-note"></p>
           </section>
         </div>
-        <p class="nameplate-order-note">按压款为互动示意，实际轴体与键帽结构待试印确认。</p>
       </div>
     </form>
   </div>

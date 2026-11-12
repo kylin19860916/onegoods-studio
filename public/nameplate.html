@@ -7,8 +7,8 @@
   <title>客製名牌 — One Goods Studio</title>
   <meta name="description" content="選一款造型和尺寸，為你的名字配上喜歡的顏色。">
   <link rel="icon" href="assets/icon.png">
-  <link rel="stylesheet" href="style.css?v=a88f1ce94c16">
-  <script src="locale.js?v=a88f1ce94c16" defer></script><script src="nameplate.js?v=a88f1ce94c16" defer></script>
+  <link rel="stylesheet" href="style.css?v=107211b54e6d">
+  <script src="locale.js?v=107211b54e6d" defer></script><script src="nameplate.js?v=107211b54e6d" defer></script>
 <link rel="canonical" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客製</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="en/nameplate.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客製</a><a href="about.html">關於 OGS</a></nav>
@@ -67,13 +67,13 @@
         <div class="nameplate-field">
           <label for="plate-style">字形風格</label>
           <select id="plate-style" name="style">
-            <optgroup label="中文字型"><option value="huninn">粉圓 · 中英文</option>
-            <option value="sans-tc">繁體黑體 · Sans Serif</option>
-            <option value="serif-tc">繁體宋體 · Serif</option>
-            <option value="sans-sc">簡體黑體 · Sans Serif</option>
-            <option value="serif-sc">簡體宋體 · Serif</option>
-            <option value="wenkai">霞鶩文楷 · 繁體</option>
-            <option value="kuaile">站酷快樂 · 簡體</option></optgroup>
+            <optgroup label="中文字型"><option value="huninn">粉圓</option>
+            <option value="sans-tc">繁體黑體</option>
+            <option value="serif-tc">繁體宋體</option>
+            <option value="sans-sc">簡體黑體</option>
+            <option value="serif-sc">簡體宋體</option>
+            <option value="wenkai">霞鶩文楷</option>
+            <option value="kuaile">站酷快乐</option></optgroup>
             <optgroup label="英文字型">
               <option value="lucky" data-sample="One Goods">Luckiest Guy</option>
               <option value="nunito" data-sample="One Goods">Nunito Black</option>
@@ -168,15 +168,13 @@
           <label><input type="radio" name="clickerStyle" value="basic" checked> 獨立字鍵款</label>
           <label><input type="radio" name="clickerStyle" value="name"> 連字按壓款</label>
         </fieldset>
-        <p class="nameplate-order-note clicker-style-note" id="clicker-style-note" data-mechanical="鍵盤造型，每顆鍵獨立按壓。" data-basic="一個字一顆圓角鍵，嵌在底座裡，各自下壓。" data-name="整組姓名做成一片，三色分層，一起下壓。">一個字一顆圓角鍵，嵌在底座裡，各自下壓。</p>
         <div class="clicker-style-settings" id="clicker-per-key-settings">
           <fieldset class="clicker-key-editor">
             <legend>按鍵與文字</legend>
-            <p class="nameplate-order-note">點選鍵帽即可輸入，下方可調整該鍵的字型和顏色。每格限一個字。</p>
             <div id="clicker-labels" class="clicker-labels" data-key-label="按鍵">
               <template id="clicker-label-template">
                 <label class="nameplate-field clicker-letter-slot">
-                  <input class="clicker-slot-key" placeholder="字" autocomplete="off" autocapitalize="off" spellcheck="false">
+                  <input class="clicker-slot-key" placeholder="_" autocomplete="off" autocapitalize="off" spellcheck="false">
                   <span class="clicker-slot-number" aria-hidden="true"></span>
                 </label>
               </template>
@@ -191,14 +189,16 @@
               <section class="clicker-key-settings" hidden>
                 <h3 data-key-settings-title data-label="設定按鍵"></h3>
                 <div class="nameplate-field" data-key-font-field><label>字型</label></div>
-                <details class="keyring-colour-section">
-                  <summary><span>鍵帽顏色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
-                  <div class="nameplate-field"><label>鍵帽顏色</label><select data-key-cap></select></div>
-                </details>
-                <details class="keyring-colour-section">
-                  <summary><span>文字顏色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
-                  <div class="nameplate-field"><label>文字顏色</label><select data-key-ink></select></div>
-                </details>
+                <div class="clicker-key-colours">
+                  <details class="clicker-colour-picker" data-compact-colour>
+                    <summary><span>鍵帽顏色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
+                    <div class="nameplate-field clicker-colour-menu"><label>鍵帽顏色</label><select data-key-cap></select></div>
+                  </details>
+                  <details class="clicker-colour-picker" data-compact-colour>
+                    <summary><span>文字顏色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
+                    <div class="nameplate-field clicker-colour-menu"><label>文字顏色</label><select data-key-ink></select></div>
+                  </details>
+                </div>
               </section>
             </template>
           </div>
@@ -219,14 +219,16 @@
           <div class="nameplate-field" id="clicker-name-font-field"><label for="clicker-name-font">整組字型</label></div>
           <section class="clicker-colors" aria-labelledby="clicker-name-colors-heading">
             <h3 id="clicker-name-colors-heading">配色</h3>
-            <details class="keyring-colour-section" open>
-              <summary><span>文字顏色</span><span class="clicker-colour-current" data-clicker-current="nameInk"><i aria-hidden="true"></i><span></span></span></summary>
-              <div class="nameplate-field"><label for="clicker-name-ink">文字顏色</label><select id="clicker-name-ink" name="nameInk"></select></div>
-            </details>
-            <details class="keyring-colour-section" open>
-              <summary><span>內底顏色</span><span class="clicker-colour-current" data-clicker-current="nameFill"><i aria-hidden="true"></i><span></span></span></summary>
-              <div class="nameplate-field"><label for="clicker-name-fill">內底顏色</label><select id="clicker-name-fill" name="nameFill"></select></div>
-            </details>
+            <div class="clicker-key-colours">
+              <details class="clicker-colour-picker" data-compact-colour>
+                <summary><span>文字顏色</span><span class="clicker-colour-current" data-clicker-current="nameInk"><i aria-hidden="true"></i><span></span></span></summary>
+                <div class="nameplate-field clicker-colour-menu"><label for="clicker-name-ink">文字顏色</label><select id="clicker-name-ink" name="nameInk"></select></div>
+              </details>
+              <details class="clicker-colour-picker" data-compact-colour>
+                <summary><span>內底顏色</span><span class="clicker-colour-current" data-clicker-current="nameFill"><i aria-hidden="true"></i><span></span></span></summary>
+                <div class="nameplate-field clicker-colour-menu"><label for="clicker-name-fill">內底顏色</label><select id="clicker-name-fill" name="nameFill"></select></div>
+              </details>
+            </div>
             <details class="keyring-colour-section" open>
               <summary><span>外框顏色</span><span class="clicker-colour-current" data-clicker-current="nameBorder"><i aria-hidden="true"></i><span></span></span></summary>
               <div class="nameplate-field"><label for="clicker-name-border">外框顏色</label><select id="clicker-name-border" name="nameBorder"></select></div>
@@ -248,7 +250,6 @@
             <p role="status" class="nameplate-order-note"></p>
           </section>
         </div>
-        <p class="nameplate-order-note">按壓款為互動示意，實際軸體與鍵帽結構待試印確認。</p>
       </div>
     </form>
   </div>

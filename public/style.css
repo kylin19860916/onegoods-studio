@@ -186,7 +186,7 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .keyring-colour-section[open]>summary::after{content:'⌃'}
 .clicker-colour-current{display:flex;align-items:center;gap:6px;margin-inline-start:auto;font-size:12px;color:#6a6073}
 .clicker-colour-current i{display:block;width:18px;height:18px;border:1px solid #29233140;border-radius:50%}
-.keyring-colour-section .keyring-colour-options legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.keyring-colour-section .keyring-colour-options legend,.clicker-colour-menu legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .keyring-steps li{padding:0}
 .keyring-steps button{width:100%;height:100%;padding:10px;border:0;background:transparent;color:inherit;font:inherit;text-align:start;cursor:pointer;border-radius:5px}
 .keyring-steps button:focus-visible{outline:2px solid #80609e;outline-offset:3px}
@@ -200,20 +200,20 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .keyring-choice span{overflow-wrap:anywhere}
 .clicker-labels{grid-template-columns:repeat(var(--clicker-count,2),minmax(0,1fr));gap:10px}
 .keyring-font-picker{position:relative;min-width:0;border:0}
-.keyring-font-picker summary{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 14px;border:1px solid #29233155;border-radius:7px;cursor:pointer;list-style:none;background:#fffdf8}
+.keyring-font-picker summary{display:grid;grid-template-columns:1fr auto;gap:4px 8px;min-height:38px;align-items:center;padding:5px 10px;border:1px solid #29233155;border-radius:7px;cursor:pointer;list-style:none;background:#fffdf8}
 .keyring-font-picker summary::-webkit-details-marker{display:none}
-.keyring-font-picker summary::after{content:'⌄';position:static;grid-column:2;grid-row:1;align-self:center;font-size:20px}
+.keyring-font-picker summary::after{content:'⌄';position:static;grid-column:2;grid-row:1;align-self:center;font-size:16px}
 .keyring-font-picker[open]>summary::after{content:'⌃'}
-.keyring-font-sample{display:block;font-size:27px;line-height:1.5;font-weight:400;font-synthesis:none}
+.keyring-font-sample{display:block;font-size:17px;line-height:1.4;font-weight:400;font-synthesis:none}
 .keyring-font-picker summary:focus-visible{outline:2px solid #80609e;outline-offset:3px}
-.keyring-font-menu{position:absolute;top:calc(100% + 6px);inset-inline:0;z-index:3;max-height:390px;overflow:auto;overscroll-behavior:contain;padding:12px;background:var(--paper);border:1px solid #29233140;border-radius:8px;box-shadow:0 8px 24px #29233120}
-.keyring-font-menu fieldset{display:grid;grid-template-columns:minmax(0,1fr);gap:7px;border:0;padding:0;margin:0 0 7px;min-width:0}
+.keyring-font-menu{position:absolute;top:calc(100% + 6px);inset-inline:0;z-index:3;max-height:300px;overflow:auto;overscroll-behavior:contain;padding:8px;background:var(--paper);border:1px solid #29233140;border-radius:8px;box-shadow:0 8px 24px #29233120}
+.keyring-font-menu fieldset{display:grid;grid-template-columns:minmax(0,1fr);gap:5px;border:0;padding:0;margin:0 0 5px;min-width:0}
 .keyring-font-menu legend{padding:0;margin-bottom:8px;font-size:13px;font-weight:700}
-.keyring-font-menu label{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px;border:1px solid #29233130;border-radius:6px;min-width:0;cursor:pointer;position:relative}
+.keyring-font-menu label{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border:1px solid #29233130;border-radius:6px;min-width:0;cursor:pointer;position:relative}
 .keyring-font-menu label:has(input:checked){background:#efe9f5;border-color:#80609e}
 .keyring-font-menu label:has(input:focus-visible){outline:2px solid #80609e;outline-offset:2px}
 .nameplate-field .keyring-font-menu input{position:absolute;opacity:0;width:1px;height:1px;min-height:0;padding:0}
-.keyring-font-menu .keyring-font-sample{font-size:clamp(18px,1.7vw,24px);white-space:nowrap}
+.keyring-font-menu .keyring-font-sample{font-size:17px;overflow-wrap:anywhere}
 .nameplate-field:has(.keyring-colour-options){container-type:inline-size}
 .keyring-colour-options{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px 6px}
 .keyring-colour-options .keyring-choice{display:flex;flex-direction:column;justify-content:start;gap:9px;padding:6px 0;border:0;border-radius:0;min-height:0;text-align:center;font-size:12px}
@@ -235,20 +235,20 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .keyring-preview-meta figcaption{font-size:11px;line-height:1.6;color:#6a6073}
 @media(max-width:760px){.keyring-preview{position:static}.keyring-preview-frame .plate-view-header{inset:14px 14px auto}}
 
-@font-face{font-family:"OGS Preview huninn";src:url("assets/fonts/keyring/huninn-preview-69028fe2ac.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview sans-tc";src:url("assets/fonts/keyring/sans-tc-preview-23c8715623.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview serif-tc";src:url("assets/fonts/keyring/serif-tc-preview-675c5815ec.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview sans-sc";src:url("assets/fonts/keyring/sans-sc-preview-33e1dabe2c.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview serif-sc";src:url("assets/fonts/keyring/serif-sc-preview-e51e7df8a5.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview wenkai";src:url("assets/fonts/keyring/wenkai-preview-d854480d6b.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview kuaile";src:url("assets/fonts/keyring/kuaile-preview-5a13798e43.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview lucky";src:url("assets/fonts/keyring/lucky-preview-e716d987f1.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview nunito";src:url("assets/fonts/keyring/nunito-preview-83c1cf846c.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview lobster";src:url("assets/fonts/keyring/lobster-preview-6d0bf5ea2a.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview lilita";src:url("assets/fonts/keyring/lilita-preview-6fb718ef9f.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview chewy";src:url("assets/fonts/keyring/chewy-preview-496a43a814.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview yellowtail";src:url("assets/fonts/keyring/yellowtail-preview-55dfa3510c.woff2") format("woff2");font-display:swap}
-@font-face{font-family:"OGS Preview blackops";src:url("assets/fonts/keyring/blackops-preview-f246249a74.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview huninn";src:url("assets/fonts/keyring/huninn-name-52120072b1.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview sans-tc";src:url("assets/fonts/keyring/sans-tc-name-bb674ad6a6.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview serif-tc";src:url("assets/fonts/keyring/serif-tc-name-a936332209.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview sans-sc";src:url("assets/fonts/keyring/sans-sc-name-cf6a2722bf.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview serif-sc";src:url("assets/fonts/keyring/serif-sc-name-41d31a8caf.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview wenkai";src:url("assets/fonts/keyring/wenkai-name-7fe84552ec.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview kuaile";src:url("assets/fonts/keyring/kuaile-name-a69136131d.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview lucky";src:url("assets/fonts/keyring/lucky-name-b3934711bd.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview nunito";src:url("assets/fonts/keyring/nunito-name-96d6a3e19b.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview lobster";src:url("assets/fonts/keyring/lobster-name-426ed224c3.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview lilita";src:url("assets/fonts/keyring/lilita-name-c65cf32db8.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview chewy";src:url("assets/fonts/keyring/chewy-name-dea9b0b9e4.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview yellowtail";src:url("assets/fonts/keyring/yellowtail-name-424e724f2a.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview blackops";src:url("assets/fonts/keyring/blackops-name-e19624c6a4.woff2") format("woff2");font-display:swap}
 
 .clicker-key-editor{border:0;padding:0;margin:0;min-width:0;position:relative}
 .clicker-key-editor>legend{font-size:14px;padding:0;margin-bottom:8px}
@@ -260,7 +260,20 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .clicker-letter-slot.active .clicker-slot-key{outline:2px solid #80609e;outline-offset:3px}
 .clicker-key-settings{display:grid;gap:12px;padding:14px;border:1px solid #29233135;border-radius:8px;background:#f7f3fa}
 .clicker-key-settings h3{font-size:16px;margin:0}
-.clicker-key-settings .keyring-colour-section:not([open])>summary{padding-bottom:0}
+.clicker-key-colours{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.clicker-colour-picker{min-width:0}
+.clicker-colour-picker>summary{display:grid;gap:3px;position:relative;min-height:49px;padding:6px 24px 6px 9px;border:1px solid #29233145;border-radius:7px;background:#fffdf8;cursor:pointer;list-style:none;font-size:12px}
+.clicker-colour-picker>summary::-webkit-details-marker{display:none}
+.clicker-colour-picker>summary::after{content:'⌄';position:absolute;inset-inline-end:9px;inset-block-start:50%;transform:translateY(-50%);font-size:15px}
+.clicker-colour-picker[open]>summary{border-color:#80609e}
+.clicker-colour-picker>summary:focus-visible{outline:2px solid #80609e;outline-offset:2px}
+.clicker-colour-picker .clicker-colour-current{margin:0;min-width:0;gap:5px;color:var(--ink);font-size:12px}
+.clicker-colour-picker .clicker-colour-current>i{flex:0 0 14px;width:14px;height:14px}
+.clicker-colour-picker .clicker-colour-current>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clicker-colour-picker .clicker-colour-menu{position:absolute;inset-inline:0;top:calc(100% + 5px);z-index:4;padding:8px;border:1px solid #29233145;border-radius:8px;background:var(--paper);box-shadow:0 8px 24px #29233120}
+.clicker-colour-menu .keyring-colour-options{grid-template-columns:repeat(3,minmax(0,1fr));gap:2px 4px}
+.clicker-colour-menu .keyring-choice{gap:4px;min-height:44px;padding:5px 2px;font-size:11px}
+.clicker-colour-menu .keyring-colour-chip{width:22px;height:22px;flex-basis:22px}
 @media(max-width:650px){
   .clicker-labels{gap:8px}
   .clicker-letter-slot{flex-basis:clamp(44px, 13vw, 68px)}
@@ -296,7 +309,6 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .clicker-style-settings{display:grid;gap:18px}
 .clicker-style-settings[hidden]{display:none}
 .clicker-style-picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0;padding:0 0 15px;border:0;border-bottom:1px solid #29233125;min-width:0}
-.clicker-style-note{margin:0}
 .clicker-style-picker legend{font-size:14px;font-weight:650;margin-bottom:9px}
 .clicker-style-picker label{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:44px;padding:7px;border:1px solid #29233138;border-radius:7px;cursor:pointer;text-align:center;font-size:14px}
 .clicker-style-picker label input{position:absolute;opacity:0;width:1px;height:1px}

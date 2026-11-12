@@ -7,8 +7,8 @@
   <title>Custom nameplate — One Goods Studio</title>
   <meta name="description" content="Pick a shape and size, then colour your name keyring.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=a88f1ce94c16">
-  <script src="../locale.js?v=a88f1ce94c16" defer></script><script src="../nameplate.js?v=a88f1ce94c16" defer></script>
+  <link rel="stylesheet" href="../style.css?v=107211b54e6d">
+  <script src="../locale.js?v=107211b54e6d" defer></script><script src="../nameplate.js?v=107211b54e6d" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav>
@@ -67,13 +67,13 @@
         <div class="nameplate-field">
           <label for="plate-style">Letter style</label>
           <select id="plate-style" name="style">
-            <optgroup label="Chinese fonts"><option value="huninn">Huninn · Chinese and English</option>
-            <option value="sans-tc">Traditional Chinese · Sans Serif</option>
-            <option value="serif-tc">Traditional Chinese · Serif</option>
-            <option value="sans-sc">Simplified Chinese · Sans Serif</option>
-            <option value="serif-sc">Simplified Chinese · Serif</option>
-            <option value="wenkai">LXGW WenKai · Traditional Chinese</option>
-            <option value="kuaile">ZCOOL KuaiLe · Simplified Chinese</option></optgroup>
+            <optgroup label="Chinese fonts"><option value="huninn">Huninn</option>
+            <option value="sans-tc">Noto Sans TC</option>
+            <option value="serif-tc">Noto Serif TC</option>
+            <option value="sans-sc">Noto Sans SC</option>
+            <option value="serif-sc">Noto Serif SC</option>
+            <option value="wenkai">LXGW WenKai</option>
+            <option value="kuaile">ZCOOL KuaiLe</option></optgroup>
             <optgroup label="English fonts">
               <option value="lucky" data-sample="One Goods">Luckiest Guy</option>
               <option value="nunito" data-sample="One Goods">Nunito Black</option>
@@ -168,15 +168,13 @@
           <label><input type="radio" name="clickerStyle" value="basic" checked> Individual letter keys</label>
           <label><input type="radio" name="clickerStyle" value="name"> Joined name clicker</label>
         </fieldset>
-        <p class="nameplate-order-note clicker-style-note" id="clicker-style-note" data-mechanical="Keyboard-shaped keys that press individually." data-basic="One rounded key per character, set into the base and pressed independently." data-name="One three-colour nameplate that presses as a single piece.">One rounded key per character, set into the base and pressed independently.</p>
         <div class="clicker-style-settings" id="clicker-per-key-settings">
           <fieldset class="clicker-key-editor">
             <legend>Keys and letters</legend>
-            <p class="nameplate-order-note">Select a keycap to type one character and set its font and colours below.</p>
             <div id="clicker-labels" class="clicker-labels" data-key-label="Key">
               <template id="clicker-label-template">
                 <label class="nameplate-field clicker-letter-slot">
-                  <input class="clicker-slot-key" placeholder="A" autocomplete="off" autocapitalize="off" spellcheck="false">
+                  <input class="clicker-slot-key" placeholder="_" autocomplete="off" autocapitalize="off" spellcheck="false">
                   <span class="clicker-slot-number" aria-hidden="true"></span>
                 </label>
               </template>
@@ -191,14 +189,16 @@
               <section class="clicker-key-settings" hidden>
                 <h3 data-key-settings-title data-label="Customize key"></h3>
                 <div class="nameplate-field" data-key-font-field><label>Font</label></div>
-                <details class="keyring-colour-section">
-                  <summary><span>Keycap colour</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
-                  <div class="nameplate-field"><label>Keycap colour</label><select data-key-cap></select></div>
-                </details>
-                <details class="keyring-colour-section">
-                  <summary><span>Text colour</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
-                  <div class="nameplate-field"><label>Text colour</label><select data-key-ink></select></div>
-                </details>
+                <div class="clicker-key-colours">
+                  <details class="clicker-colour-picker" data-compact-colour>
+                    <summary><span>Keycap colour</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
+                    <div class="nameplate-field clicker-colour-menu"><label>Keycap colour</label><select data-key-cap></select></div>
+                  </details>
+                  <details class="clicker-colour-picker" data-compact-colour>
+                    <summary><span>Text colour</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
+                    <div class="nameplate-field clicker-colour-menu"><label>Text colour</label><select data-key-ink></select></div>
+                  </details>
+                </div>
               </section>
             </template>
           </div>
@@ -219,14 +219,16 @@
           <div class="nameplate-field" id="clicker-name-font-field"><label for="clicker-name-font">Name font</label></div>
           <section class="clicker-colors" aria-labelledby="clicker-name-colors-heading">
             <h3 id="clicker-name-colors-heading">Finish</h3>
-            <details class="keyring-colour-section" open>
-              <summary><span>Text colour</span><span class="clicker-colour-current" data-clicker-current="nameInk"><i aria-hidden="true"></i><span></span></span></summary>
-              <div class="nameplate-field"><label for="clicker-name-ink">Text colour</label><select id="clicker-name-ink" name="nameInk"></select></div>
-            </details>
-            <details class="keyring-colour-section" open>
-              <summary><span>Inner colour</span><span class="clicker-colour-current" data-clicker-current="nameFill"><i aria-hidden="true"></i><span></span></span></summary>
-              <div class="nameplate-field"><label for="clicker-name-fill">Inner colour</label><select id="clicker-name-fill" name="nameFill"></select></div>
-            </details>
+            <div class="clicker-key-colours">
+              <details class="clicker-colour-picker" data-compact-colour>
+                <summary><span>Text colour</span><span class="clicker-colour-current" data-clicker-current="nameInk"><i aria-hidden="true"></i><span></span></span></summary>
+                <div class="nameplate-field clicker-colour-menu"><label for="clicker-name-ink">Text colour</label><select id="clicker-name-ink" name="nameInk"></select></div>
+              </details>
+              <details class="clicker-colour-picker" data-compact-colour>
+                <summary><span>Inner colour</span><span class="clicker-colour-current" data-clicker-current="nameFill"><i aria-hidden="true"></i><span></span></span></summary>
+                <div class="nameplate-field clicker-colour-menu"><label for="clicker-name-fill">Inner colour</label><select id="clicker-name-fill" name="nameFill"></select></div>
+              </details>
+            </div>
             <details class="keyring-colour-section" open>
               <summary><span>Border colour</span><span class="clicker-colour-current" data-clicker-current="nameBorder"><i aria-hidden="true"></i><span></span></span></summary>
               <div class="nameplate-field"><label for="clicker-name-border">Border colour</label><select id="clicker-name-border" name="nameBorder"></select></div>
@@ -248,7 +250,6 @@
             <p role="status" class="nameplate-order-note"></p>
           </section>
         </div>
-        <p class="nameplate-order-note">Interactive mock-up. Switches and keycap fit still need a print test.</p>
       </div>
     </form>
   </div>
