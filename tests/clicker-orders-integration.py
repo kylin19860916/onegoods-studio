@@ -92,6 +92,7 @@ colors = {'border': '#f2c879', 'fill': '#efb39e', 'ink': '#fffcf5'}
 results = []
 for text, tier, amount, other_tier, other_amount in [
     ('Max', 'test-a', 299, 'test-b', 399),
+    ('飛', 'test-a', 299, 'test-b', 399),
     ('玩好物', 'test-a', 299, 'test-b', 399),
     ('玩好物工作', 'test-b', 399, 'test-a', 299),
     ('Brittany', 'test-b', 399, 'test-a', 299),
@@ -147,6 +148,16 @@ for text, tier, amount, other_tier, other_amount in [
         mount_y = (min(ys) + max(ys)) / 2
         check_switch_well(model, namespace, mount_y=mount_y)
         check_cap_socket(model, namespace, mount_y=mount_y)
+        body = model.find('.//m:object[@name="Case"]', namespace)
+        points = [(float(v.attrib['x']), float(v.attrib['y'])) for v in body.findall('.//m:vertex', namespace)]
+        outer_left = min(x for x, y in points if abs(y) < 0.01)
+        hole_x = outer_left + 4.3
+        for z in (3.85, 5.0, 6.2):
+            inside = mesh_section(model, namespace, 'Case', z)
+            assert not inside(hole_x, 0)
+            assert inside(hole_x, -3.5) and inside(hole_x, 3.5)
+            assert inside(hole_x - 3.5, 0)
+
         cap_blocker = mesh_section(model, namespace, 'Exclude supports inside MX cap cross socket', 1.8)
         for x, y in ((0, 0), (2.1, 0.7), (-2.1, 0.7), (0.7, 2.1), (0.7, -2.1)):
             assert cap_blocker(x, 39 + mount_y + y)

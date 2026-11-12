@@ -3,7 +3,7 @@ import {
   Mesh, MeshStandardMaterial, OrthographicCamera, Path, Raycaster, Scene,
   Shape, ShapePath, Vector2, WebGLRenderer,
 } from 'three';
-import { MX, MX_CAP_SOCKET, MX_CASE, MX_NAME_FACE, MX_RECESS, mxStack } from './cherry-mx-spec.js';
+import { MX, MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_FACE, MX_RECESS, mxChainEyelet, mxStack } from './cherry-mx-spec.js';
 import { nameClickerOutline } from './name-clicker-outline.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -200,6 +200,14 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       return mesh;
     }
     const extrude = (shape, height) => new ExtrudeGeometry(shape, { depth: height, bevelEnabled: false, curveSegments: 16 });
+    function addChainEyelet(body, colour) {
+      const { outline, holeX } = mxChainEyelet(body.getPoints().map(({ x, y }) => [x, y]));
+      const ear = new Shape(outline.map(([x, y]) => new Vector2(x, y)));
+      const hole = new Path();
+      hole.absarc(holeX, 0, MX_CHAIN_EYELET.holeDiameter / 2, 0, 2 * Math.PI, true);
+      ear.holes.push(hole);
+      add(extrude(ear, MX_CHAIN_EYELET.thickness), colour, MX_CHAIN_EYELET.bottom);
+    }
     function cross(width, arm) {
       const shape = new Shape(), h = width / 2, a = arm / 2;
       const points = [[-a,-h],[a,-h],[a,-a],[h,-a],[h,a],[a,a],[a,h],[-a,h],[-a,a],[-h,a],[-h,-a],[-a,-a]];
@@ -267,13 +275,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       add(extrude(plate, MX_CASE.plate), caseColour, stack.plateBottom);
       add(extrude(rim, rimTop - stack.mountTop), caseColour, stack.mountTop);
 
-      const left = floor.getPoints().reduce((a, b) => b.x < a.x ? b : a);
-      const earX = left.x - 2.6;
-      const ear = rounded(12, 13, 3.8, earX);
-      const hole = new Path();
-      hole.absarc(earX - 1.2, 0, MX_RECESS.earHoleDiameter / 2, 0, 2 * Math.PI, true);
-      ear.holes.push(hole);
-      add(extrude(ear, MX_RECESS.earThickness), caseColour, 3.7).position.y = left.y;
+      addChainEyelet(floor, caseColour);
 
       const face = mountSwitch(0, 0, mountY);
       add(extrude(skirt, stack.roofBottom - stack.skirtBottom), base, stack.skirtBottom, face).userData.keyIndex = 0;
@@ -312,11 +314,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     add(extrude(plate, MX_CASE.plate), base, stack.plateBottom);
     add(extrude(rim, rimTop - stack.mountTop), base, stack.mountTop);
 
-    const ear = rounded(12, 13, 3.8, centers[0] - 14);
-    const ring = new Path();
-    ring.absarc(centers[0] - 15.2, 0, MX_RECESS.earHoleDiameter / 2, 0, Math.PI * 2, true);
-    ear.holes.push(ring);
-    add(extrude(ear, MX_RECESS.earThickness), base, 3.7);
+    addChainEyelet(body(), base);
     for (const [index, entry] of keys.entries()) {
       const { cap: keycapColour, ink: letteringColour } = entry;
       const capGroup = mountSwitch(centers[index], index);

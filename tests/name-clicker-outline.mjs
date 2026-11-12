@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { nameClickerContours, parseKeyringFont } from '../server/keyring-geometry.mjs';
 import { nameClickerOutline } from '../src/name-clicker-outline.js';
-import { MX_NAME_FACE } from '../src/cherry-mx-spec.js';
+import { MX_CHAIN_EYELET, MX_NAME_FACE, mxChainEyelet } from '../src/cherry-mx-spec.js';
 import { keyringFonts } from '../src/keyring-font-picker.js';
 
 function contains(points, x, y) {
@@ -15,11 +15,25 @@ function contains(points, x, y) {
 let checked = 0;
 for (const key of Object.keys(keyringFonts)) {
   const font = parseKeyringFont(readFileSync(new URL('../public/assets/fonts/keyring/' + keyringFonts[key], import.meta.url)));
-  for (const text of ['Max', 'III', 'WIDE', 'A B', '玩好物']) {
+  for (const text of ['Max', 'III', 'WIDE', 'A B', '玩好物', '飛']) {
     if ([...text].some(char => char !== ' ' && !font.charToGlyphIndex(char))) continue;
     const model = nameClickerContours(font, text);
     const preview = nameClickerOutline(font, text);
     assert.equal(preview.mountY, model.mountY);
+    const shell = model.profile(MX_NAME_FACE.shellMargin);
+    const eyelet = mxChainEyelet(shell);
+    assert.deepEqual(eyelet, mxChainEyelet(preview.profile(MX_NAME_FACE.shellMargin)
+      .getPoints().slice(0, -1).map(({ x, y }) => [x, y])));
+    const ys = eyelet.outline.map(([, y]) => y);
+    assert.equal(Math.max(...ys), MX_CHAIN_EYELET.width / 2);
+    assert.equal(Math.min(...ys), -MX_CHAIN_EYELET.width / 2);
+    assert(contains(eyelet.outline, eyelet.holeX, 0));
+    assert(contains(shell, eyelet.outline.at(-1)[0], 0));
+    for (let angle = 0; angle < 2 * Math.PI; angle += Math.PI / 16) {
+      const radius = MX_CHAIN_EYELET.holeDiameter / 2;
+      const x = eyelet.holeX + radius * Math.cos(angle), y = radius * Math.sin(angle);
+      assert(contains(eyelet.outline, x, y) && !contains(shell, x, y));
+    }
     for (const margin of [MX_NAME_FACE.shellMargin, MX_NAME_FACE.faceMargin, MX_NAME_FACE.insetMargin]) {
       const shape = preview.profile(margin).getPoints().map(({ x, y }) => [x, y]);
       assert.deepEqual(shape.slice(0, -1), model.profile(margin), key + ' ' + text);

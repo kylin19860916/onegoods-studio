@@ -2,7 +2,7 @@ import createManifold, { type CrossSection, type Manifold, type ManifoldToplevel
 import wasm from 'manifold-3d/manifold.wasm?module';
 import { nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
 import { keyringFonts } from '../src/keyring-font-picker.js';
-import { MX_BASE_DIVIDER, MX_CAP_SOCKET, MX_CASE, MX_NAME_FACE, MX_RECESS, MX_SWITCH_WELL, mxStack } from '../src/cherry-mx-spec.js';
+import { MX_BASE_DIVIDER, MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_FACE, MX_SWITCH_WELL, mxChainEyelet, mxStack } from '../src/cherry-mx-spec.js';
 import { HttpError } from './catalog';
 import p2sTrialProfile from './clicker-p2s-profile.json';
 
@@ -72,10 +72,10 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     if (glyphs.isEmpty() || cut(glyphs, inner).area() > 0.05) {
       throw new HttpError(400, '字形超出可製作範圍，請縮短文字或換一種字型。');
     }
-    const [leftX, leftY] = shellPoints.reduce((left, point) => point[0] < left[0] ? point : left);
-    const earX = leftX - 2.6;
-    const ear = own(roundedBox(12, 13, 3.8).translate([earX, leftY]));
-    const hole = own(own(Section.circle(MX_RECESS.earHoleDiameter / 2, 64)).translate([earX - 1.2, leftY]));
+    const { outline: earOutline, holeX } = mxChainEyelet(shellPoints);
+    const { holeDiameter, bottom: earBottom, thickness: earThickness } = MX_CHAIN_EYELET;
+    const ear = section([earOutline]);
+    const hole = own(own(Section.circle(holeDiameter / 2, 64)).translate([holeX, 0]));
     const underPlate = section([contours.profile(innerWallMargin)]);
     const dividerSpan = 2 * Math.max(...shellPoints.map(([, y]) => Math.abs(y)));
     const dividerStrips = contours.dividerXs.map((x: number) =>
@@ -97,9 +97,9 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
       ...(dividers && !dividers.isEmpty() ? [slab(dividers, MX_CASE.floor, stack.plateBottom)] : []),
       slab(cut(shell, opening), stack.plateBottom, stack.mountTop),
       slab(section(contours.rim.flat()), stack.mountTop, stack.skirtBottom + 1.25),
-      slab(ear, 3.7, 3.7 + MX_RECESS.earThickness),
+      slab(ear, earBottom, earBottom + earThickness),
     ]);
-    const base = own(Solid.difference(caseWithEar, slab(hole, 3.6, 3.8 + MX_RECESS.earThickness)));
+    const base = own(Solid.difference(caseWithEar, slab(hole, earBottom - 0.1, earBottom + earThickness + 0.1)));
     const { outerDiameter, crossSpan, crossArm, engagement } = MX_CAP_SOCKET;
     const socketStart = stack.stemTop - engagement;
     const boss = own(Section.circle(outerDiameter / 2, 64));
