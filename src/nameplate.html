@@ -63,6 +63,7 @@
           <label for="plate-name">姓名文字</label>
           <input id="plate-name" name="nameText" maxlength="20" placeholder="你的名字" required pattern=".*\S.*" autocomplete="off">
           <p class="nameplate-order-note" data-articulated-only hidden>单一字块规格，整串长度随字数与字形变化。</p>
+          <p class="nameplate-order-note" id="articulated-price" hidden>预估价格 <strong><output for="plate-name" data-start="NT$%s 起"></output></strong></p>
         </div>
         <div class="nameplate-field">
           <label for="plate-style">字形风格</label>

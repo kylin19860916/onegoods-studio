@@ -39,6 +39,10 @@ for (const select of form.querySelectorAll('[data-swatch]')) {
 const { nameText, style, shape, size, baseColor, textColor, useAccent, accentColor } = form.elements;
 const download = document.querySelector('#plate-download');
 const payment = document.querySelector('#plate-payment');
+const articulatedPrice = document.querySelector('#articulated-price');
+const articulatedAmount = articulatedPrice.querySelector('output');
+const articulatedFirstPrice = 80;
+const articulatedExtraPrice = 40;
 
 const fonts = keyringFonts;
 if (requestedProduct() === 'name-articulated') style.value = 'sans-tc';
@@ -95,7 +99,8 @@ async function render(version) {
     const ink = textColor.value;
     const third = useAccent.checked ? accentColor.value : undefined;
     const [widthMm, heightMm] = sizes[size.value];
-    const name = nameText.value.trim() || (articulated ? 'OGS' : nameText.placeholder);
+    const enteredName = nameText.value.trim();
+    const name = enteredName || (articulated ? 'OGS' : nameText.placeholder);
     const model = generateKeyring(font, name, {
       ...spec, widthMm, heightMm, shape: articulated ? 'articulated' : shape.value, baseColor: base, textColor: ink, accentColor: third,
     });
@@ -114,10 +119,18 @@ async function render(version) {
     const numbers = model.dimensions.map(value => Number(value.toFixed(1)));
     dimensions.textContent = dimensions.dataset.label + ' · ' + numbers.join(' × ') + ' mm';
     previewStatus.textContent = '';
-    generate.disabled = !nameText.value.trim();
+    generate.disabled = !enteredName;
+    if (articulated) {
+      const count = articulatedNameCharacters(enteredName).length;
+      articulatedAmount.value = count
+        ? 'NT$' + (articulatedFirstPrice + (count - 1) * articulatedExtraPrice)
+        : articulatedAmount.dataset.start.replace('%s', articulatedFirstPrice);
+      articulatedPrice.hidden = false;
+    }
   } catch (error) {
     if (version !== previewVersion) return;
     viewer?.setMeshes([]);
+    articulatedPrice.hidden = true;
     dimensions.textContent = '';
     preview.querySelectorAll('[data-outline]').forEach(path => path.removeAttribute('d'));
     if (error.message === '有字元不在此款支援的字型中。') previewStatus.textContent = previewStatus.dataset.unsupported;
@@ -145,6 +158,7 @@ function queuePreview() {
   exportStatus.textContent = '';
   clearTimeout(timer);
   if (tooLong) {
+    articulatedPrice.hidden = true;
     viewer?.setMeshes([]);
     dimensions.textContent = '';
     preview.querySelectorAll('[data-outline]').forEach(path => path.removeAttribute('d'));
@@ -221,6 +235,7 @@ function requestedProduct() {
 function showProduct() {
   const selected = requestedProduct();
   articulated = selected === 'name-articulated';
+  articulatedPrice.hidden = true;
   keyringPanel.hidden = selected === 'name-clicker';
   clickerPanel.hidden = !keyringPanel.hidden;
   for (const heading of headings) heading.hidden = heading.dataset.keyringIntro !== selected;

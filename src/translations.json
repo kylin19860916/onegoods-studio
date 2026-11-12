@@ -1,4 +1,6 @@
 {
+  "预估价格": ["預估價格", "Estimated price"],
+  "NT$%s 起": ["NT$%s 起", "From NT$%s"],
   "机械键盘款": ["機械鍵盤款", "Keyboard keys"],
   "独立字键款": ["獨立字鍵款", "Individual letter keys"],
   "连字按压款": ["連字按壓款", "Joined name clicker"],

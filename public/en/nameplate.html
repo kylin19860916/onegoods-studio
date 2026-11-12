@@ -7,8 +7,8 @@
   <title>Custom nameplate — One Goods Studio</title>
   <meta name="description" content="Pick a shape and size, then colour your name keyring.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=cd069bb95808">
-  <script src="../locale.js?v=cd069bb95808" defer></script><script src="../nameplate.js?v=cd069bb95808" defer></script>
+  <link rel="stylesheet" href="../style.css?v=5e8dfa736386">
+  <script src="../locale.js?v=5e8dfa736386" defer></script><script src="../nameplate.js?v=5e8dfa736386" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"></head>
 <body data-page="nameplate">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav>
@@ -63,6 +63,7 @@
           <label for="plate-name">Name text</label>
           <input id="plate-name" name="nameText" maxlength="20" placeholder="Your name" required pattern=".*\S.*" autocomplete="off">
           <p class="nameplate-order-note" data-articulated-only hidden>One standard size. Overall length varies with the number and shape of the letters.</p>
+          <p class="nameplate-order-note" id="articulated-price" hidden>Estimated price <strong><output for="plate-name" data-start="From NT$%s"></output></strong></p>
         </div>
         <div class="nameplate-field">
           <label for="plate-style">Letter style</label>
