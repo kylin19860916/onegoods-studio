@@ -505,3 +505,45 @@ html[lang="en"] .custom-hero h1 { font-size: clamp(45px, 6.3vw, 98px); }
 .clicker-order-test [role="status"]:empty { display: none; }
 
 .clicker-name-limit-error { color: #8b2636; font-size: 13px; line-height: 1.5; }
+
+/* Center the public storefront and cap the size of its feature panels. */
+body[data-page] {
+  --storefront-width: 1000px;
+  --storefront-inset: clamp(18px, 3vw, 36px);
+}
+body[data-page] > main {
+  width: min(100% - 32px, var(--storefront-width));
+  margin-inline: auto;
+}
+body[data-page] > :is(header, footer) {
+  padding-inline: max(5%, calc((100% - var(--storefront-width)) / 2));
+}
+body[data-page] :is(main.section, main > .section) {
+  padding-inline: var(--storefront-inset);
+  padding-block: clamp(36px, 5vw, 60px);
+}
+body[data-page="nameplate"] .nameplate-heading h1 {
+  font-size: clamp(30px, 4.4vw, 48px);
+  line-height: 1.15;
+}
+body[data-page="nameplate"] .nameplate-heading { margin-bottom: 22px; }
+body[data-page="nameplate"] .nameplate-workspace { gap: 18px; }
+body[data-page="nameplate"] .nameplate-form { padding: clamp(16px, 2.2vw, 22px); }
+body[data-page="home"] .hero h1 { font-size: clamp(38px, 5.4vw, 62px); }
+body[data-page="custom"] .custom-page { --custom-gutter: var(--storefront-inset); }
+.custom-hero h1,
+html[lang="en"] .custom-hero h1 { font-size: clamp(38px, 5.1vw, 59px); }
+.custom-styles, .custom-steps { padding-block: clamp(36px, 5vw, 60px); }
+.custom-page h2 { font-size: clamp(28px, 4vw, 42px); }
+
+@media (min-width: 851px) {
+  body[data-page="home"] :is(.hero, .playground),
+  .custom-hero-visual { min-height: 0; }
+  body[data-page="home"] .hero-copy,
+  .custom-hero-copy { padding-block: 42px; }
+  .custom-hero-visual { aspect-ratio: 1440 / 1100; }
+}
+@media (max-width: 650px) {
+  body[data-page] > main { width: 100%; }
+  body[data-page="nameplate"] .nameplate-workspace { gap: 16px; }
+}

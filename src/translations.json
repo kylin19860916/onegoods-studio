@@ -7,7 +7,7 @@
   "整组姓名做成一片，三色分层，一起下压。": ["整組姓名做成一片，三色分層，一起下壓。", "One three-colour nameplate that presses as a single piece."],
   "点选键帽即可输入，下面可调整该键的字型和颜色。每格限一个字。": ["點選鍵帽即可輸入，下方可調整該鍵的字型和顏色。每格限一個字。", "Select a keycap to type one character and set its font and colours below."],
   "设置按键": ["設定按鍵", "Customize key"],
-  "中文最多 5 字，英文最多 8 个字母。中英混排按比例合计，空格不计。": ["中文最多 5 字，英文最多 8 個字母。中英混排按比例合計，空格不計。", "Up to 5 Chinese characters or 8 English letters. Mixed text is counted proportionally. Spaces are excluded."],
+  "中文最多 5 字，英文最多 8 个字母。": ["中文最多 5 字，英文最多 8 個字母。", "Up to 5 Chinese characters or 8 English letters."],
   "文字超过长度上限，请缩短后再试。": ["文字超過長度上限，請縮短後再試。", "This text is too long. Shorten it to continue."],
   "请输入可列印的姓名或文字，即可查看测试金额。": ["請輸入可列印的姓名或文字，即可查看測試金額。", "Enter printable text to see the test price."],
   "测试价位 {tier} 档 · NT${amount}": ["測試價位 {tier} 檔 · NT${amount}", "Test tier {tier} · NT${amount}"],
