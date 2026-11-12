@@ -383,14 +383,14 @@ function buildArticulatedKeyring(font, name, { holeMm, baseColor, textColor, acc
 export function generateKeyring(font, name, spec) {
   for (const extraRim of [0, 0.3, 0.6]) {
     try {
-      return buildKeyring(font, name, { ...spec, rimMm: spec.rimMm + extraRim });
+      return buildKeyring(font, name, { ...spec, rimMm: spec.rimMm + extraRim }, spec.rimMm);
     } catch (error) {
       if (!(error instanceof DisconnectedBaseError) || extraRim === 0.6) throw error;
     }
   }
 }
 
-function buildKeyring(font, name, spec) {
+function buildKeyring(font, name, spec, eyeletRimMm) {
   const text = name.trim().normalize('NFC');
   if (!text || [...text].length > 20 || /[\p{C}\u2028\u2029]/u.test(text)) throw new Error('請輸入 1–20 個可印文字。');
   for (const character of text) {
@@ -406,8 +406,8 @@ function buildKeyring(font, name, spec) {
   const { widthMm, heightMm, baseMm, letteringMm, holeMm, rimMm, baseColor, textColor, accentColor, shape = 'contour' } = spec;
   const isContour = shape === 'contour';
   const motif = motifShapes.has(shape) ? motifPlate(shape, widthMm, heightMm) : null;
-  const outerRadius = holeMm / 2 + rimMm;
-  const ringExtension = 2 * outerRadius - rimMm;
+  const outerRadius = holeMm / 2 + eyeletRimMm;
+  const ringExtension = 2 * outerRadius - eyeletRimMm;
   const textLeft = 12;
   const plateTextWidth = motif ? widthMm - textLeft - motif.textRight : widthMm - 20;
   const availableWidth = isContour ? widthMm - ringExtension - 2 * rimMm : plateTextWidth;
@@ -428,10 +428,33 @@ function buildKeyring(font, name, spec) {
     const pad = [];
     offset.Execute(pad, rimMm * units);
     if (!pad.length) throw new Error('無法建立底板。');
-    const edge = pad.flat().reduce((a, b) => b.X < a.X ? b : a);
-    holeX = edge.X - (outerRadius - rimMm) * units;
-    holeY = edge.Y;
-    basePaths = polygons([...pad, circle(holeX, holeY, outerRadius * units)]).flat();
+    const points = pad.flat();
+    const left = Math.min(...points.map(point => point.X));
+    const bottom = Math.min(...points.map(point => point.Y));
+    const top = Math.max(...points.map(point => point.Y));
+    holeX = left - Math.round(holeMm / 2 * units);
+    holeY = Math.round((bottom + top) / 2);
+
+    // Attach at the leftmost intersection with the midline. A rounded neck
+    // keeps the eyelet joined even when the outline recedes at that height.
+    const crossings = pad.flatMap(path => path.flatMap((point, index) => {
+      const next = path[(index + 1) % path.length];
+      if ((point.Y > holeY) === (next.Y > holeY)) return [];
+      return [point.X + (next.X - point.X) * (holeY - point.Y) / (next.Y - point.Y)];
+    }));
+    const attachment = crossings.length
+      ? { X: Math.round(Math.min(...crossings)), Y: holeY }
+      : points.reduce((closest, point) => {
+        const distance = Math.abs(point.Y - holeY);
+        const bestDistance = Math.abs(closest.Y - holeY);
+        return distance < bestDistance || (distance === bestDistance && point.X < closest.X) ? point : closest;
+      });
+    const neck = [];
+    const join = new ClipperOffset(2, 7);
+    const neckStart = left - Math.round(eyeletRimMm * units / 2);
+    join.AddPath([{ X: neckStart, Y: holeY }, attachment], JoinType.jtRound, EndType.etOpenRound);
+    join.Execute(neck, eyeletRimMm * units);
+    basePaths = polygons([...pad, ...neck, circle(holeX, holeY, outerRadius * units)]).flat();
   } else {
     basePaths = motif?.paths ?? [roundedPlate(widthMm, heightMm, shape === 'capsule' ? heightMm / 2 : 4)];
     holeX = motif?.holeX ?? 5.8 * units;
