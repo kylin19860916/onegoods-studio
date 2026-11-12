@@ -564,3 +564,13 @@ body[data-page] main > :is(.home-custom, .page-intro, .custom-hero, .studio-valu
   box-shadow: 0 0 0 100vmax var(--section-background);
   clip-path: inset(0 -100vmax);
 }
+
+
+/* Let spacing and color separate the storefront's editorial sections. */
+body[data-page] > :is(header, .catalog-nav),
+body[data-page] main > :is(.hero, .home-custom, .page-intro, .studio-values, .faq, .closing, .custom-hero, .custom-steps),
+body[data-page] :is(.studio-hero, .custom-hero-visual, .custom-style-tabs, .custom-sample, .custom-steps li, .studio-values article,
+  .keynade-facts, .keynade-details, .keynade-notes, .clicker-style-picker, .keyring-steps, .keyring-colour-section, .nameplate-actions) {
+  border-block: 0;
+}
+body[data-page] :is(.studio-hero, .custom-hero-visual) { border-inline: 0; }
