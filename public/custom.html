@@ -7,42 +7,67 @@
   <title>客製 — One Goods Studio</title>
   <meta name="description" content="選擇想客製的款式，加入名字和配色，即時預覽你的 3D 作品。">
   <link rel="icon" href="assets/icon.png">
-  <link rel="stylesheet" href="style.css?v=a88f1ce94c16">
-  <script src="locale.js?v=a88f1ce94c16" defer></script>
+  <link rel="stylesheet" href="style.css?v=bdc38882076d">
+  <script src="locale.js?v=bdc38882076d" defer></script>
+  <script src="assets/custom-style-tabs.js" defer></script>
 <link rel="canonical" href="https://onegoods.studio/custom.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/custom.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/custom.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/custom.html"></head>
 <body data-page="custom">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客製</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="custom.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/custom.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="en/custom.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html" aria-current="page">客製</a><a href="about.html">關於 OGS</a></nav>
-<main class="section custom-page">
-  <div class="nameplate-heading">
-    <h1>選擇想客製的款式</h1>
-    <p>加入你的名字和配色，即時預覽 3D 效果。</p>
-  </div>
-  <div class="custom-grid">
-    <a class="custom-card" href="nameplate.html?style=name-tag">
-      <img src="assets/custom-keyring-preview.png" alt="" width="486" height="272">
-      <div class="custom-card-copy">
-        <h2>名牌款</h2>
-        <p>輸入名字，選字型、造型和尺寸，搭配喜歡的顏色。</p>
-        <span class="custom-card-action">客製名牌款</span>
-      </div>
-    </a>
-    <a class="custom-card" href="nameplate.html?style=name-clicker">
-      <img src="assets/custom-clicker-preview.png" alt="" width="568" height="318">
-      <div class="custom-card-copy">
-        <h2>按壓款</h2>
-        <p>為機械鍵盤款、獨立字鍵款或連字按壓款加上名字，在 3D 預覽裡試按。</p>
-        <span class="custom-card-action">客製按壓款</span>
-      </div>
-    </a>
-    <a class="custom-card" href="nameplate.html?style=name-articulated">
-      <img class="custom-articulated-image" src="assets/keyring/articulated.svg" alt="" width="480" height="270">
-      <div class="custom-card-copy">
-        <h2>關節字塊</h2>
-        <p>厚字以卡扣串接，旋轉 3D 預覽查看接頭。</p>
-        <span class="custom-card-action">客製關節字塊</span>
-      </div>
-    </a>
-  </div>
+<main class="custom-page">
+  <section class="custom-hero">
+    <div class="custom-hero-copy">
+      <h1>哇塞，<br>這是我的！</h1>
+      <p>把你的名字變成一件 3D 列印小物。掛在包上、拿在手上，顏色和字型都由你決定。</p>
+      <a class="button primary" href="#custom-styles">選一個款式</a>
+    </div>
+    <div class="custom-hero-visual">
+      <img class="custom-hero-image" src="assets/custom-studio-hero.webp" alt="紫色姓名吊牌、三色按壓小物和綠色關節字塊的樣品" width="1440" height="1100" fetchpriority="high">
+    </div>
+  </section>
+
+  <section class="custom-styles" id="custom-styles" aria-labelledby="custom-styles-title">
+    <h2 id="custom-styles-title">今天想做哪一款？</h2>
+    <div class="custom-style-tabs" hidden>
+      <button type="button" id="tab-name-tag" data-custom-panel="sample-name-tag">名牌款</button>
+      <button type="button" id="tab-name-clicker" data-custom-panel="sample-name-clicker">按压款</button>
+      <button type="button" id="tab-name-articulated" data-custom-panel="sample-name-articulated">關節字塊</button>
+    </div>
+    <div class="custom-samples">
+      <article class="custom-sample" id="sample-name-tag">
+        <img src="assets/custom-name-tag-studio.webp" alt="Mia 字樣的紫底白字姓名吊牌" width="1280" height="720" loading="lazy">
+        <div class="custom-sample-copy">
+          <h3>名牌款</h3>
+          <p>讓包包一眼就認得你。選字型、造型和尺寸，再配上你的顏色。</p>
+          <a class="button" href="nameplate.html?style=name-tag">客製名牌款</a>
+        </div>
+      </article>
+      <article class="custom-sample" id="sample-name-clicker">
+        <img src="assets/custom-name-clicker-studio.webp" alt="飛字連字按壓款的三色立體樣品" width="1280" height="720" loading="lazy">
+        <div class="custom-sample-copy">
+          <h3>按压款</h3>
+          <p>叩叩，試按一下你的名字。可選機械鍵盤款、獨立字鍵款或連字按壓款。</p>
+          <a class="button" href="nameplate.html?style=name-clicker">客製按壓款</a>
+        </div>
+      </article>
+      <article class="custom-sample" id="sample-name-articulated">
+        <img src="assets/custom-name-articulated-studio.webp" alt="LEO 字樣的綠色關節字塊，字母之間可見接頭" width="1280" height="720" loading="lazy">
+        <div class="custom-sample-copy">
+          <h3>關節字塊</h3>
+          <p>你的名字也會扭一扭。每個字塊用關節相連，轉一轉就能擺出不同角度。</p>
+          <a class="button" href="nameplate.html?style=name-articulated">客製關節字塊</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="custom-steps" aria-labelledby="custom-steps-title">
+    <h2 id="custom-steps-title">從名字開始</h2>
+    <ol>
+      <li><strong>挑款式</strong><span>選你想掛在包上或拿在手上玩的造型。</span></li>
+      <li><strong>加上名字</strong><span>輸入文字，再試試不同的字型和配色。</span></li>
+      <li><strong>轉一圈看看</strong><span>用即時 3D 預覽，從不同角度看成品造型。</span></li>
+    </ol>
+  </section>
 </main>
 <footer><div class="footer-brand">One Goods Studio<span>紓壓、有趣，自成一格。</span></div><div><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html">客製</a><a href="about.html">關於 OGS</a></div><small>© 2026 One Goods Studio</small></footer>
 </body>

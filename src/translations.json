@@ -1005,5 +1005,24 @@
   "3D 打印机与工作台上的多件打印作品实拍": [
     "3D 列印機與工作台上的多件列印作品實拍",
     "Photograph of a 3D printer and printed objects on a workbench"
-  ]
+  ],
+  "哇塞，": ["哇塞，", "Whoa,"],
+  "这是我的！": ["這是我的！", "that’s mine!"],
+  "把你的名字变成一件 3D 列印小物。挂在包上、拿在手上，颜色和字型都由你决定。": ["把你的名字變成一件 3D 列印小物。掛在包上、拿在手上，顏色和字型都由你決定。", "Turn your name into a 3D-printed keepsake to hang on your bag or keep in your hand. Pick your own colours and type."],
+  "选一个款式": ["選一個款式", "Pick a style"],
+  "紫色姓名吊牌、三色按压小物和绿色关节字块的样品": ["紫色姓名吊牌、三色按壓小物和綠色關節字塊的樣品", "Samples of a lavender name tag, a three-colour clicker and green articulated letters"],
+  "今天想做哪一款？": ["今天想做哪一款？", "What will you make today?"],
+  "Mia 字样的紫底白字姓名吊牌": ["Mia 字樣的紫底白字姓名吊牌", "Lavender Mia name tag with raised white lettering"],
+  "让包包一眼就认得你。选字型、造型和尺寸，再配上你的颜色。": ["讓包包一眼就認得你。選字型、造型和尺寸，再配上你的顏色。", "Make your bag unmistakably yours. Pick the type, shape and size, then add your colours."],
+  "飞字连字按压款的三色立体样品": ["飛字連字按壓款的三色立體樣品", "Three-colour clicker sample with the raised character 飛"],
+  "叩叩，试按一下你的名字。可选机械键盘款、独立字键款或连字按压款。": ["叩叩，試按一下你的名字。可選機械鍵盤款、獨立字鍵款或連字按壓款。", "Click, click. Try pressing your name in keyboard keys, individual letter keys or a joined name clicker."],
+  "LEO 字样的绿色关节字块，字母之间可见接头": ["LEO 字樣的綠色關節字塊，字母之間可見接頭", "Green LEO lettering with visible joints between the letters"],
+  "你的名字也会扭一扭。每个字块用关节相连，转一转就能摆出不同角度。": ["你的名字也會扭一扭。每個字塊用關節相連，轉一轉就能擺出不同角度。", "Give your name a little wiggle. Each letter is joined so you can turn it to a different angle."],
+  "从名字开始": ["從名字開始", "Start with a name"],
+  "挑款式": ["挑款式", "Pick a style"],
+  "选你想挂在包上或拿在手上玩的造型。": ["選你想掛在包上或拿在手上玩的造型。", "Choose something to hang on your bag or play with in your hand."],
+  "加上名字": ["加上名字", "Add your name"],
+  "输入文字，再试试不同的字型和配色。": ["輸入文字，再試試不同的字型和配色。", "Enter your text, then try different fonts and colours."],
+  "转一圈看看": ["轉一圈看看", "Give it a spin"],
+  "用即时 3D 预览，从不同角度看成品造型。": ["用即時 3D 預覽，從不同角度看成品造型。", "Turn the live 3D preview to see your design from different angles."]
 }

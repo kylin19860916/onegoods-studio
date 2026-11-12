@@ -7,42 +7,67 @@
   <title>Customize — One Goods Studio</title>
   <meta name="description" content="Choose a style, add your name and colours, and preview your design in 3D.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=a88f1ce94c16">
-  <script src="../locale.js?v=a88f1ce94c16" defer></script>
+  <link rel="stylesheet" href="../style.css?v=bdc38882076d">
+  <script src="../locale.js?v=bdc38882076d" defer></script>
+  <script src="../assets/custom-style-tabs.js" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/custom.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/custom.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/custom.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/custom.html"></head>
 <body data-page="custom">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../custom.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/custom.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/custom.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header><nav class="catalog-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav>
-<main class="section custom-page">
-  <div class="nameplate-heading">
-    <h1>Choose a style to customize</h1>
-    <p>Add your name and colours and see your design in 3D.</p>
-  </div>
-  <div class="custom-grid">
-    <a class="custom-card" href="nameplate.html?style=name-tag">
-      <img src="../assets/custom-keyring-preview.png" alt="" width="486" height="272">
-      <div class="custom-card-copy">
-        <h2>Name tag</h2>
-        <p>Enter a name, pick a font, shape and size, and choose your colours.</p>
-        <span class="custom-card-action">Customize a name tag</span>
-      </div>
-    </a>
-    <a class="custom-card" href="nameplate.html?style=name-clicker">
-      <img src="../assets/custom-clicker-preview.png" alt="" width="568" height="318">
-      <div class="custom-card-copy">
-        <h2>Clicker</h2>
-        <p>Add a name to keyboard keys, individual letter keys or a joined name clicker, then try pressing it in 3D.</p>
-        <span class="custom-card-action">Customize a clicker</span>
-      </div>
-    </a>
-    <a class="custom-card" href="nameplate.html?style=name-articulated">
-      <img class="custom-articulated-image" src="../assets/keyring/articulated.svg" alt="" width="480" height="270">
-      <div class="custom-card-copy">
-        <h2>Articulated letters</h2>
-        <p>Chunky letters snap together. Rotate the 3D preview to see the joints.</p>
-        <span class="custom-card-action">Customize articulated letters</span>
-      </div>
-    </a>
-  </div>
+<main class="custom-page">
+  <section class="custom-hero">
+    <div class="custom-hero-copy">
+      <h1>Whoa,<br>that’s mine!</h1>
+      <p>Turn your name into a 3D-printed keepsake to hang on your bag or keep in your hand. Pick your own colours and type.</p>
+      <a class="button primary" href="#custom-styles">Pick a style</a>
+    </div>
+    <div class="custom-hero-visual">
+      <img class="custom-hero-image" src="../assets/custom-studio-hero.webp" alt="Samples of a lavender name tag, a three-colour clicker and green articulated letters" width="1440" height="1100" fetchpriority="high">
+    </div>
+  </section>
+
+  <section class="custom-styles" id="custom-styles" aria-labelledby="custom-styles-title">
+    <h2 id="custom-styles-title">What will you make today?</h2>
+    <div class="custom-style-tabs" hidden>
+      <button type="button" id="tab-name-tag" data-custom-panel="sample-name-tag">名牌款</button>
+      <button type="button" id="tab-name-clicker" data-custom-panel="sample-name-clicker">按压款</button>
+      <button type="button" id="tab-name-articulated" data-custom-panel="sample-name-articulated">Articulated letters</button>
+    </div>
+    <div class="custom-samples">
+      <article class="custom-sample" id="sample-name-tag">
+        <img src="../assets/custom-name-tag-studio.webp" alt="Lavender Mia name tag with raised white lettering" width="1280" height="720" loading="lazy">
+        <div class="custom-sample-copy">
+          <h3>名牌款</h3>
+          <p>Make your bag unmistakably yours. Pick the type, shape and size, then add your colours.</p>
+          <a class="button" href="nameplate.html?style=name-tag">Customize a name tag</a>
+        </div>
+      </article>
+      <article class="custom-sample" id="sample-name-clicker">
+        <img src="../assets/custom-name-clicker-studio.webp" alt="Three-colour clicker sample with the raised character 飛" width="1280" height="720" loading="lazy">
+        <div class="custom-sample-copy">
+          <h3>按压款</h3>
+          <p>Click, click. Try pressing your name in keyboard keys, individual letter keys or a joined name clicker.</p>
+          <a class="button" href="nameplate.html?style=name-clicker">Customize a clicker</a>
+        </div>
+      </article>
+      <article class="custom-sample" id="sample-name-articulated">
+        <img src="../assets/custom-name-articulated-studio.webp" alt="Green LEO lettering with visible joints between the letters" width="1280" height="720" loading="lazy">
+        <div class="custom-sample-copy">
+          <h3>Articulated letters</h3>
+          <p>Give your name a little wiggle. Each letter is joined so you can turn it to a different angle.</p>
+          <a class="button" href="nameplate.html?style=name-articulated">Customize articulated letters</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="custom-steps" aria-labelledby="custom-steps-title">
+    <h2 id="custom-steps-title">Start with a name</h2>
+    <ol>
+      <li><strong>Pick a style</strong><span>Choose something to hang on your bag or play with in your hand.</span></li>
+      <li><strong>Add your name</strong><span>Enter your text, then try different fonts and colours.</span></li>
+      <li><strong>Give it a spin</strong><span>Turn the live 3D preview to see your design from different angles.</span></li>
+    </ol>
+  </section>
 </main>
 <footer><div class="footer-brand">One Goods Studio<span>Relaxing. Playful. Uniquely yours.</span></div><div><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html">Customize</a><a href="about.html">About OGS</a></div><small>© 2026 One Goods Studio</small></footer>
 </body>
