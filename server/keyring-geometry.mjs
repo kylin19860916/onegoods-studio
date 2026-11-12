@@ -2,7 +2,7 @@ import opentype from 'opentype.js';
 import ClipperLib from 'clipper-lib';
 import earcut from 'earcut';
 import { strToU8, zipSync } from 'fflate';
-import { MX, MX_CAP_SOCKET, MX_NAME_FACE, MX_RECESS, MX_SWITCH_WELL } from '../src/cherry-mx-spec.js';
+import { MX, MX_NAME_CAP_SOCKET, MX_NAME_FACE, MX_RECESS, MX_SWITCH_WELL } from '../src/cherry-mx-spec.js';
 
 const units = 1000;
 const core = 'http://schemas.microsoft.com/3dmanufacturing/core/2015/02';
@@ -150,7 +150,7 @@ export function nameClickerContours(font, text) {
   // around the housing so its outline never has to enter the visible face.
   const offsets = [0, ...Array.from({ length: 12 }, (_, i) => [-(i + 1) / 4, (i + 1) / 4]).flat()];
   const glyphMountY = offsets.find(y => fits(squareAt(MX_SWITCH_WELL.clearance + 1.6, y), shell)
-    && fits(circle(0, y * units, (MX_CAP_SOCKET.outerDiameter / 2 + 0.15) * units), face));
+    && fits(circle(0, y * units, (MX_NAME_CAP_SOCKET.outerDiameter / 2 + 0.15) * units), face));
   const mount = roundedPlate(16.4, 16.4, 4)
     .map(({ X, Y }) => ({ X: X - 8200, Y: Y - 8200 }));
   const contour = glyphMountY === undefined ? connectedOutline([mount, ...letterOutlines]) : glyphContour;

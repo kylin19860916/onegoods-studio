@@ -54,6 +54,7 @@ export function setupClicker() {
   const perKeySettings = document.querySelector('#clicker-per-key-settings');
   const nameSettings = document.querySelector('#clicker-name-settings');
   const hint = document.querySelector('#clicker-hint');
+  const styleNote = document.querySelector('#clicker-style-note');
   const textLimit = document.querySelector('#clicker-name-limit-error');
   const nameFont = document.querySelector('#plate-style').cloneNode(true);
   nameFont.id = 'clicker-name-font';
@@ -129,6 +130,7 @@ export function setupClicker() {
     const currentVersion = ++version;
     const style = clickerStyle.value;
     const wholeName = style === 'name';
+    styleNote.textContent = styleNote.dataset[style];
     perKeySettings.hidden = wholeName;
     nameSettings.hidden = !wholeName;
     hint.textContent = wholeName ? hint.dataset.name : hint.dataset.keys;

@@ -99,7 +99,7 @@ function renderClickerOrder(order) {
     ? `<form class="order-match" data-match-order="${esc(id)}"><label>模擬賣貨便單號<input name="reference" required maxlength="24" autocomplete="off"></label><label>商品金額（不含運）<input name="amount" type="number" min="1" step="1" required></label><button class="primary">確認配對</button><span role="status"></span></form>`
     : '';
   return `<article class="panel clicker-order-item"><div class="panel-title"><h2>${esc(design.text)}</h2><span class="badge">${status}</span></div>
-    <p><strong>${esc(id)}</strong> · 三色厚字款 · ${esc(orderDate.format(new Date(order.createdAt)))}</p>
+    <p><strong>${esc(id)}</strong> · 連字按壓款 · ${esc(orderDate.format(new Date(order.createdAt)))}</p>
     <p>字型 ${esc(orderFonts[design.font] || design.font)} · 測試價位 ${tier === 'test-a' ? 'A' : 'B'} · NT$${amount}</p>
     <div class="order-swatches">${orderSwatch('外框', design.colors.border)}${orderSwatch('內底', design.colors.fill)}${orderSwatch('凸字', design.colors.ink)}</div>
     ${matchedReference ? `<p>模擬賣貨便單號 <strong>${esc(matchedReference)}</strong> · ${esc(orderDate.format(new Date(matchedAt)))}</p>` : ''}

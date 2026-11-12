@@ -84,8 +84,8 @@ def check_cap_socket(model, namespace, centers=(0,), mount_y=0):
         for center in centers:
             for degrees in range(0, 360, 5):
                 angle = math.radians(degrees)
-                assert inside(center + 2.98 * math.cos(angle), 39 + mount_y + 2.98 * math.sin(angle))
-                assert not inside(center + 3.02 * math.cos(angle), 39 + mount_y + 3.02 * math.sin(angle))
+                assert inside(center + 2.88 * math.cos(angle), 39 + mount_y + 2.88 * math.sin(angle))
+                assert not inside(center + 2.92 * math.cos(angle), 39 + mount_y + 2.92 * math.sin(angle))
             for x, y in ((0, 0), (1.93, 0), (-1.93, 0), (0, 1.93), (0, -1.93)):
                 assert not inside(center + x, 39 + mount_y + y)
             for x, y in ((1, 1), (-1, -1), (-1, 1), (1, -1)):
@@ -204,4 +204,4 @@ for text, tier, amount, other_tier, other_amount in [
         Path(output).write_bytes(file)
     results.append({'order': order['id'], 'tier': tier, 'testPrice': amount, 'simulatedMyShipOrder': reference})
 
-print(json.dumps({'orders': results, 'checks': ['automatic pricing', 'correct checkout', 'order match', 'private 3MF download', '6 mm circular MX socket', 'four vertical walls per switch recess']}, ensure_ascii=False))
+print(json.dumps({'orders': results, 'checks': ['automatic pricing', 'correct checkout', 'order match', 'private 3MF download', '5.8 mm circular MX socket', 'four vertical walls per switch recess']}, ensure_ascii=False))

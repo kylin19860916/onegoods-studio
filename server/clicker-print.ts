@@ -2,7 +2,7 @@ import createManifold, { type CrossSection, type Manifold, type ManifoldToplevel
 import wasm from 'manifold-3d/manifold.wasm?module';
 import { nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
 import { keyringFonts } from '../src/keyring-font-picker.js';
-import { MX_BASE_DIVIDER, MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_FACE, MX_SWITCH_WELL, mxChainEyelet, mxStack } from '../src/cherry-mx-spec.js';
+import { MX_BASE_DIVIDER, MX_NAME_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_FACE, MX_SWITCH_WELL, mxChainEyelet, mxStack } from '../src/cherry-mx-spec.js';
 import { HttpError } from './catalog';
 import p2sTrialProfile from './clicker-p2s-profile.json';
 
@@ -100,7 +100,7 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
       slab(ear, earBottom, earBottom + earThickness),
     ]);
     const base = own(Solid.difference(caseWithEar, slab(hole, earBottom - 0.1, earBottom + earThickness + 0.1)));
-    const { outerDiameter, crossSpan, crossArm, engagement } = MX_CAP_SOCKET;
+    const { outerDiameter, crossSpan, crossArm, engagement } = MX_NAME_CAP_SOCKET;
     const socketStart = stack.stemTop - engagement;
     const boss = own(Section.circle(outerDiameter / 2, 64));
     const cross = own(Section.union(box(crossSpan, crossArm), box(crossArm, crossSpan)));

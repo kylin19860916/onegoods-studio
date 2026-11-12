@@ -3,7 +3,7 @@ import {
   Mesh, MeshStandardMaterial, OrthographicCamera, Path, Raycaster, Scene,
   Shape, ShapePath, Vector2, WebGLRenderer,
 } from 'three';
-import { MX, MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_FACE, MX_RECESS, mxChainEyelet, mxStack } from './cherry-mx-spec.js';
+import { MX, MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_CAP_SOCKET, MX_NAME_FACE, MX_RECESS, mxChainEyelet, mxStack } from './cherry-mx-spec.js';
 import { nameClickerOutline } from './name-clicker-outline.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -126,14 +126,18 @@ export function createClickerViewer(canvas, host, reset, inspect) {
   let keyGroups = [];
   let capGroups = [];
   let showCaps = true;
+  let lastStyle;
   const animations = new Map();
   const render = () => renderer.render(scene, camera);
   controls.addEventListener('change', render);
+  function setCapVisibility(visible) {
+    showCaps = visible;
+    capGroups.forEach(group => { group.visible = visible; });
+    inspect.textContent = visible ? inspect.dataset.inspect : inspect.dataset.assemble;
+    inspect.setAttribute('aria-pressed', String(!visible));
+  }
   inspect.addEventListener('click', () => {
-    showCaps = !showCaps;
-    capGroups.forEach(group => { group.visible = showCaps; });
-    inspect.textContent = showCaps ? inspect.dataset.inspect : inspect.dataset.assemble;
-    inspect.setAttribute('aria-pressed', String(!showCaps));
+    setCapVisibility(!showCaps);
     render();
   });
   reset.addEventListener('click', () => controls.reset());
@@ -183,6 +187,8 @@ export function createClickerViewer(canvas, host, reset, inspect) {
   });
 
   function update({ keys, base, cap, ink, style }) {
+    if (lastStyle !== style) setCapVisibility(true);
+    lastStyle = style;
     for (const request of animations.values()) cancelAnimationFrame(request);
     animations.clear();
     assembly.traverse(object => {
@@ -215,8 +221,8 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       shape.closePath();
       return shape;
     }
-    function addCapSocket(colour, parent, index) {
-      const { outerDiameter, crossSpan, crossArm, engagement } = MX_CAP_SOCKET;
+    function addCapSocket(colour, parent, index, specification = MX_CAP_SOCKET) {
+      const { outerDiameter, crossSpan, crossArm, engagement } = specification;
       const socket = new Shape();
       socket.absarc(0, 0, outerDiameter / 2, 0, 2 * Math.PI, false);
       socket.holes.push(cross(crossSpan, crossArm));
@@ -284,7 +290,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       if (lettering.length) {
         add(extrude(lettering, letteringHeight), ink, stack.capTop + insetHeight, face).userData.keyIndex = 0;
       }
-      addCapSocket(base, face, 0);
+      addCapSocket(base, face, 0, MX_NAME_CAP_SOCKET);
       const bounds = new Box3().setFromObject(assembly);
       const width = bounds.max.x - bounds.min.x;
       const height = bounds.max.y - bounds.min.y;
@@ -299,11 +305,15 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     const body = () => mechanical
       ? rounded((centers.length - 1) * pitch + 24.8, 24.8, 3.8)
       : basicClickerBody(centers);
-    const rimTop = mechanical ? stack.mountTop + 2.5 : stack.rimTop;
+    // The longer keyboard skirt overlaps the rim through the full key travel.
+    const skirtBottom = mechanical ? stack.skirtBottom - 1.65 : stack.skirtBottom;
+    const rimTop = mechanical ? skirtBottom + 1.0 : stack.rimTop;
+    const skirtWidth = mechanical ? 19.2 : MX_CASE.capWidth;
+    const capStack = { ...stack, skirtBottom };
     const walls = body();
     const plate = body();
     const rim = body();
-    const wellWidth = MX_CASE.capWidth + 2 * MX_RECESS.sideClearance;
+    const wellWidth = skirtWidth + 2 * MX_RECESS.sideClearance;
     for (const x of centers) {
       walls.holes.push(rounded(18, 18, 2, x));
       plate.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3, x));
@@ -318,18 +328,21 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     for (const [index, entry] of keys.entries()) {
       const { cap: keycapColour, ink: letteringColour } = entry;
       const capGroup = mountSwitch(centers[index], index);
-      const skirt = rounded(MX_CASE.capWidth,MX_CASE.capWidth,2.4);
-      skirt.holes.push(rounded(16,16,1.4));
-      const skirtGeometry = extrude(skirt, stack.roofBottom - stack.skirtBottom);
-      if (mechanical) taperKeycap(skirtGeometry, stack.skirtBottom, stack);
-      add(skirtGeometry, keycapColour, stack.skirtBottom, capGroup).userData.keyIndex = index;
+      const skirtRadius = mechanical ? 2.0 : 2.7;
+      const skirt = rounded(skirtWidth, skirtWidth, skirtRadius);
+      const skirtInterior = mechanical ? 16.6 : 16;
+      skirt.holes.push(rounded(skirtInterior, skirtInterior, 1.4));
+      const skirtGeometry = extrude(skirt, stack.roofBottom - skirtBottom);
+      if (mechanical) taperKeycap(skirtGeometry, skirtBottom, capStack);
+      add(skirtGeometry, keycapColour, skirtBottom, capGroup).userData.keyIndex = index;
 
       const roofBottom = stack.roofBottom + 0.2;
-      const roofGeometry = new ExtrudeGeometry(rounded(17.6, 17.6, 2), {
+      const roofWidth = skirtWidth - 0.8;
+      const roofGeometry = new ExtrudeGeometry(rounded(roofWidth, roofWidth, mechanical ? 1.6 : 2.3), {
         depth: MX_CASE.roof - 0.4, bevelEnabled: true, bevelThickness: 0.2, bevelSize: 0.4,
         bevelSegments: 3, curveSegments: 12,
       });
-      if (mechanical) taperKeycap(roofGeometry, roofBottom, stack);
+      if (mechanical) taperKeycap(roofGeometry, roofBottom, capStack);
       const roof = add(roofGeometry, keycapColour, roofBottom, capGroup);
       roof.userData.keyIndex=index;
       addCapSocket(keycapColour, capGroup, index);
@@ -340,7 +353,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     const width = bounds.max.x - bounds.min.x;
     const height = bounds.max.y - bounds.min.y;
     assembly.position.x = -(bounds.max.x + bounds.min.x) / 2;
-    worldWidth = Math.max(88, width + 26);
+    worldWidth = Math.max(62, width + 24, height + 24);
     resize();
     return [width, height, bounds.max.z];
   }

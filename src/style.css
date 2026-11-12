@@ -296,6 +296,7 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .clicker-style-settings{display:grid;gap:18px}
 .clicker-style-settings[hidden]{display:none}
 .clicker-style-picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0;padding:0 0 15px;border:0;border-bottom:1px solid #29233125;min-width:0}
+.clicker-style-note{margin:0}
 .clicker-style-picker legend{font-size:14px;font-weight:650;margin-bottom:9px}
 .clicker-style-picker label{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;min-height:44px;padding:7px;border:1px solid #29233138;border-radius:7px;cursor:pointer;text-align:center;font-size:14px}
 .clicker-style-picker label input{position:absolute;opacity:0;width:1px;height:1px}
