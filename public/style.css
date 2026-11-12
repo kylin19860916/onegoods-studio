@@ -29,11 +29,11 @@ header{gap:24px}header nav{gap:24px}
 h1{font-size:clamp(52px,5.4vw,82px);letter-spacing:-.04em;font-weight:750}
 .underline:after{transform:none;height:12%;opacity:.6}
 .hero-note{line-height:1.8}.hero-note span{margin:0 6px}
-.home-design,.design-intro,.studio-values,.about-intro,.page-intro{background:#f5f1f8}
+.home-design,.design-intro,.studio-values,.about-intro,.page-intro{--section-background:#f5f1f8;background:var(--section-background)}
 .home-design-notes,.design-explainer{border:0;background:transparent;padding:0}
 .home-design-title>.pill{background:var(--paper)}
 .home-design h2{font-size:clamp(30px,3.3vw,44px)}
-.closing{background:#eee8f4}
+.closing{--section-background:#eee8f4;background:var(--section-background)}
 .filters button{background:transparent!important}.filters button.active{background:var(--ink)!important;box-shadow:none}
 .product-art{background-image:none!important}.product-info{padding:22px}
 html[lang="en"] h1{letter-spacing:-.035em;font-size:clamp(45px,5vw,76px)}
@@ -330,7 +330,8 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
   justify-content: space-between;
   gap: 20px 40px;
   padding-block: clamp(24px, 4vw, 48px);
-  background: #f5f1f8;
+  --section-background: #f5f1f8;
+  background: var(--section-background);
   border-bottom: var(--line);
 }
 .home-custom h2 { margin: 0 0 8px; font-size: clamp(25px, 3vw, 38px); }
@@ -343,7 +344,8 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 .custom-hero {
   display: grid;
   grid-template-columns: minmax(0, .84fr) minmax(0, 1.16fr);
-  background: #eadff4;
+  --section-background: #eadff4;
+  background: var(--section-background);
   border-bottom: 1px solid var(--ink);
 }
 .custom-hero-copy {
@@ -546,4 +548,19 @@ html[lang="en"] .custom-hero h1 { font-size: clamp(38px, 5.1vw, 59px); }
 @media (max-width: 650px) {
   body[data-page] > main { width: 100%; }
   body[data-page="nameplate"] .nameplate-workspace { gap: 16px; }
+}
+
+/* Extend the section paint outside the centered content without widening layout. */
+body[data-page] main > :is(.home-custom, .page-intro, .custom-hero, .studio-values, .closing) {
+  position: relative;
+  isolation: isolate;
+}
+body[data-page] main > :is(.home-custom, .page-intro, .custom-hero, .studio-values, .closing)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  box-shadow: 0 0 0 100vmax var(--section-background);
+  clip-path: inset(0 -100vmax);
 }
