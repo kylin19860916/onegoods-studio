@@ -19,3 +19,12 @@ export function quoteClickerTest(input) {
   const length = [...text.replaceAll(' ', '')].length;
   return { text, tier: length <= 3 ? tierA : tierB };
 }
+
+// The agreed SKU prices are used only by the ECPay test checkout here.
+const stagePrices = [80, 140, 200, 250, 290, 330, 370, 410];
+export function quoteClickerEcpayStage(input) {
+  const quote = quoteClickerTest(input);
+  if (!quote) return null;
+  const length = [...quote.text.replaceAll(' ', '')].length;
+  return { text: quote.text, tier: { id: 'ecpay-stage', amount: stagePrices[length - 1] } };
+}

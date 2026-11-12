@@ -73,11 +73,11 @@ html[lang="en"] .product-meta{letter-spacing:.03em;flex-wrap:wrap}
 .products .product-art{width:100%;max-width:100%;box-sizing:border-box}
 @media(max-width:650px){.shop .products{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-/* Rounded Traditional Chinese display face; body text and outlined brand assets stay independent. */
+@font-face{font-family:"OGS Site Heading";src:url("assets/fonts/keyring/NotoSansTC-Bold.woff") format("woff");font-style:normal;font-weight:700;font-display:swap}
 @font-face{font-family:"OGS Heading Rounded";src:url("assets/fonts/ogs-heading-rounded-v2.woff2") format("woff2");font-style:normal;font-weight:200 900;font-display:swap}
-html[lang="zh-Hant"] h1,html[lang="zh-Hant"] h2{font-family:"OGS Heading Rounded","Chiron GoRound TC WS","PingFang TC",sans-serif;font-synthesis:none;letter-spacing:-.025em}
-html[lang="zh-Hant"] h1{font-weight:750}
-html[lang="zh-Hant"] h2{font-weight:650;line-height:1.35}
+html :is(h1,h2){font-family:"OGS Site Heading","PingFang TC",sans-serif;font-weight:700;font-synthesis:none}
+html[lang="zh-Hant"] :is(h1,h2){letter-spacing:-.025em}
+html[lang="zh-Hant"] h2{line-height:1.35}
 
 /* One compact disclosure keeps language choices out of the main navigation row. */
 header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:relative;font-size:12px}.language-menu{border:0;position:relative}.language-menu>summary{display:flex;align-items:center;gap:12px;list-style:none;white-space:nowrap;border:1px solid #29233125;background:#eee8f4;color:#503868;border-radius:6px;padding:10px 12px;font-size:12px;font-weight:600;line-height:1.4}.language-menu>summary::after,.language-menu[open]>summary::after{content:none}.language-menu>summary::-webkit-details-marker{display:none}.language-chevron{display:inline-block;width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg)}.language-menu[open] .language-chevron{transform:translateY(2px) rotate(225deg)}.language-options{position:absolute;right:0;top:calc(100% + 8px);min-width:152px;padding:6px;background:var(--paper);border:1px solid #29233130;border-radius:8px;box-shadow:0 8px 24px #29233116;z-index:30}.language-switch .language-options a{display:block;margin:2px 0;padding:10px 13px;border-radius:4px;font-size:12px;white-space:nowrap}.language-options a[aria-current=true]{font-weight:700}.language-menu>summary:hover{border-color:var(--purple)}@media(max-width:900px){header .language-switch{margin-left:0}}@media(max-width:650px){header .language-switch{display:block;margin-left:auto}.language-menu>summary{padding:9px 11px;font-size:11px}.language-options{min-width:145px}}

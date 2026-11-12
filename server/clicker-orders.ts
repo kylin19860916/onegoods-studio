@@ -1,12 +1,14 @@
 import { isAdmin, json, HttpError } from './catalog';
 import { generateClicker3mf, type ClickerDesign } from './clicker-print';
-import { exceedsClickerTextLimit, quoteClickerTest } from '../src/clicker-test-pricing.js';
+import { exceedsClickerTextLimit, quoteClickerEcpayStage, quoteClickerTest } from '../src/clicker-test-pricing.js';
 import { keyringFonts } from '../src/keyring-font-picker.js';
+import { ecpayStageCheckout, ecpayStageReturnUrl, isEcpayStageCallback, readEcpayStageResult, verifyEcpayStageTrade } from './ecpay-stage';
 
 const palette = new Set(['#a087c1', '#fffcf5', '#f2c879', '#393142', '#b8d6bd', '#efb39e']);
 const prefix = '/api/clicker-orders/test';
 const orderRoute = /^\/api\/clicker-orders\/test\/(OGS-T-[A-F0-9]{12})\/checkout(?:\/(test-[ab]))?$/;
-const adminRoute = /^\/api\/admin\/clicker-orders\/(OGS-T-[A-F0-9]{12})\/(match|3mf)$/;
+const ecpayRoute = /^\/api\/clicker-orders\/test\/(OGS-E-[A-F0-9]{12})\/checkout\/ecpay-stage$/;
+const adminRoute = /^\/api\/admin\/clicker-orders\/(OGS-[TE]-[A-F0-9]{12})\/(match|3mf)$/;
 const testOnly = '測試流程 · 不會付款或出貨';
 
 type Order = {
@@ -25,9 +27,9 @@ const fileKey = (id: string) => 'clicker-test/' + id + '.3mf';
 const code = (prefix: string) => prefix + crypto.randomUUID().replaceAll('-', '').slice(0, 12).toUpperCase();
 const fail = (message: string, status = 400): never => { throw new HttpError(status, message); };
 
-function validate(body: Payload) {
+function validate(body: Payload, ecpay: boolean) {
   if (exceedsClickerTextLimit(body?.text)) return fail('文字超過長度上限。中文最多 5 字，英文最多 8 個字母。');
-  const quote = quoteClickerTest(body?.text);
+  const quote = (ecpay ? quoteClickerEcpayStage : quoteClickerTest)(body?.text);
   const font = body?.font;
   if (!quote) return fail('請填寫可列印的姓名或文字。');
   if (typeof font !== 'string' || !Object.hasOwn(keyringFonts, font)) return fail('請選擇可用的字型。');
@@ -49,18 +51,18 @@ function receipt(row: Pick<Order, 'id' | 'tier' | 'amount'>) {
   return { id: row.id, tier: row.tier, amount: row.amount, checkoutUrl: prefix + '/' + row.id + '/checkout/' + row.tier };
 }
 
-async function createOrder(request: Request, store: Store) {
-  const { design, tier, requestId } = validate(await requestJson(request));
+async function createOrder(request: Request, store: Store, ecpay: boolean) {
+  const { design, tier, requestId } = validate(await requestJson(request), ecpay);
   const snapshot = JSON.stringify(design);
   const lookup = store.DB.prepare('SELECT * FROM clicker_orders WHERE request_id=?').bind(requestId);
   const existing = await lookup.first<Order>();
   if (existing) {
-    if (existing.design !== snapshot) return fail('此確認已提交，請重新確認變更後的設計。', 409);
+    if (existing.design !== snapshot || existing.tier !== tier.id) return fail('此確認已提交，請重新確認變更後的設計。', 409);
     return json(receipt(existing));
   }
   const fontUrl = new URL('/assets/fonts/keyring/' + keyringFonts[design.font], request.url);
   const file = await generateClicker3mf(design, await store.ASSETS.fetch(new Request(fontUrl)));
-  const id = code('OGS-T-');
+  const id = code(ecpay ? 'OGS-E-' : 'OGS-T-');
   await store.BUCKET.put(fileKey(id), file, { httpMetadata: { contentType: 'model/3mf' } });
   try {
     const result = await store.DB.prepare('INSERT INTO clicker_orders (id,request_id,design,tier,amount,created_at) VALUES (?,?,?,?,?,?) ON CONFLICT(request_id) DO NOTHING')
@@ -75,7 +77,7 @@ async function createOrder(request: Request, store: Store) {
   }
   await store.BUCKET.delete(fileKey(id));
   const concurrent = await lookup.first<Order>();
-  if (!concurrent || concurrent.design !== snapshot) return fail('此確認已提交，請重新確認設計。', 409);
+  if (!concurrent || concurrent.design !== snapshot || concurrent.tier !== tier.id) return fail('此確認已提交，請重新確認設計。', 409);
   return json(receipt(concurrent));
 }
 
@@ -134,32 +136,66 @@ async function matchOrder(request: Request, store: Store, order: Order) {
   return json({ reference, matchedAt });
 }
 
+async function recordEcpayStagePayment(request: Request, store: Store) {
+  const { id, fields } = await readEcpayStageResult(request);
+  const order = await store.DB.prepare("SELECT * FROM clicker_orders WHERE id=? AND tier='ecpay-stage'").bind(id).first<Order>();
+  if (!order) return fail('Test order not found', 404);
+  const acknowledged = () => new Response('1|OK', { headers: { 'Content-Type': 'text/plain' } });
+  if (fields.RtnCode !== '1' || fields.SimulatePaid === '1') return acknowledged();
+  if (fields.TradeAmt !== String(order.amount) || !/^[A-Za-z0-9]{1,20}$/.test(fields.TradeNo) ||
+      !fields.PaymentType?.startsWith('Credit_')) return fail('ECPay payment does not match order', 409);
+  if (order.matched_reference === fields.TradeNo) return acknowledged();
+  if (order.matched_reference) return fail('ECPay order already matched', 409);
+  await verifyEcpayStageTrade(order, fields);
+  if (!await store.BUCKET.head(fileKey(id))) return fail('Print file missing', 409);
+  const result = await store.DB.prepare('UPDATE clicker_orders SET matched_reference=?,matched_at=? WHERE id=? AND matched_reference IS NULL')
+    .bind(fields.TradeNo, new Date().toISOString(), id).run();
+  if (!result.meta.changes) {
+    const current = await store.DB.prepare('SELECT matched_reference FROM clicker_orders WHERE id=?').bind(id).first<Order>();
+    if (current?.matched_reference !== fields.TradeNo) return fail('ECPay order already matched', 409);
+  }
+  return acknowledged();
+}
+
 export async function clickerOrderApi(request: Request, env: Cloudflare.Env, user: Parameters<typeof isAdmin>[0]) {
   try {
-    if (!user) return json({ error: '請先用 OGS 管理帳號登入。' }, 401);
-    if (!isAdmin(user, env)) return json({ error: '此流程目前僅開放 OGS 內部測試。' }, 403);
     const url = new URL(request.url);
     const path = url.pathname;
+    const callback = ecpayStageReturnUrl(env);
+    if (isEcpayStageCallback(path)) {
+      if (request.method !== 'POST' || callback?.pathname !== path || !env.DB || !env.BUCKET) return fail('找不到此功能。', 404);
+      return await recordEcpayStagePayment(request, env as Store);
+    }
+    if (!user) return json({ error: '請先用 OGS 管理帳號登入。' }, 401);
+    if (!isAdmin(user, env)) return json({ error: '此流程目前僅開放 OGS 內部測試。' }, 403);
     if (request.method !== 'GET' && request.headers.get('Origin') !== url.origin) return fail('請在本網站內操作。', 403);
+    const ecpay = url.searchParams.get('provider') === 'ecpay';
+    if (path === prefix && ecpay && !callback) return fail('綠界測試目前未啟用。', 404);
     if (path === prefix && request.method === 'GET') return json({ test: true });
     if (!env.DB || !env.BUCKET) throw new Error('Order storage is not configured');
     const store = env as Store;
-    if (path === prefix && request.method === 'POST') return await createOrder(request, store);
+    if (path === prefix && request.method === 'POST') return await createOrder(request, store, ecpay);
     if (path === '/api/admin/clicker-orders' && request.method === 'GET') {
       const query = url.searchParams.get('q')?.trim().toUpperCase() ?? '';
-      const result = await store.DB.prepare('SELECT * FROM clicker_orders WHERE id LIKE ? OR mock_reference LIKE ? ORDER BY created_at DESC LIMIT 100')
-        .bind('%' + query.slice(0, 64).replace(/[%_]/g, '') + '%', '%' + query.slice(0, 64).replace(/[%_]/g, '') + '%').all<Order>();
-      return json({ items: result.results.map(row => ({
+      const pattern = '%' + query.slice(0, 64).replace(/[%_]/g, '') + '%';
+      const result = await store.DB.prepare('SELECT * FROM clicker_orders WHERE id LIKE ? OR mock_reference LIKE ? OR matched_reference LIKE ? ORDER BY created_at DESC LIMIT 100')
+        .bind(pattern, pattern, pattern).all<Order>();
+      return json({ ecpayStageAvailable: !!callback, items: result.results.map(row => ({
         id: row.id, design: JSON.parse(row.design), tier: row.tier, amount: row.amount, createdAt: row.created_at,
         checkoutCreated: !!row.mock_reference, matchedReference: row.matched_reference, matchedAt: row.matched_at,
       })) });
     }
     const checkout = orderRoute.exec(path);
+    const ecpayCheckout = ecpayRoute.exec(path);
     const admin = adminRoute.exec(path);
-    const id = (checkout ?? admin)?.[1];
+    const id = (checkout ?? ecpayCheckout ?? admin)?.[1];
     if (!id) return json({ error: '找不到此功能。' }, 404);
     const order = await store.DB.prepare('SELECT * FROM clicker_orders WHERE id=?').bind(id).first<Order>();
     if (!order) return json({ error: '找不到客製訂單。' }, 404);
+    if (ecpayCheckout && request.method === 'GET' && order.tier === 'ecpay-stage' && callback) {
+      if (order.matched_reference) return Response.redirect(new URL('/admin#clicker-orders', request.url), 303);
+      return await ecpayStageCheckout(order, callback, url.origin);
+    }
     if (checkout && ['GET', 'POST'].includes(request.method)) {
       if (checkout[2] && checkout[2] !== order.tier) return fail('此測試結帳連結與客製訂單價位不符。', 404);
       return await simulateCheckout(request, store, order);

@@ -56,7 +56,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)r
 $('#new-item').onclick=()=>openEditor(blank(),true);$('#back-list').onclick=()=>{if(canLeave())showList();};$('#search').oninput=()=>{state.filters[state.kind].query=$('#search').value;renderList();};for(const [id,key]of [['category','category'],['record','record'],['sale','sale'],['sort','sort']])$('#'+id+'-filter').onchange=()=>{state.filters[state.kind][key]=$('#'+id+'-filter').value;renderList();};$('#reset-filters').onclick=resetFilters;$('#refresh').onclick=()=>refresh().then(()=>notify('列表已更新。')).catch(e=>notify(e.message,true));$('#add-spec').onclick=()=>{state.current.specs=collect().specs;state.current.specs.push({label:'',value:''});state.dirty=true;renderSpecs();};$('#image-upload').onchange=e=>upload(e.target,'image');$('#design-upload').onchange=e=>upload(e.target,'design');$('#archive-item').onclick=()=>{if(confirm('封存後會從官網移除，之後仍可恢復。要封存嗎？')){field('status').value='archived';state.dirty=true;save();}};$('#view-public').onclick=()=>window.open(state.current.kind==='design'?'/design-files.html':'/product.html?id='+encodeURIComponent(state.current.id),'_blank','noopener');
 $('#backup').onclick=async()=>{try{const [{items},{items:categories}]=await Promise.all([api('catalog'),api('categories')]);const blob=new Blob([JSON.stringify({brand:'One Goods Studio',exportedAt:new Date().toISOString(),items,categories},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='OGS-catalog-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){notify(e.message,true);}};
 window.addEventListener('beforeunload',e=>{if(state.dirty||state.categoryDirty){e.preventDefault();e.returnValue='';}});
-(async()=>{try{const session=await api('session');$('#account').textContent=session.email;await api('initialize',{method:'POST',body:'{}'});await refresh();if(location.hash==='#clicker-orders')showClickerOrders();}catch(e){notify(e.message,true);$('#list-summary').textContent='資料未能載入。';}})();
+(async()=>{try{const session=await api('session');$('#account').textContent=session.email;await api('initialize',{method:'POST',body:'{}'});await refresh();if(location.hash==='#clicker-orders'){const id=new URLSearchParams(location.search).get('clicker-order');if(/^OGS-E-[A-F0-9]{12}$/.test(id||''))$('#clicker-order-search').elements.query.value=id;showClickerOrders();}}catch(e){notify(e.message,true);$('#list-summary').textContent='資料未能載入。';}})();
 
 const orderList = $('#clicker-order-list');
 const orderSearch = $('#clicker-order-search');
@@ -81,8 +81,8 @@ function showClickerOrders() {
   for (const id of ['catalog-view', 'categories-view', 'editor-view', 'new-item']) $('#' + id).hidden = true;
   document.querySelectorAll('.nav-item').forEach(button => button.classList.toggle('active', button === orderNav));
   $('#page-title').textContent = '客製訂單';
-  $('#page-description').textContent = '核對客製內容、配對賣貨便單號並下載 3MF。目前僅開放內部測試。';
-  history.replaceState(null, '', '#clicker-orders');
+  $('#page-description').textContent = '核對客製內容、交易編號及下載 3MF。目前僅開放內部測試。';
+  history.replaceState(null, '', location.pathname + '#clicker-orders');
   orderView.hidden = false;
   loadClickerOrders();
 }
@@ -94,17 +94,20 @@ function orderSwatch(label, color) {
 
 function renderClickerOrder(order) {
   const { id, design, tier, amount, checkoutCreated, matchedReference, matchedAt } = order;
-  const status = matchedReference ? '已配對（測試）' : checkoutCreated ? '待配對' : '待模擬下單';
-  const matchForm = checkoutCreated && !matchedReference
+  const ecpay = tier === 'ecpay-stage';
+  const status = ecpay
+    ? matchedReference ? '測試付款成功 · 已配對' : '待綠界測試付款'
+    : matchedReference ? '已配對（測試）' : checkoutCreated ? '待配對' : '待模擬下單';
+  const matchForm = !ecpay && checkoutCreated && !matchedReference
     ? `<form class="order-match" data-match-order="${esc(id)}"><label>模擬賣貨便單號<input name="reference" required maxlength="24" autocomplete="off"></label><label>商品金額（不含運）<input name="amount" type="number" min="1" step="1" required></label><button class="primary">確認配對</button><span role="status"></span></form>`
     : '';
   return `<article class="panel clicker-order-item"><div class="panel-title"><h2>${esc(design.text)}</h2><span class="badge">${status}</span></div>
     <p><strong>${esc(id)}</strong> · 連字按壓款 · ${esc(orderDate.format(new Date(order.createdAt)))}</p>
-    <p>字型 ${esc(orderFonts[design.font] || design.font)} · 測試價位 ${tier === 'test-a' ? 'A' : 'B'} · NT$${amount}</p>
+    <p>字型 ${esc(orderFonts[design.font] || design.font)} · ${ecpay ? '綠界測試' : '測試價位 ' + (tier === 'test-a' ? 'A' : 'B')} · NT$${amount}</p>
     <div class="order-swatches">${orderSwatch('外框', design.colors.border)}${orderSwatch('內底', design.colors.fill)}${orderSwatch('凸字', design.colors.ink)}</div>
-    ${matchedReference ? `<p>模擬賣貨便單號 <strong>${esc(matchedReference)}</strong> · ${esc(orderDate.format(new Date(matchedAt)))}</p>` : ''}
+    ${matchedReference ? `<p>${ecpay ? '綠界測試交易編號' : '模擬賣貨便單號'} <strong>${esc(matchedReference)}</strong> · ${esc(orderDate.format(new Date(matchedAt)))}</p>` : ''}
     ${matchForm}
-    <div class="order-toolbar"><a class="text-action" href="/api/admin/clicker-orders/${esc(id)}/3mf" download>下載 3MF</a>${checkoutCreated ? '' : `<a class="text-action" href="/api/clicker-orders/test/${esc(id)}/checkout/${esc(tier)}">繼續模擬下單</a>`}</div>
+    <div class="order-toolbar"><a class="text-action" href="/api/admin/clicker-orders/${esc(id)}/3mf" download>下載 3MF</a>${checkoutCreated || matchedReference ? '' : `<a class="text-action" href="/api/clicker-orders/test/${esc(id)}/checkout/${esc(tier)}">${ecpay ? '前往綠界測試付款' : '繼續模擬下單'}</a>`}</div>
     </article>`;
 }
 
@@ -112,8 +115,10 @@ async function loadClickerOrders() {
   const version = ++orderSearchVersion;
   orderList.textContent = '正在讀取客製訂單…';
   try {
-    const { items } = await api('clicker-orders?q=' + encodeURIComponent(orderSearch.elements.query.value.trim()));
-    if (version === orderSearchVersion) orderList.innerHTML = items.length ? items.map(renderClickerOrder).join('') : '<p>沒有符合的客製訂單。</p>';
+    const { items, ecpayStageAvailable } = await api('clicker-orders?q=' + encodeURIComponent(orderSearch.elements.query.value.trim()));
+    if (version !== orderSearchVersion) return;
+    $('#new-ecpay-test').hidden = !ecpayStageAvailable;
+    orderList.innerHTML = items.length ? items.map(renderClickerOrder).join('') : '<p>沒有符合的客製訂單。</p>';
   } catch (error) {
     if (version === orderSearchVersion) orderList.textContent = error.message;
   }
