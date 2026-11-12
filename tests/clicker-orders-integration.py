@@ -141,12 +141,18 @@ for text, tier, amount, other_tier, other_amount in [
         namespace = {'m': 'http://schemas.microsoft.com/3dmanufacturing/core/2015/02'}
         model = ET.fromstring(project.read('3D/3dmodel.model'))
         assert model.attrib['unit'] == 'millimeter'
-        assert len(model.findall('.//m:mesh', namespace)) == 5
+        assert len(model.findall('.//m:mesh', namespace)) == 6
         blocker = model.find('.//m:object[@name="Exclude supports inside MX well 1"]', namespace)
         ys = [float(v.attrib['y']) for v in blocker.findall('.//m:vertex', namespace)]
         mount_y = (min(ys) + max(ys)) / 2
         check_switch_well(model, namespace, mount_y=mount_y)
         check_cap_socket(model, namespace, mount_y=mount_y)
+        cap_blocker = mesh_section(model, namespace, 'Exclude supports inside MX cap cross socket', 1.8)
+        for x, y in ((0, 0), (2.1, 0.7), (-2.1, 0.7), (0.7, 2.1), (0.7, -2.1)):
+            assert cap_blocker(x, 39 + mount_y + y)
+        for x, y in ((1.5, 1.5), (2.8, 0), (0, -2.8)):
+            assert not cap_blocker(x, 39 + mount_y + y)
+
         if text == 'Max':
             assert math.isclose(mount_y, -0.5)
             inset = mesh_section(model, namespace, 'Inset', 5.65)
@@ -159,7 +165,7 @@ for text, tier, amount, other_tier, other_amount in [
         settings = json.loads(project.read('Metadata/project_settings.config'))
         assert settings['filament_colour'] == ['#F2C879', '#EFB39E', '#FFFCF5']
         models = ET.fromstring(project.read('Metadata/model_settings.config'))
-        assert len(models.findall('.//part[@subtype="support_blocker"]')) == 1
+        assert len(models.findall('.//part[@subtype="support_blocker"]')) == 2
         assert [p.attrib['value'] for p in models.findall('.//part/metadata[@key="extruder"]')] == ['1', '1', '2', '3']
     output = os.environ.get('OGS_TEST_EXPORT')
     if output and text == '玩好物工作':

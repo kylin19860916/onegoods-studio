@@ -112,6 +112,9 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const insetTop = stack.capTop + insetHeight;
     // Lay the case and the moving assembly separately on the print plate.
     const printOffset: [number, number, number] = [0, 39, -Math.min(socketStart, stack.skirtBottom)];
+    // Keep supports under the cap while excluding them from the female cross.
+    const crossClearance = atMount(own(cross.offset(0.15, 'Round', 2, 24)));
+    const crossSupportBlocker = own(slab(crossClearance, -printOffset[2], stack.roofBottom + 0.15).translate(printOffset));
     const parts: Array<{ name: string; filament: number; color: string; solid: Manifold; subtype?: 'support_blocker' }> = [
       { name: 'Case', filament: 1, color: design.colors.border, solid: base },
       { name: 'Moving cap', filament: 1, color: design.colors.border, solid: own(movingCap.translate(printOffset)) },
@@ -123,6 +126,13 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
         color: design.colors.border,
         subtype: 'support_blocker',
         solid: slab(atMount(box(clearance + 0.3, clearance + 0.3)), MX_CASE.floor - 0.15, stack.mountTop + 0.05),
+      },
+      {
+        name: 'Exclude supports inside MX cap cross socket',
+        filament: 1,
+        color: design.colors.border,
+        subtype: 'support_blocker',
+        solid: crossSupportBlocker,
       },
     ];
     const meshes = parts.map(({ name, color, filament, solid, subtype }) => {
