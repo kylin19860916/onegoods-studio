@@ -580,3 +580,37 @@ body[data-page] :is(.studio-hero, .custom-hero-visual, .custom-style-tabs, .cust
   border-block: 0;
 }
 body[data-page] :is(.studio-hero, .custom-hero-visual) { border-inline: 0; }
+
+.home-hero-objects {
+  display: grid;
+  align-items: center;
+  min-width: 0;
+  padding: clamp(14px, 2vw, 30px);
+}
+.home-hero-objects img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+body[data-page] .section-with-accent {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(80px, 28%);
+  align-items: center;
+  gap: clamp(12px, 2vw, 24px);
+}
+.section-accent {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  min-width: 0;
+  justify-self: end;
+  height: auto;
+}
+.custom-styles-heading .section-accent {
+  width: min(100%, 180px);
+  justify-self: end;
+}
+@media (max-width: 650px) {
+  body[data-page="home"] .hero-copy { padding-bottom: 12px; }
+  .home-hero-objects { padding: 0 18px 26px; }
+}
