@@ -10,11 +10,13 @@ async function api(url, options) {
 }
 
 export function setupClickerOrderTest(form, readDesign) {
-  const mode = new URLSearchParams(location.search).get('test-order');
-  if (mode !== '1' && mode !== 'ecpay') return;
+  const params = new URLSearchParams(location.search);
+  const mode = params.get('test-order');
+  const preview = params.get('order-preview') === '1';
+  if (!preview && mode !== '1' && mode !== 'ecpay') return;
   const ecpay = mode === 'ecpay';
   const apiUrl = ecpay ? endpoint + '?provider=ecpay' : endpoint;
-  const quoteDesign = ecpay ? quoteClickerEcpayStage : quoteClickerTest;
+  const quoteDesign = (preview || ecpay) ? quoteClickerEcpayStage : quoteClickerTest;
   const panel = document.querySelector('#clicker-order-test');
   const price = panel.querySelector('#clicker-order-price');
   const submit = panel.querySelector('button[type="submit"]');
@@ -24,7 +26,14 @@ export function setupClickerOrderTest(form, readDesign) {
   const name = form.querySelector('#clicker-name-text');
   let pending = null;
   let submitting = false;
-  if (ecpay) {
+  if (preview) {
+    panel.querySelector('h3').textContent = '商品金額';
+    panel.querySelector('p').hidden = true;
+    controls.querySelector('p').hidden = true;
+    submit.textContent = '前往下單';
+    form.elements.clickerStyle.value = 'name';
+    document.querySelectorAll('#name-clicker .plate-view-hint, #name-clicker figcaption, #clicker-form .eyebrow, [data-keyring-intro="name-clicker"] p').forEach(node => node.hidden = true);
+  } else if (ecpay) {
     const locale = document.documentElement.lang;
     const copy = locale.startsWith('en')
       ? ['ECPay test checkout', 'Sandbox only · No charge or shipment', 'Confirm design and go to ECPay test checkout']
@@ -60,7 +69,7 @@ export function setupClickerOrderTest(form, readDesign) {
     const text = readDesign()?.text;
     const quote = quoteDesign(text);
     price.textContent = quote
-      ? ecpay ? 'NT$' + quote.tier.amount : panel.dataset.quote.replace('{tier}', quote.tier.code).replace('{amount}', String(quote.tier.amount))
+      ? (preview || ecpay) ? 'NT$' + quote.tier.amount : panel.dataset.quote.replace('{tier}', quote.tier.code).replace('{amount}', String(quote.tier.amount))
       : exceedsClickerTextLimit(text) ? '' : panel.dataset.nameRequired;
     submit.disabled = submitting || !quote;
   }
@@ -72,6 +81,13 @@ export function setupClickerOrderTest(form, readDesign) {
     const design = configuration();
     if (!design) {
       if (readDesign()) name.focus();
+      return;
+    }
+    if (preview) {
+      const item = { kind: 'custom', name: '連字按壓款', price: quoteDesign(design.text).tier.amount, design,
+        fontName: form.elements.clickerNameFont.selectedOptions[0].textContent.trim(), quantity: 1 };
+      sessionStorage.setItem('ogs-order-preview', JSON.stringify({ ...item, submitted: false }));
+      location.assign('/internal-checkout.html?preview=1');
       return;
     }
     const snapshot = JSON.stringify(design);

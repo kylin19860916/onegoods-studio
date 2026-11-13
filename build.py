@@ -16,6 +16,8 @@ for lang, folder, column in locales:
     def translate(text):
         return text if column is None else pattern.sub(lambda m: translations[m[0]][column], text)
     for page in src.glob('*.html'):
+        if page.name == 'internal-checkout.html' and folder:
+            continue
         text = translate(page.read_text()).replace('lang="zh-Hans"', f'lang="{lang}"')
         if folder:
             text = text.replace('href="assets/', 'href="../assets/').replace('src="assets/', 'src="../assets/')
@@ -54,6 +56,8 @@ for lang, folder, column in locales:
         script = script.replace('makerworld.com/zh/', 'makerworld.com/en/')
     (target / 'app.js').write_text(script)
 (dist / 'style.css').write_text((src / 'style.css').read_text())
+for script_name in ('checkout-preview.js', 'checkout-preview-shipping.js'):
+    (dist / script_name).write_text((src / script_name).read_text())
 (dist / 'locale.js').write_text((src / 'locale.js').read_text())
 subprocess.run([
     str(root / 'node_modules' / '.bin' / 'esbuild'), 'src/nameplate.js',
@@ -66,3 +70,9 @@ print(f'Built 3 locales × {len(list(src.glob("*.html")))} routes, localized pro
 import shutil
 for name in ["admin.css", "admin.js"]:
     shutil.copy2(root / "admin" / name, dist / name)
+
+subprocess.run([
+    str(root / 'node_modules' / '.bin' / 'esbuild'), 'src/admin-shipping-pdf.js',
+    '--bundle', '--platform=browser', '--format=esm', '--minify', '--legal-comments=eof',
+    '--outfile=public/admin-shipping-pdf.js',
+], cwd=root, check=True)

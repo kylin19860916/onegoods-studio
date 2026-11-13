@@ -56,7 +56,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)r
 $('#new-item').onclick=()=>openEditor(blank(),true);$('#back-list').onclick=()=>{if(canLeave())showList();};$('#search').oninput=()=>{state.filters[state.kind].query=$('#search').value;renderList();};for(const [id,key]of [['category','category'],['record','record'],['sale','sale'],['sort','sort']])$('#'+id+'-filter').onchange=()=>{state.filters[state.kind][key]=$('#'+id+'-filter').value;renderList();};$('#reset-filters').onclick=resetFilters;$('#refresh').onclick=()=>refresh().then(()=>notify('列表已更新。')).catch(e=>notify(e.message,true));$('#add-spec').onclick=()=>{state.current.specs=collect().specs;state.current.specs.push({label:'',value:''});state.dirty=true;renderSpecs();};$('#image-upload').onchange=e=>upload(e.target,'image');$('#design-upload').onchange=e=>upload(e.target,'design');$('#archive-item').onclick=()=>{if(confirm('封存後會從官網移除，之後仍可恢復。要封存嗎？')){field('status').value='archived';state.dirty=true;save();}};$('#view-public').onclick=()=>window.open(state.current.kind==='design'?'/design-files.html':'/product.html?id='+encodeURIComponent(state.current.id),'_blank','noopener');
 $('#backup').onclick=async()=>{try{const [{items},{items:categories}]=await Promise.all([api('catalog'),api('categories')]);const blob=new Blob([JSON.stringify({brand:'One Goods Studio',exportedAt:new Date().toISOString(),items,categories},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='OGS-catalog-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){notify(e.message,true);}};
 window.addEventListener('beforeunload',e=>{if(state.dirty||state.categoryDirty){e.preventDefault();e.returnValue='';}});
-(async()=>{try{const session=await api('session');$('#account').textContent=session.email;await api('initialize',{method:'POST',body:'{}'});await refresh();if(location.hash==='#clicker-orders'){const id=new URLSearchParams(location.search).get('clicker-order');if(/^OGS-E-[A-F0-9]{12}$/.test(id||''))$('#clicker-order-search').elements.query.value=id;showClickerOrders();}}catch(e){notify(e.message,true);$('#list-summary').textContent='資料未能載入。';}})();
+(async()=>{try{const session=await api('session');$('#account').textContent=session.email;await api('initialize',{method:'POST',body:'{}'});await refresh();if(isOrderRoute()){const id=new URLSearchParams(location.search).get('clicker-order');if(/^OGS-(?:E|T|DEMO)-[A-F0-9]{12}$/.test(id||'')) orderSearch.elements.query.value=id; showClickerOrders();}}catch(e){notify(e.message,true);$('#list-summary').textContent='資料未能載入。';}})();
 
 const orderList = $('#clicker-order-list');
 const orderSearch = $('#clicker-order-search');
@@ -66,11 +66,35 @@ const orderColors = {'#a087c1':'薰衣草紫','#fffcf5':'奶油白','#f2c879':'�
 const orderFonts = {huninn:'粉圓','sans-tc':'繁體黑體','serif-tc':'繁體宋體','sans-sc':'簡體黑體','serif-sc':'簡體宋體',wenkai:'文楷',kuaile:'快樂體',lucky:'Luckiest Guy',nunito:'Nunito',lobster:'Lobster',lilita:'Lilita One',chewy:'Chewy',yellowtail:'Yellowtail',blackops:'Black Ops One'};
 const orderDate = new Intl.DateTimeFormat('zh-TW', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Taipei' });
 let orderSearchVersion = 0;
+let orders = [];
+let orderStatusFilter = 'all';
+let orderSort = { field: 'date', direction: 'descending' };
+let shippingTools = false;
+const listView = $('#order-list-view');
+const detailView = $('#order-detail-view');
+const detailContent = $('#order-detail');
+const money = amount => 'NT$' + Number(amount).toLocaleString('en-TW');
+const formatOrderDate = value => value ? orderDate.format(new Date(value)) : '—';
+const orderStatuses = { unpaid: '待付款', active: '進行中', pending: '待寄件', complete: '已完成', attention: '待處理' };
+
+function isOrderRoute() {
+  return location.hash === '#clicker-orders' || /^#orders(?:\/|$)/.test(location.hash);
+}
+
+function orderStatus(order) {
+  if (order.paymentState === 'failure') return 'attention';
+  if (!order.previewPaid && !order.matchedReference) return 'unpaid';
+  const status = String(order.shipment?.status ?? '');
+  if (['2067','3022'].includes(status)) return 'complete';
+  if (['2074','3020','2099'].includes(status)) return 'attention';
+  if (status === '300') return 'pending';
+  return 'active';
+}
 
 function hideClickerOrders() {
   orderView.hidden = true;
   orderNav.classList.remove('active');
-  if (location.hash === '#clicker-orders') history.replaceState(null, '', location.pathname + location.search);
+  if (isOrderRoute()) history.replaceState(null, '', location.pathname + location.search);
 }
 
 function showClickerOrders() {
@@ -80,9 +104,9 @@ function showClickerOrders() {
   state.current = null;
   for (const id of ['catalog-view', 'categories-view', 'editor-view', 'new-item']) $('#' + id).hidden = true;
   document.querySelectorAll('.nav-item').forEach(button => button.classList.toggle('active', button === orderNav));
-  $('#page-title').textContent = '客製訂單';
-  $('#page-description').textContent = '核對客製內容、交易編號及下載 3MF。目前僅開放內部測試。';
-  history.replaceState(null, '', location.pathname + '#clicker-orders');
+  $('#page-title').textContent = '訂單';
+  $('#page-description').textContent = '管理客製訂單和商品訂單。';
+  if (!isOrderRoute()) history.replaceState(null, '', location.pathname + '#orders');
   orderView.hidden = false;
   loadClickerOrders();
 }
@@ -94,39 +118,256 @@ function orderSwatch(label, color) {
 
 function renderClickerOrder(order) {
   const { id, design, tier, amount, checkoutCreated, matchedReference, matchedAt } = order;
+  const delivery = order.delivery;
+  const address = delivery?.address;
+  const store = delivery?.store;
+  const destination = store
+    ? [store.carrier, store.name, store.id, store.address].join(' · ')
+    : address ? [address.postalCode, address.city + address.district + address.street, address.unit].filter(Boolean).join(' ') : '';
   const ecpay = tier === 'ecpay-stage';
-  const status = ecpay
+  const status = order.previewPaid && !ecpay ? '模擬付款完成' : ecpay
     ? matchedReference ? '測試付款成功 · 已配對' : '待綠界測試付款'
     : matchedReference ? '已配對（測試）' : checkoutCreated ? '待配對' : '待模擬下單';
   const matchForm = !ecpay && checkoutCreated && !matchedReference
     ? `<form class="order-match" data-match-order="${esc(id)}"><label>模擬賣貨便單號<input name="reference" required maxlength="24" autocomplete="off"></label><label>商品金額（不含運）<input name="amount" type="number" min="1" step="1" required></label><button class="primary">確認配對</button><span role="status"></span></form>`
     : '';
+  const shipment = order.shipment;
+  const logistics = destination && order.previewPaid ? `<div class="order-toolbar">
+    <button type="button" class="text-action" data-logistics-action="${shipment ? 'query' : 'create'}" data-order-id="${esc(id)}">${shipment ? '查詢綠界物流測試單' : '建立綠界物流測試單'}</button>
+    ${shipment?.id && shipment.subtype === 'UNIMARTC2C' ? `<button type="button" class="text-action" data-logistics-action="code" data-order-id="${esc(id)}">複製交貨便代碼</button><button type="button" class="text-action" data-logistics-action="print" data-order-id="${esc(id)}">列印託運單</button>` : ''}
+    ${shipment?.id ? `<span>物流單號 ${esc(shipment.id)} · 貨態 ${esc(shipment.status)}${shipment.notice ? ' · 已收到通知' : ''}</span>` : ''}
+    <span role="status"></span></div>` : '';
   return `<article class="panel clicker-order-item"><div class="panel-title"><h2>${esc(design.text)}</h2><span class="badge">${status}</span></div>
     <p><strong>${esc(id)}</strong> · 連字按壓款 · ${esc(orderDate.format(new Date(order.createdAt)))}</p>
     <p>字型 ${esc(orderFonts[design.font] || design.font)} · ${ecpay ? '綠界測試' : '測試價位 ' + (tier === 'test-a' ? 'A' : 'B')} · NT$${amount}</p>
     <div class="order-swatches">${orderSwatch('外框', design.colors.border)}${orderSwatch('內底', design.colors.fill)}${orderSwatch('凸字', design.colors.ink)}</div>
     ${matchedReference ? `<p>${ecpay ? '綠界測試交易編號' : '模擬賣貨便單號'} <strong>${esc(matchedReference)}</strong> · ${esc(orderDate.format(new Date(matchedAt)))}</p>` : ''}
+    ${destination ? `<fieldset><legend>配送資料（測試）</legend><p>${esc(delivery.contact)} · ${esc(delivery.phone)}</p>
+      <label>${store ? '取貨門市' : '收件地址'}<input aria-label="${store ? '取貨門市' : '收件地址'}" value="${esc(destination)}" readonly></label></fieldset>` : ''}
     ${matchForm}
-    <div class="order-toolbar"><a class="text-action" href="/api/admin/clicker-orders/${esc(id)}/3mf" download>下載 3MF</a>${checkoutCreated || matchedReference ? '' : `<a class="text-action" href="/api/clicker-orders/test/${esc(id)}/checkout/${esc(tier)}">${ecpay ? '前往綠界測試付款' : '繼續模擬下單'}</a>`}</div>
+    ${logistics}
+    <div class="order-toolbar"><a class="text-action" href="/api/admin/clicker-orders/${esc(id)}/3mf" download>下載 3MF</a>${checkoutCreated || matchedReference || tier === 'checkout-preview' ? '' : `<a class="text-action" href="/api/clicker-orders/test/${esc(id)}/checkout/${esc(tier)}">${ecpay ? '前往綠界測試付款' : '繼續模擬下單'}</a>`}</div>
     </article>`;
+}
+
+function renderPhysicalOrder(order) {
+  const { delivery } = order;
+  const store = delivery?.store;
+  const address = delivery?.address;
+  const destination = store
+    ? [store.carrier, store.name, store.id, store.address].filter(Boolean).join(' · ')
+    : address ? [address.postalCode, address.city + address.district + address.street, address.unit].filter(Boolean).join(' ') : '';
+  return `<article class="panel clicker-order-item"><div class="panel-title"><h2>${esc(order.name)}</h2><span class="badge">${orderStatuses[orderStatus(order)]}</span></div>
+    <p><strong>${esc(order.id)}</strong> · 商品訂單 · ${formatOrderDate(order.createdAt)}</p>
+    <p>數量 ${esc(order.quantity)} · 商品小計 ${money(order.subtotal)} · 運費 ${money(order.shipping)} · 合計 ${money(order.amount)}</p>
+    ${destination ? `<fieldset><legend>配送資料（測試）</legend><p>${esc(delivery.contact)} · ${esc(delivery.phone)}</p><p>${esc(destination)}</p></fieldset>` : ''}
+    </article>`;
+}
+
+const orderCollator = new Intl.Collator('zh-TW', { numeric: true, sensitivity: 'base' });
+const orderStatusRanks = Object.keys(orderStatuses);
+const orderSortColumns = { date: '日期', kind: '類型', item: '品項', status: '狀態' };
+const orderItemName = order => order.design?.text || order.name || '';
+
+function orderSortHeader(field) {
+  const active = field === orderSort.field;
+  const arrow = active ? (orderSort.direction === 'ascending' ? '↑' : '↓') : '↕';
+  return `<th scope="col"${active ? ` aria-sort="${orderSort.direction}"` : ''}><button class="order-sort" type="button" data-order-sort="${field}">${orderSortColumns[field]} <span aria-hidden="true">${arrow}</span></button></th>`;
+}
+
+function sortVisibleOrders(left, right) {
+  const leftDate = Date.parse(left.createdAt);
+  const rightDate = Date.parse(right.createdAt);
+  const dateOrder = (rightDate || 0) - (leftDate || 0);
+  const direction = orderSort.direction === 'ascending' ? 1 : -1;
+  if (orderSort.field === 'date') {
+    if (Number.isFinite(leftDate) !== Number.isFinite(rightDate)) return Number.isFinite(leftDate) ? -1 : 1;
+    return -dateOrder * direction;
+  }
+  const compare = {
+    kind: () => orderCollator.compare(left.kind, right.kind),
+    item: () => orderCollator.compare(orderItemName(left), orderItemName(right)),
+    status: () => orderStatusRanks.indexOf(orderStatus(left)) - orderStatusRanks.indexOf(orderStatus(right)),
+  };
+  return compare[orderSort.field]() * direction || dateOrder;
+}
+
+function renderOrderView() {
+  const detailId = /^#orders\/(OGS-(?:T|E|DEMO)-[A-F0-9]{12})$/.exec(location.hash)?.[1];
+  listView.hidden = Boolean(detailId);
+  detailView.hidden = !detailId;
+  $('#page-title').textContent = detailId ? '訂單詳情' : '訂單';
+  $('#page-description').textContent = detailId || '管理客製訂單和商品訂單。';
+  if (detailId) {
+    const order = orders.find(item => item.id === detailId);
+    detailContent.innerHTML = order ? (order.kind === 'physical' ? renderPhysicalOrder(order) : renderClickerOrder(order))
+      : '<p>目前找不到這筆訂單。</p>';
+    return;
+  }
+  detailContent.replaceChildren();
+  $('#pending-shipments').hidden = !shippingTools || orderStatusFilter !== 'pending';
+  const type = $('#order-type-filter').value;
+  const query = orderSearch.elements.query.value.trim().toLowerCase();
+  const visible = orders.filter(order => {
+    const name = orderItemName(order);
+    const keywords = [order.id, name, order.matchedReference, order.searchReference, order.delivery?.contact];
+    return (type === 'all' || type === order.kind) &&
+      (orderStatusFilter === 'all' || orderStatusFilter === orderStatus(order)) &&
+      (!query || keywords.some(value => value?.toLowerCase().includes(query)));
+  }).sort(sortVisibleOrders);
+  orderList.innerHTML = visible.length ? `<table class="orders-table">
+    <thead><tr><th scope="col">訂單</th>${orderSortHeader('date')}${orderSortHeader('kind')}${orderSortHeader('item')}<th scope="col">金額</th>${orderSortHeader('status')}</tr></thead>
+    <tbody>${visible.map(order => {
+      const status = orderStatus(order);
+      return `<tr><td><a href="#orders/${esc(order.id)}">${esc(order.id)}</a></td><td>${formatOrderDate(order.createdAt)}</td>
+      <td>${order.kind === 'custom' ? '客製' : '商品'}</td><td>${esc(orderItemName(order))}</td>
+      <td>${money(order.amount)}</td><td><span class="badge order-state order-state-${status}">${orderStatuses[status]}</span></td></tr>`;
+    }).join('')}</tbody></table>` : '<p class="order-empty">沒有符合條件的訂單。</p>';
 }
 
 async function loadClickerOrders() {
   const version = ++orderSearchVersion;
-  orderList.textContent = '正在讀取客製訂單…';
+  const target = location.hash.startsWith('#orders/') ? detailContent : orderList;
+  if (target === detailContent) {
+    detailView.hidden = false;
+    listView.hidden = true;
+  }
+  target.textContent = '正在讀取訂單…';
   try {
-    const { items, ecpayStageAvailable } = await api('clicker-orders?q=' + encodeURIComponent(orderSearch.elements.query.value.trim()));
-    if (version !== orderSearchVersion) return;
+    const detailId = /^#orders\/(OGS-(?:T|E|DEMO)-[A-F0-9]{12})$/.exec(location.hash)?.[1];
+    const query = orderSearch.elements.query.value.trim();
+    const { items, physicalItems, ecpayStageAvailable, shippingToolsAvailable } = await api('clicker-orders?q=' + encodeURIComponent(detailId || query));
+    if (version !== orderSearchVersion || !isOrderRoute()) return;
+    orders = [...items, ...(physicalItems || [])].sort((left, right) => (right.createdAt || '').localeCompare(left.createdAt || ''));
+    shippingTools = shippingToolsAvailable;
+    $('#new-checkout-test').hidden = !shippingTools;
     $('#new-ecpay-test').hidden = !ecpayStageAvailable;
-    orderList.innerHTML = items.length ? items.map(renderClickerOrder).join('') : '<p>沒有符合的客製訂單。</p>';
+    renderOrderView();
   } catch (error) {
-    if (version === orderSearchVersion) orderList.textContent = error.message;
+    if (version === orderSearchVersion) target.textContent = error.message;
   }
 }
 
-orderNav.onclick = showClickerOrders;
+orderNav.onclick = () => {
+  if (isOrderRoute() && location.hash.startsWith('#orders/')) location.hash = '#orders';
+  else showClickerOrders();
+};
+window.addEventListener('hashchange', () => {
+  if (isOrderRoute()) showClickerOrders();
+  else if (!orderView.hidden) showList();
+});
 orderSearch.onsubmit = event => { event.preventDefault(); loadClickerOrders(); };
-orderList.addEventListener('submit', async event => {
+$('#order-type-filter').onchange = renderOrderView;
+orderList.addEventListener('click', event => {
+  const button = event.target.closest('[data-order-sort]');
+  if (!button) return;
+  const field = button.dataset.orderSort;
+  const direction = field === orderSort.field
+    ? (orderSort.direction === 'ascending' ? 'descending' : 'ascending')
+    : (field === 'date' ? 'descending' : 'ascending');
+  orderSort = { field, direction };
+  renderOrderView();
+  orderList.querySelector(`[data-order-sort="${field}"]`)?.focus({ preventScroll: true });
+});
+$('#order-status-filters').addEventListener('click', event => {
+  const filter = event.target.closest('[data-order-status]');
+  if (!filter) return;
+  orderStatusFilter = filter.dataset.orderStatus;
+  for (const button of $('#order-status-filters').querySelectorAll('button')) {
+    button.classList.toggle('active', button === filter);
+    button.setAttribute('aria-pressed', String(button === filter));
+  }
+  renderOrderView();
+});
+async function logisticsRequest(action, id) {
+  const response = await fetch('/api/checkout-logistics-preview/' + action, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }),
+  });
+  if (!response.ok) {
+    const result = await response.json().catch(() => ({}));
+    throw new Error(result.error || '無法讀取物流測試單。');
+  }
+  return response;
+}
+
+function openStageLabel(tab, { action, fields }) {
+  const destination = 'https://logistics-stage.ecpay.com.tw/Express/PrintUniMartC2COrderInfo';
+  if (action !== destination) throw new Error('列印網址與綠界測試環境不符。');
+  const form = tab.document.createElement('form');
+  form.method = 'POST';
+  form.action = destination;
+  for (const [name, value] of Object.entries(fields)) {
+    const input = tab.document.createElement('input');
+    Object.assign(input, { type: 'hidden', name, value });
+    form.append(input);
+  }
+  tab.document.body.append(form);
+  form.submit();
+}
+
+async function shippingAction(button, action, id) {
+  const status = button.parentElement.querySelector('[role="status"]');
+  const printing = action === 'print' || action === 'print-pending';
+  let tab;
+  button.disabled = true;
+  status.textContent = '正在讀取綠界測試單…';
+  try {
+    if (printing) {
+      tab = window.open('about:blank', '_blank');
+      if (!tab) throw new Error('請允許開啟新分頁後重試。');
+      tab.opener = null;
+      tab.document.body.textContent = '正在開啟綠界測試託運單…';
+    }
+    const response = logisticsRequest(action === 'download-pending-pdf' ? 'render-pending-labels' : action, id);
+    if (action === 'code') {
+      const code = response.then(result => result.json()).then(result => result.code);
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ 'text/plain': code.then(value => new Blob([value], {type:'text/plain'})) })]);
+        status.textContent = '已複製 12 碼交貨便代碼。';
+      } catch {
+        const input = document.createElement('input');
+        input.value = await code;
+        input.readOnly = true;
+        input.setAttribute('aria-label', '12 碼交貨便代碼');
+        status.replaceChildren(input);
+        input.select();
+      }
+    } else if (printing) {
+      openStageLabel(tab, await (await response).json());
+      status.textContent = '已開啟綠界測試託運單。';
+    } else if (action === 'download-pending-pdf') {
+      const [{ downloadShippingPdf }, labels] = await Promise.all([import('/admin-shipping-pdf.js'), response]);
+      await downloadShippingPdf(labels);
+      status.textContent = '已下載綠界測試託運單 PDF。';
+    } else if (action === 'export-pending') {
+      const url = URL.createObjectURL(await (await response).blob());
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'ogs-7eleven-pending-test.html';
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      status.textContent = '已下載 7-ELEVEN 待寄件清單。';
+    } else {
+      await response;
+      await loadClickerOrders();
+    }
+  } catch (error) {
+    tab?.close();
+    status.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+$('#pending-shipments').addEventListener('click', event => {
+  const button = event.target.closest('[data-shipping-batch]');
+  if (button) shippingAction(button, button.dataset.shippingBatch);
+});
+detailContent.addEventListener('click', event => {
+  const button = event.target.closest('[data-logistics-action]');
+  if (button) shippingAction(button, button.dataset.logisticsAction, button.dataset.orderId);
+});
+detailContent.addEventListener('submit', async event => {
   event.preventDefault();
   const form = event.target;
   if (!form.reportValidity()) return;

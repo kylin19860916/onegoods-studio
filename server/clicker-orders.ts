@@ -1,3 +1,4 @@
+import { isCheckoutTestHost } from './checkout-test-host';
 import { isAdmin, json, HttpError } from './catalog';
 import { generateClicker3mf, type ClickerDesign } from './clicker-print';
 import { exceedsClickerTextLimit, quoteClickerEcpayStage, quoteClickerTest } from '../src/clicker-test-pricing.js';
@@ -51,13 +52,15 @@ function receipt(row: Pick<Order, 'id' | 'tier' | 'amount'>) {
   return { id: row.id, tier: row.tier, amount: row.amount, checkoutUrl: prefix + '/' + row.id + '/checkout/' + row.tier };
 }
 
-async function createOrder(request: Request, store: Store, ecpay: boolean) {
-  const { design, tier, requestId } = validate(await requestJson(request), ecpay);
+export async function createOrder(request: Request, store: Store, ecpay: boolean, options: { preview?: boolean; shipping?: number } = {}) {
+  const { preview = false, shipping = 0 } = options;
+  const { design, tier: quote, requestId } = validate(await requestJson(request), ecpay || preview);
+  const tier = { ...quote, id: preview ? 'checkout-preview' : quote.id, amount: quote.amount + shipping };
   const snapshot = JSON.stringify(design);
   const lookup = store.DB.prepare('SELECT * FROM clicker_orders WHERE request_id=?').bind(requestId);
   const existing = await lookup.first<Order>();
   if (existing) {
-    if (existing.design !== snapshot || existing.tier !== tier.id) return fail('此確認已提交，請重新確認變更後的設計。', 409);
+    if (existing.design !== snapshot || existing.tier !== tier.id || existing.amount !== tier.amount) return fail('此確認已提交，請重新確認變更後的設計。', 409);
     return json(receipt(existing));
   }
   const fontUrl = new URL('/assets/fonts/keyring/' + keyringFonts[design.font], request.url);
@@ -77,7 +80,7 @@ async function createOrder(request: Request, store: Store, ecpay: boolean) {
   }
   await store.BUCKET.delete(fileKey(id));
   const concurrent = await lookup.first<Order>();
-  if (!concurrent || concurrent.design !== snapshot || concurrent.tier !== tier.id) return fail('此確認已提交，請重新確認設計。', 409);
+  if (!concurrent || concurrent.design !== snapshot || concurrent.tier !== tier.id || concurrent.amount !== tier.amount) return fail('此確認已提交，請重新確認設計。', 409);
   return json(receipt(concurrent));
 }
 
@@ -178,10 +181,33 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
     if (path === '/api/admin/clicker-orders' && request.method === 'GET') {
       const query = url.searchParams.get('q')?.trim().toUpperCase() ?? '';
       const pattern = '%' + query.slice(0, 64).replace(/[%_]/g, '') + '%';
-      const result = await store.DB.prepare('SELECT * FROM clicker_orders WHERE id LIKE ? OR mock_reference LIKE ? OR matched_reference LIKE ? ORDER BY created_at DESC LIMIT 100')
-        .bind(pattern, pattern, pattern).all<Order>();
-      return json({ ecpayStageAvailable: !!callback, items: result.results.map(row => ({
-        id: row.id, design: JSON.parse(row.design), tier: row.tier, amount: row.amount, createdAt: row.created_at,
+      const querySql = `SELECT * FROM clicker_orders WHERE id LIKE ? OR mock_reference LIKE ? OR matched_reference LIKE ? OR json_extract(design, '$.text') LIKE ? ORDER BY created_at DESC LIMIT 100`;
+      const previewSql = querySql.replace('SELECT *', "SELECT clicker_orders.*, (SELECT receipt FROM checkout_preview_orders WHERE request_id = clicker_orders.request_id) AS preview_receipt, (SELECT status FROM checkout_preview_orders WHERE request_id = clicker_orders.request_id) AS preview_status, (SELECT json_object('id', logistics_id, 'status', status, 'notice', notice, 'subtype', subtype) FROM checkout_preview_shipments WHERE order_id = clicker_orders.id) AS preview_shipment");
+      const result = await store.DB.prepare(isCheckoutTestHost(url) ? previewSql : querySql)
+        .bind(pattern, pattern, pattern, pattern).all<Order & { preview_receipt?: string; preview_status?: string; preview_shipment?: string }>();
+      const checkoutTest = isCheckoutTestHost(url);
+      const physical = checkoutTest ? await store.DB.prepare(`
+        SELECT p.receipt, p.status, json_extract(p.payload, '$.item.id') AS product_id,
+          json_extract(p.payload, '$.item.quantity') AS quantity, json_extract(c.data, '$.name') AS product_name
+        FROM checkout_preview_orders p
+        LEFT JOIN catalog c ON c.id = json_extract(p.payload, '$.item.id')
+        WHERE json_extract(p.payload, '$.item.kind') = 'physical'
+        ORDER BY p.rowid DESC LIMIT 100
+      `).all<{ receipt: string; status: string; product_id: string; quantity: number; product_name: string | null }>() : null;
+      const physicalItems = (physical?.results ?? []).map(row => {
+        const receipt = JSON.parse(row.receipt);
+        return {
+          id: receipt.id, kind: 'physical', name: receipt.productName || row.product_name || row.product_id,
+          quantity: row.quantity, amount: receipt.total, createdAt: receipt.createdAt,
+          delivery: receipt.delivery, previewPaid: row.status === 'success', paymentState: row.status,
+          subtotal: receipt.subtotal, shipping: receipt.shipping,
+        };
+      });
+      return json({ ecpayStageAvailable: !!callback, shippingToolsAvailable: checkoutTest, physicalItems, items: result.results.map(row => ({
+        id: row.id, kind: 'custom', searchReference: row.mock_reference, design: JSON.parse(row.design), tier: row.tier, amount: row.amount, createdAt: row.created_at,
+        delivery: row.preview_receipt ? JSON.parse(row.preview_receipt).delivery : undefined,
+        previewPaid: row.preview_status === 'success' || (!!row.preview_receipt && !!row.matched_reference),
+        shipment: row.preview_shipment ? JSON.parse(row.preview_shipment) : undefined,
         checkoutCreated: !!row.mock_reference, matchedReference: row.matched_reference, matchedAt: row.matched_at,
       })) });
     }

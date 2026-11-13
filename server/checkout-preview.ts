@@ -1,0 +1,111 @@
+import { isCheckoutTestHost } from './checkout-test-host';
+import { HttpError, isAdmin, json } from './catalog';
+import { createOrder } from './clicker-orders';
+import { quoteClickerEcpayStage } from '../src/clicker-test-pricing.js';
+
+import { ecpayStageReturnUrl } from './ecpay-stage';
+import { readPreviewStore } from './checkout-delivery-preview';
+import { previewShipping } from '../src/checkout-preview-shipping.js';
+const uuid = /^[0-9a-f-]{36}$/i;
+const cap = (value: unknown, max: number) => typeof value === 'string' ? value.trim().slice(0, max) : '';
+
+type PreviewStore = { DB: D1Database; BUCKET: R2Bucket; ASSETS: Fetcher };
+type Receipt = { id: string; createdAt?: string; productName?: string; subtotal: number; shipping: number; total: number; checkoutUrl?: string; delivery?: unknown };
+
+export async function previewCheckout(request: Request, env: Cloudflare.Env, user: Parameters<typeof isAdmin>[0]) {
+  const url = new URL(request.url);
+  if (!isCheckoutTestHost(url)) {
+    return json({ error: '找不到此功能。' }, 404);
+  }
+  if (!isAdmin(user, env)) return json({ error: '請先登入 OGS 管理帳號。' }, 403);
+  if (request.method !== 'POST' || request.headers.get('Origin') !== url.origin) {
+    return json({ error: '請在測試頁內操作。' }, 403);
+  }
+  try {
+    const { DB: db } = env as PreviewStore;
+    const raw = await request.text();
+    if (raw.length > 8192) throw new HttpError(413, '送出的資料過長。');
+    const body = JSON.parse(raw);
+    const requestId = cap(body?.requestId, 36);
+    if (!uuid.test(requestId)) throw new HttpError(400, '提交編號無效。');
+    if (body.paymentState !== undefined) {
+      if (!['pending', 'failure', 'success'].includes(body.paymentState)) throw new HttpError(400, '付款狀態無效。');
+      const result = await db.prepare(
+        "UPDATE checkout_preview_orders SET status = CASE WHEN status = 'success' THEN status ELSE ? END WHERE request_id = ? AND json_extract(receipt, '$.checkoutUrl') IS NULL RETURNING status"
+      ).bind(body.paymentState, requestId).first<{status: string}>();
+      if (!result) throw new HttpError(404, '找不到測試單。');
+      return json(result);
+    }
+    const { item, method } = body;
+    const ecpay = body.provider === 'ecpay';
+    if (ecpay && !ecpayStageReturnUrl(env)) throw new HttpError(503, '綠界測試目前未啟用。');
+    if (ecpay && item?.kind !== 'custom') throw new HttpError(400, '此綠界測試入口適用於連字按壓款。');
+    const existing = await db.prepare('SELECT receipt, payload FROM checkout_preview_orders WHERE request_id = ?')
+      .bind(requestId).first<{receipt: string; payload: string}>();
+    if (existing) {
+      if (existing.payload !== raw) throw new HttpError(409, '訂單內容已變更，請重新確認。');
+      return json(JSON.parse(existing.receipt));
+    }
+
+    if (method !== 'store' && method !== 'home') throw new HttpError(400, '請選擇配送方式。');
+    const contact = cap(body.contact, 80);
+    const phone = cap(body.phone, 32);
+    if (!contact || !phone) throw new HttpError(400, '請填寫收件人與電話。');
+    const store = method === 'store' ? await readPreviewStore(db, body.storeToken) : null;
+    if (method === 'store' && !store) throw new HttpError(400, '請重新選擇取貨門市。');
+    const address = method === 'home' ? {
+      city: cap(body.address?.city, 12), district: cap(body.address?.district, 12),
+      postalCode: cap(body.address?.postalCode, 6), street: cap(body.address?.street, 100),
+      unit: cap(body.address?.unit, 40),
+    } : null;
+    if (address && (!address.city || !address.district || !address.street || !/^\d{3}(?:\d{2,3})?$/.test(address.postalCode))) {
+      throw new HttpError(400, '請填寫縣市、行政區、郵遞區號與街道門牌。');
+    }
+    const delivery = { method, contact, phone, store, address };
+
+    const shipping = (method === 'store' ? previewShipping.store : previewShipping.home).fee;
+    let checkoutUrl: string | undefined;
+    let subtotal: number;
+    let id: string;
+    let productName: string | undefined;
+    if (item?.kind === 'custom') {
+      const quote = quoteClickerEcpayStage(item.design?.text);
+      if (!quote) throw new HttpError(400, '請確認客製文字。');
+      const customRequest = new Request(request.url, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...item.design, requestId }),
+      });
+      const response = await createOrder(customRequest, env as PreviewStore, ecpay, { preview: !ecpay, shipping: ecpay ? shipping : 0 });
+      const custom = await response.json() as {id: string; amount: number; checkoutUrl: string};
+      id = custom.id;
+      subtotal = quote.tier.amount;
+      if (ecpay) checkoutUrl = custom.checkoutUrl;
+    } else {
+      const quantity = item?.quantity;
+      if (item?.kind !== 'physical' || !Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
+        throw new HttpError(400, '請確認商品與數量。');
+      }
+      const row = await db.prepare("SELECT data FROM catalog WHERE id = ? AND kind = 'physical' AND status = 'published'")
+        .bind(cap(item.id, 80)).first<{data: string}>();
+      const product = row ? JSON.parse(row.data) : null;
+      if (product?.saleStatus !== 'available' || typeof product.price !== 'number') {
+        throw new HttpError(409, '這件商品目前無法下單。');
+      }
+      id = 'OGS-DEMO-' + requestId.replaceAll('-', '').slice(0, 12).toUpperCase();
+      subtotal = product.price * quantity;
+      productName = product.name;
+    }
+    const receipt: Receipt = { id, createdAt: new Date().toISOString(), productName, subtotal, shipping, total: subtotal + shipping, checkoutUrl, delivery };
+    await db.prepare('INSERT INTO checkout_preview_orders (request_id, receipt, payload) VALUES (?, ?, ?) ON CONFLICT (request_id) DO NOTHING')
+      .bind(requestId, JSON.stringify(receipt), raw).run();
+    const saved = await db.prepare('SELECT receipt, payload FROM checkout_preview_orders WHERE request_id = ?')
+      .bind(requestId).first<{receipt: string; payload: string}>();
+    if (!saved || saved.payload !== raw) throw new HttpError(409, '訂單內容已變更，請重新確認。');
+    return json(JSON.parse(saved.receipt), 201);
+  } catch (error) {
+    if (error instanceof HttpError) return json({ error: error.message }, error.status);
+    if (error instanceof SyntaxError) return json({ error: '資料格式不正確。' }, 400);
+    console.error('Local checkout test failed', error);
+    return json({ error: '目前無法建立測試單，請再試一次。' }, 500);
+  }
+}

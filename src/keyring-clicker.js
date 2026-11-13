@@ -68,10 +68,13 @@ export function setupClicker() {
       },
     };
   }
+  const previewDraft = new URLSearchParams(location.search).get('order-preview') === '1'
+    ? JSON.parse(sessionStorage.getItem('ogs-order-preview') || 'null') : null;
+  const saved = previewDraft?.kind === 'custom' && !previewDraft.submitted ? previewDraft.design : null;
   const base = setupColour(form.elements.base, '#393142');
-  const nameInk = setupColour(form.elements.nameInk, '#fffcf5');
-  const nameFill = setupColour(form.elements.nameFill, '#efb39e');
-  const nameBorder = setupColour(form.elements.nameBorder, '#f2c879');
+  const nameInk = setupColour(form.elements.nameInk, saved?.colors.ink ?? '#fffcf5');
+  const nameFill = setupColour(form.elements.nameFill, saved?.colors.fill ?? '#efb39e');
+  const nameBorder = setupColour(form.elements.nameBorder, saved?.colors.border ?? '#f2c879');
   const { clickerStyle, clickerName } = form.elements;
   const perKeySettings = document.querySelector('#clicker-per-key-settings');
   const nameSettings = document.querySelector('#clicker-name-settings');
@@ -80,7 +83,8 @@ export function setupClicker() {
   const nameFont = document.querySelector('#plate-style').cloneNode(true);
   nameFont.id = 'clicker-name-font';
   nameFont.name = 'clickerNameFont';
-  nameFont.value = 'huninn';
+  nameFont.value = saved?.font ?? 'huninn';
+  if (saved) clickerName.value = saved.text;
   document.querySelector('#clicker-name-font-field').append(nameFont);
   setupFontPicker(nameFont);
   const remove = document.querySelector('#clicker-remove');

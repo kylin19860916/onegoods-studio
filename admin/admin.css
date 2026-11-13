@@ -33,3 +33,39 @@
 @media (max-width: 700px) {
   .order-match { grid-template-columns: minmax(0, 1fr); }
 }
+
+#order-status-filters { margin-bottom: 12px; }
+.order-type { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.orders-table-wrap { overflow-x: auto; border: 1px solid #d8d0dc; border-radius: 10px; background: #fff; }
+.orders-table { width: 100%; min-width: 650px; border-collapse: collapse; text-align: left; font-size: 14px; }
+.orders-table th, .orders-table td { padding: 12px 14px; border-bottom: 1px solid #e8e2eb; }
+.orders-table th { background: #f7f4f8; white-space: nowrap; }
+.orders-table tbody tr:last-child td { border-bottom: 0; }
+.orders-table tbody tr:hover { background: #faf7fc; }
+.orders-table td:first-child a { white-space: nowrap; color: #57396e; font-weight: 700; }
+.orders-table .order-state { white-space: nowrap; }
+.orders-table .order-state-unpaid { background: #eae0f7; color: #512b72; }
+.orders-table .order-state-active { background: #d9ebff; color: #174875; }
+.orders-table .order-state-pending { background: #ffe7ab; color: #644006; }
+.orders-table .order-state-complete { background: #d7efdd; color: #205433; }
+.orders-table .order-state-attention { background: #fbdadd; color: #8b2533; }
+.order-empty { padding: 8px 16px; }
+.order-detail { margin-top: 16px; max-width: 850px; }
+
+.orders-table .order-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.order-sort span { color: #71677a; }
+.orders-table th[aria-sort] .order-sort span { color: #57396e; font-weight: 700; }
+.orders-table .order-sort:hover { background: #ece5f2; }
+.orders-table .order-sort:focus-visible { outline: 2px solid #79569a; outline-offset: 2px; }

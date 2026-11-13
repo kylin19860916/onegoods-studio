@@ -1,10 +1,32 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>OGS 商品管理</title><link rel="icon" href="/assets/icon.png"><link rel="stylesheet" href="/admin.css?v=5"><script src="/admin.js?v=9" defer></script></head><body><div class="shell"><aside><a class="brand" href="/"><img src="/assets/ogs-wordmark-header.png" alt="OGS"><span>STUDIO MANAGER</span></a><nav aria-label="管理分類"><button class="nav-item active" data-kind="physical">實體商品 <span id="physical-count">—</span></button><button class="nav-item" data-kind="design">設計檔案 <span id="design-count">—</span></button><button class="nav-item" id="manage-categories">分類管理</button><button class="nav-item" id="manage-clicker-orders">客製訂單</button></nav><div class="sidebar-bottom"><a href="/" target="_blank" rel="noopener">查看官網</a><button id="backup">匯出商品備份</button><a href="/signout-with-chatgpt?return_to=%2F">登出</a><small id="account"></small></div></aside><main><header><div><span class="eyebrow">ONE GOODS STUDIO / CONTENT</span><h1 id="page-title">實體商品</h1><p id="page-description">從一個點子，整理成準備亮相的小物。</p></div><button class="primary" id="new-item">新增實體商品</button></header><div id="notice" role="status" aria-live="polite" hidden></div><section id="clicker-orders-view" hidden>
-  <div class="toolbar order-toolbar">
-    <form id="clicker-order-search"><label class="search"><span class="sr-only">搜尋客製編號或交易編號</span><input name="query" type="search" placeholder="搜尋客製編號或交易編號" maxlength="64"></label><button>搜尋</button></form>
-    <a class="primary" href="/nameplate?style=name-clicker&amp;test-order=1">建立賣貨便模擬單</a>
-    <a class="primary" id="new-ecpay-test" href="/nameplate?style=name-clicker&amp;test-order=ecpay" hidden>建立綠界測試單</a>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>OGS 商品管理</title><link rel="icon" href="/assets/icon.png"><link rel="stylesheet" href="/admin.css?v=9"><script src="/admin.js?v=14" defer></script></head><body><div class="shell"><aside><a class="brand" href="/"><img src="/assets/ogs-wordmark-header.png" alt="OGS"><span>STUDIO MANAGER</span></a><nav aria-label="管理分類"><button class="nav-item active" data-kind="physical">實體商品 <span id="physical-count">—</span></button><button class="nav-item" data-kind="design">設計檔案 <span id="design-count">—</span></button><button class="nav-item" id="manage-categories">分類管理</button><button class="nav-item" id="manage-clicker-orders">訂單</button></nav><div class="sidebar-bottom"><a href="/" target="_blank" rel="noopener">查看官網</a><button id="backup">匯出商品備份</button><a href="/signout-with-chatgpt?return_to=%2F">登出</a><small id="account"></small></div></aside><main><header><div><span class="eyebrow">ONE GOODS STUDIO / CONTENT</span><h1 id="page-title">實體商品</h1><p id="page-description">從一個點子，整理成準備亮相的小物。</p></div><button class="primary" id="new-item">新增實體商品</button></header><div id="notice" role="status" aria-live="polite" hidden></div><section id="clicker-orders-view" hidden>
+  <div id="order-list-view">
+  <div id="order-status-filters" class="status-tabs" role="group" aria-label="訂單狀態">
+    <button type="button" data-order-status="all" aria-pressed="true" class="active">全部</button>
+    <button type="button" data-order-status="unpaid" aria-pressed="false">待付款</button>
+    <button type="button" data-order-status="active" aria-pressed="false">進行中</button>
+    <button type="button" data-order-status="pending" aria-pressed="false">待寄件</button>
+    <button type="button" data-order-status="complete" aria-pressed="false">已完成</button>
+    <button type="button" data-order-status="attention" aria-pressed="false">待處理</button>
   </div>
-  <div id="clicker-order-list" class="catalog-list" aria-live="polite"></div>
+  <div class="toolbar order-toolbar">
+    <form id="clicker-order-search"><label class="search"><span class="sr-only">搜尋訂單編號、品項或交易編號</span><input name="query" type="search" placeholder="搜尋訂單編號、品項或交易編號" maxlength="64"></label><button>搜尋</button></form>
+    <label class="order-type">訂單類型 <select id="order-type-filter"><option value="all">全部</option><option value="custom">客製訂單</option><option value="physical">商品訂單</option></select></label>
+    <a class="primary" href="/nameplate?style=name-clicker&amp;test-order=1">建立賣貨便模擬單</a>
+    <a class="text-action" id="new-checkout-test" href="/internal-checkout.html?preview=1&amp;start=1" hidden>測試站內結帳</a>
+    <a class="primary" id="new-ecpay-test" href="/internal-checkout.html?preview=1&amp;sample=clicker&amp;payment=ecpay" hidden>建立綠界測試單</a>
+  </div>
+  <div id="pending-shipments" class="toolbar order-toolbar" hidden>
+    <button type="button" data-shipping-batch="export-pending">下載 7-ELEVEN 待寄件清單</button>
+    <button type="button" data-shipping-batch="download-pending-pdf">批次下載託運單 PDF</button>
+    <button type="button" data-shipping-batch="print-pending">批次列印託運單</button>
+    <span role="status"></span>
+  </div>
+  <div id="clicker-order-list" class="orders-table-wrap" aria-live="polite"></div>
+  </div>
+  <section id="order-detail-view" hidden>
+    <a class="text-action" href="#orders">返回訂單</a>
+    <div id="order-detail" class="order-detail"></div>
+  </section>
 </section><section id="catalog-view"><div id="status-tabs" class="status-tabs" role="group" aria-label="展示狀態"></div>
 <div class="toolbar"><label class="search"><span class="sr-only">搜尋商品名稱、編號或網址代號</span><input id="search" placeholder="搜尋名稱、編號或網址代號…" type="search"></label><button id="refresh">重新整理</button></div>
 <div class="filter-bar"><label id="category-filter-field">商品分類<select id="category-filter"><option value="all">全部分類</option><option value="press">按壓派</option><option value="spin">旋轉派</option><option value="other">其他小物</option></select></label><label>資料類型<select id="record-filter"><option value="all">全部資料</option><option value="product">正式商品</option><option value="placeholder">類別示意</option></select></label><label>銷售狀態<select id="sale-filter"><option value="all">全部銷售狀態</option><option value="coming_soon">尚未開售</option><option value="available">已開售</option></select></label><label>列表排序<select id="sort-filter"><option value="display">前台排列順序</option><option value="updated">最近更新</option><option value="number">商品編號</option><option value="name">商品名稱</option></select></label></div>

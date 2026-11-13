@@ -44,3 +44,26 @@ export const logisticsNotifications = sqliteTable('logistics_notifications', {
   statusCode: text('status_code').notNull(),
   receivedAt: text('received_at').notNull(),
 });
+
+export const checkoutPreviewOrders = sqliteTable('checkout_preview_orders', {
+  requestId: text('request_id').primaryKey(),
+  receipt: text('receipt').notNull(),
+  payload: text('payload').notNull(),
+  status: text('status').notNull().default('unpaid'),
+});
+
+export const checkoutPreviewStoreMaps = sqliteTable('checkout_preview_store_maps', {
+  token: text('token').primaryKey(),
+  carrier: text('carrier').notNull(),
+  expiresAt: integer('expires_at').notNull(),
+  result: text('result'),
+});
+
+export const checkoutPreviewShipments = sqliteTable('checkout_preview_shipments', {
+  orderId: text('order_id').primaryKey(),
+  tradeNo: text('trade_no').notNull().unique(),
+  subtype: text('subtype').notNull(),
+  logisticsId: text('logistics_id').unique(),
+  status: text('status'),
+  notice: text('notice'),
+});

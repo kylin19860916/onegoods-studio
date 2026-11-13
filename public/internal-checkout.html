@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>訂單確認 · One Goods Studio</title>
+  <link rel="stylesheet" href="/style.css?v=f2f4872b5a3f">
+  <script type="module" src="/checkout-preview.js"></script>
+<link rel="canonical" href="https://onegoods.studio/internal-checkout.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/internal-checkout.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/internal-checkout.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/internal-checkout.html"></head>
+<body data-page="checkout">
+  <header>
+    <a class="brand" href="/internal-checkout.html?preview=1&amp;start=1" aria-label="One Goods Studio"><img class="brand-icon" src="/assets/icon.png" alt=""><img class="brand-wordmark" src="/assets/ogs-wordmark-header.png" alt="OGS"></a>
+  <nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="internal-checkout.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/internal-checkout.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="en/internal-checkout.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header>
+  <main class="section checkout-preview" hidden>
+    <p class="checkout-preview-label">內部下單預覽</p>
+    <section id="checkout-account" class="checkout-card checkout-account" hidden>
+      <h2 id="checkout-account-title">註冊或登入</h2>
+      <form id="checkout-account-form">
+        <label for="checkout-email">測試電子郵件</label>
+        <input id="checkout-email" type="email" value="buyer@example.com" required autocomplete="off">
+        <button class="button yellow" type="submit">繼續</button>
+      </form>
+      <button class="button cream" id="checkout-guest" type="button">訪客結帳</button>
+    </section>
+    <section id="checkout-start" hidden>
+      <h1>試走站內下單</h1>
+      <p class="checkout-intro">選一件商品開始，或直接打開範例購物袋。全程可用測試資料。</p>
+      <div class="checkout-actions">
+        <a class="button yellow" href="?preview=1&amp;sample=clicker&amp;payment=ecpay">試看客製購物袋</a>
+        <a class="button cream" href="?preview=1&amp;product=keynade-mx">從 Keynade MX 商品頁開始</a>
+        <a class="button cream" href="/nameplate?style=name-clicker&amp;order-preview=1">從客製設計頁開始</a>
+      </div>
+    </section>
+    <div id="checkout-flow" hidden>
+      <a id="checkout-back" class="custom-back">返回商品</a>
+      <h1 id="checkout-title" tabindex="-1">填寫配送資料</h1>
+      <nav aria-label="下單進度" class="checkout-progress">
+        <ol><li data-step="cart">購物袋</li><li data-step="delivery">配送</li><li data-step="review">確認</li><li data-step="payment">付款</li></ol>
+      </nav>
+      <div class="checkout-columns">
+        <section id="checkout-cart" class="checkout-card" hidden>
+          <h2>確認購買內容</h2>
+          <button class="button yellow" id="checkout-continue" type="button">前往結帳</button>
+        </section>
+        <form id="checkout-delivery" class="checkout-card" hidden>
+          <div class="checkout-actions">
+            <button class="button cream" id="checkout-member" type="button">註冊／登入</button>
+            <button class="button cream" id="checkout-fill-example" type="button">填入測試配送資料</button>
+          </div>
+          <fieldset class="checkout-shipping-methods" aria-describedby="checkout-shipping-note">
+            <legend>配送方式</legend>
+            <div id="checkout-method-options"></div>
+            <small id="checkout-shipping-note">預覽運費</small>
+          </fieldset>
+          <label for="checkout-contact">收件人</label>
+          <input id="checkout-contact" name="contact" required autocomplete="off">
+          <label for="checkout-phone">聯絡電話</label>
+          <input id="checkout-phone" name="phone" type="tel" required autocomplete="off">
+          <div id="checkout-store-fields" class="checkout-field" hidden>
+            <label for="checkout-carrier">超商品牌</label>
+            <select id="checkout-carrier">
+              <option value="UNIMARTC2C">7-ELEVEN</option><option value="FAMIC2C">全家</option><option value="HILIFEC2C">萊爾富</option>
+            </select>
+            <button type="button" class="button cream" id="checkout-pick-store">選擇取貨門市</button>
+            <p id="checkout-selected-store" role="status"></p>
+          </div>
+          <fieldset id="checkout-home-fields" class="checkout-shipping-methods checkout-field" disabled hidden>
+            <legend>收件地址</legend>
+            <label for="checkout-address-search">搜尋台灣地址</label>
+            <input id="checkout-address-search" placeholder="輸入路名或門牌" autocomplete="off" disabled>
+            <div id="checkout-address-suggestions" class="checkout-field"></div>
+            <small id="checkout-address-status" role="status"></small>
+            <small id="checkout-address-attribution" translate="no" hidden>Google Maps</small>
+            <div class="checkout-address-parts">
+              <label>縣市<input name="city" required maxlength="12" autocomplete="address-level1"></label>
+              <label>行政區／鄉鎮市<input name="district" required maxlength="12" autocomplete="address-level2"></label>
+              <label>郵遞區號<input name="postalCode" required maxlength="6" inputmode="numeric" pattern="[0-9]{3}([0-9]{2,3})?" autocomplete="postal-code"></label>
+            </div>
+            <label>街道門牌<input name="street" required maxlength="100" autocomplete="address-line1"></label>
+            <label>樓層／室號（選填）<input name="unit" maxlength="40" autocomplete="address-line2"></label>
+          </fieldset>
+          <button class="button yellow" type="submit">確認訂單</button>
+        </form>
+        <section id="checkout-review" class="checkout-card" hidden>
+          <h2>配送資料</h2>
+          <dl class="checkout-details" id="checkout-delivery-summary"></dl>
+          <div class="checkout-actions checkout-review-actions" id="checkout-review-actions" hidden>
+            <button class="button yellow" id="checkout-submit" type="button">前往付款</button>
+            <button class="button cream" id="checkout-edit" type="button">修改配送資料</button>
+            <p id="checkout-submit-error" role="alert" hidden></p>
+          </div>
+        </section>
+        <section id="checkout-payment" class="checkout-card" hidden>
+          <h2>模擬付款</h2>
+          <p id="checkout-payment-status" role="status"></p>
+          <div class="checkout-actions">
+            <button class="button yellow" id="checkout-test-success" type="button">模擬付款成功</button>
+            <button class="button cream" id="checkout-test-pending" type="button">模擬待付款</button>
+            <button class="button cream" id="checkout-test-failure" type="button">模擬付款失敗</button>
+          </div>
+        </section>
+        <section id="checkout-done" class="checkout-card" hidden>
+          <h2>測試訂單完成</h2>
+          <dl class="checkout-details" id="checkout-receipt"></dl>
+          <a class="button cream" href="/internal-checkout.html?preview=1&amp;start=1">回到預覽入口</a>
+        </section>
+        <aside class="checkout-card" aria-labelledby="checkout-summary-title">
+          <h2 id="checkout-summary-title">商品明細</h2>
+          <img id="checkout-image" alt="" hidden>
+          <p id="checkout-item"></p>
+          <dl class="checkout-details" id="checkout-design" hidden></dl>
+          <label id="checkout-quantity-field" for="checkout-quantity" hidden>數量 <input id="checkout-quantity" type="number" min="1" max="99" step="1" value="1" form="checkout-delivery" required></label>
+          <dl class="checkout-details checkout-totals">
+            <div><dt>商品小計</dt><dd id="checkout-subtotal"></dd></div>
+            <div><dt>運費</dt><dd id="checkout-shipping">選擇配送後顯示</dd></div>
+            <div id="checkout-total-line" hidden><dt>合計</dt><dd id="checkout-total"></dd></div>
+          </dl>
+        </aside>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
