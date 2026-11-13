@@ -326,7 +326,7 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 }
 .home-custom {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(145px, 310px);
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
   align-items: center;
   gap: clamp(14px, 5vw, 60px);
   padding-block: clamp(24px, 4vw, 48px);
@@ -495,7 +495,8 @@ html[lang="en"] .custom-hero h1 { font-size: clamp(45px, 6.3vw, 98px); }
   text-underline-offset: 4px;
 }
 @media (max-width: 650px) {
-  .home-custom { grid-template-columns: minmax(0, 1fr) minmax(76px, 27%); }
+  .home-custom { grid-template-columns: minmax(96px, 34%) minmax(0, 1fr); }
+  .home-custom h2 { text-wrap: balance; }
 }
 
 .clicker-order-test {
