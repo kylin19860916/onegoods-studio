@@ -29,6 +29,13 @@
       "when": 1794375083300,
       "tag": "0003_cynical_viper",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1794551215089,
+      "tag": "0004_logistics_notifications",
+      "breakpoints": true
     }
   ]
 }

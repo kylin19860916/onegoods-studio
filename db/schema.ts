@@ -30,3 +30,17 @@ export const clickerOrders = sqliteTable('clicker_orders', {
  matchedReference: text('matched_reference').unique(),
  matchedAt: text('matched_at'),
 });
+
+export const logisticsShipments = sqliteTable('logistics_shipments', {
+  tradeNo: text('trade_no').primaryKey().notNull(),
+  orderId: text('order_id').notNull(),
+  logisticsId: text('logistics_id').notNull().unique(),
+  subtype: text('subtype').notNull(),
+});
+
+export const logisticsNotifications = sqliteTable('logistics_notifications', {
+  id: text('id').primaryKey().notNull(),
+  tradeNo: text('trade_no').notNull().references(() => logisticsShipments.tradeNo),
+  statusCode: text('status_code').notNull(),
+  receivedAt: text('received_at').notNull(),
+});
