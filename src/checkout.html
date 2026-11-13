@@ -14,7 +14,7 @@
 <main class="section store-checkout" id="store-checkout">
   <a id="store-back" class="text-button" href="products.html">返回商品</a>
   <h1>官网结账</h1>
-  <p>结账预览 · 不会收款或出货</p>
+  <p id="store-preview-note">结账预览 · 不会收款或出货</p>
   <p id="store-loading" role="status">正在载入商品…</p>
   <form id="store-order-form" class="store-order-grid" hidden>
     <section id="store-bag" class="store-order-panel">
@@ -38,6 +38,17 @@
         <label for="store-carrier">取货超商</label>
         <select id="store-carrier"><option>7-ELEVEN</option><option>全家</option><option>莱尔富</option></select>
       </div>
+      <fieldset id="store-address-fields" hidden disabled>
+        <legend>台湾本岛配送</legend>
+        <label for="store-contact">收件人</label><input id="store-contact" name="contact" autocomplete="shipping name" maxlength="40" required>
+        <label for="store-phone">手机号码</label><input id="store-phone" name="phone" type="tel" autocomplete="shipping tel" maxlength="20" required>
+        <label for="store-email">电子邮件</label><input id="store-email" name="email" type="email" autocomplete="email" maxlength="100" required>
+        <label for="store-city">县市</label><input id="store-city" name="city" autocomplete="shipping address-level1" maxlength="12" required>
+        <label for="store-district">行政区</label><input id="store-district" name="district" autocomplete="shipping address-level2" maxlength="16" required>
+        <label for="store-postal">邮递区号</label><input id="store-postal" name="postalCode" inputmode="numeric" autocomplete="shipping postal-code" pattern="[0-9]{3}([0-9]{2,3})?" maxlength="6" required>
+        <label for="store-street">街道与门牌</label><input id="store-street" name="street" autocomplete="shipping address-line1" maxlength="100" required>
+        <label for="store-unit">楼层或室号（选填）</label><input id="store-unit" name="unit" autocomplete="shipping address-line2" maxlength="35">
+      </fieldset>
       <div class="store-checkout-actions">
         <button class="button yellow" type="submit">确认订单内容</button>
         <button id="store-to-bag" class="button cream" type="button">返回购物袋</button>
@@ -46,9 +57,9 @@
     <section id="store-confirmation" class="store-order-panel" hidden>
       <h2 tabindex="-1">确认订单内容</h2>
       <p id="store-review-item"></p>
-      <p id="store-review-shipping"></p>
+      <p id="store-review-shipping"></p><p id="store-review-address" hidden></p><p id="store-payment-error" role="alert" hidden></p>
       <div class="store-checkout-actions">
-        <button class="button yellow" type="submit">完成结账预览</button>
+        <button id="store-pay" class="button yellow" type="submit">完成结账预览</button>
         <button id="store-edit-shipping" class="button cream" type="button">修改配送</button>
       </div>
     </section>

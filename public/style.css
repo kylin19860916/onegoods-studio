@@ -690,3 +690,7 @@ body[data-page] .section-with-accent {
 #checkout-home-fields label { display: grid; gap: 5px; }
 #checkout-store-fields .button { justify-self: start; }
 @media (max-width: 480px) { .checkout-address-parts { grid-template-columns: 1fr; } }
+#store-address-fields { border: 0; padding: 0; margin: 20px 0 0; min-width: 0; }
+#store-address-fields legend { font-weight: 700; padding: 0; }
+#store-address-fields input { width: 100%; }
+#store-payment-error { color: #8b2533; }

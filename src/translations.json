@@ -1054,5 +1054,16 @@
   "金额明细": ["金額明細", "Price breakdown"],
   "商品小计": ["商品小計", "Subtotal"],
   "运费": ["運費", "Shipping"],
-  "合计": ["合計", "Total"]
+  "合计": ["合計", "Total"],
+  "台湾本岛配送": ["台灣本島配送", "Delivery within Taiwan main island"],
+  "收件人": ["收件人", "Recipient"],
+  "手机号码": ["手機號碼", "Mobile number"],
+  "电子邮件": ["電子郵件", "Email"],
+  "县市": ["縣市", "City or county"],
+  "行政区": ["行政區", "District"],
+  "邮递区号": ["郵遞區號", "Postal code"],
+  "街道与门牌": ["街道與門牌", "Street address"],
+  "楼层或室号（选填）": ["樓層或室號（選填）", "Floor or unit (optional)"],
+  "前往绿界付款": ["前往綠界付款", "Continue to ECPay"],
+  "目前无法前往付款。": ["目前無法前往付款。", "Payment is temporarily unavailable."]
 }

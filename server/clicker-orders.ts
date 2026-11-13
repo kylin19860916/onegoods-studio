@@ -194,6 +194,18 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
         WHERE json_extract(p.payload, '$.item.kind') = 'physical'
         ORDER BY p.rowid DESC LIMIT 100
       `).all<{ receipt: string; status: string; product_id: string; quantity: number; product_name: string | null }>() : null;
+      const liveOrders = await store.DB.prepare(`
+        SELECT id, snapshot, amount, created_at, payment_reference, paid_at FROM store_orders
+        WHERE id LIKE ? OR payment_reference LIKE ? OR json_extract(snapshot, '$.name') LIKE ?
+          OR json_extract(snapshot, '$.delivery.contact') LIKE ?
+        ORDER BY created_at DESC LIMIT 100
+      `).bind(pattern, pattern, pattern, pattern).all<{ id: string; snapshot: string; amount: number; created_at: string; payment_reference: string | null; paid_at: string | null }>();
+      const liveItems = liveOrders.results.map(row => {
+        const details = JSON.parse(row.snapshot);
+        return { id: row.id, kind: 'physical', live: true, name: details.name, quantity: details.quantity,
+          amount: row.amount, subtotal: details.subtotal, shipping: details.shipping, delivery: details.delivery,
+          createdAt: row.created_at, matchedReference: row.payment_reference, matchedAt: row.paid_at };
+      });
       const physicalItems = (physical?.results ?? []).map(row => {
         const receipt = JSON.parse(row.receipt);
         return {
@@ -203,7 +215,7 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
           subtotal: receipt.subtotal, shipping: receipt.shipping,
         };
       });
-      return json({ ecpayStageAvailable: !!callback, shippingToolsAvailable: checkoutTest, physicalItems, items: result.results.map(row => ({
+      return json({ ecpayStageAvailable: !!callback, shippingToolsAvailable: checkoutTest, physicalItems: [...liveItems, ...physicalItems], items: result.results.map(row => ({
         id: row.id, kind: 'custom', searchReference: row.mock_reference, design: JSON.parse(row.design), tier: row.tier, amount: row.amount, createdAt: row.created_at,
         delivery: row.preview_receipt ? JSON.parse(row.preview_receipt).delivery : undefined,
         previewPaid: row.preview_status === 'success' || (!!row.preview_receipt && !!row.matched_reference),

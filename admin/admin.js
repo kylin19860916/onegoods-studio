@@ -56,7 +56,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)r
 $('#new-item').onclick=()=>openEditor(blank(),true);$('#back-list').onclick=()=>{if(canLeave())showList();};$('#search').oninput=()=>{state.filters[state.kind].query=$('#search').value;renderList();};for(const [id,key]of [['category','category'],['record','record'],['sale','sale'],['sort','sort']])$('#'+id+'-filter').onchange=()=>{state.filters[state.kind][key]=$('#'+id+'-filter').value;renderList();};$('#reset-filters').onclick=resetFilters;$('#refresh').onclick=()=>refresh().then(()=>notify('列表已更新。')).catch(e=>notify(e.message,true));$('#add-spec').onclick=()=>{state.current.specs=collect().specs;state.current.specs.push({label:'',value:''});state.dirty=true;renderSpecs();};$('#image-upload').onchange=e=>upload(e.target,'image');$('#design-upload').onchange=e=>upload(e.target,'design');$('#archive-item').onclick=()=>{if(confirm('封存後會從官網移除，之後仍可恢復。要封存嗎？')){field('status').value='archived';state.dirty=true;save();}};$('#view-public').onclick=()=>window.open(state.current.kind==='design'?'/design-files.html':'/product.html?id='+encodeURIComponent(state.current.id),'_blank','noopener');
 $('#backup').onclick=async()=>{try{const [{items},{items:categories}]=await Promise.all([api('catalog'),api('categories')]);const blob=new Blob([JSON.stringify({brand:'One Goods Studio',exportedAt:new Date().toISOString(),items,categories},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='OGS-catalog-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){notify(e.message,true);}};
 window.addEventListener('beforeunload',e=>{if(state.dirty||state.categoryDirty){e.preventDefault();e.returnValue='';}});
-(async()=>{try{const session=await api('session');$('#account').textContent=session.email;await api('initialize',{method:'POST',body:'{}'});await refresh();if(isOrderRoute()){const id=new URLSearchParams(location.search).get('clicker-order');if(/^OGS-(?:E|T|DEMO)-[A-F0-9]{12}$/.test(id||'')) orderSearch.elements.query.value=id; showClickerOrders();}}catch(e){notify(e.message,true);$('#list-summary').textContent='資料未能載入。';}})();
+(async()=>{try{const session=await api('session');$('#account').textContent=session.email;await api('initialize',{method:'POST',body:'{}'});await refresh();if(isOrderRoute()){const id=new URLSearchParams(location.search).get('clicker-order');if(/^OGS-(?:E|T|P|DEMO)-[A-F0-9]{12}$/.test(id||'')) orderSearch.elements.query.value=id; showClickerOrders();}}catch(e){notify(e.message,true);$('#list-summary').textContent='資料未能載入。';}})();
 
 const orderList = $('#clicker-order-list');
 const orderSearch = $('#clicker-order-search');
@@ -87,7 +87,7 @@ function orderStatus(order) {
   const status = String(order.shipment?.status ?? '');
   if (['2067','3022'].includes(status)) return 'complete';
   if (['2074','3020','2099'].includes(status)) return 'attention';
-  if (status === '300') return 'pending';
+  if (status === '300' || (order.live && order.matchedReference)) return 'pending';
   return 'active';
 }
 
@@ -160,7 +160,8 @@ function renderPhysicalOrder(order) {
   return `<article class="panel clicker-order-item"><div class="panel-title"><h2>${esc(order.name)}</h2><span class="badge">${orderStatuses[orderStatus(order)]}</span></div>
     <p><strong>${esc(order.id)}</strong> · 商品訂單 · ${formatOrderDate(order.createdAt)}</p>
     <p>數量 ${esc(order.quantity)} · 商品小計 ${money(order.subtotal)} · 運費 ${money(order.shipping)} · 合計 ${money(order.amount)}</p>
-    ${destination ? `<fieldset><legend>配送資料（測試）</legend><p>${esc(delivery.contact)} · ${esc(delivery.phone)}</p><p>${esc(destination)}</p></fieldset>` : ''}
+    ${order.live && order.matchedReference ? `<p>綠界交易編號 ${esc(order.matchedReference)} · ${formatOrderDate(order.matchedAt)}</p>` : ''}
+    ${destination ? `<fieldset><legend>${order.live ? '黑貓宅配' : '配送資料（測試）'}</legend><p>${esc(delivery.contact)} · ${esc(delivery.phone)}</p><p>${esc(destination)}</p>${order.live ? `<p>${esc(delivery.email)}</p>` : ''}</fieldset>` : ''}
     </article>`;
 }
 
@@ -193,7 +194,7 @@ function sortVisibleOrders(left, right) {
 }
 
 function renderOrderView() {
-  const detailId = /^#orders\/(OGS-(?:T|E|DEMO)-[A-F0-9]{12})$/.exec(location.hash)?.[1];
+  const detailId = /^#orders\/(OGS-(?:T|E|P|DEMO)-[A-F0-9]{12})$/.exec(location.hash)?.[1];
   listView.hidden = Boolean(detailId);
   detailView.hidden = !detailId;
   $('#page-title').textContent = detailId ? '訂單詳情' : '訂單';
@@ -234,7 +235,7 @@ async function loadClickerOrders() {
   }
   target.textContent = '正在讀取訂單…';
   try {
-    const detailId = /^#orders\/(OGS-(?:T|E|DEMO)-[A-F0-9]{12})$/.exec(location.hash)?.[1];
+    const detailId = /^#orders\/(OGS-(?:T|E|P|DEMO)-[A-F0-9]{12})$/.exec(location.hash)?.[1];
     const query = orderSearch.elements.query.value.trim();
     const { items, physicalItems, ecpayStageAvailable, shippingToolsAvailable } = await api('clicker-orders?q=' + encodeURIComponent(detailId || query));
     if (version !== orderSearchVersion || !isOrderRoute()) return;

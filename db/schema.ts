@@ -67,3 +67,13 @@ export const checkoutPreviewShipments = sqliteTable('checkout_preview_shipments'
   status: text('status'),
   notice: text('notice'),
 });
+
+export const storeOrders = sqliteTable('store_orders', {
+  id: text('id').primaryKey(),
+  requestId: text('request_id').notNull().unique(),
+  snapshot: text('snapshot').notNull(),
+  amount: integer('amount').notNull(),
+  createdAt: text('created_at').notNull(),
+  paymentReference: text('payment_reference').unique(),
+  paidAt: text('paid_at'),
+});

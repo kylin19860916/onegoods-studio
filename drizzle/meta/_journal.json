@@ -43,6 +43,13 @@
       "when": 1794555451911,
       "tag": "0005_unusual_fallen_one",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1794557605856,
+      "tag": "0006_wise_paladin",
+      "breakpoints": true
     }
   ]
 }

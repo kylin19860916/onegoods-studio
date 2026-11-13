@@ -1,4 +1,13 @@
 let products=[];
+let storePayment = { enabled: false };
+async function paymentConfig() {
+ if (!qs('#full-product') && !qs('#store-checkout')) return storePayment;
+ try {
+   const response = await fetch('/api/store-payment/config', { cache: 'no-store' });
+   if (response.ok) return await response.json();
+ } catch {}
+ return { enabled: false };
+}
 const qs=s=>document.querySelector(s);
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const locale=document.documentElement.lang;
@@ -16,7 +25,7 @@ function canOrder(p){
  return p?.kind==='physical'&&!p.isPlaceholder&&p.saleStatus==='available'&&Number.isSafeInteger(Number(p.price))&&Number(p.price)>0;
 }
 function buyAction(p){
- const official=canOrder(p)?`<div class="store-order-entry"><a class="button yellow" href="checkout.html?product=${encodeURIComponent(p.id)}">官网下单</a><small>结账预览</small></div>`:'';
+ const official=canOrder(p)?`<div class="store-order-entry"><a class="button yellow" href="checkout.html?product=${encodeURIComponent(p.id)}">官网下单</a>${storePayment.enabled?'':'<small>结账预览</small>'}</div>`:'';
  if(p.saleStatus!=='available')return '<span class="sale-status">尚未开售</span>';
  const channels=[p.purchaseUrl?{id:'myship',url:p.purchaseUrl,logo:'platforms/seven-eleven.svg',label:'賣貨便购买',note:'需登入 uniopen 会员'}:null,p.shopeeUrl?{id:'shopee',url:p.shopeeUrl,logo:'platforms/shopee.png',label:'蝦皮购买',note:'前往 Shopee 商品页'}:null].filter(Boolean);
  if(!channels.length)return official;
@@ -39,7 +48,7 @@ if(qs('#open-info'))qs('#open-info').onclick=()=>qs('#info-dialog').showModal();
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}}));
 if(qs('#year'))qs('#year').textContent=new Date().getFullYear();
 const pages={home:'index.html',products:'products.html',designs:'design-files.html',about:'about.html',product:'products.html'};document.querySelectorAll('header nav:not(.language-switch) a,.catalog-nav a').forEach(a=>{if(a.getAttribute('href')===pages[document.body.dataset.page])a.setAttribute('aria-current','page');});
-async function loadCatalog(){try{const r=await fetch('/api/catalog',{cache:'no-store'});if(!r.ok)throw Error('catalog');const data=await r.json();categories=data.categories||[];products=data.items.map(localize);renderCategoryFilters();renderProducts();renderFullProduct();renderStoreCheckout();}catch{const target=qs('#products')||qs('#full-product')||qs('#store-checkout');if(target)target.innerHTML='<p role="alert">商品资料暂时无法载入，请稍后重新整理页面。</p>';}}
+async function loadCatalog(){try{const [r,payment]=await Promise.all([fetch('/api/catalog',{cache:'no-store'}),paymentConfig()]);storePayment=payment;if(!r.ok)throw Error('catalog');const data=await r.json();categories=data.categories||[];products=data.items.map(localize);renderCategoryFilters();renderProducts();renderFullProduct();renderStoreCheckout();}catch{const target=qs('#products')||qs('#full-product')||qs('#store-checkout');if(target)target.innerHTML='<p role="alert">商品资料暂时无法载入，请稍后重新整理页面。</p>';}}
 function renderStoreCheckout(){
  const checkout=qs('#store-checkout');
  if(!checkout)return;
@@ -58,6 +67,18 @@ function renderStoreCheckout(){
  const confirmation=qs('#store-confirmation');
  const receipt=qs('#store-receipt');
  const sections=[qs('#store-bag'),qs('#store-shipping'),confirmation,receipt];
+ const address = qs('#store-address-fields');
+ const pay = qs('#store-pay');
+ const error = qs('#store-payment-error');
+ const reviewAddress = qs('#store-review-address');
+ let submission;
+ if (storePayment.enabled) {
+   qs('#store-preview-note').hidden = true;
+   delivery.querySelector('[value=pickup]').remove();
+   delivery.options[0].textContent = '黑猫宅配 · NT$' + storePayment.shipping;
+   address.hidden = address.disabled = false;
+   pay.textContent = '前往绿界付款';
+ }
  const money=amount=>'NT$'+amount.toLocaleString('en-TW');
 
  qs('#store-back').href='product.html?id='+encodeURIComponent(product.id);
@@ -71,7 +92,7 @@ function renderStoreCheckout(){
  function refresh(){
    const subtotal=price*Number(quantity.value);
    const isPickup=delivery.value==='pickup';
-   const fee=isPickup?60:100;
+   const fee=storePayment.enabled?storePayment.shipping:isPickup?60:100;
    store.hidden=!isPickup;
    qs('#store-subtotal').textContent=money(subtotal);
    qs('#store-fee').textContent=money(fee);
@@ -91,11 +112,57 @@ function renderStoreCheckout(){
  });
  qs('#store-to-bag').addEventListener('click',()=>showStep(0));
  qs('#store-edit-shipping').addEventListener('click',()=>showStep(1));
- form.addEventListener('submit',event=>{
+ form.addEventListener('submit', async event => {
    event.preventDefault();
    refresh();
-   if(!sections[1].hidden)showStep(2);
-   else if(!confirmation.hidden)showStep(3);
+   if (!sections[1].hidden) {
+     if (storePayment.enabled) {
+       const fields = form.elements;
+       reviewAddress.textContent = [fields.contact.value, fields.phone.value, fields.email.value,
+         fields.postalCode.value + ' ' + fields.city.value + fields.district.value + fields.street.value + fields.unit.value].join(' · ');
+       reviewAddress.hidden = false;
+     }
+     showStep(2);
+     return;
+   }
+   if (confirmation.hidden) return;
+   if (!storePayment.enabled) {
+     showStep(3);
+     return;
+   }
+   const payload = { ...Object.fromEntries(new FormData(form)), productId: product.id, quantity: quantity.valueAsNumber,
+     total: price * quantity.valueAsNumber + storePayment.shipping };
+   const snapshot = JSON.stringify(payload);
+   if (submission?.snapshot !== snapshot) submission = { snapshot, requestId: crypto.randomUUID() };
+   pay.disabled = true;
+   error.hidden = true;
+   try {
+     const response = await fetch('/api/store-payment/checkout', {
+       method: 'POST', headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({ ...payload, requestId: submission.requestId }),
+     });
+     const result = await response.json();
+     if (!response.ok) throw new Error(result.error || '目前无法前往付款。');
+     if (result.receipt) {
+       location.assign(result.receipt);
+       return;
+     }
+     if (result.action !== 'https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5') throw new Error('目前无法前往付款。');
+     const paymentForm = document.createElement('form');
+     paymentForm.method = 'POST';
+     paymentForm.action = result.action;
+     for (const [name, value] of Object.entries(result.fields)) {
+       const field = document.createElement('input');
+       Object.assign(field, { type: 'hidden', name, value });
+       paymentForm.append(field);
+     }
+     document.body.append(paymentForm);
+     paymentForm.submit();
+   } catch (failure) {
+     error.textContent = failure.message;
+     error.hidden = false;
+     pay.disabled = false;
+   }
  });
  refresh();
  qs('#store-loading').hidden=true;
