@@ -12,10 +12,15 @@ let filter='all';
 let categories=[];
 function renderCategoryFilters(){const group=qs('.shop-tools .filters');if(!group||document.body.dataset.catalog==='digital')return;group.innerHTML='<button data-filter="all" class="active" aria-pressed="true">全部好物</button>'+categories.map(c=>`<button data-filter="${escapeHtml(c.id)}" aria-pressed="false">${escapeHtml(locale==='en'?(c.nameEn||c.name):locale==='zh-Hans'?(c.nameZhHans||c.name):c.name)}</button>`).join('');if(filter!=='all'&&!categories.some(c=>c.id===filter))filter='all';setFilter(filter);}
 
+function canOrder(p){
+ return p?.kind==='physical'&&!p.isPlaceholder&&p.saleStatus==='available'&&Number.isSafeInteger(Number(p.price))&&Number(p.price)>0;
+}
 function buyAction(p){
- if(p.saleStatus!=='available'||(!p.purchaseUrl&&!p.shopeeUrl))return '<span class="sale-status">尚未開賣</span>';
+ const official=canOrder(p)?`<div class="store-order-entry"><a class="button yellow" href="checkout.html?product=${encodeURIComponent(p.id)}">官網下單</a><small>結帳預覽</small></div>`:'';
+ if(p.saleStatus!=='available')return '<span class="sale-status">尚未開賣</span>';
  const channels=[p.purchaseUrl?{id:'myship',url:p.purchaseUrl,logo:'platforms/seven-eleven.svg',label:'賣貨便購買',note:'需登入 uniopen 會員'}:null,p.shopeeUrl?{id:'shopee',url:p.shopeeUrl,logo:'platforms/shopee.png',label:'蝦皮購買',note:'前往 Shopee 商品頁'}:null].filter(Boolean);
- return `<div class="purchase-platforms" role="group" aria-label="選擇購買平台"><div class="purchase-platforms-heading"><p class="purchase-platforms-title">選擇購買平台</p><p class="purchase-platforms-note">訂單、付款與配送由各平台處理。</p></div><div class="purchase-platforms-grid">${channels.map(c=>`<a class="platform-purchase ${c.id}" href="${escapeHtml(c.url)}" target="_blank" rel="noopener noreferrer"><span class="platform-logo"><img src="${assetUrl(c.logo)}" alt="" width="96" height="48"></span><span class="platform-copy"><strong>${c.label}</strong><span>${c.note}</span></span></a>`).join('')}</div></div>`;
+ if(!channels.length)return official;
+ return official+`<div class="purchase-platforms" role="group" aria-label="其他購買平台"><div class="purchase-platforms-heading"><p class="purchase-platforms-title">其他購買平台</p><p class="purchase-platforms-note">訂單、付款與配送由各平台處理。</p></div><div class="purchase-platforms-grid">${channels.map(c=>`<a class="platform-purchase ${c.id}" href="${escapeHtml(c.url)}" target="_blank" rel="noopener noreferrer"><span class="platform-logo"><img src="${assetUrl(c.logo)}" alt="" width="96" height="48"></span><span class="platform-copy"><strong>${c.label}</strong><span>${c.note}</span></span></a>`).join('')}</div></div>`;
 }
 function renderProducts(){const grid=qs('#products');if(!grid)return;const list=products.filter(p=>!p.isPlaceholder).filter(p=>p.kind==='physical'&&(filter==='all'||p.type===filter));grid.innerHTML=list.length?list.map(p=>`<article class="product-card"><button class="product-art" style="background:${escapeHtml(p.color)}" data-detail="${escapeHtml(p.id)}" aria-label="查看${escapeHtml(p.name)}詳情">${art(p)}${p.type==='file'?`<span class="card-stamp">${p.format}</span>`:''}</button><div class="product-info"><h3><button class="title-link" data-detail="${escapeHtml(p.id)}">${escapeHtml(p.name)}</button></h3><div class="card-bottom">${priceLabel(p)?`<span>${priceLabel(p)}</span>`:''}<button class="text-button card-details" data-detail="${escapeHtml(p.id)}">查看詳情</button></div></div></article>`).join(''):document.body.dataset.catalog==='digital'?'':'<p class="catalog-note">目前沒有符合條件的商品。</p>';}
 function setFilter(value){filter=value;document.querySelectorAll('[data-filter]').forEach(b=>{const active=b.dataset.filter===value;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active)});renderProducts();}
@@ -34,5 +39,66 @@ if(qs('#open-info'))qs('#open-info').onclick=()=>qs('#info-dialog').showModal();
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}}));
 if(qs('#year'))qs('#year').textContent=new Date().getFullYear();
 const pages={home:'index.html',products:'products.html',designs:'design-files.html',about:'about.html',product:'products.html'};document.querySelectorAll('header nav:not(.language-switch) a,.catalog-nav a').forEach(a=>{if(a.getAttribute('href')===pages[document.body.dataset.page])a.setAttribute('aria-current','page');});
-async function loadCatalog(){try{const r=await fetch('/api/catalog',{cache:'no-store'});if(!r.ok)throw Error('catalog');const data=await r.json();categories=data.categories||[];products=data.items.map(localize);renderCategoryFilters();renderProducts();renderFullProduct();}catch{const target=qs('#products')||qs('#full-product');if(target)target.innerHTML='<p role="alert">商品資料暫時無法載入，請稍後重新整理頁面。</p>';}}
+async function loadCatalog(){try{const r=await fetch('/api/catalog',{cache:'no-store'});if(!r.ok)throw Error('catalog');const data=await r.json();categories=data.categories||[];products=data.items.map(localize);renderCategoryFilters();renderProducts();renderFullProduct();renderStoreCheckout();}catch{const target=qs('#products')||qs('#full-product')||qs('#store-checkout');if(target)target.innerHTML='<p role="alert">商品資料暫時無法載入，請稍後重新整理頁面。</p>';}}
+function renderStoreCheckout(){
+ const checkout=qs('#store-checkout');
+ if(!checkout)return;
+ const id=new URLSearchParams(location.search).get('product');
+ const product=products.find(p=>p.id===id);
+ if(!canOrder(product)){
+   checkout.innerHTML='<p role="status">這件商品目前無法在官網下單。</p><a class="button cream" href="products.html">返回好物</a>';
+   return;
+ }
+ const price=Number(product.price);
+ const form=qs('#store-order-form');
+ const quantity=qs('#store-quantity');
+ const delivery=qs('#store-delivery');
+ const carrier=qs('#store-carrier');
+ const store=qs('#store-carrier-field');
+ const confirmation=qs('#store-confirmation');
+ const receipt=qs('#store-receipt');
+ const sections=[qs('#store-bag'),qs('#store-shipping'),confirmation,receipt];
+ const money=amount=>'NT$'+amount.toLocaleString('en-TW');
+
+ qs('#store-back').href='product.html?id='+encodeURIComponent(product.id);
+ qs('#store-name').textContent=product.name;
+ qs('#store-unit-price').textContent=money(price);
+ if(product.image){
+   const image=qs('#store-photo');
+   image.src=assetUrl(product.image);
+   image.hidden=false;
+ }
+ function refresh(){
+   const subtotal=price*Number(quantity.value);
+   const isPickup=delivery.value==='pickup';
+   const fee=isPickup?60:100;
+   store.hidden=!isPickup;
+   qs('#store-subtotal').textContent=money(subtotal);
+   qs('#store-fee').textContent=money(fee);
+   qs('#store-total').textContent=money(subtotal+fee);
+   qs('#store-review-item').textContent=product.name+' × '+quantity.value;
+   qs('#store-review-shipping').textContent=isPickup?delivery.selectedOptions[0].text.split(' · ')[0]+' · '+carrier.selectedOptions[0].text:delivery.selectedOptions[0].text.split(' · ')[0];
+ }
+ function showStep(step){
+   sections.forEach((section,index)=>{section.hidden=index!==step;});
+   if(step===3)qs('#store-summary').hidden=true;
+   sections[step].querySelector('h2').focus();
+ }
+ quantity.addEventListener('input',refresh);
+ form.addEventListener('change',refresh);
+ qs('#store-to-shipping').addEventListener('click',()=>{
+   if(quantity.reportValidity())showStep(1);
+ });
+ qs('#store-to-bag').addEventListener('click',()=>showStep(0));
+ qs('#store-edit-shipping').addEventListener('click',()=>showStep(1));
+ form.addEventListener('submit',event=>{
+   event.preventDefault();
+   refresh();
+   if(!sections[1].hidden)showStep(2);
+   else if(!confirmation.hidden)showStep(3);
+ });
+ refresh();
+ qs('#store-loading').hidden=true;
+ form.hidden=false;
+}
 loadCatalog();

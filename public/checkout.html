@@ -1,1 +1,70 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="refresh" content="0;url=products.html"><title>好物</title><link rel="canonical" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/checkout.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/checkout.html"></head><body><a href="products.html">瀏覽實體商品</a></body></html>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>官網結帳 — One Goods Studio</title>
+  <link rel="icon" href="assets/icon.png">
+  <link rel="stylesheet" href="style.css?v=1ed96dc01f3f">
+  <script src="locale.js?v=1ed96dc01f3f" defer></script><script src="app.js?v=1ed96dc01f3f" defer></script>
+<link rel="canonical" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/checkout.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/checkout.html"></head>
+<body data-page="checkout">
+<header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html">客製</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="checkout.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/checkout.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="en/checkout.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header>
+<main class="section store-checkout" id="store-checkout">
+  <a id="store-back" class="text-button" href="products.html">返回商品</a>
+  <h1>官網結帳</h1>
+  <p>結帳預覽 · 不會收款或出貨</p>
+  <p id="store-loading" role="status">正在載入商品…</p>
+  <form id="store-order-form" class="store-order-grid" hidden>
+    <section id="store-bag" class="store-order-panel">
+      <h2 tabindex="-1">購物袋</h2>
+      <div class="store-checkout-item">
+        <img id="store-photo" alt="" width="72" height="72" hidden>
+        <div><strong id="store-name"></strong><p id="store-unit-price"></p></div>
+      </div>
+      <label for="store-quantity">數量</label>
+      <input id="store-quantity" type="number" value="1" min="1" step="1" max="99" required>
+      <div class="store-checkout-actions"><button id="store-to-shipping" class="button yellow" type="button">選擇配送</button></div>
+    </section>
+    <section id="store-shipping" class="store-order-panel" hidden>
+      <h2 tabindex="-1">選擇配送</h2>
+      <label for="store-delivery">配送方式</label>
+      <select id="store-delivery">
+        <option value="pickup">超商取貨 · NT$60</option>
+        <option value="home">黑貓宅配 · NT$100</option>
+      </select>
+      <div id="store-carrier-field">
+        <label for="store-carrier">取貨超商</label>
+        <select id="store-carrier"><option>7-ELEVEN</option><option>全家</option><option>萊爾富</option></select>
+      </div>
+      <div class="store-checkout-actions">
+        <button class="button yellow" type="submit">確認訂單內容</button>
+        <button id="store-to-bag" class="button cream" type="button">返回購物袋</button>
+      </div>
+    </section>
+    <section id="store-confirmation" class="store-order-panel" hidden>
+      <h2 tabindex="-1">確認訂單內容</h2>
+      <p id="store-review-item"></p>
+      <p id="store-review-shipping"></p>
+      <div class="store-checkout-actions">
+        <button class="button yellow" type="submit">完成結帳預覽</button>
+        <button id="store-edit-shipping" class="button cream" type="button">修改配送</button>
+      </div>
+    </section>
+    <section id="store-receipt" class="store-order-panel" hidden>
+      <h2 tabindex="-1">結帳預覽完成</h2>
+      <a class="button cream" href="products.html">返回好物</a>
+    </section>
+    <aside id="store-summary" class="store-order-panel">
+      <h2>金額明細</h2>
+      <dl aria-live="polite">
+        <div><dt>商品小計</dt><dd id="store-subtotal"></dd></div>
+        <div><dt>運費</dt><dd id="store-fee"></dd></div>
+        <div><dt>合計</dt><dd id="store-total"></dd></div>
+      </dl>
+    </aside>
+  </form>
+</main>
+</body>
+</html>
