@@ -21,7 +21,7 @@ export function isEcpayStageCallback(path: string) {
 }
 
 function merchantTradeNo(id: string) {
-  return 'OGSE' + id.slice('OGS-E-'.length);
+  return id.startsWith('OGS-DEMO-') ? 'OGSD' + id.slice('OGS-DEMO-'.length) : 'OGSE' + id.slice('OGS-E-'.length);
 }
 
 export async function stageCheckMac(fields: Fields) {
@@ -36,18 +36,19 @@ export async function stageCheckMac(fields: Fields) {
 
 const escapeAttribute = (value: string) => value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
-export async function ecpayStageCheckout(order: Order, callback: URL, siteOrigin: string) {
+export async function ecpayStageCheckout(order: Order, callback: URL, siteOrigin: string, productName?: string) {
   const date = new Intl.DateTimeFormat('sv-SE', {
     timeZone: 'Asia/Taipei', dateStyle: 'short', timeStyle: 'medium',
   }).format(new Date(order.created_at)).replaceAll('-', '/');
   const fields: Fields = {
     MerchantID: merchant, MerchantTradeNo: merchantTradeNo(order.id), MerchantTradeDate: date,
     PaymentType: 'aio', TotalAmount: String(order.amount), TradeDesc: 'OGS stage test',
-    ItemName: 'OGS 測試・連字按壓款', ReturnURL: callback.href, ChoosePayment: 'Credit',
+    ItemName: 'OGS 測試・' + (productName || '連字按壓款').replaceAll('#', ' ').slice(0, 80), ReturnURL: callback.href, ChoosePayment: 'Credit',
     EncryptType: '1', CustomField1: order.id,
   };
   if (siteOrigin === callback.origin) {
-    fields.ClientBackURL = new URL('/admin?clicker-order=' + order.id + '#clicker-orders', siteOrigin).href;
+    const back = productName ? '/admin#orders/' + order.id : '/admin?clicker-order=' + order.id + '#clicker-orders';
+    fields.ClientBackURL = new URL(back, siteOrigin).href;
   }
   fields.CheckMacValue = await stageCheckMac(fields);
   const inputs = Object.entries(fields).map(([name, value]) =>
@@ -80,8 +81,8 @@ export async function readEcpayStageResult(request: Request) {
   const body = await request.text();
   if (body.length > 8192) throw new HttpError(413, 'Invalid ECPay request');
   const fields = readFields(body);
-  const match = /^OGSE([A-F0-9]{12})$/.exec(fields.MerchantTradeNo);
-  const id = match && 'OGS-E-' + match[1];
+  const match = /^OGS([ED])([A-F0-9]{12})$/.exec(fields.MerchantTradeNo);
+  const id = match && (match[1] === 'D' ? 'OGS-DEMO-' : 'OGS-E-') + match[2];
   if (!id || fields.CustomField1 !== id || fields.MerchantID !== merchant || fields.CheckMacValue !== await stageCheckMac(fields)) {
     throw new HttpError(400, 'Invalid ECPay callback');
   }

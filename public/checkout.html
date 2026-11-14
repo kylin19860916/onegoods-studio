@@ -6,8 +6,8 @@
   <meta name="robots" content="noindex">
   <title>官網結帳 — One Goods Studio</title>
   <link rel="icon" href="assets/icon.png">
-  <link rel="stylesheet" href="style.css?v=cfdf933cb97b">
-  <script src="locale.js?v=cfdf933cb97b" defer></script><script src="app.js?v=cfdf933cb97b" defer></script>
+  <link rel="stylesheet" href="style.css?v=f0ba05b18af6">
+  <script src="locale.js?v=f0ba05b18af6" defer></script><script src="app.js?v=f0ba05b18af6" defer></script>
 <link rel="canonical" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/checkout.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/checkout.html"></head>
 <body data-page="checkout">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html">客製</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="checkout.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/checkout.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="en/checkout.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header>
@@ -59,12 +59,24 @@
       <p id="store-review-item"></p>
       <p id="store-review-shipping"></p><p id="store-review-address" hidden></p><p id="store-payment-error" role="alert" hidden></p>
       <div class="store-checkout-actions">
-        <button id="store-pay" class="button yellow" type="submit">完成結帳預覽</button>
+        <button id="store-pay" class="button yellow" type="submit">前往模擬付款</button>
         <button id="store-edit-shipping" class="button cream" type="button">修改配送</button>
       </div>
     </section>
+    <section id="store-payment-demo" class="store-order-panel" hidden>
+      <h2 tabindex="-1">付款預覽</h2>
+      <p>測試付款無需填寫銀行卡資料。</p>
+      <p id="store-demo-payment-error" role="status" hidden>模擬付款未成功，可以重試。</p>
+      <div class="store-checkout-actions">
+        <button id="store-demo-success" class="button yellow" type="button">模擬付款成功</button>
+        <button id="store-demo-failure" class="button cream" type="button">模擬付款失敗</button>
+        <button id="store-demo-back" class="button cream" type="button">返回訂單確認</button>
+      </div>
+    </section>
     <section id="store-receipt" class="store-order-panel" hidden>
-      <h2 tabindex="-1">結帳預覽完成</h2>
+      <h2 tabindex="-1">模擬付款已完成</h2>
+      <p id="store-receipt-item"></p>
+      <p id="store-receipt-shipping"></p>
       <a class="button cream" href="products.html">返回好物</a>
     </section>
     <aside id="store-summary" class="store-order-panel">

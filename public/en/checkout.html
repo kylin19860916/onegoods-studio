@@ -6,8 +6,8 @@
   <meta name="robots" content="noindex">
   <title>OGS checkout — One Goods Studio</title>
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=cfdf933cb97b">
-  <script src="../locale.js?v=cfdf933cb97b" defer></script><script src="app.js?v=cfdf933cb97b" defer></script>
+  <link rel="stylesheet" href="../style.css?v=f0ba05b18af6">
+  <script src="../locale.js?v=f0ba05b18af6" defer></script><script src="app.js?v=f0ba05b18af6" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/checkout.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/checkout.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/checkout.html"></head>
 <body data-page="checkout">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html">Customize</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../checkout.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/checkout.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/checkout.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header>
@@ -59,12 +59,24 @@
       <p id="store-review-item"></p>
       <p id="store-review-shipping"></p><p id="store-review-address" hidden></p><p id="store-payment-error" role="alert" hidden></p>
       <div class="store-checkout-actions">
-        <button id="store-pay" class="button yellow" type="submit">Finish checkout preview</button>
+        <button id="store-pay" class="button yellow" type="submit">Continue to demo payment</button>
         <button id="store-edit-shipping" class="button cream" type="button">Edit delivery</button>
       </div>
     </section>
+    <section id="store-payment-demo" class="store-order-panel" hidden>
+      <h2 tabindex="-1">Payment preview</h2>
+      <p>This demo does not require card details.</p>
+      <p id="store-demo-payment-error" role="status" hidden>The simulated payment failed. You can try again.</p>
+      <div class="store-checkout-actions">
+        <button id="store-demo-success" class="button yellow" type="button">Simulate successful payment</button>
+        <button id="store-demo-failure" class="button cream" type="button">Simulate failed payment</button>
+        <button id="store-demo-back" class="button cream" type="button">Back to order review</button>
+      </div>
+    </section>
     <section id="store-receipt" class="store-order-panel" hidden>
-      <h2 tabindex="-1">Checkout preview complete</h2>
+      <h2 tabindex="-1">Demo payment complete</h2>
+      <p id="store-receipt-item"></p>
+      <p id="store-receipt-shipping"></p>
       <a class="button cream" href="products.html">Back to shop</a>
     </section>
     <aside id="store-summary" class="store-order-panel">

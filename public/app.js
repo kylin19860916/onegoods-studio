@@ -66,7 +66,8 @@ function renderStoreCheckout(){
  const store=qs('#store-carrier-field');
  const confirmation=qs('#store-confirmation');
  const receipt=qs('#store-receipt');
- const sections=[qs('#store-bag'),qs('#store-shipping'),confirmation,receipt];
+ const paymentDemo = qs('#store-payment-demo');
+ const sections=[qs('#store-bag'),qs('#store-shipping'),confirmation,paymentDemo,receipt];
  const address = qs('#store-address-fields');
  const pay = qs('#store-pay');
  const error = qs('#store-payment-error');
@@ -102,7 +103,6 @@ function renderStoreCheckout(){
  }
  function showStep(step){
    sections.forEach((section,index)=>{section.hidden=index!==step;});
-   if(step===3)qs('#store-summary').hidden=true;
    sections[step].querySelector('h2').focus();
  }
  quantity.addEventListener('input',refresh);
@@ -112,6 +112,14 @@ function renderStoreCheckout(){
  });
  qs('#store-to-bag').addEventListener('click',()=>showStep(0));
  qs('#store-edit-shipping').addEventListener('click',()=>showStep(1));
+ const demoError = qs('#store-demo-payment-error');
+ qs('#store-demo-back').addEventListener('click',()=>showStep(2));
+ qs('#store-demo-failure').addEventListener('click',()=>{ demoError.hidden=false; });
+ qs('#store-demo-success').addEventListener('click',()=>{
+   qs('#store-receipt-item').textContent = qs('#store-review-item').textContent;
+   qs('#store-receipt-shipping').textContent = qs('#store-review-shipping').textContent;
+   showStep(4);
+ });
  form.addEventListener('submit', async event => {
    event.preventDefault();
    refresh();
@@ -127,6 +135,7 @@ function renderStoreCheckout(){
    }
    if (confirmation.hidden) return;
    if (!storePayment.enabled) {
+     demoError.hidden = true;
      showStep(3);
      return;
    }

@@ -1065,5 +1065,13 @@
   "街道与门牌": ["街道與門牌", "Street address"],
   "楼层或室号（选填）": ["樓層或室號（選填）", "Floor or unit (optional)"],
   "前往绿界付款": ["前往綠界付款", "Continue to ECPay"],
-  "目前无法前往付款。": ["目前無法前往付款。", "Payment is temporarily unavailable."]
+  "目前无法前往付款。": ["目前無法前往付款。", "Payment is temporarily unavailable."],
+  "前往模拟付款": ["前往模擬付款", "Continue to demo payment"],
+  "付款预览": ["付款預覽", "Payment preview"],
+  "测试付款无需填写银行卡资料。": ["測試付款無需填寫銀行卡資料。", "This demo does not require card details."],
+  "模拟付款成功": ["模擬付款成功", "Simulate successful payment"],
+  "模拟付款失败": ["模擬付款失敗", "Simulate failed payment"],
+  "模拟付款未成功，可以重试。": ["模擬付款未成功，可以重試。", "The simulated payment failed. You can try again."],
+  "返回订单确认": ["返回訂單確認", "Back to order review"],
+  "模拟付款已完成": ["模擬付款已完成", "Demo payment complete"]
 }

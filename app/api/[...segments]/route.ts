@@ -20,7 +20,7 @@ async function handle(request: Request) {
   const user = await getChatGPTUser();
   if (path.startsWith('/api/checkout-delivery-preview/')) return deliveryPreview(request, env, user);
   if (path.startsWith('/api/checkout-logistics-preview/')) return logisticsPreview(request, env, user);
-  if (path === '/api/checkout-preview') return previewCheckout(request, env, user);
+  if (path === '/api/checkout-preview' || path.startsWith('/api/checkout-preview/payment/')) return previewCheckout(request, env, user);
   if (/^\/api\/(?:admin\/)?clicker-orders(?:\/|$)/.test(path)) return clickerOrderApi(request, env, user);
   return catalogApi(request, env, user);
 }

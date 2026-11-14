@@ -139,8 +139,7 @@ async function matchOrder(request: Request, store: Store, order: Order) {
   return json({ reference, matchedAt });
 }
 
-async function recordEcpayStagePayment(request: Request, store: Store) {
-  const { id, fields } = await readEcpayStageResult(request);
+async function recordEcpayStagePayment(id: string, fields: Record<string, string>, store: Store) {
   const order = await store.DB.prepare("SELECT * FROM clicker_orders WHERE id=? AND tier='ecpay-stage'").bind(id).first<Order>();
   if (!order) return fail('Test order not found', 404);
   const acknowledged = () => new Response('1|OK', { headers: { 'Content-Type': 'text/plain' } });
@@ -167,7 +166,12 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
     const callback = ecpayStageReturnUrl(env);
     if (isEcpayStageCallback(path)) {
       if (request.method !== 'POST' || callback?.pathname !== path || !env.DB || !env.BUCKET) return fail('找不到此功能。', 404);
-      return await recordEcpayStagePayment(request, env as Store);
+      const { id, fields } = await readEcpayStageResult(request);
+      if (id.startsWith('OGS-DEMO-')) {
+        const { recordPhysicalStagePayment } = await import('./checkout-preview');
+        return await recordPhysicalStagePayment(env.DB, id, fields);
+      }
+      return await recordEcpayStagePayment(id, fields, env as Store);
     }
     if (!user) return json({ error: '請先用 OGS 管理帳號登入。' }, 401);
     if (!isAdmin(user, env)) return json({ error: '此流程目前僅開放 OGS 內部測試。' }, 403);
@@ -211,7 +215,7 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
         return {
           id: receipt.id, kind: 'physical', name: receipt.productName || row.product_name || row.product_id,
           quantity: row.quantity, amount: receipt.total, createdAt: receipt.createdAt,
-          delivery: receipt.delivery, previewPaid: row.status === 'success', paymentState: row.status,
+          delivery: receipt.delivery, matchedReference: receipt.paymentReference, matchedAt: receipt.paidAt, previewPaid: row.status === 'success', paymentState: row.status,
           subtotal: receipt.subtotal, shipping: receipt.shipping,
         };
       });

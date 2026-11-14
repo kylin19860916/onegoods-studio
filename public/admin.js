@@ -160,7 +160,7 @@ function renderPhysicalOrder(order) {
   return `<article class="panel clicker-order-item"><div class="panel-title"><h2>${esc(order.name)}</h2><span class="badge">${orderStatuses[orderStatus(order)]}</span></div>
     <p><strong>${esc(order.id)}</strong> · 商品訂單 · ${formatOrderDate(order.createdAt)}</p>
     <p>數量 ${esc(order.quantity)} · 商品小計 ${money(order.subtotal)} · 運費 ${money(order.shipping)} · 合計 ${money(order.amount)}</p>
-    ${order.live && order.matchedReference ? `<p>綠界交易編號 ${esc(order.matchedReference)} · ${formatOrderDate(order.matchedAt)}</p>` : ''}
+    ${order.matchedReference ? `<p>綠界交易編號 ${esc(order.matchedReference)} · ${formatOrderDate(order.matchedAt)}</p>` : ''}
     ${destination ? `<fieldset><legend>${order.live ? '黑貓宅配' : '配送資料（測試）'}</legend><p>${esc(delivery.contact)} · ${esc(delivery.phone)}</p><p>${esc(destination)}</p>${order.live ? `<p>${esc(delivery.email)}</p>` : ''}</fieldset>` : ''}
     </article>`;
 }
