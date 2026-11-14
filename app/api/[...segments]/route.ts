@@ -15,7 +15,7 @@ async function handle(request: Request) {
   if (path.startsWith('/api/store-payment/')) return storePayment(request, env);
   if (path === logisticsCallbackPath) return receiveLogisticsNotice(request, env);
   if (isEcpayStageCallback(path)) return clickerOrderApi(request, env, null);
-  if (path === '/api/checkout-delivery-preview/store-return') return deliveryPreview(request, env, null);
+  if (/^\/api\/checkout-delivery-preview\/(?:store-return|public-store-start|public-store)$/.test(path)) return deliveryPreview(request, env, null);
   if (/^\/api\/checkout-logistics-preview\/notice(?:\/|$)/.test(path)) return logisticsPreview(request, env, null);
   const user = await getChatGPTUser();
   if (path.startsWith('/api/checkout-delivery-preview/')) return deliveryPreview(request, env, user);

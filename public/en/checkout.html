@@ -6,8 +6,8 @@
   <meta name="robots" content="noindex">
   <title>OGS checkout — One Goods Studio</title>
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=f0ba05b18af6">
-  <script src="../locale.js?v=f0ba05b18af6" defer></script><script src="app.js?v=f0ba05b18af6" defer></script>
+  <link rel="stylesheet" href="../style.css?v=32f46fd0f0a2">
+  <script src="../locale.js?v=32f46fd0f0a2" defer></script><script src="app.js?v=32f46fd0f0a2" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/checkout.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/checkout.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/checkout.html"></head>
 <body data-page="checkout">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html">Customize</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../checkout.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/checkout.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/checkout.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header>
@@ -36,7 +36,19 @@
       </select>
       <div id="store-carrier-field">
         <label for="store-carrier">Convenience store</label>
-        <select id="store-carrier"><option>7-ELEVEN</option><option>FamilyMart</option><option>Hi-Life</option></select>
+        <select id="store-carrier">
+          <option value="UNIMARTC2C">7-ELEVEN</option>
+          <option value="FAMIC2C">FamilyMart</option>
+          <option value="HILIFEC2C">Hi-Life</option>
+        </select>
+        <div class="store-pickup-choice">
+          <button id="store-choose-branch" class="button cream" type="button">Choose pickup store</button>
+          <div id="store-branch-result" aria-live="polite" hidden>
+            <strong id="store-branch-name"></strong>
+            <p id="store-branch-address"></p>
+          </div>
+          <p id="store-branch-error" role="alert" hidden></p>
+        </div>
       </div>
       <fieldset id="store-address-fields" hidden disabled>
         <legend>Delivery within Taiwan main island</legend>
@@ -76,7 +88,7 @@
     <section id="store-receipt" class="store-order-panel" hidden>
       <h2 tabindex="-1">Demo payment complete</h2>
       <p id="store-receipt-item"></p>
-      <p id="store-receipt-shipping"></p>
+      <p id="store-receipt-shipping"></p><p id="store-receipt-address" hidden></p>
       <a class="button cream" href="products.html">Back to shop</a>
     </section>
     <aside id="store-summary" class="store-order-panel">

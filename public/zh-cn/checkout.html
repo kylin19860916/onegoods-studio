@@ -6,8 +6,8 @@
   <meta name="robots" content="noindex">
   <title>官网结账 — One Goods Studio</title>
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=f0ba05b18af6">
-  <script src="../locale.js?v=f0ba05b18af6" defer></script><script src="app.js?v=f0ba05b18af6" defer></script>
+  <link rel="stylesheet" href="../style.css?v=32f46fd0f0a2">
+  <script src="../locale.js?v=32f46fd0f0a2" defer></script><script src="app.js?v=32f46fd0f0a2" defer></script>
 <link rel="canonical" href="https://onegoods.studio/zh-cn/checkout.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/checkout.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/checkout.html"></head>
 <body data-page="checkout">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首页"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主导航"><a href="index.html">首页</a><a href="products.html">好物</a><a href="custom.html">客制</a><a href="about.html">关于 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切换语言，当前：简体中文">简<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../checkout.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/checkout.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans" aria-current="true">简体中文</a><a href="../en/checkout.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header>
@@ -36,7 +36,19 @@
       </select>
       <div id="store-carrier-field">
         <label for="store-carrier">取货超商</label>
-        <select id="store-carrier"><option>7-ELEVEN</option><option>全家</option><option>莱尔富</option></select>
+        <select id="store-carrier">
+          <option value="UNIMARTC2C">7-ELEVEN</option>
+          <option value="FAMIC2C">全家</option>
+          <option value="HILIFEC2C">莱尔富</option>
+        </select>
+        <div class="store-pickup-choice">
+          <button id="store-choose-branch" class="button cream" type="button">选择取货门市</button>
+          <div id="store-branch-result" aria-live="polite" hidden>
+            <strong id="store-branch-name"></strong>
+            <p id="store-branch-address"></p>
+          </div>
+          <p id="store-branch-error" role="alert" hidden></p>
+        </div>
       </div>
       <fieldset id="store-address-fields" hidden disabled>
         <legend>台湾本岛配送</legend>
@@ -76,7 +88,7 @@
     <section id="store-receipt" class="store-order-panel" hidden>
       <h2 tabindex="-1">模拟付款已完成</h2>
       <p id="store-receipt-item"></p>
-      <p id="store-receipt-shipping"></p>
+      <p id="store-receipt-shipping"></p><p id="store-receipt-address" hidden></p>
       <a class="button cream" href="products.html">返回好物</a>
     </section>
     <aside id="store-summary" class="store-order-panel">

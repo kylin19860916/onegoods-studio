@@ -52,7 +52,15 @@ async function loadCatalog(){try{const [r,payment]=await Promise.all([fetch('/ap
 function renderStoreCheckout(){
  const checkout=qs('#store-checkout');
  if(!checkout)return;
- const id=new URLSearchParams(location.search).get('product');
+ const checkoutUrl=new URL(location.href);
+ const mapToken=checkoutUrl.searchParams.get('store');
+ const draftKey='ogs-pickup-preview';
+ let draft;
+ try {
+   const saved=JSON.parse(sessionStorage.getItem(draftKey));
+   if(mapToken && saved?.token===mapToken) draft=saved;
+ } catch {}
+ const id=checkoutUrl.searchParams.get('product') || draft?.product;
  const product=products.find(p=>p.id===id);
  if(!canOrder(product)){
    checkout.innerHTML='<p role="status">This item is currently unavailable for direct ordering.</p><a class="button cream" href="products.html">Back to shop</a>';
@@ -64,6 +72,11 @@ function renderStoreCheckout(){
  const delivery=qs('#store-delivery');
  const carrier=qs('#store-carrier');
  const store=qs('#store-carrier-field');
+ const chooseBranch=qs('#store-choose-branch');
+ const branchResult=qs('#store-branch-result');
+ const branchError=qs('#store-branch-error');
+ const mapApi='/api/checkout-delivery-preview/';
+ let selectedBranch;
  const confirmation=qs('#store-confirmation');
  const receipt=qs('#store-receipt');
  const paymentDemo = qs('#store-payment-demo');
@@ -95,15 +108,85 @@ function renderStoreCheckout(){
    const isPickup=delivery.value==='pickup';
    const fee=storePayment.enabled?storePayment.shipping:isPickup?60:100;
    store.hidden=!isPickup;
+   const branch=isPickup && selectedBranch?.carrier===carrier.value ? selectedBranch : null;
+   branchResult.hidden=!branch;
+   chooseBranch.textContent=branch?'Change pickup store':'Choose pickup store';
+   const branchLabel=branch ? branch.name+'（'+branch.id+'）' : '';
+   qs('#store-branch-name').textContent=branchLabel;
+   qs('#store-branch-address').textContent=branch?.address || '';
+   if(!storePayment.enabled){
+     reviewAddress.hidden=!branch;
+     reviewAddress.textContent=branch?.address || '';
+   }
    qs('#store-subtotal').textContent=money(subtotal);
    qs('#store-fee').textContent=money(fee);
    qs('#store-total').textContent=money(subtotal+fee);
    qs('#store-review-item').textContent=product.name+' × '+quantity.value;
-   qs('#store-review-shipping').textContent=isPickup?delivery.selectedOptions[0].text.split(' · ')[0]+' · '+carrier.selectedOptions[0].text:delivery.selectedOptions[0].text.split(' · ')[0];
+   qs('#store-review-shipping').textContent=isPickup?delivery.selectedOptions[0].text.split(' · ')[0]+' · '+carrier.selectedOptions[0].text+(branch?' · '+branchLabel:''):delivery.selectedOptions[0].text.split(' · ')[0];
  }
  function showStep(step){
    sections.forEach((section,index)=>{section.hidden=index!==step;});
    sections[step].querySelector('h2').focus();
+ }
+ function showBranchError(message){
+   branchError.textContent=message;
+   branchError.hidden=false;
+ }
+ for(const input of [carrier,delivery]){
+   input.addEventListener('change',()=>{ branchError.hidden=true; });
+ }
+ chooseBranch.addEventListener('click',async()=>{
+   if(!quantity.reportValidity())return;
+   const requestedCarrier=carrier.value;
+   chooseBranch.disabled=true;
+   branchError.hidden=true;
+   try {
+     const response=await fetch(mapApi+'public-store-start',{
+       method:'POST',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({carrier:requestedCarrier,mobile:matchMedia('(max-width: 680px)').matches,language:document.documentElement.lang}),
+     });
+     const selection=await response.json();
+     if(!response.ok || selection.action!=='https://logistics-stage.ecpay.com.tw/Express/map')throw new Error();
+     if(delivery.value!=='pickup' || carrier.value!==requestedCarrier || sections[1].hidden)return;
+     sessionStorage.setItem(draftKey,JSON.stringify({
+       token:selection.token,product:product.id,quantity:quantity.value,carrier:requestedCarrier,
+     }));
+     const mapForm=document.createElement('form');
+     mapForm.method='POST';
+     mapForm.action=selection.action;
+     for(const [name,value] of Object.entries(selection.fields)){
+       const field=document.createElement('input');
+       Object.assign(field,{type:'hidden',name,value});
+       mapForm.append(field);
+     }
+     document.body.append(mapForm);
+     mapForm.submit();
+   } catch {
+     showBranchError('Store selection is temporarily unavailable. Please try again.');
+   } finally {
+     chooseBranch.disabled=false;
+   }
+ });
+ async function restoreBranch(){
+   if(storePayment.enabled || draft?.product!==product.id || ![...carrier.options].some(option=>option.value===draft.carrier))return;
+   checkoutUrl.searchParams.set('product',product.id);
+   history.replaceState(null,'',checkoutUrl);
+   carrier.value=draft.carrier;
+   quantity.value=draft.quantity;
+   refresh();
+   showStep(1);
+   chooseBranch.disabled=true;
+   try {
+     const response=await fetch(mapApi+'public-store?token='+encodeURIComponent(mapToken),{cache:'no-store'});
+     const {store:branch}=await response.json();
+     if(!response.ok || !branch)throw new Error();
+     selectedBranch={...branch,carrier:draft.carrier};
+     refresh();
+   } catch {
+     showBranchError('Choose your pickup store again.');
+   } finally {
+     chooseBranch.disabled=false;
+   }
  }
  quantity.addEventListener('input',refresh);
  form.addEventListener('change',refresh);
@@ -118,12 +201,20 @@ function renderStoreCheckout(){
  qs('#store-demo-success').addEventListener('click',()=>{
    qs('#store-receipt-item').textContent = qs('#store-review-item').textContent;
    qs('#store-receipt-shipping').textContent = qs('#store-review-shipping').textContent;
+   const receiptAddress=qs('#store-receipt-address');
+   receiptAddress.textContent=reviewAddress.textContent;
+   receiptAddress.hidden=reviewAddress.hidden;
    showStep(4);
  });
  form.addEventListener('submit', async event => {
    event.preventDefault();
    refresh();
    if (!sections[1].hidden) {
+     if(delivery.value==='pickup' && selectedBranch?.carrier!==carrier.value){
+       showBranchError('Choose a pickup store to continue.');
+       chooseBranch.focus();
+       return;
+     }
      if (storePayment.enabled) {
        const fields = form.elements;
        reviewAddress.textContent = [fields.contact.value, fields.phone.value, fields.email.value,
@@ -176,5 +267,6 @@ function renderStoreCheckout(){
  refresh();
  qs('#store-loading').hidden=true;
  form.hidden=false;
+ restoreBranch();
 }
 loadCatalog();

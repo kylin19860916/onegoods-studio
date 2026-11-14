@@ -36,7 +36,19 @@
       </select>
       <div id="store-carrier-field">
         <label for="store-carrier">取货超商</label>
-        <select id="store-carrier"><option>7-ELEVEN</option><option>全家</option><option>莱尔富</option></select>
+        <select id="store-carrier">
+          <option value="UNIMARTC2C">7-ELEVEN</option>
+          <option value="FAMIC2C">全家</option>
+          <option value="HILIFEC2C">莱尔富</option>
+        </select>
+        <div class="store-pickup-choice">
+          <button id="store-choose-branch" class="button cream" type="button">选择取货门市</button>
+          <div id="store-branch-result" aria-live="polite" hidden>
+            <strong id="store-branch-name"></strong>
+            <p id="store-branch-address"></p>
+          </div>
+          <p id="store-branch-error" role="alert" hidden></p>
+        </div>
       </div>
       <fieldset id="store-address-fields" hidden disabled>
         <legend>台湾本岛配送</legend>
@@ -76,7 +88,7 @@
     <section id="store-receipt" class="store-order-panel" hidden>
       <h2 tabindex="-1">模拟付款已完成</h2>
       <p id="store-receipt-item"></p>
-      <p id="store-receipt-shipping"></p>
+      <p id="store-receipt-shipping"></p><p id="store-receipt-address" hidden></p>
       <a class="button cream" href="products.html">返回好物</a>
     </section>
     <aside id="store-summary" class="store-order-panel">
