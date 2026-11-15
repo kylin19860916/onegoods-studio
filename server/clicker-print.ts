@@ -2,7 +2,7 @@ import createManifold, { type CrossSection, type Manifold, type ManifoldToplevel
 import wasm from 'manifold-3d/manifold.wasm?module';
 import { nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
 import { keyringFonts } from '../src/keyring-font-picker.js';
-import { MX_BASE_DIVIDER, MX_NAME_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_FACE, MX_SWITCH_WELL, mxChainEyelet, mxStack } from '../src/cherry-mx-spec.js';
+import { MX_BASE_DIVIDER, MX_NAME_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_EYELET_BLEND, MX_NAME_FACE, MX_SWITCH_WELL, mxChainEyelet, mxEyeletBlendMesh, mxStack } from '../src/cherry-mx-spec.js';
 import { HttpError } from './catalog';
 import p2sTrialProfile from './clicker-p2s-profile.json';
 
@@ -41,7 +41,7 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     throw new HttpError(400, '目前的字型缺少這些文字，請更換字型或調整文字。');
   }
   const contours = nameClickerContours(font, design.text);
-  const { CrossSection: Section, Manifold: Solid } = await getKernel();
+  const { CrossSection: Section, Manifold: Solid, Mesh } = await getKernel();
   const allocated: Array<{ delete(): void }> = [];
   function own<T extends { delete(): void }>(value: T): T {
     allocated.push(value);
@@ -72,9 +72,9 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     if (glyphs.isEmpty() || cut(glyphs, inner).area() > 0.05) {
       throw new HttpError(400, '字形超出可製作範圍，請縮短文字或換一種字型。');
     }
-    const { outline: earOutline, holeX } = mxChainEyelet(shellPoints);
+    const { outline: earOutline, holeX, rootLeft } = mxChainEyelet(shellPoints);
     const { holeDiameter, bottom: earBottom, thickness: earThickness } = MX_CHAIN_EYELET;
-    const ear = section([earOutline]);
+    const ear = own(new Section([earOutline]));
     const hole = own(own(Section.circle(holeDiameter / 2, 64)).translate([holeX, 0]));
     const underPlate = section([contours.profile(innerWallMargin)]);
     const dividerSpan = 2 * Math.max(...shellPoints.map(([, y]) => Math.abs(y)));
@@ -90,6 +90,15 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
       own(Section.intersection(underPlate, own(Section.union(dividerStrips)))),
       wellVoid,
     ) : null;
+    const { leadInRadius, leadInTop } = MX_EYELET_BLEND;
+    const arc = own(new Solid(new Mesh(mxEyeletBlendMesh(earOutline, rootLeft))));
+    const entry = join([
+      own(Solid.cylinder(leadInTop + 0.01, leadInRadius, leadInRadius, 64)),
+      own(own(Solid.cylinder(earBottom - leadInTop, leadInRadius, holeDiameter / 2, 64))
+        .translate([0, 0, leadInTop])),
+    ]);
+    const supportOpening = slab(wellVoid, MX_CASE.floor, stack.plateBottom);
+    const blendedEar = own(Solid.difference([arc, own(entry.translate([holeX, 0, 0])), supportOpening]));
     const caseWithEar = join([
       slab(shell, 0, MX_CASE.floor),
       slab(cut(cut(shell, underPlate), wellVoid), MX_CASE.floor, stack.plateBottom),
@@ -98,8 +107,9 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
       slab(cut(shell, opening), stack.plateBottom, stack.mountTop),
       slab(section(contours.rim.flat()), stack.mountTop, stack.skirtBottom + 1.25),
       slab(ear, earBottom, earBottom + earThickness),
+      blendedEar,
     ]);
-    const base = own(Solid.difference(caseWithEar, slab(hole, earBottom - 0.1, earBottom + earThickness + 0.1)));
+    const base = own(Solid.difference(caseWithEar, slab(hole, 0, earBottom + earThickness + 0.1)));
     const { outerDiameter, crossSpan, crossArm, engagement } = MX_NAME_CAP_SOCKET;
     const socketStart = stack.stemTop - engagement;
     const boss = own(Section.circle(outerDiameter / 2, 64));

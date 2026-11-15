@@ -43,8 +43,40 @@ export function mxChainEyelet(shell) {
     return /** @type {[number, number]} */ ([holeX + radius * Math.cos(angle), radius * Math.sin(angle)]);
   });
   outline.push([rootX, -radius], [rootX, radius]);
-  return { outline, holeX };
+  return { outline, holeX, rootLeft: midX };
 }
+export const MX_EYELET_BLEND = Object.freeze({
+  lowerZ: 0.5, leadInRadius: 3.25, leadInTop: 2.53, segments: 48,
+});
+
+/** @param {[number, number][]} outline @param {number} rootLeft */
+export function mxEyeletBlendMesh(outline, rootLeft) {
+  const { lowerZ, segments } = MX_EYELET_BLEND;
+  const joinZ = MX_CHAIN_EYELET.bottom;
+  const count = outline.length;
+  const positions = [];
+  const faces = [];
+  for (let layer = 0; layer <= segments + 1; layer++) {
+    const progress = Math.min(layer / segments, 1);
+    const ease = Math.sin(Math.PI * progress / 2) ** 2;
+    const z = layer <= segments ? lowerZ + (joinZ - lowerZ) * progress : joinZ + 0.3;
+    const anchor = rootLeft + 0.35;
+    for (const [x, y] of outline) {
+      positions.push(anchor + (x - anchor) * Math.max(0.01, ease), y * (0.68 + 0.32 * ease), z);
+    }
+  }
+  for (let layer = 0; layer <= segments; layer++) {
+    const first = layer * count;
+    for (let i = 0; i < count; i++) {
+      const a = first + i, b = first + (i + 1) % count;
+      faces.push(a, b, b + count, a, b + count, a + count);
+    }
+  }
+  const top = (segments + 1) * count;
+  for (let i = 1; i < count - 1; i++) faces.push(0, i + 1, i, top, top + i, top + i + 1);
+  return { numProp: 3, vertProperties: new Float32Array(positions), triVerts: new Uint32Array(faces) };
+}
+
 export function mxStack() {
   const bodyBottom = MX_CASE.floor + MX_CASE.pinClearance + MX.pins;
   const mountTop = bodyBottom + MX.lowerBody;
