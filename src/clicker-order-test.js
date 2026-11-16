@@ -50,7 +50,7 @@ export function setupClickerOrderTest(form, readDesign) {
     controls.querySelector('p').hidden = true;
 
   }
-  panel.hidden = false;
+  renderQuote();
   api(apiUrl).then(() => {
     controls.hidden = false;
     if (ecpay) {
@@ -73,6 +73,7 @@ export function setupClickerOrderTest(form, readDesign) {
   function renderQuote() {
     const design = readDesign();
     const mechanical = mechanicalTest && design?.style === 'mechanical';
+    panel.hidden = !design || (design.style === 'mechanical' && !mechanical);
     if (mechanicalTest) {
       pricingHint.hidden = mechanical;
       submit.textContent = mechanical ? panel.dataset.mechanicalSubmit : submitLabel;
