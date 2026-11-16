@@ -3,6 +3,7 @@ import wasm from 'manifold-3d/manifold.wasm?module';
 import { mechanicalKeyContours, nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
 import { keyringFonts } from '../src/keyring-font-picker.js';
 import { MX_BASE_DIVIDER, MX_CAP_SOCKET, MX_NAME_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_EYELET_BLEND, MX_NAME_FACE, MX_SWITCH_WELL, mxChainEyelet, mxEyeletBlendMesh, mxStack } from '../src/cherry-mx-spec.js';
+import { MECHANICAL_KEYCAP, mechanicalKeycapShell } from '../src/mechanical-keycap.js';
 import { HttpError } from './catalog';
 import p2sTrialProfile from './clicker-p2s-profile.json';
 import mechanicalBases from './mechanical-base-templates.json';
@@ -197,13 +198,12 @@ export async function generateMechanical3mf(design: MechanicalDesign, readFont: 
   type PrintMesh = { name: string; color: string; filament: number; vertices: number[][]; triangles: number[][]; subtype?: 'support_blocker' };
   const parts: PrintMesh[] = [{ ...base, name: 'V3 Mechanical Base', color: design.base, filament: 1 }];
   const blockers: PrintMesh[] = [];
-  const { CrossSection: Section, Manifold: Solid } = await getKernel();
+  const { CrossSection: Section, Manifold: Solid, Mesh } = await getKernel();
   const allocated: Array<{ delete(): void }> = [];
   const own = <T extends { delete(): void }>(part: T) => { allocated.push(part); return part; };
   const box = (w: number, h: number) => own(Section.square([w, h], true));
-  const rounded = (width: number, radius: number) => own(box(width - 2 * radius, width - 2 * radius).offset(radius, 'Round', 2, 40));
   const stack = mxStack();
-  const skirtBottom = stack.skirtBottom - 1.65;
+  const skirtBottom = stack.skirtBottom - MECHANICAL_KEYCAP.skirtDrop;
   const capHeight = stack.capTop - skirtBottom;
   const cavityHeight = stack.roofBottom - skirtBottom;
   const socketBottom = stack.stemTop - MX_CAP_SOCKET.engagement - skirtBottom;
@@ -218,9 +218,7 @@ export async function generateMechanical3mf(design: MechanicalDesign, readFont: 
     (subtype ? blockers : parts).push({ name, vertices, triangles, color, filament: colors.indexOf(color)+1, subtype });
   }
   try {
-    const outer = own(rounded(19.2, 2).extrude(capHeight, 0, 0, [0.89, 0.89]));
-    const inner = own(own(rounded(16.6, 1.4).extrude(cavityHeight + 0.05, 0, 0, [16.2 / 16.6, 16.2 / 16.6])).translate([0, 0, -0.05]));
-    const skirt = own(Solid.difference(outer, inner));
+    const skirt = own(new Solid(new Mesh(mechanicalKeycapShell(capHeight, cavityHeight))));
     const cross = own(Section.union(box(crossSpan, crossArm), box(crossArm, crossSpan)));
     const boss = own(Section.difference(own(Section.circle(outerDiameter / 2, 64)), cross));
     const socket = own(own(boss.extrude(cavityHeight - socketBottom + 0.18)).translate([0, 0, socketBottom]));
