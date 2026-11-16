@@ -1,6 +1,6 @@
 import { isCheckoutTestHost } from './checkout-test-host';
 import { isAdmin, json, HttpError } from './catalog';
-import { generateClicker3mf, type ClickerDesign } from './clicker-print';
+import { generateClicker3mf, generateMechanical3mf, type ClickerDesign, type MechanicalDesign } from './clicker-print';
 import { exceedsClickerTextLimit, quoteClickerEcpayStage, quoteClickerTest } from '../src/clicker-test-pricing.js';
 import { keyringFonts } from '../src/keyring-font-picker.js';
 import { ecpayStageCheckout, ecpayStageReturnUrl, isEcpayStageCallback, readEcpayStageResult, verifyEcpayStageTrade } from './ecpay-stage';
@@ -23,18 +23,34 @@ type Order = {
   matched_at: string | null;
 };
 type Store = { DB: D1Database; BUCKET: R2Bucket; ASSETS: Fetcher };
-type Payload = { requestId?: unknown; text?: unknown; font?: unknown; colors?: Partial<ClickerDesign['colors']> };
+type Payload = { style?: unknown; base?: unknown; keys?: unknown; requestId?: unknown; text?: unknown; font?: unknown; colors?: Partial<ClickerDesign['colors']> };
 const fileKey = (id: string) => 'clicker-test/' + id + '.3mf';
 const code = (prefix: string) => prefix + crypto.randomUUID().replaceAll('-', '').slice(0, 12).toUpperCase();
 const fail = (message: string, status = 400): never => { throw new HttpError(status, message); };
 
 function validate(body: Payload, ecpay: boolean) {
+  if (!body || typeof body.requestId !== 'string' || !/^[a-f0-9-]{36}$/.test(body.requestId)) return fail('提交編號不正確，請重新整理。');
+  if (body.style === 'mechanical') {
+    if (ecpay) return fail('機械鍵盤款目前僅開放 3MF 測試。');
+    if (typeof body.base !== 'string' || !palette.has(body.base)) return fail('請選擇可用的底座顏色。');
+    if (!Array.isArray(body.keys) || body.keys.length < 1 || body.keys.length > 6) return fail('請選擇 1 至 6 鍵。');
+    const keys = body.keys.map(key => {
+      if (!key || typeof key.text !== 'string' || key.text.length > 12 ||
+          typeof key.font !== 'string' || !Object.hasOwn(keyringFonts, key.font) ||
+          !palette.has(key.cap) || !palette.has(key.ink)) return fail('請確認每鍵的文字、字型和顏色。');
+      const text = key.text.trim().normalize('NFC');
+      if (text && !/^[\p{L}\p{N}][\p{M}]*$/u.test(text)) return fail('每鍵限一個字或字母。');
+      return { text, font: key.font as MechanicalDesign['keys'][number]['font'], cap: String(key.cap), ink: String(key.ink) };
+    });
+    const design: MechanicalDesign = { style: 'mechanical', text: keys.map(key => key.text).join('') || `機械鍵盤款 ${keys.length} 鍵`, base: body.base, keys };
+    return { design, tier: { id: 'mechanical-test', amount: 0 }, requestId: body.requestId };
+  }
+  if (body.style !== undefined) return fail('請選擇可測試的款式。');
   if (exceedsClickerTextLimit(body?.text)) return fail('文字超過長度上限。中文最多 5 字，英文最多 8 個字母。');
   const quote = (ecpay ? quoteClickerEcpayStage : quoteClickerTest)(body?.text);
   const font = body?.font;
   if (!quote) return fail('請填寫可列印的姓名或文字。');
   if (typeof font !== 'string' || !Object.hasOwn(keyringFonts, font)) return fail('請選擇可用的字型。');
-  if (typeof body.requestId !== 'string' || !/^[a-f0-9-]{36}$/.test(body.requestId)) return fail('提交編號不正確，請重新整理。');
   const colors = { border: body.colors?.border ?? '', fill: body.colors?.fill ?? '', ink: body.colors?.ink ?? '' };
   if (Object.values(colors).some(value => !palette.has(value))) return fail('請選擇可用的顏色。');
   const design: ClickerDesign = { text: quote.text, font: font as ClickerDesign['font'], colors };
@@ -49,7 +65,7 @@ async function requestJson(request: Request) {
 }
 
 function receipt(row: Pick<Order, 'id' | 'tier' | 'amount'>) {
-  return { id: row.id, tier: row.tier, amount: row.amount, checkoutUrl: prefix + '/' + row.id + '/checkout/' + row.tier };
+  return { id: row.id, tier: row.tier, amount: row.amount, checkoutUrl: row.tier === 'mechanical-test' ? '/admin#orders/' + row.id : prefix + '/' + row.id + '/checkout/' + row.tier };
 }
 
 export async function createOrder(request: Request, store: Store, ecpay: boolean, options: { preview?: boolean; shipping?: number } = {}) {
@@ -63,8 +79,11 @@ export async function createOrder(request: Request, store: Store, ecpay: boolean
     if (existing.design !== snapshot || existing.tier !== tier.id || existing.amount !== tier.amount) return fail('此確認已提交，請重新確認變更後的設計。', 409);
     return json(receipt(existing));
   }
-  const fontUrl = new URL('/assets/fonts/keyring/' + keyringFonts[design.font], request.url);
-  const file = await generateClicker3mf(design, await store.ASSETS.fetch(new Request(fontUrl)));
+  const readFont = (font: keyof typeof keyringFonts) =>
+    store.ASSETS.fetch(new Request(new URL('/assets/fonts/keyring/' + keyringFonts[font], request.url)));
+  const file = 'style' in design
+    ? await generateMechanical3mf(design, readFont)
+    : await generateClicker3mf(design, await readFont(design.font));
   const id = code(ecpay ? 'OGS-E-' : 'OGS-T-');
   await store.BUCKET.put(fileKey(id), file, { httpMetadata: { contentType: 'model/3mf' } });
   try {
@@ -238,7 +257,7 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
       if (order.matched_reference) return Response.redirect(new URL('/admin#clicker-orders', request.url), 303);
       return await ecpayStageCheckout(order, callback, url.origin);
     }
-    if (checkout && ['GET', 'POST'].includes(request.method)) {
+    if (checkout && order.tier !== 'mechanical-test' && ['GET', 'POST'].includes(request.method)) {
       if (checkout[2] && checkout[2] !== order.tier) return fail('此測試結帳連結與客製訂單價位不符。', 404);
       return await simulateCheckout(request, store, order);
     }

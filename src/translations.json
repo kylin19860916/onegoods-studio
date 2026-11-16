@@ -1,4 +1,6 @@
 {
+  "建立 3MF 测试单": ["建立 3MF 測試單", "Create 3MF test order"],
+  "{count} 键 · 3MF 测试": ["{count} 鍵 · 3MF 測試", "{count} keys · 3MF test"],
   "预估价格": ["預估價格", "Estimated price"],
   "NT$%s 起": ["NT$%s 起", "From NT$%s"],
   "机械键盘款": ["機械鍵盤款", "Keyboard keys"],

@@ -82,6 +82,7 @@ function isOrderRoute() {
 }
 
 function orderStatus(order) {
+  if (order.tier === 'mechanical-test') return 'complete';
   if (order.paymentState === 'failure') return 'attention';
   if (!order.previewPaid && !order.matchedReference) return 'unpaid';
   const status = String(order.shipment?.status ?? '');
@@ -118,6 +119,14 @@ function orderSwatch(label, color) {
 
 function renderClickerOrder(order) {
   const { id, design, tier, amount, checkoutCreated, matchedReference, matchedAt } = order;
+  if (design.style === 'mechanical') {
+    return `<article class="panel clicker-order-item"><div class="panel-title"><h2>${esc(design.text)}</h2><span class="badge">3MF 測試</span></div>
+      <p><strong>${esc(id)}</strong> · 機械鍵盤款 · ${design.keys.length} 鍵 · ${formatOrderDate(order.createdAt)}</p>
+      <div class="order-swatches">${orderSwatch('底座', design.base)}</div>
+      <ol>${design.keys.map(key => `<li>${esc(key.text || '空白鍵')} · ${esc(orderFonts[key.font] || key.font)}
+      <div class="order-swatches">${orderSwatch('鍵帽', key.cap)}${key.text ? orderSwatch('文字', key.ink) : ''}</div></li>`).join('')}</ol>
+      <div class="order-toolbar"><a class="text-action" href="/api/admin/clicker-orders/${esc(id)}/3mf" download>下載 3MF</a></div></article>`;
+  }
   const delivery = order.delivery;
   const address = delivery?.address;
   const store = delivery?.store;
@@ -222,7 +231,7 @@ function renderOrderView() {
       const status = orderStatus(order);
       return `<tr><td><a href="#orders/${esc(order.id)}">${esc(order.id)}</a></td><td>${formatOrderDate(order.createdAt)}</td>
       <td>${order.kind === 'custom' ? '客製' : '商品'}</td><td>${esc(orderItemName(order))}</td>
-      <td>${money(order.amount)}</td><td><span class="badge order-state order-state-${status}">${orderStatuses[status]}</span></td></tr>`;
+      <td>${order.tier === 'mechanical-test' ? '—' : money(order.amount)}</td><td><span class="badge order-state order-state-${status}">${order.tier === 'mechanical-test' ? '3MF 測試' : orderStatuses[status]}</span></td></tr>`;
     }).join('')}</tbody></table>` : '<p class="order-empty">沒有符合條件的訂單。</p>';
 }
 

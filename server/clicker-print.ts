@@ -1,10 +1,19 @@
 import createManifold, { type CrossSection, type Manifold, type ManifoldToplevel } from 'manifold-3d';
 import wasm from 'manifold-3d/manifold.wasm?module';
-import { nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
+import { mechanicalKeyContours, nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
 import { keyringFonts } from '../src/keyring-font-picker.js';
-import { MX_BASE_DIVIDER, MX_NAME_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_EYELET_BLEND, MX_NAME_FACE, MX_SWITCH_WELL, mxChainEyelet, mxEyeletBlendMesh, mxStack } from '../src/cherry-mx-spec.js';
+import { MX_BASE_DIVIDER, MX_CAP_SOCKET, MX_NAME_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_EYELET_BLEND, MX_NAME_FACE, MX_SWITCH_WELL, mxChainEyelet, mxEyeletBlendMesh, mxStack } from '../src/cherry-mx-spec.js';
 import { HttpError } from './catalog';
 import p2sTrialProfile from './clicker-p2s-profile.json';
+import mechanicalBases from './mechanical-base-templates.json';
+import filamentVectors from './mechanical-filament-vectors.json';
+
+export type MechanicalDesign = {
+  style: 'mechanical';
+  text: string;
+  base: string;
+  keys: { text: string; font: FontKey; cap: string; ink: string }[];
+};
 
 type FontKey = keyof typeof keyringFonts;
 export type ClickerDesign = {
@@ -48,7 +57,7 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     return value;
   }
   function section(rings: [number, number][][]) {
-    return own(own(new Section(rings, 'EvenOdd')).simplify(0.012));
+    return own(own(new Section(rings as [number, number][][], 'EvenOdd')).simplify(0.012));
   }
   function slab(outline: CrossSection, bottom: number, top: number) {
     return own(own(outline.extrude(top - bottom)).translate([0, 0, bottom]));
@@ -160,6 +169,86 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     // The internal test uses the P2S/0.4 mm PLA profile from the validated sample.
     const filament_colour = [design.colors.border, design.colors.fill, design.colors.ink].map(color => color.toUpperCase());
     return writeKeyring3mf({ meshes, assemblyName: 'OGS Three-colour Clicker', bambuProfile: { ...p2sTrialProfile, filament_colour } });
+  } finally {
+    for (const part of allocated.reverse()) part.delete();
+  }
+}
+
+export async function generateMechanical3mf(design: MechanicalDesign, readFont: (key: FontKey) => Promise<Response>) {
+  const base = mechanicalBases[design.keys.length - 1];
+  if (!base) throw new HttpError(400, '請選擇 1 至 6 鍵。');
+  const fonts = new Map(await Promise.all([...new Set(design.keys.filter(key => key.text).map(key => key.font))].map(async key => {
+    const response = await readFont(key);
+    if (!response.ok) throw new Error('Clicker font asset is unavailable');
+    return [key, parseKeyringFont(new Uint8Array(await response.arrayBuffer()))] as const;
+  })));
+  const colors = [...new Set([design.base, ...design.keys.flatMap(key => key.text ? [key.cap, key.ink] : [key.cap])])];
+  const profile = {
+    ...p2sTrialProfile,
+    ...Object.fromEntries(Object.entries(filamentVectors).map(([key, values]) => [key, colors.flatMap(() => values)])),
+    filament_colour: colors.map(color => color.toUpperCase()),
+    flush_volumes_matrix: colors.flatMap((_, a) => colors.map((_, b) => a === b ? '0' : '280')),
+    flush_volumes_vector: colors.flatMap(() => ['140', '140']),
+    inherits_group: Array(colors.length + 2).fill(''),
+    different_settings_to_system: Array(colors.length + 2).fill(''),
+    enable_prime_tower: colors.length === 1 ? '0' : '1',
+    wipe_tower_y: ['180'],
+  };
+  type PrintMesh = { name: string; color: string; filament: number; vertices: number[][]; triangles: number[][]; subtype?: 'support_blocker' };
+  const parts: PrintMesh[] = [{ ...base, name: 'V3 Mechanical Base', color: design.base, filament: 1 }];
+  const blockers: PrintMesh[] = [];
+  const { CrossSection: Section, Manifold: Solid } = await getKernel();
+  const allocated: Array<{ delete(): void }> = [];
+  const own = <T extends { delete(): void }>(part: T) => { allocated.push(part); return part; };
+  const box = (w: number, h: number) => own(Section.square([w, h], true));
+  const rounded = (width: number, radius: number) => own(box(width - 2 * radius, width - 2 * radius).offset(radius, 'Round', 2, 40));
+  const stack = mxStack();
+  const skirtBottom = stack.skirtBottom - 1.65;
+  const capHeight = stack.capTop - skirtBottom;
+  const cavityHeight = stack.roofBottom - skirtBottom;
+  const socketBottom = stack.stemTop - MX_CAP_SOCKET.engagement - skirtBottom;
+  const { crossSpan, crossArm, outerDiameter } = MX_CAP_SOCKET;
+  const capY = 39;
+  function exportPart(name: string, color: string, solid: Manifold, subtype?: 'support_blocker') {
+    if (solid.isEmpty() || solid.status() !== 'NoError') throw new HttpError(400, '無法生成完整的鍵帽。');
+    const { numProp, vertProperties, triVerts } = solid.getMesh();
+    const vertices = Array.from({length: vertProperties.length / numProp}, (_, i) =>
+      Array.from(vertProperties.subarray(i*numProp, i*numProp + 3), v => Number(v.toFixed(6))));
+    const triangles = Array.from({length: triVerts.length / 3}, (_, i) => Array.from(triVerts.subarray(3*i,3*i+3)));
+    (subtype ? blockers : parts).push({ name, vertices, triangles, color, filament: colors.indexOf(color)+1, subtype });
+  }
+  try {
+    const outer = own(rounded(19.2, 2).extrude(capHeight, 0, 0, [0.89, 0.89]));
+    const inner = own(own(rounded(16.6, 1.4).extrude(cavityHeight + 0.05, 0, 0, [16.2 / 16.6, 16.2 / 16.6])).translate([0, 0, -0.05]));
+    const skirt = own(Solid.difference(outer, inner));
+    const cross = own(Section.union(box(crossSpan, crossArm), box(crossArm, crossSpan)));
+    const boss = own(Section.difference(own(Section.circle(outerDiameter / 2, 64)), cross));
+    const socket = own(own(boss.extrude(cavityHeight - socketBottom + 0.18)).translate([0, 0, socketBottom]));
+    const cap = own(Solid.union(skirt, socket));
+    const socketClearance = own(cross.offset(0.45, 'Round', 2, 32));
+    for (const [index, key] of design.keys.entries()) {
+      const x = (index - (design.keys.length - 1)/2) * 22;
+      const number = index + 1;
+      exportPart(`Keycap ${number}`, key.cap, own(cap.translate([x, capY, 0])));
+      if (key.text) {
+        const font = fonts.get(key.font)!;
+        const rings = font.charToGlyphIndex(key.text) ? mechanicalKeyContours(font, key.text) : [];
+        if (!rings.length) throw new HttpError(400, `第 ${number} 鍵的字型不支援這個文字。`);
+        const glyph = own(new Section(rings as [number, number][][], 'EvenOdd'));
+        const text = own(own(glyph.extrude(0.65)).translate([x, capY, capHeight]));
+        exportPart(`Keycap ${number} lettering`, key.ink, text);
+      }
+      const well = own(own(Solid.cube([18.3, 18.3, 9.1], true)).translate([x, 0, 6.25]));
+      exportPart(`Exclude supports inside MX well ${number}`, design.base, well, 'support_blocker');
+      // Preserve the cross recess while allowing the bottom face of the hanging boss to be supported.
+      const crossBlocker = own(own(Solid.union(
+        own(socketClearance.extrude(cavityHeight + 0.1)),
+        own(own(Solid.cylinder(cavityHeight - socketBottom + 1.3, 5, 5, 64))
+          .translate([0, 0, socketBottom - 0.7])),
+      )).translate([x, capY, 0]));
+      exportPart(`Exclude supports inside MX socket ${number}`, key.cap, crossBlocker, 'support_blocker');
+    }
+    return writeKeyring3mf({ meshes: [...parts, ...blockers], assemblyName: 'OGS Mechanical Keyboard Clicker', bambuProfile: profile });
   } finally {
     for (const part of allocated.reverse()) part.delete();
   }

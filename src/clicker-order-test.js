@@ -24,6 +24,10 @@ export function setupClickerOrderTest(form, readDesign) {
   const login = panel.querySelector('#clicker-order-login');
   const controls = panel.querySelector('#clicker-order-controls');
   const name = form.querySelector('#clicker-name-text');
+  const submitLabel = submit.textContent;
+  const pricingHint = controls.querySelector('p');
+  const mechanicalTest = !preview && !ecpay;
+  login.href = '/signin-with-chatgpt?return_to=' + encodeURIComponent(location.pathname + location.search);
   let pending = null;
   let submitting = false;
   if (preview) {
@@ -44,7 +48,7 @@ export function setupClickerOrderTest(form, readDesign) {
     panel.querySelector('p').textContent = copy[1];
     submit.textContent = copy[2];
     controls.querySelector('p').hidden = true;
-    login.href = '/signin-with-chatgpt?return_to=' + encodeURIComponent(location.pathname + location.search);
+
   }
   panel.hidden = false;
   api(apiUrl).then(() => {
@@ -61,12 +65,24 @@ export function setupClickerOrderTest(form, readDesign) {
 
   function configuration() {
     const design = readDesign();
+    if (design?.style === 'mechanical') return mechanicalTest ? design : null;
     const quote = quoteDesign(design?.text);
     return quote ? { ...design, text: quote.text } : null;
   }
 
   function renderQuote() {
-    const text = readDesign()?.text;
+    const design = readDesign();
+    const mechanical = mechanicalTest && design?.style === 'mechanical';
+    if (mechanicalTest) {
+      pricingHint.hidden = mechanical;
+      submit.textContent = mechanical ? panel.dataset.mechanicalSubmit : submitLabel;
+    }
+    if (mechanical) {
+      price.textContent = panel.dataset.mechanicalReady.replace('{count}', String(design.keys.length));
+      submit.disabled = submitting;
+      return;
+    }
+    const text = design?.style === 'mechanical' ? undefined : design?.text;
     const quote = quoteDesign(text);
     price.textContent = quote
       ? (preview || ecpay) ? 'NT$' + quote.tier.amount : panel.dataset.quote.replace('{tier}', quote.tier.code).replace('{amount}', String(quote.tier.amount))
@@ -75,6 +91,7 @@ export function setupClickerOrderTest(form, readDesign) {
   }
 
   form.addEventListener('input', renderQuote);
+  form.addEventListener('clicker-key-count', renderQuote);
   form.addEventListener('compositionend', renderQuote);
   form.addEventListener('submit', async () => {
     if (controls.hidden || submitting) return;
