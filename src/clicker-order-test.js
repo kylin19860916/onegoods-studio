@@ -18,6 +18,7 @@ export function setupClickerOrderTest(form, readDesign) {
   const apiUrl = ecpay ? endpoint + '?provider=ecpay' : endpoint;
   const quoteDesign = (preview || ecpay) ? quoteClickerEcpayStage : quoteClickerTest;
   const panel = document.querySelector('#clicker-order-test');
+  if (!panel) return;
   const price = panel.querySelector('#clicker-order-price');
   const submit = panel.querySelector('button[type="submit"]');
   const status = panel.querySelector('[role="status"]');

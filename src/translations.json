@@ -873,7 +873,7 @@
   ],
   "把喜欢的小东西，带在身边。": [
     "把喜歡的小東西，帶在身邊。",
-    "Keep a little joy close at hand."
+    "Take your favourite little things with you."
   ],
   "找一件合拍的小物": [
     "找一件合拍的小物",
@@ -1922,5 +1922,129 @@
   "联系电话": [
     "聯絡電話",
     "Phone"
+  ],
+  "客服信箱": [
+    "客服信箱",
+    "Customer service email"
+  ],
+  "客服电话": [
+    "客服電話",
+    "Customer service phone"
+  ],
+  "官方网站": [
+    "官方網站",
+    "Website"
+  ],
+  "线上刷卡付款开通中，目前可透过蝦皮或賣貨便购买。": [
+    "線上刷卡付款開通中，目前可透過蝦皮或賣貨便購買。",
+    "Online card payments are being set up. You can currently buy on Shopee or MyShip."
+  ],
+  "线上刷卡付款开通中": [
+    "線上刷卡付款開通中",
+    "Online card payments coming soon"
+  ],
+  "前往賣貨便賣场": [
+    "前往賣貨便賣場",
+    "Visit our MyShip store"
+  ],
+  "客服联络": [
+    "客服聯絡",
+    "Customer service"
+  ],
+  "平台订单的配送方式与运费，请在蝦皮或賣貨便结账时确认。": [
+    "平台訂單的配送方式與運費，請在蝦皮或賣貨便結帳時確認。",
+    "Check delivery options and shipping fees at checkout on Shopee or MyShip."
+  ],
+  "原创 3D 列印纾压小物｜可客制名字｜台湾出货": [
+    "原創 3D 列印紓壓小物｜可客製名字｜台灣出貨",
+    "Original 3D-printed fidget goods | Personalised names | Shipped from Taiwan"
+  ],
+  "探索原创按压玩具与随身挂饰，找到合拍的日常小物。": [
+    "探索原創按壓玩具與隨身掛飾，找到合拍的日常小物。",
+    "Discover original clickers and keychains for everyday fun."
+  ],
+  "在 Instagram 认识 OGS": [
+    "在 Instagram 認識 OGS",
+    "Meet OGS on Instagram"
+  ],
+  "查看购买方式": [
+    "查看購買方式",
+    "View buying options"
+  ],
+  "按压款": [
+    "按壓款",
+    "Clicker"
+  ],
+  "商品实拍": [
+    "商品實拍",
+    "Product photo"
+  ],
+  "商品视角": [
+    "商品視角",
+    "Product view"
+  ],
+  "送出设计，我们会与你联络确认": [
+    "送出設計，我們會與你聯絡確認",
+    "Send your design for confirmation"
+  ],
+  "購買與售後說明": [
+    "購買與售後說明",
+    "Purchasing and after-sales"
+  ],
+  "目前購買方式": [
+    "目前購買方式",
+    "How to buy"
+  ],
+  "線上刷卡付款開通中，目前可透過蝦皮或賣貨便購買。商品價格、配送費、出貨時間及隨附內容，請以下單平台的商品頁與結帳確認資料為準。": [
+    "線上刷卡付款開通中，目前可透過蝦皮或賣貨便購買。商品價格、配送費、出貨時間及隨附內容，請以下單平台的商品頁與結帳確認資料為準。",
+    "Online card payments are being set up. Please buy through Shopee or MyShip. Confirm the product price, shipping fee, dispatch time and included items on that platform before ordering."
+  ],
+  "退貨與退款": [
+    "退貨與退款",
+    "Returns and refunds"
+  ],
+  "一般通訊交易商品依台灣消費者保護法辦理，原則上可於收受商品後七日內以退回商品或書面通知方式解除契約。客製商品如涉及解除權例外，須於下單前另行告知，依個別訂單與適用法規處理。": [
+    "一般通訊交易商品依台灣消費者保護法辦理，原則上可於收受商品後七日內以退回商品或書面通知方式解除契約。客製商品如涉及解除權例外，須於下單前另行告知，依個別訂單與適用法規處理。",
+    "For ordinary distance purchases, Taiwan consumer protection rules generally allow cancellation within seven days after receipt by returning the goods or giving written notice. Any applicable exception for a customised order must be disclosed before purchase and handled under the applicable law."
+  ],
+  "商品瑕疵、破損或收到不同品項，請提供訂單編號、問題描述及照片，寄至客服信箱。我們會核對訂單並與你確認後續處理。平台訂單可同時使用該平台的退貨或退款申請功能。": [
+    "商品瑕疵、破損或收到不同品項，請提供訂單編號、問題描述及照片，寄至客服信箱。我們會核對訂單並與你確認後續處理。平台訂單可同時使用該平台的退貨或退款申請功能。",
+    "For defects, damage or an incorrect item, email your order number, a description and photos to customer service. We will check the order and discuss the next steps. For marketplace orders, you may also use that platform’s return or refund process."
+  ],
+  "數位檔案與授權": [
+    "數位檔案與授權",
+    "Digital files and licences"
+  ],
+  "數位檔案的用途及商業使用範圍，以各設計的授權內容為準。購買前請確認檔案格式、所需配件及列印設備。": [
+    "數位檔案的用途及商業使用範圍，以各設計的授權內容為準。購買前請確認檔案格式、所需配件及列印設備。",
+    "The licence for each design determines permitted uses, including commercial use. Check the file format, required parts and printing equipment before purchasing."
+  ],
+  "隱私權說明": [
+    "隱私權說明",
+    "Privacy notice"
+  ],
+  "資料用途": [
+    "資料用途",
+    "How we use information"
+  ],
+  "One Goods Studio 為回覆客服問題、確認客製內容、處理訂單及配送，使用你提供的姓名、Email、電話、地址或取貨門市、訂單與設計資料。未提供必要資料時，可能無法完成對應服務。": [
+    "One Goods Studio 為回覆客服問題、確認客製內容、處理訂單及配送，使用你提供的姓名、Email、電話、地址或取貨門市、訂單與設計資料。未提供必要資料時，可能無法完成對應服務。",
+    "One Goods Studio uses the name, email, phone number, address or pickup store, order details and design information you provide to answer enquiries, confirm custom designs and process orders and delivery. Without necessary information, we may be unable to provide the relevant service."
+  ],
+  "資料處理與保存": [
+    "資料處理與保存",
+    "Processing and retention"
+  ],
+  "資料限於服務及依法保存所必要的期間使用，處理地區包含台灣及網站託管服務所涉及的地區。必要資料會由 OGS、網站託管及相關交易服務供應商處理；前往蝦皮、賣貨便、綠界或 Instagram 時，亦請參閱各服務的隱私權政策。": [
+    "資料限於服務及依法保存所必要的期間使用，處理地區包含台灣及網站託管服務所涉及的地區。必要資料會由 OGS、網站託管及相關交易服務供應商處理；前往蝦皮、賣貨便、綠界或 Instagram 時，亦請參閱各服務的隱私權政策。",
+    "Information is used for the period necessary to provide the service and meet legal retention requirements. Processing may occur in Taiwan and locations used by the website hosting service. Necessary information is handled by OGS, its hosting service and relevant transaction providers. Please also read the privacy policies of Shopee, MyShip, ECPay or Instagram when using those services."
+  ],
+  "你的資料權利": [
+    "你的資料權利",
+    "Your information rights"
+  ],
+  "如需查詢、閱覽、取得複本、補充更正，或請求停止蒐集、處理、利用及刪除個人資料，請聯絡 aka051118@gmail.com 或 0916662580。我們會確認申請人的身分，並依適用法規處理。": [
+    "如需查詢、閱覽、取得複本、補充更正，或請求停止蒐集、處理、利用及刪除個人資料，請聯絡 aka051118@gmail.com 或 0916662580。我們會確認申請人的身分，並依適用法規處理。",
+    "To request access, a copy, correction, or cessation of collection, processing or use, or deletion of your personal information, contact aka051118@gmail.com or 0916662580. We will verify your identity and handle the request under applicable law."
   ]
 }

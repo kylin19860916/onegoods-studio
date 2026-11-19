@@ -224,13 +224,25 @@ export function setupClicker() {
   clickerName.addEventListener('compositionend', render);
   form.addEventListener('input', event => { if (!event.isComposing) render(); });
   form.addEventListener('submit', event => event.preventDefault());
-  setupClickerOrderTest(form, () => clickerStyle.value === 'name' ? {
+  const readContactDesign = () => clickerStyle.value === 'name' ? {
     text: clickerName.value.trim(),
     font: nameFont.value,
     colors: { border: nameBorder.value, fill: nameFill.value, ink: nameInk.value },
   } : clickerStyle.value === 'mechanical' ? {
     style: 'mechanical', base: base.value,
     keys: keys.slice(0, count).map(key => ({ text: key.input.value.trim(), font: key.font.value, cap: key.cap.value, ink: key.ink.value })),
-  } : null);
+  } : {
+    style: 'individual', base: base.value,
+    keys: keys.slice(0, count).map(key => ({text:key.input.value.trim(),font:key.font.value,cap:key.cap.value,ink:key.ink.value})),
+  };
+  setupClickerOrderTest(form, readContactDesign);
+  const contactDesign = document.querySelector('#clicker-contact-design');
+  contactDesign?.addEventListener('click', () => {
+    const content = JSON.stringify(readContactDesign(), null, 2);
+    location.href = 'mailto:aka051118@gmail.com?subject=' + encodeURIComponent('OGS 客製設計確認') + '&body=' + encodeURIComponent(content);
+    document.querySelector('#design-contact-status').textContent = document.documentElement.lang === 'en'
+      ? 'Send the draft from your email app to contact us.'
+      : document.documentElement.lang === 'zh-Hans' ? '请在邮件程序中发送设计资料给我们。' : '請在郵件程式中寄出設計資料給我們。';
+  });
   render();
 }

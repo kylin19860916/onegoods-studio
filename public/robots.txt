@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /admin
+Disallow: /api/
+Disallow: /internal-checkout
+Sitemap: https://onegoods.studio/sitemap.xml

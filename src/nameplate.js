@@ -238,6 +238,7 @@ function showProduct() {
   articulatedPrice.hidden = true;
   keyringPanel.hidden = selected === 'name-clicker';
   clickerPanel.hidden = !keyringPanel.hidden;
+  document.querySelector('#design-contact').hidden = selected !== 'name-clicker';
   for (const heading of headings) heading.hidden = heading.dataset.keyringIntro !== selected;
   for (const option of nameTagOptions) option.hidden = articulated;
   for (const option of articulatedOptions) option.hidden = !articulated;

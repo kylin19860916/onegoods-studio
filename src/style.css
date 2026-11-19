@@ -758,3 +758,21 @@ footer.site-footer > small { grid-column: 1 / -1; font-size: 12px; color: #55495
 @media (max-width: 380px) {
   footer.site-footer { grid-template-columns: 1fr; }
 }
+
+.footer-contact .footer-store-name { margin-bottom: 6px; font-weight: 600; }
+.footer-instagram { display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; font-size: 14px; min-height: 44px; }
+.product-contact, .product-delivery { font-size: 14px; line-height: 1.7; }
+.product-contact a { text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.home-hero-objects img { object-fit: contain; }
+@media (max-width: 680px) {
+  header nav a, .catalog-nav a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; }
+  .eyebrow { font-size: 11px; }
+  .card-bottom > span, .keynade-price { font-size: 14px; font-weight: 700; }
+  .card-details, .platform-purchase, .store-order-entry .button { min-height: 44px; }
+}
+
+.footer-policy-links {display:flex;flex-wrap:wrap;gap:14px;margin-top:20px;font-size:14px}
+.policy-page {max-width:760px}
+.policy-page h1 {font-size:36px;letter-spacing:0}
+.policy-page h2 {margin-top:32px;font-size:22px}
+.policy-page p {font-size:16px;line-height:1.85}

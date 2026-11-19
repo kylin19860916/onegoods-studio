@@ -76,3 +76,29 @@ subprocess.run([
     '--bundle', '--platform=browser', '--format=esm', '--minify', '--legal-comments=eof',
     '--outfile=public/admin-shipping-pdf.js',
 ], cwd=root, check=True)
+
+# Sharing metadata is embedded in the initial HTML for link previews.
+from html import escape
+from opencc import OpenCC
+traditional = OpenCC('s2twp')
+for lang, folder, _ in locales:
+    directory = dist / folder
+    for page in directory.glob('*.html'):
+        text = page.read_text()
+        if lang == 'zh-Hant':
+            text = traditional.convert(text)
+        title = re.search(r'<title>(.*?)</title>', text).group(1)
+        description = re.search(r'<meta name="description" content="([^"]*)"', text)
+        description = description.group(1) if description else title
+        canonical = f'{origin}/{folder + "/" if folder else ""}{page.name}'
+        metadata = (f'<meta property="og:type" content="website"><meta property="og:title" content="{escape(title, quote=True)}">'
+                    f'<meta property="og:description" content="{escape(description, quote=True)}"><meta property="og:url" content="{canonical}">'
+                    f'<meta property="og:image" content="{origin}/assets/ogs-sharing.jpg"><meta property="og:image:width" content="1200">'
+                    f'<meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">')
+        page.write_text(text.replace('</head>', metadata + '</head>'))
+public_pages = ['index.html', 'products.html', 'custom.html', 'about.html', 'nameplate.html', 'purchase-policy.html', 'privacy.html']
+urls = [f'{origin}/{folder + "/" if folder else ""}{page}' for _, folder, _ in locales for page in public_pages]
+(dist / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>'
+    + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+    + ''.join('<url><loc>' + url + '</loc></url>' for url in urls) + '</urlset>')
+(dist / 'robots.txt').write_text('User-agent: *\nDisallow: /admin\nDisallow: /api/\nDisallow: /internal-checkout\nSitemap: ' + origin + '/sitemap.xml\n')
