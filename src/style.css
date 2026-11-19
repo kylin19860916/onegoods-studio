@@ -697,3 +697,16 @@ body[data-page] .section-with-accent {
 #store-address-fields legend { font-weight: 700; padding: 0; }
 #store-address-fields input { width: 100%; }
 #store-payment-error { color: #8b2533; }
+
+.footer-contact {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: normal;
+}
+.footer-contact a { width: fit-content; overflow-wrap: anywhere; }
+.footer-contact a:hover { text-decoration: underline; }
