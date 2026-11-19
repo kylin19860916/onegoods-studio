@@ -1,211 +1,828 @@
 {
-  "建立 3MF 测试单": ["建立 3MF 測試單", "Create 3MF test order"],
-  "{count} 键 · 3MF 测试": ["{count} 鍵 · 3MF 測試", "{count} keys · 3MF test"],
-  "预估价格": ["預估價格", "Estimated price"],
-  "NT$%s 起": ["NT$%s 起", "From NT$%s"],
-  "机械键盘款": ["機械鍵盤款", "Keyboard keys"],
-  "独立字键款": ["獨立字鍵款", "Individual letter keys"],
-  "连字按压款": ["連字按壓款", "Joined name clicker"],
-  "键盘造型，每颗键独立按压。": ["鍵盤造型，每顆鍵獨立按壓。", "Keyboard-shaped keys that press individually."],
-  "一个字一颗圆角键，嵌在底座里，各自下压。": ["一個字一顆圓角鍵，嵌在底座裡，各自下壓。", "One rounded key per character, set into the base and pressed independently."],
-  "整组姓名做成一片，三色分层，一起下压。": ["整組姓名做成一片，三色分層，一起下壓。", "One three-colour nameplate that presses as a single piece."],
-  "点选键帽即可输入，下面可调整该键的字型和颜色。每格限一个字。": ["點選鍵帽即可輸入，下方可調整該鍵的字型和顏色。每格限一個字。", "Select a keycap to type one character and set its font and colours below."],
-  "设置按键": ["設定按鍵", "Customize key"],
-  "中文最多 5 字，英文最多 8 个字母。": ["中文最多 5 字，英文最多 8 個字母。", "Up to 5 Chinese characters or 8 English letters."],
-  "文字超过长度上限，请缩短后再试。": ["文字超過長度上限，請縮短後再試。", "This text is too long. Shorten it to continue."],
-  "请输入可列印的姓名或文字，即可查看测试金额。": ["請輸入可列印的姓名或文字，即可查看測試金額。", "Enter printable text to see the test price."],
-  "测试价位 {tier} 档 · NT${amount}": ["測試價位 {tier} 檔 · NT${amount}", "Test tier {tier} · NT${amount}"],
-  "配置已变更，请重新确认后下单。": ["設定已變更，請重新確認後下單。", "Your design changed. Confirm it again to continue."],
-  "测试分档：1–3 个字符为 A 档，4 个字符以上为 B 档，空格不计。": ["測試分檔：1–3 個字元為 A 檔，4 個字元以上為 B 檔，空格不計。", "Test tiers: 1–3 characters for A and 4 or more for B. Spaces are excluded."],
-  "确认设计并前往模拟结账": ["確認設計並前往模擬結帳", "Confirm design and go to mock checkout"],
-  "客制订单测试": ["客製訂單測試", "Custom order test"],
-  "仅供内部测试，不会付款或出货。": ["僅供內部測試，不會付款或出貨。", "Internal test. No payment or shipment."],
-  "登入测试": ["登入測試", "Sign in to test"],
-  "正在建立测试订单及 3MF…": ["正在建立測試訂單及 3MF…", "Creating the test order and 3MF…"],
-  ">客制</a>": [">客製</a>", ">Customize</a>"],
-  "客制 — One Goods Studio": ["客製 — One Goods Studio", "Customize — One Goods Studio"],
-  "开始客制": ["開始客製", "Start customizing"],
-  "探索客制款式": ["探索客製款式", "Explore custom styles"],
-  "把你的名字，做成好物。": ["把你的名字，做成好物。", "Make something with your name on it."],
-  "选择名牌款、按压款或关节字块，换上你的名字和配色，即时看 3D 效果。": ["選擇名牌款、按壓款或關節字塊，換上你的名字和配色，即時看 3D 效果。", "Choose a name tag, clicker or articulated letters, then preview your name and colours in 3D."],
-  "返回客制款式": ["返回客製款式", "Back to custom styles"],
-  "客制你的姓名按压款。": ["客製你的姓名按壓款。", "Customize your name clicker."],
-  "选键帽款式，加入姓名和配色，试按你的 3D 预览。": ["選鍵帽款式，加入姓名和配色，試按你的 3D 預覽。", "Pick a keycap style, add your name and colours, and press the keys in the 3D preview."],
-  "选择想客制的款式": ["選擇想客製的款式", "Choose a style to customize"],
-  "选择想客制的款式，加入名字和配色，即时预览你的 3D 作品。": ["選擇想客製的款式，加入名字和配色，即時預覽你的 3D 作品。", "Choose a style, add your name and colours, and preview your design in 3D."],
-  "加入你的名字和配色，即时预览 3D 效果。": ["加入你的名字和配色，即時預覽 3D 效果。", "Add your name and colours and see your design in 3D."],
-  "<h2>按压款</h2>": ["<h2>按壓款</h2>", "<h2>Clicker</h2>"],
-  "<h2>名牌款</h2>": ["<h2>名牌款</h2>", "<h2>Name tag</h2>"],
-  "客制名牌款": ["客製名牌款", "Customize a name tag"],
-  "客制关节字块": ["客製關節字塊", "Customize articulated letters"],
-  "厚字以卡扣串接，旋转 3D 预览查看接头。": ["厚字以卡扣串接，旋轉 3D 預覽查看接頭。", "Chunky letters snap together. Rotate the 3D preview to see the joints."],
-  "输入名字、选好配色，查看字块和卡扣的 3D 结构。": ["輸入名字、選好配色，查看字塊和卡扣的 3D 結構。", "Enter a name and choose colours to preview the letters and snap joints in 3D."],
-  "单一字块规格，整串长度随字数与字形变化。": ["單一字塊規格，整串長度隨字數與字形變化。", "One standard size. Overall length varies with the number and shape of the letters."],
-  "输入名字，选字型、造型和尺寸，搭配喜欢的颜色。": ["輸入名字，選字型、造型和尺寸，搭配喜歡的顏色。", "Enter a name, pick a font, shape and size, and choose your colours."],
-  "为机械键盘款、独立字键款或连字按压款加上名字，在 3D 预览里试按。": ["為機械鍵盤款、獨立字鍵款或連字按壓款加上名字，在 3D 預覽裡試按。", "Add a name to keyboard keys, individual letter keys or a joined name clicker, then try pressing it in 3D."],
-  "客制钥匙圈": ["客製鑰匙圈", "Customize a keyring"],
-  "客制按压款": ["客製按壓款", "Customize a clicker"],
-  "按压款式": ["按壓款式", "Clicker style"],
-  "姓名或文字": ["姓名或文字", "Name or text"],
-  "整组字型": ["整組字型", "Name font"],
-  "内底颜色": ["內底顏色", "Inner colour"],
-  "外框颜色": ["外框顏色", "Border colour"],
-  "placeholder=\"好物\"": ["placeholder=\"好物\"", "placeholder=\"OGS\""],
-  "拖动旋转 · 捏合缩放 · 点按姓名面板": ["拖動旋轉 · 捏合縮放 · 點按姓名面板", "Drag to rotate · Pinch to zoom · Tap nameplate"],
-  "<label>字型</label>": ["<label>字型</label>", "<label>Font</label>"],
-  "placeholder=\"字\"": ["placeholder=\"字\"", "placeholder=\"A\""],
-  "检视键轴": ["檢視鍵軸", "View switches"],
-  "显示键帽": ["顯示鍵帽", "Show keycaps"],
-  "增加底板颜色": ["增加底板顏色", "Add base colour"],
-  "凸字颜色": ["凸字顏色", "Lettering colour"],
-  "底板颜色": ["底板顏色", "Base colour"],
-  "按键与文字": ["按鍵與文字", "Keys and letters"],
-  "3D 按压款预览，可拖动旋转与缩放": ["3D 按壓款預覽，可拖動旋轉與縮放", "3D clicker preview. Drag to rotate and zoom."],
-  "拖动旋转 · 捏合缩放 · 点按键帽": ["拖動旋轉 · 捏合縮放 · 點按鍵帽", "Drag to rotate · Pinch to zoom · Tap a keycap"],
-  "3D 预览载入失败，请再试一次。": ["3D 預覽載入失敗，請再試一次。", "Could not load the 3D preview. Please try again."],
-  "目前浏览器无法显示 3D，请使用支持 WebGL 的浏览器。": ["目前瀏覽器無法顯示 3D，請使用支援 WebGL 的瀏覽器。", "This browser cannot show the 3D preview. Please use a WebGL-capable browser."],
-  "所选字体不支持这些文字，请更换字体或姓名。": ["所選字型不支援這些文字，請更換字型或姓名。", "This font does not support these characters. Choose another font or name."],
-  "中文字型": ["中文字型", "Chinese fonts"],
-  "英文字型": ["英文字型", "English fonts"],
-  "霞鹜文楷": ["霞鶩文楷", "LXGW WenKai"],
-  "站酷快乐": ["站酷快乐", "ZCOOL KuaiLe"],
-  "减少一格": ["減少一格", "Remove one key"],
-  "增加一格": ["增加一格", "Add one key"],
-  "每格限一个字，可输入中文或英文字母。": ["每格限一個字，可輸入中文或英文字母。", "One character per key: Chinese or an English letter."],
-  "钥匙圈款": ["鑰匙圈款", "Keyrings"],
-  ">按压款</a>": [">按壓款</a>", ">Clickers</a>"],
-  "文字颜色": ["文字顏色", "Text colour"],
-  "提交确认": ["提交確認", "Confirm design"],
-  "前往付款": ["前往付款", "Proceed to payment"],
-  "已确认。可下载 PNG，付款暂未开放。": ["已確認。可下載 PNG，付款暫未開放。", "Design confirmed. Download your PNG; payment is not open yet."],
-  ">造型</legend>": [">造型</legend>", ">Shape</legend>"],
-  "这组文字无法生成完整底板，请缩短姓名或换一种造型。": ["這組文字無法生成完整底板，請縮短姓名或換一種造型。", "This text cannot form a complete base. Try a shorter name or a different shape."],
-  "客制类型": ["客製類型", "Custom product type"],
-  ">姓名钥匙圈</a>": [">姓名鑰匙圈</a>", ">Name keyring</a>"],
-  "姓名按压款": ["姓名按壓款", "Name clicker"],
-  "按键互动示意": ["按鍵互動示意", "Interactive key preview"],
-  "点按预览中的按键，看看姓名怎样分在各格。": ["點按預覽中的按鍵，看看姓名怎樣分在各格。", "Press the preview keys to see how your name fits."],
-  "按键格数": ["按鍵格數", "Number of keys"],
-  "每格文字": ["每格文字", "Text on each key"],
-  "data-key-label=\"按键\"": ["data-key-label=\"按鍵\"", "data-key-label=\"Key\""],
-  "底座颜色": ["底座顏色", "Base colour"],
-  "键帽颜色": ["鍵帽顏色", "Keycap colour"],
-  "按压款为互动示意，实际轴体与键帽结构待试印确认。": ["按壓款為互動示意，實際軸體與鍵帽結構待試印確認。", "Interactive mock-up. Switches and keycap fit still need a print test."],
-  "1 格</option>": ["1 格</option>", "1 key</option>"],
-  "2 格</option>": ["2 格</option>", "2 keys</option>"],
-  "3 格</option>": ["3 格</option>", "3 keys</option>"],
-  "4 格</option>": ["4 格</option>", "4 keys</option>"],
-  "选一款造型和尺寸，为你的名字配上喜欢的颜色。": ["選一款造型和尺寸，為你的名字配上喜歡的顏色。", "Pick a shape and size, then colour your name keyring."],
-  "款式与尺寸": ["款式與尺寸", "Style and size"],
-  "姓名与字体": ["姓名與字型", "Name and font"],
-  ">爱心</span>": [">愛心</span>", ">Heart</span>"],
-  ">星星</span>": [">星星</span>", ">Star</span>"],
-  ">花朵</span>": [">花朵</span>", ">Flower</span>"],
-  "输入名字，选好字体、底板和尺寸，再为你的钥匙圈配色。": ["輸入名字，選好字型、底板和尺寸，再為你的鑰匙圈配色。", "Enter a name, pick a font, base and size, then colour your keyring."],
-  "尺寸规格": ["尺寸規格", "Size"],
-  "<strong>小型</strong>": ["<strong>小型</strong>", "<strong>Small</strong>"],
-  "<strong>中型</strong>": ["<strong>中型</strong>", "<strong>Medium</strong>"],
-  "<strong>大型</strong>": ["<strong>大型</strong>", "<strong>Large</strong>"],
-  "以上为长宽上限。随字轮廓的实际尺寸会依字形调整。": ["以上為長寬上限。隨字輪廓的實際尺寸會依字形調整。", "These are maximum dimensions. The contour shape adapts to the lettering."],
-  "模型尺寸": ["模型尺寸", "Model dimensions"],
-  "输入名字，选好字体和底板，再为你的钥匙圈配色。": ["輸入名字，選好字型和底板，再為你的鑰匙圈配色。", "Enter a name, pick a font and base, then colour your keyring."],
-  "名字与造型": ["名字與造型", "Name and shape"],
-  "选颜色": ["選顏色", "Choose colours"],
-  "粉圓": ["粉圓", "Huninn"],
-  "繁体黑体": ["繁體黑體", "Noto Sans TC"],
-  "繁体宋体": ["繁體宋體", "Noto Serif TC"],
-  "简体黑体": ["簡體黑體", "Noto Sans SC"],
-  "简体宋体": ["簡體宋體", "Noto Serif SC"],
-  "底板造型": ["底板造型", "Base shape"],
-  "关节字块": ["關節字塊", "Articulated letters"],
-  "字块颜色": ["字塊顏色", "Letter body colour"],
-  "增加底层颜色": ["增加底層顏色", "Add a bottom layer colour"],
-  "底层颜色": ["底層顏色", "Bottom layer colour"],
-  "字面颜色": ["字面顏色", "Letter face colour"],
-  "关节字块最多 8 字，空格不计。": ["關節字塊最多 8 字，空格不計。", "Articulated letters support up to 8 characters, excluding spaces."],
-  "随字轮廓": ["隨字輪廓", "Letter contour"],
-  "胶囊底板": ["膠囊底板", "Capsule"],
-  "圆角底板": ["圓角底板", "Rounded rectangle"],
-  "统一预览规格：最长 65 mm，底板与凸字总厚 4 mm。": ["統一預覽規格：最長 65 mm，底板與凸字總厚 4 mm。", "Standard preview size: up to 65 mm long and 4 mm thick."],
-  "下一步：选颜色": ["下一步：選顏色", "Next: Choose colours"],
-  "打印方式": ["列印方式", "Print colours"],
-  "单色": ["單色", "One colour"],
-  "双色": ["雙色", "Two colours"],
-  "颜色 1 · 底板": ["顏色 1 · 底板", "Colour 1 · Base"],
-  "颜色 2 · 凸字": ["顏色 2 · 凸字", "Colour 2 · Raised lettering"],
-  "增加颜色 3": ["增加顏色 3", "Add a third colour"],
-  "颜色 3 · 底板侧边": ["顏色 3 · 底板側邊", "Colour 3 · Base edge"],
-  "薰衣草紫": ["薰衣草紫", "Lavender"],
-  "奶油白": ["奶油白", "Cream"],
-  "蜂蜜金": ["蜂蜜金", "Honey gold"],
-  "炭灰": ["炭灰", "Charcoal"],
-  "薄荷绿": ["薄荷綠", "Mint"],
-  "蜜桃粉": ["蜜桃粉", "Peach"],
-  "这组文字无法生成完整底板，请缩短姓名或换一种底板造型。": ["這組文字無法生成完整底板，請縮短姓名或換一種底板造型。", "This text cannot form a complete base. Try a shorter name or a different base shape."],
-  "重置视角": ["重置視角", "Reset view"],
-  "3D 预览，拖动或使用方向键旋转": ["3D 預覽，拖曳或使用方向鍵旋轉", "3D keyring preview. Drag or use the arrow keys to rotate."],
-  "拖动旋转 · 捏合缩放": ["拖曳旋轉 · 捏合縮放", "Drag to rotate · Pinch to zoom"],
-  "粉圆凸字（中英文）": ["粉圓凸字（中英文）", "Huninn rounded (Chinese and English)"],
-  "正在生成轮廓…": ["正在生成輪廓…", "Generating outlines…"],
-  "这组文字无法在所选尺寸生成完整底板，请缩短姓名或换大一点的尺寸。": ["這組文字無法在所選尺寸生成完整底板，請縮短姓名或換大一點的尺寸。", "This text cannot form a single base at the selected size. Try a shorter name or a larger size."],
-  "生成预览图": ["生成預覽圖", "Generate preview"],
-  "下载 PNG": ["下載 PNG", "Download PNG"],
-  "预览图已生成。": ["預覽圖已生成。", "Preview ready."],
-  "预览图生成失败，请再试一次。": ["預覽圖生成失敗，請再試一次。", "Could not generate the preview. Try again."],
-  "客制你的名牌。": ["客製你的名牌。", "Customize your name tag."],
-  "客制你的关节字块。": ["客製你的關節字塊。", "Customize your articulated letters."],
-  "选好风格、尺寸和配色，看看你的名字变成什么样。": ["選好風格、尺寸和配色，看看你的名字變成什麼樣。", "Choose a style, size and colours, and see your name take shape."],
-  "字形风格": ["字形風格", "Letter style"],
-  "圆润凸字": ["圓潤凸字", "Rounded lettering"],
-  "粗体凸字": ["粗體凸字", "Bold lettering"],
-  "钥匙圈尺寸": ["鑰匙圈尺寸", "Keyring size"],
-  "姓名文字": ["姓名文字", "Name text"],
-  "钥匙圈配色": ["鑰匙圈配色", "Keyring colours"],
-  "下载预览图": ["下載預覽圖", "Download preview"],
-  "预览图下载失败，请再试一次。": ["預覽圖下載失敗，請再試一次。", "Could not download the preview. Try again."],
-  "正式售价与賣貨便商品连结确认后开放送单。": ["正式售價與賣貨便商品連結確認後開放送單。", "Ordering will open once the price and 7-ELEVEN listing are confirmed."],
-  "轮廓姓名钥匙圈": ["輪廓姓名鑰匙圈", "Contour name keyring"],
-  "底座式桌牌": ["底座式桌牌", "Standing desk nameplate"],
-  "客制步骤": ["客製步驟", "Customisation steps"],
-  "选择风格": ["選擇風格", "Choose a style"],
-  "选择尺寸": ["選擇尺寸", "Choose a size"],
-  "名牌尺寸": ["名牌尺寸", "Nameplate size"],
-  "小型（预览）": ["小型（預覽）", "Small (preview)"],
-  "中型（预览）": ["中型（預覽）", "Medium (preview)"],
-  "大型（预览）": ["大型（預覽）", "Large (preview)"],
-  "输入名字": ["輸入名字", "Enter a name"],
-  "选择配色": ["選擇配色", "Choose colours"],
-  "确认价格与订单": ["確認價格與訂單", "Review price and order"],
-  "价格与付款方式确认后开放送单。": ["價格與付款方式確認後開放送單。", "Ordering will open once pricing and payment are confirmed."],
-  "提交打印订单": ["提交列印訂單", "Submit print order"],
-  "上一步": ["上一步", "Back"],
-  "下一步": ["下一步", "Next"],
-  ">风格</li>": [">風格</li>", ">Style</li>"],
-  ">尺寸</li>": [">尺寸</li>", ">Size</li>"],
-  ">名字</li>": [">名字</li>", ">Name</li>"],
-  ">配色</li>": [">配色</li>", ">Colours</li>"],
-  ">确认</li>": [">確認</li>", ">Review</li>"],
-  "客制名牌": ["客製名牌", "Custom nameplate"],
-  "客制你的名牌。": ["客製你的名牌。", "Make it yours."],
-  "输入名字、选择款式和配色，即时预览你的 3D 打印名牌。": ["輸入名字、選擇款式和配色，即時預覽你的 3D 列印名牌。", "Enter a name and choose a shape and colours to preview your 3D-printed nameplate."],
-  "名牌即时预览": ["名牌即時預覽", "Live nameplate preview"],
-  "你的名字": ["你的名字", "Your name"],
-  "画面为设计示意，实际成品颜色与尺寸依制作确认为准。": ["畫面為設計示意，實際成品顏色與尺寸依製作確認為準。", "Design preview. Final colours and dimensions depend on production specifications."],
-  "设定你的名牌": ["設定你的名牌", "Design your nameplate"],
-  "名牌文字": ["名牌文字", "Nameplate text"],
-  "外形款式": ["外形款式", "Shape"],
-  "圆角方形": ["圓角方形", "Rounded rectangle"],
-  "胶囊形": ["膠囊形", "Capsule"],
-  "名牌配色": ["名牌配色", "Colour palette"],
-  "薰衣草紫 × 奶油白": ["薰衣草紫 × 奶油白", "Lavender × Cream"],
-  "蜂蜜金 × 深灰": ["蜂蜜金 × 深灰", "Honey × Charcoal"],
-  "炭灰 × 奶油白": ["炭灰 × 奶油白", "Charcoal × Cream"],
-  "客制内容": ["客製內容", "Customisation details"],
-  "复制客制内容": ["複製客製內容", "Copy customisation"],
-  "已复制客制内容。": ["已複製客製內容。", "Customisation copied."],
-  "已选取客制内容，请手动复制。": ["已選取客製內容，請手動複製。", "Details selected. Copy them to your clipboard."],
-  "全部好物": ["全部好物", "All goods"],
-  "好物": ["好物", "Goods"],
+  "建立 3MF 测试单": [
+    "建立 3MF 測試單",
+    "Create 3MF test order"
+  ],
+  "{count} 键 · 3MF 测试": [
+    "{count} 鍵 · 3MF 測試",
+    "{count} keys · 3MF test"
+  ],
+  "预估价格": [
+    "預估價格",
+    "Estimated price"
+  ],
+  "NT$%s 起": [
+    "NT$%s 起",
+    "From NT$%s"
+  ],
+  "机械键盘款": [
+    "機械鍵盤款",
+    "Keyboard keys"
+  ],
+  "独立字键款": [
+    "獨立字鍵款",
+    "Individual letter keys"
+  ],
+  "连字按压款": [
+    "連字按壓款",
+    "Joined name clicker"
+  ],
+  "键盘造型，每颗键独立按压。": [
+    "鍵盤造型，每顆鍵獨立按壓。",
+    "Keyboard-shaped keys that press individually."
+  ],
+  "一个字一颗圆角键，嵌在底座里，各自下压。": [
+    "一個字一顆圓角鍵，嵌在底座裡，各自下壓。",
+    "One rounded key per character, set into the base and pressed independently."
+  ],
+  "整组姓名做成一片，三色分层，一起下压。": [
+    "整組姓名做成一片，三色分層，一起下壓。",
+    "One three-colour nameplate that presses as a single piece."
+  ],
+  "点选键帽即可输入，下面可调整该键的字型和颜色。每格限一个字。": [
+    "點選鍵帽即可輸入，下方可調整該鍵的字型和顏色。每格限一個字。",
+    "Select a keycap to type one character and set its font and colours below."
+  ],
+  "设置按键": [
+    "設定按鍵",
+    "Customize key"
+  ],
+  "中文最多 5 字，英文最多 8 个字母。": [
+    "中文最多 5 字，英文最多 8 個字母。",
+    "Up to 5 Chinese characters or 8 English letters."
+  ],
+  "文字超过长度上限，请缩短后再试。": [
+    "文字超過長度上限，請縮短後再試。",
+    "This text is too long. Shorten it to continue."
+  ],
+  "请输入可列印的姓名或文字，即可查看测试金额。": [
+    "請輸入可列印的姓名或文字，即可查看測試金額。",
+    "Enter printable text to see the test price."
+  ],
+  "测试价位 {tier} 档 · NT${amount}": [
+    "測試價位 {tier} 檔 · NT${amount}",
+    "Test tier {tier} · NT${amount}"
+  ],
+  "配置已变更，请重新确认后下单。": [
+    "設定已變更，請重新確認後下單。",
+    "Your design changed. Confirm it again to continue."
+  ],
+  "测试分档：1–3 个字符为 A 档，4 个字符以上为 B 档，空格不计。": [
+    "測試分檔：1–3 個字元為 A 檔，4 個字元以上為 B 檔，空格不計。",
+    "Test tiers: 1–3 characters for A and 4 or more for B. Spaces are excluded."
+  ],
+  "确认设计并前往模拟结账": [
+    "確認設計並前往模擬結帳",
+    "Confirm design and go to mock checkout"
+  ],
+  "客制订单测试": [
+    "客製訂單測試",
+    "Custom order test"
+  ],
+  "仅供内部测试，不会付款或出货。": [
+    "僅供內部測試，不會付款或出貨。",
+    "Internal test. No payment or shipment."
+  ],
+  "登入测试": [
+    "登入測試",
+    "Sign in to test"
+  ],
+  "正在建立测试订单及 3MF…": [
+    "正在建立測試訂單及 3MF…",
+    "Creating the test order and 3MF…"
+  ],
+  ">客制</a>": [
+    ">客製</a>",
+    ">Customize</a>"
+  ],
+  "客制 — One Goods Studio": [
+    "客製 — One Goods Studio",
+    "Customize — One Goods Studio"
+  ],
+  "开始客制": [
+    "開始客製",
+    "Start customizing"
+  ],
+  "探索客制款式": [
+    "探索客製款式",
+    "Explore custom styles"
+  ],
+  "把你的名字，做成好物。": [
+    "把你的名字，做成好物。",
+    "Make something with your name on it."
+  ],
+  "选择名牌款、按压款或关节字块，换上你的名字和配色，即时看 3D 效果。": [
+    "選擇名牌款、按壓款或關節字塊，換上你的名字和配色，即時看 3D 效果。",
+    "Choose a name tag, clicker or articulated letters, then preview your name and colours in 3D."
+  ],
+  "返回客制款式": [
+    "返回客製款式",
+    "Back to custom styles"
+  ],
+  "客制你的姓名按压款。": [
+    "客製你的姓名按壓款。",
+    "Customize your name clicker."
+  ],
+  "选键帽款式，加入姓名和配色，试按你的 3D 预览。": [
+    "選鍵帽款式，加入姓名和配色，試按你的 3D 預覽。",
+    "Pick a keycap style, add your name and colours, and press the keys in the 3D preview."
+  ],
+  "选择想客制的款式": [
+    "選擇想客製的款式",
+    "Choose a style to customize"
+  ],
+  "选择想客制的款式，加入名字和配色，即时预览你的 3D 作品。": [
+    "選擇想客製的款式，加入名字和配色，即時預覽你的 3D 作品。",
+    "Choose a style, add your name and colours, and preview your design in 3D."
+  ],
+  "加入你的名字和配色，即时预览 3D 效果。": [
+    "加入你的名字和配色，即時預覽 3D 效果。",
+    "Add your name and colours and see your design in 3D."
+  ],
+  "<h2>按压款</h2>": [
+    "<h2>按壓款</h2>",
+    "<h2>Clicker</h2>"
+  ],
+  "<h2>名牌款</h2>": [
+    "<h2>名牌款</h2>",
+    "<h2>Name tag</h2>"
+  ],
+  "客制名牌款": [
+    "客製名牌款",
+    "Customize a name tag"
+  ],
+  "客制关节字块": [
+    "客製關節字塊",
+    "Customize articulated letters"
+  ],
+  "厚字以卡扣串接，旋转 3D 预览查看接头。": [
+    "厚字以卡扣串接，旋轉 3D 預覽查看接頭。",
+    "Chunky letters snap together. Rotate the 3D preview to see the joints."
+  ],
+  "输入名字、选好配色，查看字块和卡扣的 3D 结构。": [
+    "輸入名字、選好配色，查看字塊和卡扣的 3D 結構。",
+    "Enter a name and choose colours to preview the letters and snap joints in 3D."
+  ],
+  "单一字块规格，整串长度随字数与字形变化。": [
+    "單一字塊規格，整串長度隨字數與字形變化。",
+    "One standard size. Overall length varies with the number and shape of the letters."
+  ],
+  "输入名字，选字型、造型和尺寸，搭配喜欢的颜色。": [
+    "輸入名字，選字型、造型和尺寸，搭配喜歡的顏色。",
+    "Enter a name, pick a font, shape and size, and choose your colours."
+  ],
+  "为机械键盘款、独立字键款或连字按压款加上名字，在 3D 预览里试按。": [
+    "為機械鍵盤款、獨立字鍵款或連字按壓款加上名字，在 3D 預覽裡試按。",
+    "Add a name to keyboard keys, individual letter keys or a joined name clicker, then try pressing it in 3D."
+  ],
+  "客制钥匙圈": [
+    "客製鑰匙圈",
+    "Customize a keyring"
+  ],
+  "客制按压款": [
+    "客製按壓款",
+    "Customize a clicker"
+  ],
+  "按压款式": [
+    "按壓款式",
+    "Clicker style"
+  ],
+  "姓名或文字": [
+    "姓名或文字",
+    "Name or text"
+  ],
+  "整组字型": [
+    "整組字型",
+    "Name font"
+  ],
+  "内底颜色": [
+    "內底顏色",
+    "Inner colour"
+  ],
+  "外框颜色": [
+    "外框顏色",
+    "Border colour"
+  ],
+  "placeholder=\"好物\"": [
+    "placeholder=\"好物\"",
+    "placeholder=\"OGS\""
+  ],
+  "拖动旋转 · 捏合缩放 · 点按姓名面板": [
+    "拖動旋轉 · 捏合縮放 · 點按姓名面板",
+    "Drag to rotate · Pinch to zoom · Tap nameplate"
+  ],
+  "<label>字型</label>": [
+    "<label>字型</label>",
+    "<label>Font</label>"
+  ],
+  "placeholder=\"字\"": [
+    "placeholder=\"字\"",
+    "placeholder=\"A\""
+  ],
+  "检视键轴": [
+    "檢視鍵軸",
+    "View switches"
+  ],
+  "显示键帽": [
+    "顯示鍵帽",
+    "Show keycaps"
+  ],
+  "增加底板颜色": [
+    "增加底板顏色",
+    "Add base colour"
+  ],
+  "凸字颜色": [
+    "凸字顏色",
+    "Lettering colour"
+  ],
+  "底板颜色": [
+    "底板顏色",
+    "Base colour"
+  ],
+  "按键与文字": [
+    "按鍵與文字",
+    "Keys and letters"
+  ],
+  "3D 按压款预览，可拖动旋转与缩放": [
+    "3D 按壓款預覽，可拖動旋轉與縮放",
+    "3D clicker preview. Drag to rotate and zoom."
+  ],
+  "拖动旋转 · 捏合缩放 · 点按键帽": [
+    "拖動旋轉 · 捏合縮放 · 點按鍵帽",
+    "Drag to rotate · Pinch to zoom · Tap a keycap"
+  ],
+  "3D 预览载入失败，请再试一次。": [
+    "3D 預覽載入失敗，請再試一次。",
+    "Could not load the 3D preview. Please try again."
+  ],
+  "目前浏览器无法显示 3D，请使用支持 WebGL 的浏览器。": [
+    "目前瀏覽器無法顯示 3D，請使用支援 WebGL 的瀏覽器。",
+    "This browser cannot show the 3D preview. Please use a WebGL-capable browser."
+  ],
+  "所选字体不支持这些文字，请更换字体或姓名。": [
+    "所選字型不支援這些文字，請更換字型或姓名。",
+    "This font does not support these characters. Choose another font or name."
+  ],
+  "中文字型": [
+    "中文字型",
+    "Chinese fonts"
+  ],
+  "英文字型": [
+    "英文字型",
+    "English fonts"
+  ],
+  "霞鹜文楷": [
+    "霞鶩文楷",
+    "LXGW WenKai"
+  ],
+  "站酷快乐": [
+    "站酷快乐",
+    "ZCOOL KuaiLe"
+  ],
+  "减少一格": [
+    "減少一格",
+    "Remove one key"
+  ],
+  "增加一格": [
+    "增加一格",
+    "Add one key"
+  ],
+  "每格限一个字，可输入中文或英文字母。": [
+    "每格限一個字，可輸入中文或英文字母。",
+    "One character per key: Chinese or an English letter."
+  ],
+  "钥匙圈款": [
+    "鑰匙圈款",
+    "Keyrings"
+  ],
+  ">按压款</a>": [
+    ">按壓款</a>",
+    ">Clickers</a>"
+  ],
+  "文字颜色": [
+    "文字顏色",
+    "Text colour"
+  ],
+  "提交确认": [
+    "提交確認",
+    "Confirm design"
+  ],
+  "前往付款": [
+    "前往付款",
+    "Proceed to payment"
+  ],
+  "已确认。可下载 PNG，付款暂未开放。": [
+    "已確認。可下載 PNG，付款暫未開放。",
+    "Design confirmed. Download your PNG; payment is not open yet."
+  ],
+  ">造型</legend>": [
+    ">造型</legend>",
+    ">Shape</legend>"
+  ],
+  "这组文字无法生成完整底板，请缩短姓名或换一种造型。": [
+    "這組文字無法生成完整底板，請縮短姓名或換一種造型。",
+    "This text cannot form a complete base. Try a shorter name or a different shape."
+  ],
+  "客制类型": [
+    "客製類型",
+    "Custom product type"
+  ],
+  ">姓名钥匙圈</a>": [
+    ">姓名鑰匙圈</a>",
+    ">Name keyring</a>"
+  ],
+  "姓名按压款": [
+    "姓名按壓款",
+    "Name clicker"
+  ],
+  "按键互动示意": [
+    "按鍵互動示意",
+    "Interactive key preview"
+  ],
+  "点按预览中的按键，看看姓名怎样分在各格。": [
+    "點按預覽中的按鍵，看看姓名怎樣分在各格。",
+    "Press the preview keys to see how your name fits."
+  ],
+  "按键格数": [
+    "按鍵格數",
+    "Number of keys"
+  ],
+  "每格文字": [
+    "每格文字",
+    "Text on each key"
+  ],
+  "data-key-label=\"按键\"": [
+    "data-key-label=\"按鍵\"",
+    "data-key-label=\"Key\""
+  ],
+  "底座颜色": [
+    "底座顏色",
+    "Base colour"
+  ],
+  "键帽颜色": [
+    "鍵帽顏色",
+    "Keycap colour"
+  ],
+  "按压款为互动示意，实际轴体与键帽结构待试印确认。": [
+    "按壓款為互動示意，實際軸體與鍵帽結構待試印確認。",
+    "Interactive mock-up. Switches and keycap fit still need a print test."
+  ],
+  "1 格</option>": [
+    "1 格</option>",
+    "1 key</option>"
+  ],
+  "2 格</option>": [
+    "2 格</option>",
+    "2 keys</option>"
+  ],
+  "3 格</option>": [
+    "3 格</option>",
+    "3 keys</option>"
+  ],
+  "4 格</option>": [
+    "4 格</option>",
+    "4 keys</option>"
+  ],
+  "选一款造型和尺寸，为你的名字配上喜欢的颜色。": [
+    "選一款造型和尺寸，為你的名字配上喜歡的顏色。",
+    "Pick a shape and size, then colour your name keyring."
+  ],
+  "款式与尺寸": [
+    "款式與尺寸",
+    "Style and size"
+  ],
+  "姓名与字体": [
+    "姓名與字型",
+    "Name and font"
+  ],
+  ">爱心</span>": [
+    ">愛心</span>",
+    ">Heart</span>"
+  ],
+  ">星星</span>": [
+    ">星星</span>",
+    ">Star</span>"
+  ],
+  ">花朵</span>": [
+    ">花朵</span>",
+    ">Flower</span>"
+  ],
+  "输入名字，选好字体、底板和尺寸，再为你的钥匙圈配色。": [
+    "輸入名字，選好字型、底板和尺寸，再為你的鑰匙圈配色。",
+    "Enter a name, pick a font, base and size, then colour your keyring."
+  ],
+  "尺寸规格": [
+    "尺寸規格",
+    "Size"
+  ],
+  "<strong>小型</strong>": [
+    "<strong>小型</strong>",
+    "<strong>Small</strong>"
+  ],
+  "<strong>中型</strong>": [
+    "<strong>中型</strong>",
+    "<strong>Medium</strong>"
+  ],
+  "<strong>大型</strong>": [
+    "<strong>大型</strong>",
+    "<strong>Large</strong>"
+  ],
+  "以上为长宽上限。随字轮廓的实际尺寸会依字形调整。": [
+    "以上為長寬上限。隨字輪廓的實際尺寸會依字形調整。",
+    "These are maximum dimensions. The contour shape adapts to the lettering."
+  ],
+  "模型尺寸": [
+    "模型尺寸",
+    "Model dimensions"
+  ],
+  "输入名字，选好字体和底板，再为你的钥匙圈配色。": [
+    "輸入名字，選好字型和底板，再為你的鑰匙圈配色。",
+    "Enter a name, pick a font and base, then colour your keyring."
+  ],
+  "名字与造型": [
+    "名字與造型",
+    "Name and shape"
+  ],
+  "选颜色": [
+    "選顏色",
+    "Choose colours"
+  ],
+  "粉圓": [
+    "粉圓",
+    "Huninn"
+  ],
+  "繁体黑体": [
+    "繁體黑體",
+    "Noto Sans TC"
+  ],
+  "繁体宋体": [
+    "繁體宋體",
+    "Noto Serif TC"
+  ],
+  "简体黑体": [
+    "簡體黑體",
+    "Noto Sans SC"
+  ],
+  "简体宋体": [
+    "簡體宋體",
+    "Noto Serif SC"
+  ],
+  "底板造型": [
+    "底板造型",
+    "Base shape"
+  ],
+  "关节字块": [
+    "關節字塊",
+    "Articulated letters"
+  ],
+  "字块颜色": [
+    "字塊顏色",
+    "Letter body colour"
+  ],
+  "增加底层颜色": [
+    "增加底層顏色",
+    "Add a bottom layer colour"
+  ],
+  "底层颜色": [
+    "底層顏色",
+    "Bottom layer colour"
+  ],
+  "字面颜色": [
+    "字面顏色",
+    "Letter face colour"
+  ],
+  "关节字块最多 8 字，空格不计。": [
+    "關節字塊最多 8 字，空格不計。",
+    "Articulated letters support up to 8 characters, excluding spaces."
+  ],
+  "随字轮廓": [
+    "隨字輪廓",
+    "Letter contour"
+  ],
+  "胶囊底板": [
+    "膠囊底板",
+    "Capsule"
+  ],
+  "圆角底板": [
+    "圓角底板",
+    "Rounded rectangle"
+  ],
+  "统一预览规格：最长 65 mm，底板与凸字总厚 4 mm。": [
+    "統一預覽規格：最長 65 mm，底板與凸字總厚 4 mm。",
+    "Standard preview size: up to 65 mm long and 4 mm thick."
+  ],
+  "下一步：选颜色": [
+    "下一步：選顏色",
+    "Next: Choose colours"
+  ],
+  "打印方式": [
+    "列印方式",
+    "Print colours"
+  ],
+  "单色": [
+    "單色",
+    "One colour"
+  ],
+  "双色": [
+    "雙色",
+    "Two colours"
+  ],
+  "颜色 1 · 底板": [
+    "顏色 1 · 底板",
+    "Colour 1 · Base"
+  ],
+  "颜色 2 · 凸字": [
+    "顏色 2 · 凸字",
+    "Colour 2 · Raised lettering"
+  ],
+  "增加颜色 3": [
+    "增加顏色 3",
+    "Add a third colour"
+  ],
+  "颜色 3 · 底板侧边": [
+    "顏色 3 · 底板側邊",
+    "Colour 3 · Base edge"
+  ],
+  "薰衣草紫": [
+    "薰衣草紫",
+    "Lavender"
+  ],
+  "奶油白": [
+    "奶油白",
+    "Cream"
+  ],
+  "蜂蜜金": [
+    "蜂蜜金",
+    "Honey gold"
+  ],
+  "炭灰": [
+    "炭灰",
+    "Charcoal"
+  ],
+  "薄荷绿": [
+    "薄荷綠",
+    "Mint"
+  ],
+  "蜜桃粉": [
+    "蜜桃粉",
+    "Peach"
+  ],
+  "这组文字无法生成完整底板，请缩短姓名或换一种底板造型。": [
+    "這組文字無法生成完整底板，請縮短姓名或換一種底板造型。",
+    "This text cannot form a complete base. Try a shorter name or a different base shape."
+  ],
+  "重置视角": [
+    "重置視角",
+    "Reset view"
+  ],
+  "3D 预览，拖动或使用方向键旋转": [
+    "3D 預覽，拖曳或使用方向鍵旋轉",
+    "3D keyring preview. Drag or use the arrow keys to rotate."
+  ],
+  "拖动旋转 · 捏合缩放": [
+    "拖曳旋轉 · 捏合縮放",
+    "Drag to rotate · Pinch to zoom"
+  ],
+  "粉圆凸字（中英文）": [
+    "粉圓凸字（中英文）",
+    "Huninn rounded (Chinese and English)"
+  ],
+  "正在生成轮廓…": [
+    "正在生成輪廓…",
+    "Generating outlines…"
+  ],
+  "这组文字无法在所选尺寸生成完整底板，请缩短姓名或换大一点的尺寸。": [
+    "這組文字無法在所選尺寸生成完整底板，請縮短姓名或換大一點的尺寸。",
+    "This text cannot form a single base at the selected size. Try a shorter name or a larger size."
+  ],
+  "生成预览图": [
+    "生成預覽圖",
+    "Generate preview"
+  ],
+  "下载 PNG": [
+    "下載 PNG",
+    "Download PNG"
+  ],
+  "预览图已生成。": [
+    "預覽圖已生成。",
+    "Preview ready."
+  ],
+  "预览图生成失败，请再试一次。": [
+    "預覽圖生成失敗，請再試一次。",
+    "Could not generate the preview. Try again."
+  ],
+  "客制你的名牌。": [
+    "客製你的名牌。",
+    "Make it yours."
+  ],
+  "客制你的关节字块。": [
+    "客製你的關節字塊。",
+    "Customize your articulated letters."
+  ],
+  "选好风格、尺寸和配色，看看你的名字变成什么样。": [
+    "選好風格、尺寸和配色，看看你的名字變成什麼樣。",
+    "Choose a style, size and colours, and see your name take shape."
+  ],
+  "字形风格": [
+    "字形風格",
+    "Letter style"
+  ],
+  "圆润凸字": [
+    "圓潤凸字",
+    "Rounded lettering"
+  ],
+  "粗体凸字": [
+    "粗體凸字",
+    "Bold lettering"
+  ],
+  "钥匙圈尺寸": [
+    "鑰匙圈尺寸",
+    "Keyring size"
+  ],
+  "姓名文字": [
+    "姓名文字",
+    "Name text"
+  ],
+  "钥匙圈配色": [
+    "鑰匙圈配色",
+    "Keyring colours"
+  ],
+  "下载预览图": [
+    "下載預覽圖",
+    "Download preview"
+  ],
+  "预览图下载失败，请再试一次。": [
+    "預覽圖下載失敗，請再試一次。",
+    "Could not download the preview. Try again."
+  ],
+  "正式售价与賣貨便商品连结确认后开放送单。": [
+    "正式售價與賣貨便商品連結確認後開放送單。",
+    "Ordering will open once the price and 7-ELEVEN listing are confirmed."
+  ],
+  "轮廓姓名钥匙圈": [
+    "輪廓姓名鑰匙圈",
+    "Contour name keyring"
+  ],
+  "底座式桌牌": [
+    "底座式桌牌",
+    "Standing desk nameplate"
+  ],
+  "客制步骤": [
+    "客製步驟",
+    "Customisation steps"
+  ],
+  "选择风格": [
+    "選擇風格",
+    "Choose a style"
+  ],
+  "选择尺寸": [
+    "選擇尺寸",
+    "Choose a size"
+  ],
+  "名牌尺寸": [
+    "名牌尺寸",
+    "Nameplate size"
+  ],
+  "小型（预览）": [
+    "小型（預覽）",
+    "Small (preview)"
+  ],
+  "中型（预览）": [
+    "中型（預覽）",
+    "Medium (preview)"
+  ],
+  "大型（预览）": [
+    "大型（預覽）",
+    "Large (preview)"
+  ],
+  "输入名字": [
+    "輸入名字",
+    "Enter a name"
+  ],
+  "选择配色": [
+    "選擇配色",
+    "Choose colours"
+  ],
+  "确认价格与订单": [
+    "確認價格與訂單",
+    "Review price and order"
+  ],
+  "价格与付款方式确认后开放送单。": [
+    "價格與付款方式確認後開放送單。",
+    "Ordering will open once pricing and payment are confirmed."
+  ],
+  "提交打印订单": [
+    "提交列印訂單",
+    "Submit print order"
+  ],
+  "上一步": [
+    "上一步",
+    "Back"
+  ],
+  "下一步": [
+    "下一步",
+    "Next"
+  ],
+  ">风格</li>": [
+    ">風格</li>",
+    ">Style</li>"
+  ],
+  ">尺寸</li>": [
+    ">尺寸</li>",
+    ">Size</li>"
+  ],
+  ">名字</li>": [
+    ">名字</li>",
+    ">Name</li>"
+  ],
+  ">配色</li>": [
+    ">配色</li>",
+    ">Colours</li>"
+  ],
+  ">确认</li>": [
+    ">確認</li>",
+    ">Review</li>"
+  ],
+  "客制名牌": [
+    "客製名牌",
+    "Custom nameplate"
+  ],
+  "输入名字、选择款式和配色，即时预览你的 3D 打印名牌。": [
+    "輸入名字、選擇款式和配色，即時預覽你的 3D 列印名牌。",
+    "Enter a name and choose a shape and colours to preview your 3D-printed nameplate."
+  ],
+  "名牌即时预览": [
+    "名牌即時預覽",
+    "Live nameplate preview"
+  ],
+  "你的名字": [
+    "你的名字",
+    "Your name"
+  ],
+  "画面为设计示意，实际成品颜色与尺寸依制作确认为准。": [
+    "畫面為設計示意，實際成品顏色與尺寸依製作確認為準。",
+    "Design preview. Final colours and dimensions depend on production specifications."
+  ],
+  "设定你的名牌": [
+    "設定你的名牌",
+    "Design your nameplate"
+  ],
+  "名牌文字": [
+    "名牌文字",
+    "Nameplate text"
+  ],
+  "外形款式": [
+    "外形款式",
+    "Shape"
+  ],
+  "圆角方形": [
+    "圓角方形",
+    "Rounded rectangle"
+  ],
+  "胶囊形": [
+    "膠囊形",
+    "Capsule"
+  ],
+  "名牌配色": [
+    "名牌配色",
+    "Colour palette"
+  ],
+  "薰衣草紫 × 奶油白": [
+    "薰衣草紫 × 奶油白",
+    "Lavender × Cream"
+  ],
+  "蜂蜜金 × 深灰": [
+    "蜂蜜金 × 深灰",
+    "Honey × Charcoal"
+  ],
+  "炭灰 × 奶油白": [
+    "炭灰 × 奶油白",
+    "Charcoal × Cream"
+  ],
+  "客制内容": [
+    "客製內容",
+    "Customisation details"
+  ],
+  "复制客制内容": [
+    "複製客製內容",
+    "Copy customisation"
+  ],
+  "已复制客制内容。": [
+    "已複製客製內容。",
+    "Customisation copied."
+  ],
+  "已选取客制内容，请手动复制。": [
+    "已選取客製內容，請手動複製。",
+    "Details selected. Copy them to your clipboard."
+  ],
+  "全部好物": [
+    "全部好物",
+    "All goods"
+  ],
+  "好物": [
+    "好物",
+    "Goods"
+  ],
   "首页": [
     "首頁",
     "Home"
@@ -294,7 +911,10 @@
     "商品照片與售價尚未公布。全站以新臺幣（TWD / NT$）計價，實際商品、規格及檔案內容以正式發布為準。",
     "Product photos and prices have not been announced. Prices will be in New Taiwan dollars (TWD / NT$). Final listings will confirm products, specifications and file contents."
   ],
-  "探索全部好物": ["探索全部好物", "Browse all goods"],
+  "探索全部好物": [
+    "探索全部好物",
+    "Browse all goods"
+  ],
   "探索全部实体产品": [
     "探索全部實體商品",
     "Explore physical goods"
@@ -1011,74 +1631,296 @@
     "3D 列印機與工作台上的多件列印作品實拍",
     "Photograph of a 3D printer and printed objects on a workbench"
   ],
-  "哇塞，": ["哇塞，", "Whoa,"],
-  "这是我的！": ["這是我的！", "that’s mine!"],
-  "把你的名字变成一件 3D 列印小物。挂在包上、拿在手上，颜色和字型都由你决定。": ["把你的名字變成一件 3D 列印小物。掛在包上、拿在手上，顏色和字型都由你決定。", "Turn your name into a 3D-printed keepsake to hang on your bag or keep in your hand. Pick your own colours and type."],
-  "选一个款式": ["選一個款式", "Pick a style"],
-  "紫色姓名吊牌、三色按压小物和绿色关节字块的样品": ["紫色姓名吊牌、三色按壓小物和綠色關節字塊的樣品", "Samples of a lavender name tag, a three-colour clicker and green articulated letters"],
-  "今天想做哪一款？": ["今天想做哪一款？", "What will you make today?"],
-  "Mia 字样的紫底白字姓名吊牌": ["Mia 字樣的紫底白字姓名吊牌", "Lavender Mia name tag with raised white lettering"],
-  "让包包一眼就认得你。选字型、造型和尺寸，再配上你的颜色。": ["讓包包一眼就認得你。選字型、造型和尺寸，再配上你的顏色。", "Make your bag unmistakably yours. Pick the type, shape and size, then add your colours."],
-  "飞字连字按压款的三色立体样品": ["飛字連字按壓款的三色立體樣品", "Three-colour clicker sample with the raised character 飛"],
-  "叩叩，试按一下你的名字。可选机械键盘款、独立字键款或连字按压款。": ["叩叩，試按一下你的名字。可選機械鍵盤款、獨立字鍵款或連字按壓款。", "Click, click. Try pressing your name in keyboard keys, individual letter keys or a joined name clicker."],
-  "LEO 字样的绿色关节字块，字母之间可见接头": ["LEO 字樣的綠色關節字塊，字母之間可見接頭", "Green LEO lettering with visible joints between the letters"],
-  "你的名字也会扭一扭。每个字块用关节相连，转一转就能摆出不同角度。": ["你的名字也會扭一扭。每個字塊用關節相連，轉一轉就能擺出不同角度。", "Give your name a little wiggle. Each letter is joined so you can turn it to a different angle."],
-  "从名字开始": ["從名字開始", "Start with a name"],
-  "挑款式": ["挑款式", "Pick a style"],
-  "选你想挂在包上或拿在手上玩的造型。": ["選你想掛在包上或拿在手上玩的造型。", "Choose something to hang on your bag or play with in your hand."],
-  "加上名字": ["加上名字", "Add your name"],
-  "输入文字，再试试不同的字型和配色。": ["輸入文字，再試試不同的字型和配色。", "Enter your text, then try different fonts and colours."],
-  "转一圈看看": ["轉一圈看看", "Give it a spin"],
-  "用即时 3D 预览，从不同角度看成品造型。": ["用即時 3D 預覽，從不同角度看成品造型。", "Turn the live 3D preview to see your design from different angles."],
-  "官网下单": ["官網下單", "Order on OGS"],
-  "官网结账": ["官網結帳", "OGS checkout"],
-  "结账预览 · 不会收款或出货": ["結帳預覽 · 不會收款或出貨", "Checkout preview · No payment or shipment"],
-  "结账预览": ["結帳預覽", "Checkout preview"],
-  "其他购买平台": ["其他購買平台", "Other ways to buy"],
-  "这件商品目前无法在官网下单。": ["這件商品目前無法在官網下單。", "This item is currently unavailable for direct ordering."],
-  "返回好物": ["返回好物", "Back to shop"],
-  "返回商品": ["返回商品", "Back to product"],
-  "正在载入商品…": ["正在載入商品…", "Loading product…"],
-  "购物袋": ["購物袋", "Shopping bag"],
-  "数量": ["數量", "Quantity"],
-  "选择配送": ["選擇配送", "Choose delivery"],
-  "配送方式": ["配送方式", "Delivery method"],
-  "超商取货": ["超商取貨", "Convenience-store pickup"],
-  "黑猫宅配": ["黑貓宅配", "Black Cat home delivery"],
-  "选择取货门市": ["選擇取貨門市", "Choose pickup store"],
-  "更换取货门市": ["更換取貨門市", "Change pickup store"],
-  "请先选择取货门市。": ["請先選擇取貨門市。", "Choose a pickup store to continue."],
-  "请重新选择取货门市。": ["請重新選擇取貨門市。", "Choose your pickup store again."],
-  "暂时无法打开取货门市，请重试。": ["暫時無法開啟選店頁面，請重試。", "Store selection is temporarily unavailable. Please try again."],
-  "取货超商": ["取貨超商", "Convenience store"],
-  "全家": ["全家", "FamilyMart"],
-  "莱尔富": ["萊爾富", "Hi-Life"],
-  "确认订单内容": ["確認訂單內容", "Review order"],
-  "返回购物袋": ["返回購物袋", "Back to shopping bag"],
-  "完成结账预览": ["完成結帳預覽", "Finish checkout preview"],
-  "修改配送": ["修改配送", "Edit delivery"],
-  "结账预览完成": ["結帳預覽完成", "Checkout preview complete"],
-  "金额明细": ["金額明細", "Price breakdown"],
-  "商品小计": ["商品小計", "Subtotal"],
-  "运费": ["運費", "Shipping"],
-  "合计": ["合計", "Total"],
-  "台湾本岛配送": ["台灣本島配送", "Delivery within Taiwan main island"],
-  "收件人": ["收件人", "Recipient"],
-  "手机号码": ["手機號碼", "Mobile number"],
-  "电子邮件": ["電子郵件", "Email"],
-  "县市": ["縣市", "City or county"],
-  "行政区": ["行政區", "District"],
-  "邮递区号": ["郵遞區號", "Postal code"],
-  "街道与门牌": ["街道與門牌", "Street address"],
-  "楼层或室号（选填）": ["樓層或室號（選填）", "Floor or unit (optional)"],
-  "前往绿界付款": ["前往綠界付款", "Continue to ECPay"],
-  "目前无法前往付款。": ["目前無法前往付款。", "Payment is temporarily unavailable."],
-  "前往模拟付款": ["前往模擬付款", "Continue to demo payment"],
-  "付款预览": ["付款預覽", "Payment preview"],
-  "测试付款无需填写银行卡资料。": ["測試付款無需填寫銀行卡資料。", "This demo does not require card details."],
-  "模拟付款成功": ["模擬付款成功", "Simulate successful payment"],
-  "模拟付款失败": ["模擬付款失敗", "Simulate failed payment"],
-  "模拟付款未成功，可以重试。": ["模擬付款未成功，可以重試。", "The simulated payment failed. You can try again."],
-  "返回订单确认": ["返回訂單確認", "Back to order review"],
-  "模拟付款已完成": ["模擬付款已完成", "Demo payment complete"]
+  "哇塞，": [
+    "哇塞，",
+    "Whoa,"
+  ],
+  "这是我的！": [
+    "這是我的！",
+    "that’s mine!"
+  ],
+  "把你的名字变成一件 3D 列印小物。挂在包上、拿在手上，颜色和字型都由你决定。": [
+    "把你的名字變成一件 3D 列印小物。掛在包上、拿在手上，顏色和字型都由你決定。",
+    "Turn your name into a 3D-printed keepsake to hang on your bag or keep in your hand. Pick your own colours and type."
+  ],
+  "选一个款式": [
+    "選一個款式",
+    "Pick a style"
+  ],
+  "紫色姓名吊牌、三色按压小物和绿色关节字块的样品": [
+    "紫色姓名吊牌、三色按壓小物和綠色關節字塊的樣品",
+    "Samples of a lavender name tag, a three-colour clicker and green articulated letters"
+  ],
+  "今天想做哪一款？": [
+    "今天想做哪一款？",
+    "What will you make today?"
+  ],
+  "Mia 字样的紫底白字姓名吊牌": [
+    "Mia 字樣的紫底白字姓名吊牌",
+    "Lavender Mia name tag with raised white lettering"
+  ],
+  "让包包一眼就认得你。选字型、造型和尺寸，再配上你的颜色。": [
+    "讓包包一眼就認得你。選字型、造型和尺寸，再配上你的顏色。",
+    "Make your bag unmistakably yours. Pick the type, shape and size, then add your colours."
+  ],
+  "飞字连字按压款的三色立体样品": [
+    "飛字連字按壓款的三色立體樣品",
+    "Three-colour clicker sample with the raised character 飛"
+  ],
+  "叩叩，试按一下你的名字。可选机械键盘款、独立字键款或连字按压款。": [
+    "叩叩，試按一下你的名字。可選機械鍵盤款、獨立字鍵款或連字按壓款。",
+    "Click, click. Try pressing your name in keyboard keys, individual letter keys or a joined name clicker."
+  ],
+  "LEO 字样的绿色关节字块，字母之间可见接头": [
+    "LEO 字樣的綠色關節字塊，字母之間可見接頭",
+    "Green LEO lettering with visible joints between the letters"
+  ],
+  "你的名字也会扭一扭。每个字块用关节相连，转一转就能摆出不同角度。": [
+    "你的名字也會扭一扭。每個字塊用關節相連，轉一轉就能擺出不同角度。",
+    "Give your name a little wiggle. Each letter is joined so you can turn it to a different angle."
+  ],
+  "从名字开始": [
+    "從名字開始",
+    "Start with a name"
+  ],
+  "挑款式": [
+    "挑款式",
+    "Pick a style"
+  ],
+  "选你想挂在包上或拿在手上玩的造型。": [
+    "選你想掛在包上或拿在手上玩的造型。",
+    "Choose something to hang on your bag or play with in your hand."
+  ],
+  "加上名字": [
+    "加上名字",
+    "Add your name"
+  ],
+  "输入文字，再试试不同的字型和配色。": [
+    "輸入文字，再試試不同的字型和配色。",
+    "Enter your text, then try different fonts and colours."
+  ],
+  "转一圈看看": [
+    "轉一圈看看",
+    "Give it a spin"
+  ],
+  "用即时 3D 预览，从不同角度看成品造型。": [
+    "用即時 3D 預覽，從不同角度看成品造型。",
+    "Turn the live 3D preview to see your design from different angles."
+  ],
+  "官网下单": [
+    "官網下單",
+    "Order on OGS"
+  ],
+  "官网结账": [
+    "官網結帳",
+    "OGS checkout"
+  ],
+  "结账预览 · 不会收款或出货": [
+    "結帳預覽 · 不會收款或出貨",
+    "Checkout preview · No payment or shipment"
+  ],
+  "结账预览": [
+    "結帳預覽",
+    "Checkout preview"
+  ],
+  "其他购买平台": [
+    "其他購買平台",
+    "Other ways to buy"
+  ],
+  "这件商品目前无法在官网下单。": [
+    "這件商品目前無法在官網下單。",
+    "This item is currently unavailable for direct ordering."
+  ],
+  "返回好物": [
+    "返回好物",
+    "Back to shop"
+  ],
+  "返回商品": [
+    "返回商品",
+    "Back to product"
+  ],
+  "正在载入商品…": [
+    "正在載入商品…",
+    "Loading product…"
+  ],
+  "购物袋": [
+    "購物袋",
+    "Shopping bag"
+  ],
+  "数量": [
+    "數量",
+    "Quantity"
+  ],
+  "选择配送": [
+    "選擇配送",
+    "Choose delivery"
+  ],
+  "配送方式": [
+    "配送方式",
+    "Delivery method"
+  ],
+  "超商取货": [
+    "超商取貨",
+    "Convenience-store pickup"
+  ],
+  "黑猫宅配": [
+    "黑貓宅配",
+    "Black Cat home delivery"
+  ],
+  "选择取货门市": [
+    "選擇取貨門市",
+    "Choose pickup store"
+  ],
+  "更换取货门市": [
+    "更換取貨門市",
+    "Change pickup store"
+  ],
+  "请先选择取货门市。": [
+    "請先選擇取貨門市。",
+    "Choose a pickup store to continue."
+  ],
+  "请重新选择取货门市。": [
+    "請重新選擇取貨門市。",
+    "Choose your pickup store again."
+  ],
+  "暂时无法打开取货门市，请重试。": [
+    "暫時無法開啟選店頁面，請重試。",
+    "Store selection is temporarily unavailable. Please try again."
+  ],
+  "取货超商": [
+    "取貨超商",
+    "Convenience store"
+  ],
+  "全家": [
+    "全家",
+    "FamilyMart"
+  ],
+  "莱尔富": [
+    "萊爾富",
+    "Hi-Life"
+  ],
+  "确认订单内容": [
+    "確認訂單內容",
+    "Review order"
+  ],
+  "返回购物袋": [
+    "返回購物袋",
+    "Back to shopping bag"
+  ],
+  "完成结账预览": [
+    "完成結帳預覽",
+    "Finish checkout preview"
+  ],
+  "修改配送": [
+    "修改配送",
+    "Edit delivery"
+  ],
+  "结账预览完成": [
+    "結帳預覽完成",
+    "Checkout preview complete"
+  ],
+  "金额明细": [
+    "金額明細",
+    "Price breakdown"
+  ],
+  "商品小计": [
+    "商品小計",
+    "Subtotal"
+  ],
+  "运费": [
+    "運費",
+    "Shipping"
+  ],
+  "合计": [
+    "合計",
+    "Total"
+  ],
+  "台湾本岛配送": [
+    "台灣本島配送",
+    "Delivery within Taiwan main island"
+  ],
+  "收件人": [
+    "收件人",
+    "Recipient"
+  ],
+  "手机号码": [
+    "手機號碼",
+    "Mobile number"
+  ],
+  "电子邮件": [
+    "電子郵件",
+    "Email"
+  ],
+  "县市": [
+    "縣市",
+    "City or county"
+  ],
+  "行政区": [
+    "行政區",
+    "District"
+  ],
+  "邮递区号": [
+    "郵遞區號",
+    "Postal code"
+  ],
+  "街道与门牌": [
+    "街道與門牌",
+    "Street address"
+  ],
+  "楼层或室号（选填）": [
+    "樓層或室號（選填）",
+    "Floor or unit (optional)"
+  ],
+  "前往绿界付款": [
+    "前往綠界付款",
+    "Continue to ECPay"
+  ],
+  "目前无法前往付款。": [
+    "目前無法前往付款。",
+    "Payment is temporarily unavailable."
+  ],
+  "前往模拟付款": [
+    "前往模擬付款",
+    "Continue to demo payment"
+  ],
+  "付款预览": [
+    "付款預覽",
+    "Payment preview"
+  ],
+  "测试付款无需填写银行卡资料。": [
+    "測試付款無需填寫銀行卡資料。",
+    "This demo does not require card details."
+  ],
+  "模拟付款成功": [
+    "模擬付款成功",
+    "Simulate successful payment"
+  ],
+  "模拟付款失败": [
+    "模擬付款失敗",
+    "Simulate failed payment"
+  ],
+  "模拟付款未成功，可以重试。": [
+    "模擬付款未成功，可以重試。",
+    "The simulated payment failed. You can try again."
+  ],
+  "返回订单确认": [
+    "返回訂單確認",
+    "Back to order review"
+  ],
+  "模拟付款已完成": [
+    "模擬付款已完成",
+    "Demo payment complete"
+  ],
+  "联系我们": [
+    "聯絡我們",
+    "Contact us"
+  ],
+  "商品、客制或订单问题，欢迎与我们联系。": [
+    "商品、客製或訂單問題，歡迎與我們聯繫。",
+    "Get in touch about products, custom designs or your order."
+  ],
+  "联系电话": [
+    "聯絡電話",
+    "Phone"
+  ]
 }
