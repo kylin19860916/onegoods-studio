@@ -10,6 +10,9 @@ origin = 'https://onegoods.studio'
 build_id = hashlib.sha256(b''.join(p.read_bytes() for p in sorted(src.glob('*')) if p.is_file()) + (root / 'server' / 'keyring-geometry.mjs').read_bytes()).hexdigest()[:12]
 locales = [('zh-Hant', '', 0), ('zh-Hans', 'zh-cn', None), ('en', 'en', 1)]
 
+image_mapping=json.loads((dist/'image-variants.json').read_text()) if (dist/'image-variants.json').exists() else {}
+image_script=(root/'preview/image-map-script.txt').read_text().strip()
+admin_script=(root/'preview/admin-export-entry.txt').read_text().strip()
 for lang, folder, column in locales:
     target = dist / folder
     target.mkdir(exist_ok=True)
@@ -19,6 +22,8 @@ for lang, folder, column in locales:
         if page.name == 'internal-checkout.html' and folder:
             continue
         text = translate(page.read_text()).replace('lang="zh-Hans"', f'lang="{lang}"')
+        if page.name == 'nameplate.html':
+            text=text.replace('</head>', '<link rel="stylesheet" href="/assets/fonts/subsets/'+(root/'preview/font-style-entry.txt').read_text().strip()+'"></head>')
         if folder:
             text = text.replace('href="assets/', 'href="../assets/').replace('src="assets/', 'src="../assets/')
             for asset in ('href="style.css"', 'src="nameplate.js"', 'src="locale.js"'):
@@ -29,7 +34,11 @@ for lang, folder, column in locales:
         meta = f'<link rel="canonical" href="{canonical}">'
         for alt, directory, _ in locales:
             meta += f'<link rel="alternate" hreflang="{alt}" href="{origin}/{directory + "/" if directory else ""}{page.name}">'
-        text = text.replace('</head>', meta + '</head>')
+        text = text.replace('</head>', '<script src="/'+image_script+'" defer></script>' + meta + '</head>')
+        text = text.replace('<body ', '<body data-export-module="/assets/'+admin_script+'" ',1)
+        for original,variant in image_mapping.items():
+            text=text.replace('src="'+original+'"','src="'+variant['url']+'"')
+
         if '</header>' in text:
             options = []
             for alternate, directory, _ in locales:
@@ -102,3 +111,11 @@ urls = [f'{origin}/{folder + "/" if folder else ""}{page}' for _, folder, _ in l
     + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
     + ''.join('<url><loc>' + url + '</loc></url>' for url in urls) + '</urlset>')
 (dist / 'robots.txt').write_text('User-agent: *\nDisallow: /admin\nDisallow: /api/\nDisallow: /internal-checkout\nSitemap: ' + origin + '/sitemap.xml\n')
+
+customizer=(dist/'nameplate.js').read_bytes()
+customizer_name='customizer-'+hashlib.sha256(customizer).hexdigest()[:12]+'.js'
+(dist/'assets'/customizer_name).write_bytes(customizer)
+for page in dist.rglob('*.html'):
+    text=page.read_text()
+    text=re.sub(r'src="(?:\.\./)?nameplate.js[^"]*"', 'src="/assets/'+customizer_name+'"', text)
+    page.write_text(text)

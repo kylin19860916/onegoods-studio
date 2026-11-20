@@ -1,3 +1,4 @@
+import { setupPreviewStudio, studioSurface } from './preview-studio.js';
 import {
   AmbientLight, Box3, BoxGeometry, BufferAttribute, BufferGeometry, Color, CylinderGeometry, DirectionalLight, ExtrudeGeometry, Group,
   Mesh, MeshStandardMaterial, OrthographicCamera, Path, Raycaster, Scene,
@@ -93,8 +94,8 @@ export function createClickerViewer(canvas, host, reset, inspect) {
   try { renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true }); }
   catch { return null; }
   const scene = new Scene();
-  const assembly = new Group();
-  scene.add(assembly, new AmbientLight(0xffffff, 1.7));
+  let assembly = new Group();
+  scene.add(assembly, new AmbientLight(0xffffff, 0.55));
   const light = new DirectionalLight(0xfff6ec, 2.5);
   light.position.set(-45, -60, 100);
   const fill = new DirectionalLight(0xe6dcff, 1);
@@ -118,6 +119,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
   const animations = new Map();
   const render = () => renderer.render(scene, camera);
   controls.addEventListener('change', render);
+  const studio = setupPreviewStudio(renderer, scene, camera, controls, render);
   function setCapVisibility(visible) {
     showCaps = visible;
     capGroups.forEach(group => { group.visible = visible; });
@@ -137,7 +139,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     camera.top = worldWidth / 2 * h / w;
     camera.bottom = -camera.top;
     camera.updateProjectionMatrix();
-    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, matchMedia('(max-width:680px)').matches ? 1.25 : 2));
     renderer.setSize(w, h, false);
     render();
   }
@@ -174,21 +176,18 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     if (event.key === ' ' || event.key === 'Enter') { event.preventDefault(); press(0); }
   });
 
-  function update({ keys, base, cap, ink, style }) {
+  function buildAssembly({ keys, base, cap, ink, style }) {
     if (lastStyle !== style) setCapVisibility(true);
     lastStyle = style;
     for (const request of animations.values()) cancelAnimationFrame(request);
     animations.clear();
-    assembly.traverse(object => {
-      if (object.isMesh) { object.geometry.dispose(); object.material.dispose(); }
-    });
-    assembly.clear();
     keyGroups = [];
     capGroups = [];
     assembly.position.x = 0;
     const stack = mxStack();
     function add(geometry, colour, z, parent = assembly) {
-      const mesh = new Mesh(geometry, new MeshStandardMaterial({ color: colour, roughness: 0.6, metalness: 0.02 }));
+      const mesh = new Mesh(studioSurface(geometry), new MeshStandardMaterial({ color: colour, roughness: 0.68, metalness: 0 }));
+      geometry.dispose();
       mesh.position.z = z;
       parent.add(mesh);
       return mesh;
@@ -343,6 +342,34 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     worldWidth = Math.max(62, width + 24, height + 24);
     resize();
     return [width, height, bounds.max.z];
+  }
+  function dispose(group) {
+    group.traverse(object => {
+      if (object.isMesh) { object.geometry.dispose(); object.material.dispose(); }
+    });
+  }
+  function update(configuration) {
+    const previous = assembly;
+    const previousKeys = keyGroups;
+    const previousCaps = capGroups;
+    assembly = new Group();
+    try {
+      const dimensions = buildAssembly(configuration);
+      scene.remove(previous);
+      scene.add(assembly);
+      dispose(previous);
+      studio.fitShadow(dimensions[0], dimensions[1]);
+      render();
+      studio.introduce();
+      return dimensions;
+    } catch (error) {
+      dispose(assembly);
+      assembly = previous;
+      keyGroups = previousKeys;
+      capGroups = previousCaps;
+      render();
+      throw error;
+    }
   }
   resize();
   return { update, press };

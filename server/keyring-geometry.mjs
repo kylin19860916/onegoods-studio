@@ -8,6 +8,17 @@ const units = 1000;
 const core = 'http://schemas.microsoft.com/3dmanufacturing/core/2015/02';
 const { Clipper, ClipperOffset, PolyTree, PolyType, PolyFillType, ClipType, JoinType, EndType } = ClipperLib;
 
+// Diagnostic contour matching the viewer's 12 mm keycap lettering bounds.
+export function keycapFeatureContours(font, text) {
+  if (!text.trim()) return [];
+  const rings=flatten(font.getPath(text,0,0,16).commands);
+  const points=rings.flat();
+  if(!points.length)return [];
+  const xs=points.map(point=>point[0]),ys=points.map(point=>point[1]);
+  const scale=Math.min(12/(Math.max(...xs)-Math.min(...xs)),12/(Math.max(...ys)-Math.min(...ys)));
+  return polygons(rings.map(ring=>ring.map(([x,y])=>({X:Math.round(x*scale*units),Y:Math.round(y*scale*units)}))));
+}
+
 export function parseKeyringFont(bytes) {
   return opentype.parse(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
 }
@@ -386,6 +397,8 @@ function buildArticulatedKeyring(font, name, { holeMm, baseColor, textColor, acc
     meshes,
     preview: { base: pathData(polygons(bases.flat())), lettering: pathData(faces),
       viewBox: [-2, -top - 2, right + 4, top - bottom + 4] },
+    printContours: faces,
+    letterHeightMm: top-bottom,
     dimensions: [right, top - bottom, thickness],
   };
 }
@@ -493,6 +506,8 @@ function buildKeyring(font, name, spec, eyeletRimMm) {
   return {
     meshes,
     preview: { base: pathData(drilled), lettering: pathData(lettering), viewBox: [left - 2, -high - 2, right - left + 4, high - low + 4] },
+    printContours: lettering,
+    letterHeightMm: (maxY-minY)*scale,
     dimensions: [right - left, high - low, baseMm + letteringMm],
   };
 }

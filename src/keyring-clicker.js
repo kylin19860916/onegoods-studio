@@ -1,25 +1,12 @@
+import { checkPrintFeatures, printWarning } from './printability.js';
+import { loadPreviewFont } from './preview-fonts.js';
 import { exceedsClickerTextLimit } from './clicker-test-pricing.js';
 import { setupClickerOrderTest } from './clicker-order-test.js';
 import { expandChoices } from './keyring-choices.js';
-import { keyringFonts, setupFontPicker } from './keyring-font-picker.js';
-import { parseKeyringFont } from '../server/keyring-geometry.mjs';
+import { setupFontPicker } from './keyring-font-picker.js';
+import { keycapFeatureContours, nameClickerContours } from '../server/keyring-geometry.mjs';
 import { createClickerViewer } from './clicker-viewer.js';
 
-const fontCache = new Map();
-function loadFont(key) {
-  if (!fontCache.has(key)) {
-    const pending = fetch('/assets/fonts/keyring/' + keyringFonts[key]).then(response => {
-      if (!response.ok) throw new Error('Font unavailable');
-      return response.arrayBuffer();
-    }).then(buffer => parseKeyringFont(new Uint8Array(buffer))).catch(error => {
-      fontCache.delete(key);
-      throw error;
-    });
-    fontCache.set(key, pending);
-    if (fontCache.size > 5) fontCache.delete(fontCache.keys().next().value);
-  }
-  return fontCache.get(key);
-}
 
 export function setupClicker() {
   const form = document.querySelector('#clicker-form');
@@ -152,6 +139,7 @@ export function setupClicker() {
     }
   }
 
+  let exportDesign;
   async function render() {
     const currentVersion = ++version;
     const style = clickerStyle.value;
@@ -178,7 +166,7 @@ export function setupClicker() {
     textLimit.hidden = !tooLong;
     clickerName.setAttribute('aria-invalid', String(tooLong));
     clickerName.setCustomValidity(tooLong ? textLimit.textContent : '');
-    if (tooLong) return;
+    if (tooLong) { exportDesign=null; status.textContent=textLimit.textContent; return; }
     if (!viewer) { status.textContent = status.dataset.noWebgl; return; }
     try {
       const sources = wholeName
@@ -187,25 +175,29 @@ export function setupClicker() {
           text: key.input.value.trim(), font: key.font.value, cap: key.cap.value, ink: key.ink.value,
         }));
       const entries = await Promise.all(sources.map(async entry => ({
-        ...entry, text: entry.text.normalize('NFC'), font: await loadFont(entry.font),
+        ...entry, text: entry.text.normalize('NFC'), font: await loadPreviewFont(entry.font, entry.text || ' '),
       })));
       if (currentVersion !== version) return;
-      let unsupported = false;
       for (const entry of entries) {
         if ([...entry.text].some(char => char !== ' ' && !entry.font.charToGlyphIndex(char))) {
-          entry.text = '';
-          unsupported = true;
+          throw new Error(status.dataset.unsupported);
         }
       }
       const palette = wholeName
         ? { base: nameBorder.value, cap: nameFill.value, ink: nameInk.value }
         : { base: base.value };
+      const featureWarnings=wholeName
+        ? [checkPrintFeatures(nameClickerContours(entries[0].font,entries[0].text).lettering)]
+        : entries.map(entry=>checkPrintFeatures(keycapFeatureContours(entry.font,entry.text)));
+      const featureWarning=printWarning({thin:featureWarnings.some(result=>result.thin),narrow:featureWarnings.some(result=>result.narrow)});
       const size = viewer.update({ keys: entries, style, ...palette });
+      exportDesign = wholeName ? {text:entries[0].text,font:entries[0].font.fontKey,colors:{border:nameBorder.value,fill:nameFill.value,ink:nameInk.value}} : style === 'mechanical' ? {style:'mechanical',base:base.value,keys:entries.map(entry=>({...entry,font:entry.font.fontKey}))} : null;
       const dimensions = document.querySelector('#clicker-dimensions');
       dimensions.textContent = dimensions.dataset.label + ' · ' + size.map(n => Number(n.toFixed(1))).join(' × ') + ' mm';
-      status.textContent = unsupported ? status.dataset.unsupported : '';
+      status.textContent = entries.some(entry => entry.font.fallbackUsed) ? (document.documentElement.lang === 'en' ? 'Preview uses Noto Sans TC for missing characters.' : '缺少字元的字型已改用思源黑體顯示。') : '';
+      status.textContent = [status.textContent, featureWarning].filter(Boolean).join(' ');
     } catch {
-      if (currentVersion === version) status.textContent = status.dataset.error;
+      if (currentVersion === version) {exportDesign=null;status.textContent = status.dataset.error;}
     }
   }
   remove.addEventListener('click', () => {
@@ -236,6 +228,21 @@ export function setupClicker() {
     keys: keys.slice(0, count).map(key => ({text:key.input.value.trim(),font:key.font.value,cap:key.cap.value,ink:key.ink.value})),
   };
   setupClickerOrderTest(form, readContactDesign);
+  if (new URLSearchParams(location.search).get('admin') === '1') {
+    const button=document.createElement('button');
+    button.type='button';button.className='button cream';button.textContent='Export 3MF';
+    button.addEventListener('click',async()=>{
+      if (!exportDesign) {status.textContent='3MF export is available for connected and mechanical clickers.';return;}
+      button.disabled=true;
+      try {
+        const module=await import(document.body.dataset.exportModule);
+        await module.exportClicker(exportDesign);
+      } catch {status.textContent='3MF export failed. Please try again.';}
+      finally {button.disabled=false;}
+    });
+    form.append(button);
+  }
+
   const contactDesign = document.querySelector('#clicker-contact-design');
   contactDesign?.addEventListener('click', () => {
     const content = JSON.stringify(readContactDesign(), null, 2);

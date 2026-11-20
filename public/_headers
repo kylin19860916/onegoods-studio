@@ -1,0 +1,12 @@
+/assets/fonts/subsets/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/optimized/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/customizer-*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/admin-export-*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/manifold-*
+  Cache-Control: public, max-age=31536000, immutable
+/image-variants-*
+  Cache-Control: public, max-age=31536000, immutable

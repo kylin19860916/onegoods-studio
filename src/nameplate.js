@@ -1,8 +1,10 @@
-import { articulatedNameCharacters, articulatedNameLimit, parseKeyringFont, generateKeyring } from '../server/keyring-geometry.mjs';
+import { checkPrintFeatures, printWarning, PRINT_LIMITS } from './printability.js';
+import { loadPreviewFont } from './preview-fonts.js';
+import { writeKeyring3mf, articulatedNameCharacters, articulatedNameLimit, generateKeyring } from '../server/keyring-geometry.mjs';
 import { createKeyringViewer } from './keyring-viewer.js';
 import { setupClicker } from './keyring-clicker.js';
 import { expandChoices } from './keyring-choices.js';
-import { keyringFonts, setupFontPicker } from './keyring-font-picker.js';
+import { setupFontPicker } from './keyring-font-picker.js';
 
 const form = document.querySelector('#nameplate-form');
 const preview = document.querySelector('#plate-preview');
@@ -10,12 +12,16 @@ const position = document.querySelector('#plate-position');
 const canvas = document.querySelector('#plate-canvas');
 const host = document.querySelector('#plate-view');
 const reset = document.querySelector('#plate-reset-view');
-const viewer = createKeyringViewer(canvas, host, reset);
-if (viewer) {
-  canvas.hidden = false;
-  preview.setAttribute('hidden', '');
-  reset.hidden = false;
-  document.querySelector('#plate-view-hint').hidden = false;
+let viewer;
+function ensureViewer() {
+  if (viewer) return;
+  viewer=createKeyringViewer(canvas,host,reset);
+  if (viewer) {
+    canvas.hidden=false;
+    preview.setAttribute('hidden','');
+    reset.hidden=false;
+    document.querySelector('#plate-view-hint').hidden=false;
+  }
 }
 const previewStatus = document.querySelector('#plate-preview-status');
 const dimensions = document.querySelector('#keyring-dimensions');
@@ -44,34 +50,17 @@ const articulatedAmount = articulatedPrice.querySelector('output');
 const articulatedFirstPrice = 80;
 const articulatedExtraPrice = 40;
 
-const fonts = keyringFonts;
 if (requestedProduct() === 'name-articulated') style.value = 'sans-tc';
 setupFontPicker(style);
 const sizes = { small: [50, 20.8], medium: [65, 27], large: [80, 33.2] };
 const spec = { baseMm: 3, letteringMm: 1, holeMm: 4, rimMm: 1.8 };
-let currentFont;
-let fontPromise;
+let latestPrintableModel;
+let clickerReady=false;
 let previewVersion = 0;
 let timer;
 let articulated = false;
 let currentStep = 0;
 
-function loadFont(key) {
-  if (key === currentFont && fontPromise) return fontPromise;
-  currentFont = key;
-  const pending = fetch('/assets/fonts/keyring/' + fonts[key])
-    .then(response => {
-      if (!response.ok) throw new Error('Font unavailable');
-      return response.arrayBuffer();
-    })
-    .then(bytes => parseKeyringFont(new Uint8Array(bytes)))
-    .catch(error => {
-      if (fontPromise === pending) fontPromise = undefined;
-      throw error;
-    });
-  fontPromise = pending;
-  return pending;
-}
 
 function shade(color) {
   const parts = color.slice(1).match(/../g);
@@ -93,7 +82,7 @@ function showStep(step, focus = true) {
 async function render(version) {
   previewStatus.textContent = previewStatus.dataset.loading;
   try {
-    const font = await loadFont(style.value);
+    const font = await loadPreviewFont(style.value, nameText.value.trim() || (articulated ? 'OGS' : nameText.placeholder));
     if (version !== previewVersion) return;
     const base = baseColor.value;
     const ink = textColor.value;
@@ -104,6 +93,8 @@ async function render(version) {
     const model = generateKeyring(font, name, {
       ...spec, widthMm, heightMm, shape: articulated ? 'articulated' : shape.value, baseColor: base, textColor: ink, accentColor: third,
     });
+    if (model.letterHeightMm < PRINT_LIMITS.minimumLetterHeightMm) throw new Error('Minimum letter height');
+    const featureWarning = printWarning(checkPrintFeatures(model.printContours));
     const colors = { base, side: third || shade(base), ink, shadow: shade(ink) };
     for (const [part, color] of Object.entries(colors)) {
       preview.style.setProperty('--plate-' + part, color);
@@ -115,11 +106,14 @@ async function render(version) {
     preview.querySelectorAll('[data-outline]').forEach(path => {
       path.setAttribute('d', model.preview[path.dataset.outline]);
     });
+    ensureViewer();
     viewer?.setMeshes(model.meshes, { fit: articulated });
     const numbers = model.dimensions.map(value => Number(value.toFixed(1)));
     dimensions.textContent = dimensions.dataset.label + ' · ' + numbers.join(' × ') + ' mm';
-    previewStatus.textContent = '';
+    previewStatus.textContent = font.fallbackUsed ? (document.documentElement.lang === 'en' ? 'Some characters are unavailable in this font. Preview uses Noto Sans TC.' : '部分字元不在所選字型中，已改用思源黑體顯示。') : '';
+    previewStatus.textContent = [previewStatus.textContent, featureWarning].filter(Boolean).join(' ');
     generate.disabled = !enteredName;
+    latestPrintableModel = model;
     if (articulated) {
       const count = articulatedNameCharacters(enteredName).length;
       articulatedAmount.value = count
@@ -129,11 +123,12 @@ async function render(version) {
     }
   } catch (error) {
     if (version !== previewVersion) return;
-    viewer?.setMeshes([]);
+
     articulatedPrice.hidden = true;
     dimensions.textContent = '';
-    preview.querySelectorAll('[data-outline]').forEach(path => path.removeAttribute('d'));
-    if (error.message === '有字元不在此款支援的字型中。') previewStatus.textContent = previewStatus.dataset.unsupported;
+
+    if (error.message === 'Minimum letter height') previewStatus.textContent = printWarning({thin:true});
+    else if (error.message === '有字元不在此款支援的字型中。') previewStatus.textContent = previewStatus.dataset.unsupported;
     else previewStatus.textContent = previewStatus.dataset.error;
   }
 }
@@ -159,9 +154,9 @@ function queuePreview() {
   clearTimeout(timer);
   if (tooLong) {
     articulatedPrice.hidden = true;
-    viewer?.setMeshes([]);
+
     dimensions.textContent = '';
-    preview.querySelectorAll('[data-outline]').forEach(path => path.removeAttribute('d'));
+
     previewStatus.textContent = nameText.validationMessage;
   } else {
     timer = setTimeout(() => render(version), 120);
@@ -238,6 +233,7 @@ function showProduct() {
   articulatedPrice.hidden = true;
   keyringPanel.hidden = selected === 'name-clicker';
   clickerPanel.hidden = !keyringPanel.hidden;
+  if(selected === 'name-clicker' && !clickerReady) {setupClicker();clickerReady=true;}
   document.querySelector('#design-contact').hidden = selected !== 'name-clicker';
   for (const heading of headings) heading.hidden = heading.dataset.keyringIntro !== selected;
   for (const option of nameTagOptions) option.hidden = articulated;
@@ -255,4 +251,19 @@ function showProduct() {
 
 window.addEventListener('hashchange', showProduct);
 showProduct();
-setupClicker();
+
+if (new URLSearchParams(location.search).get('admin') === '1') {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'button cream';
+  button.textContent = 'Export 3MF';
+  button.addEventListener('click', () => {
+    if (!latestPrintableModel || generate.disabled) return;
+    const bytes = writeKeyring3mf({meshes:latestPrintableModel.meshes,assemblyName:'OGS custom name'});
+    const url = URL.createObjectURL(new Blob([bytes], {type:'model/3mf'}));
+    const link = document.createElement('a');
+    link.href=url;link.download='OGS-custom-name.3mf';link.click();
+    setTimeout(()=>URL.revokeObjectURL(url),10000);
+  });
+  form.append(button);
+}

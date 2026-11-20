@@ -1,3 +1,4 @@
+import { setupPreviewStudio, studioSurface } from './preview-studio.js';
 import {
   AmbientLight, BufferGeometry, DirectionalLight, Float32BufferAttribute, Group,
   Mesh, MeshStandardMaterial, OrthographicCamera, Scene, Vector3, WebGLRenderer,
@@ -14,8 +15,8 @@ export function createKeyringViewer(canvas, host, resetButton) {
 
   const scene = new Scene();
   const model = new Group();
-  scene.add(model, new AmbientLight(0xffffff, 1.65));
-  const key = new DirectionalLight(0xfff5ee, 2.1);
+  scene.add(model, new AmbientLight(0xffffff, 0.55));
+  const key = new DirectionalLight(0xfff5ee, 2.4);
   key.position.set(-26, -45, 72);
   const fill = new DirectionalLight(0xe7dfff, 0.75);
   fill.position.set(60, 25, 45);
@@ -32,6 +33,7 @@ export function createKeyringViewer(canvas, host, resetButton) {
   controls.saveState();
   const render = () => renderer.render(scene, camera);
   controls.addEventListener('change', render);
+  const studio = setupPreviewStudio(renderer, scene, camera, controls, render);
   resetButton.addEventListener('click', () => controls.reset());
 
   let halfWidth = 45;
@@ -45,7 +47,7 @@ export function createKeyringViewer(canvas, host, resetButton) {
     camera.top = halfWidth * height / width;
     camera.bottom = -camera.top;
     camera.updateProjectionMatrix();
-    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, matchMedia('(max-width:680px)').matches ? 1.25 : 2));
     renderer.setSize(width, height, false);
     render();
   }
@@ -86,10 +88,13 @@ export function createKeyringViewer(canvas, host, resetButton) {
       const positions = part.vertices.flatMap(vertex => vertex.map((value, axis) => value - center[axis]));
       geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
       geometry.setIndex(part.triangles.flat());
-      geometry.computeVertexNormals();
-      model.add(new Mesh(geometry, new MeshStandardMaterial({ color: part.color, roughness: 0.72, flatShading: true })));
+      const smooth = studioSurface(geometry);
+      geometry.dispose();
+      model.add(new Mesh(smooth, new MeshStandardMaterial({ color: part.color, roughness: 0.68, metalness: 0 })));
     }
+    studio.fitShadow(halfWidth * 1.7, halfWidth * 0.8, -center[2] - 0.6);
     resize();
+    studio.introduce();
   }
 
   return {
