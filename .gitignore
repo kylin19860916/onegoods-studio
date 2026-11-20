@@ -44,3 +44,13 @@ yarn-error.log*
 
 # OS metadata
 .DS_Store
+
+# Additional local credential formats
+/.venv/
+/.secrets/
+*.key
+*.p12
+*.pfx
+*.token
+/wrangler-credentials*.json
+/oauth-credentials*.json
