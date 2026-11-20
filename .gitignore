@@ -54,3 +54,6 @@ yarn-error.log*
 *.token
 /wrangler-credentials*.json
 /oauth-credentials*.json
+
+# Only the empty local template is safe to share.
+!/.dev.vars.example

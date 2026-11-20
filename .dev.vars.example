@@ -1,0 +1,20 @@
+# Copy to .dev.vars with npm run setup:local.
+# Local mock sign-in uses seedy@sites.test on loopback only.
+OGS_ADMIN_EMAILS="seedy@sites.test"
+
+# Optional integrations. Leave empty for basic local development.
+# OGS_GOOGLE_PLACES_KEY=
+# OGS_ECPAY_STAGE_RETURN_URL=
+# OGS_ECPAY_MAP_RETURN_URL=
+# OGS_ECPAY_LOGISTICS_STAGE_RETURN_URL=
+
+# Production credentials intentionally omitted. Keep these empty locally.
+# Source checkout must not enable production collection or shipment.
+# OGS_ECPAY_PAYMENT_MERCHANT_ID=
+# OGS_ECPAY_PAYMENT_HASH_KEY=
+# OGS_ECPAY_PAYMENT_HASH_IV=
+# OGS_STORE_HOME_SHIPPING_FEE=
+# OGS_ECPAY_LOGISTICS_MERCHANT_ID=
+# OGS_ECPAY_LOGISTICS_HASH_KEY=
+# OGS_ECPAY_LOGISTICS_HASH_IV=
+# OGS_ECPAY_LOGISTICS_RETURN_URL=

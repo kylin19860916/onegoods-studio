@@ -84,6 +84,8 @@ traditional = OpenCC('s2twp')
 for lang, folder, _ in locales:
     directory = dist / folder
     for page in directory.glob('*.html'):
+        if not (src / page.name).exists():
+            continue
         text = page.read_text()
         if lang == 'zh-Hant':
             text = traditional.convert(text)

@@ -16,7 +16,7 @@
 
 OGStudio/website 是較舊且另有未提交修改的副本，未混入本次快照。
 og-upgrade-r1 是另一個未上正式站的預覽分支，未合併入本次快照。
-原正式 checkout 沒有待提交修改。本次僅補強 .gitignore 並新增這份交接文件，網站功能與內容沒有變更。
+原正式 checkout 沒有待提交修改。初次快照僅補強 .gitignore 並新增交接文件；後續補上本地設定範本、初始化工具與開發文件，詳見 LOCAL_DEVELOPMENT.md。
 
 ## 正式部署方式
 
@@ -41,13 +41,15 @@ og-upgrade-r1 是另一個未上正式站的預覽分支，未合併入本次快
 ## Build 與輸出
 
 Node.js 需求見 package.json，目前為 >=22.13.0。
-Python build.py 使用 opencc-python-reimplemented；目前專案沒有獨立 Python requirements 鎖定檔。
+Python build.py 使用 opencc-python-reimplemented；本地依賴已鎖定在 requirements-local.txt。
 
-完整建置步驟為：
+首次本地啟動請執行 npm ci、npm run setup:local、npm run dev。完整步驟與本地 D1 初始化方式見 LOCAL_DEVELOPMENT.md。
+
+手動建置步驟為：
 
     npm ci
     python3 -m venv .venv
-    .venv/bin/pip install opencc-python-reimplemented
+    .venv/bin/pip install -r requirements-local.txt
     .venv/bin/python build.py
     npm run build
 
@@ -56,7 +58,7 @@ Python build.py 使用 opencc-python-reimplemented；目前專案沒有獨立 Py
 - Worker 入口為 dist/server/index.js。
 - 部署用靜態 Assets 位於 dist/client/。
 - build 會產生 dist/server/wrangler.json，該目錄受 Git 忽略。
-- 源碼根目錄沒有 wrangler.toml 或 wrangler.jsonc。
+- 源碼根目錄沒有正式 wrangler.toml 或 wrangler.jsonc；新增的 wrangler.local.jsonc 僅供本地 D1 初始化使用。
 - 源碼設定來自 .openai/hosting.json、vite.config.ts 與 worker/index.ts。
 - 產生的 wrangler.json 使用本機 placeholder 資源設定，不能視為正式帳號與資料庫資源的完整部署設定。
 

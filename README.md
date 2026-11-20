@@ -3,9 +3,19 @@
 Existing Sites project: `appgprj_6ae2086cabe08191b93babd61954edd2`.
 Production: https://one-goods-studio.kylin1986.chatgpt.site
 
+For Mac mini local development:
+
+    npm ci
+    npm run setup:local
+    npm run dev
+
+See [LOCAL_DEVELOPMENT.md](LOCAL_DEVELOPMENT.md) for the empty environment template,
+local D1 initialization, mock admin sign-in, and integration settings.
+The setup command is local-only. Production deployment is a separate operation.
+
 Edit `src/*.html`, `src/app.js`, `src/style.css`, `src/locale.js` and
-`src/translations.json`; run `python3 build.py` to regenerate `dist/`.
-Assets remain in `dist/assets/`. Do not hand-edit generated localized files.
+`src/translations.json`; run `.venv/bin/python build.py` to regenerate `public/`.
+Assets remain in `public/assets/`. `npm run build` creates the Worker output in `dist/`. Do not hand-edit generated localized files.
 
 Traditional Chinese (Taiwan vocabulary) is the default. Simplified Chinese is
 under `/zh-cn/`; English is under `/en/`. The language selector preserves product
