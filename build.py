@@ -87,6 +87,8 @@ for lang, folder, _ in locales:
         text = page.read_text()
         if lang == 'zh-Hant':
             text = traditional.convert(text)
+        # Strip sharing metadata from earlier builds so pages not regenerated from src/ stay idempotent.
+        text = re.sub(r'<meta property="og:[^"]*" content="[^"]*">|<meta name="twitter:card" content="[^"]*">', '', text)
         title = re.search(r'<title>(.*?)</title>', text).group(1)
         description = re.search(r'<meta name="description" content="([^"]*)"', text)
         description = description.group(1) if description else title

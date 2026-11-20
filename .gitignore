@@ -54,3 +54,4 @@ yarn-error.log*
 *.token
 /wrangler-credentials*.json
 /oauth-credentials*.json
+node_modules/
