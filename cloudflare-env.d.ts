@@ -4,6 +4,11 @@ declare namespace Cloudflare {
     BUCKET?: R2Bucket;
     ASSETS?: Fetcher;
     OGS_ECPAY_STAGE_RETURN_URL?: string;
+    OGS_ECPAY_PAYMENT_ENABLED?: string;
+    OGS_ECPAY_PAYMENT_MERCHANT_ID?: string;
+    OGS_ECPAY_PAYMENT_HASH_KEY?: string;
+    OGS_ECPAY_PAYMENT_HASH_IV?: string;
+    OGS_STORE_HOME_SHIPPING_FEE?: string;
   }
 }
 

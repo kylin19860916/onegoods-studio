@@ -2,6 +2,7 @@ import { timingSafeEqual } from 'node:crypto';
 import { HttpError, json } from './catalog';
 
 type Env = Cloudflare.Env & {
+  OGS_ECPAY_PAYMENT_ENABLED?: string;
   OGS_ECPAY_PAYMENT_MERCHANT_ID?: string;
   OGS_ECPAY_PAYMENT_HASH_KEY?: string;
   OGS_ECPAY_PAYMENT_HASH_IV?: string;
@@ -56,7 +57,10 @@ export async function storePayment(request: Request, env: Env) {
   const config = credentials(env);
   const fee = shippingFee(env);
   const db = env.DB;
-  if (action === '/config' && request.method === 'GET') return json({ enabled: Boolean(config && db && fee !== null), shipping: fee });
+  // Preparing credentials must not silently switch the public shop to live collection.
+  // Pending payment notifications remain verifiable even when new checkout is paused.
+  const enabled = url.origin === origin && env.OGS_ECPAY_PAYMENT_ENABLED === 'true' && Boolean(config && db && fee !== null);
+  if (action === '/config' && request.method === 'GET') return json({ enabled, shipping: fee });
   if (!db) return json({}, 503);
   try {
     if (action === '/status' && request.method === 'GET') {
@@ -87,7 +91,8 @@ export async function storePayment(request: Request, env: Env) {
         return responseText('Order mismatch', 409);
       }
       if (fields.RtnCode !== '1' || fields.SimulatePaid === '1') return responseText('1|OK');
-      if (!/^\d{8,24}$/.test(fields.TradeNo || '')) return responseText('Invalid transaction', 400);
+      if (fields.SimulatePaid !== '0' || !/^Credit_/.test(fields.PaymentType || '') ||
+          !/^\d{8,24}$/.test(fields.TradeNo || '')) return responseText('Invalid transaction', 400);
       await db.prepare('UPDATE store_orders SET payment_reference=?, paid_at=? WHERE id=? AND payment_reference IS NULL')
         .bind(fields.TradeNo, new Date().toISOString(), order.id).run();
       const updated = await db.prepare('SELECT payment_reference FROM store_orders WHERE id=?').bind(order.id).first<Order>();
@@ -95,7 +100,7 @@ export async function storePayment(request: Request, env: Env) {
     }
     if (action !== '/checkout' || request.method !== 'POST') return json({}, 404);
     if (request.headers.get('Origin') !== url.origin || !request.headers.get('Content-Type')?.startsWith('application/json')) return json({}, 403);
-    if (!config || fee === null) return json({ error: '官網付款準備中，請稍後再試。' }, 503);
+    if (!enabled || !config || fee === null) return json({ error: '官網付款準備中，請稍後再試。' }, 503);
     const raw = await request.text();
     if (raw.length > 4096) return json({}, 413);
     const body = JSON.parse(raw);
