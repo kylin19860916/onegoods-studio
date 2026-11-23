@@ -6,10 +6,10 @@
   <meta name="robots" content="noindex">
   <title>官網結帳 — One Goods Studio</title>
   <link rel="icon" href="assets/icon.png">
-  <link rel="stylesheet" href="style.css?v=18d5b03b6131">
-  <script src="taiwan-address.js?v=18d5b03b6131" defer></script>
-  <script src="checkout-address-search.js?v=18d5b03b6131" defer></script>
-  <script src="locale.js?v=18d5b03b6131" defer></script><script src="app.js?v=18d5b03b6131" defer></script>
+  <link rel="stylesheet" href="style.css?v=6136d0a32c28">
+  <script src="taiwan-address.js?v=6136d0a32c28" defer></script>
+  <script src="checkout-address-search.js?v=6136d0a32c28" defer></script>
+  <script src="locale.js?v=6136d0a32c28" defer></script><script src="app.js?v=6136d0a32c28" defer></script>
 <link rel="canonical" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/checkout.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/checkout.html"><meta property="og:type" content="website"><meta property="og:title" content="官網結帳 — One Goods Studio"><meta property="og:description" content="官網結帳 — One Goods Studio"><meta property="og:url" content="https://onegoods.studio/checkout.html"><meta property="og:image" content="https://onegoods.studio/assets/ogs-sharing.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"></head>
 <body data-page="checkout">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html">客製</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="checkout.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/checkout.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">簡體中文</a><a href="en/checkout.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header>
@@ -57,6 +57,7 @@
         <label for="store-contact">收件人</label><input id="store-contact" name="contact" autocomplete="shipping name" maxlength="40" required>
         <label for="store-phone">手機號碼</label><input id="store-phone" name="phone" type="tel" autocomplete="shipping tel" maxlength="20" required>
         <label for="store-email">電子郵件</label><input id="store-email" name="email" type="email" autocomplete="email" maxlength="100" required>
+        <div id="store-home-fields">
         <div id="address-search" class="address-search" hidden>
           <label for="address-search-input">地址搜尋（選填）</label>
           <input id="address-search-input" type="search" maxlength="180" autocomplete="off" aria-describedby="address-search-note" aria-controls="address-search-results">
@@ -66,7 +67,6 @@
           <div id="address-search-attribution" hidden><img src="assets/google-maps-attribution.svg" alt="Google Maps" height="18"></div>
           <small>搜尋內容會傳送至 Google。使用地址搜尋即適用 <a href="https://maps.google.com/help/terms_maps/" target="_blank" rel="noopener noreferrer">Google Maps 服務條款</a>及 <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google 隱私權政策</a>。請確認門牌與樓層後再下單。</small>
         </div>
-        <div id="store-home-fields">
         <label for="store-city">縣市</label><select id="store-city" name="city" autocomplete="shipping address-level1" required><option value="">請選擇縣市</option></select>
         <label for="store-district">行政區</label><select id="store-district" name="district" autocomplete="shipping address-level2" required disabled><option value="">請選擇行政區</option></select>
         <label for="store-postal">郵遞區號</label><input id="store-postal" name="postalCode" readonly aria-describedby="store-postal-note" inputmode="numeric" autocomplete="shipping postal-code" pattern="[0-9]{3}([0-9]{2,3})?" maxlength="6" required>

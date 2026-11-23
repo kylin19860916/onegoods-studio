@@ -57,6 +57,7 @@
         <label for="store-contact">收件人</label><input id="store-contact" name="contact" autocomplete="shipping name" maxlength="40" required>
         <label for="store-phone">手机号码</label><input id="store-phone" name="phone" type="tel" autocomplete="shipping tel" maxlength="20" required>
         <label for="store-email">电子邮件</label><input id="store-email" name="email" type="email" autocomplete="email" maxlength="100" required>
+        <div id="store-home-fields">
         <div id="address-search" class="address-search" hidden>
           <label for="address-search-input">地址搜寻（选填）</label>
           <input id="address-search-input" type="search" maxlength="180" autocomplete="off" aria-describedby="address-search-note" aria-controls="address-search-results">
@@ -66,7 +67,6 @@
           <div id="address-search-attribution" hidden><img src="assets/google-maps-attribution.svg" alt="Google Maps" height="18"></div>
           <small>搜寻内容会传送至 Google。使用地址搜寻即适用 <a href="https://maps.google.com/help/terms_maps/" target="_blank" rel="noopener noreferrer">Google Maps 服务条款</a>及 <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google 隐私权政策</a>。请确认门牌与楼层后再下单。</small>
         </div>
-        <div id="store-home-fields">
         <label for="store-city">县市</label><select id="store-city" name="city" autocomplete="shipping address-level1" required><option value="">请选择县市</option></select>
         <label for="store-district">行政区</label><select id="store-district" name="district" autocomplete="shipping address-level2" required disabled><option value="">请选择行政区</option></select>
         <label for="store-postal">邮递区号</label><input id="store-postal" name="postalCode" readonly aria-describedby="store-postal-note" inputmode="numeric" autocomplete="shipping postal-code" pattern="[0-9]{3}([0-9]{2,3})?" maxlength="6" required>
