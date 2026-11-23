@@ -25,6 +25,12 @@ assert.equal((await config(env)).enabled,true);
 for(const invalid of [{OGS_ECPAY_PAYMENT_ENABLED:undefined},{OGS_ECPAY_PAYMENT_ENABLED:'false'},{OGS_ECPAY_PAYMENT_ENABLED:'TRUE'},{OGS_ECPAY_PAYMENT_HASH_KEY:undefined},{OGS_STORE_HOME_SHIPPING_FEE:undefined},{OGS_ECPAY_PAYMENT_MERCHANT_ID:'3002607'}]) assert.equal((await config({...env,...invalid})).enabled,false);
 assert.equal((await (await storePayment(new Request('http://localhost:5173/api/store-payment/config'),env)).json()).enabled,undefined); // Production bundle rejects local routes.
 const payload={requestId:randomUUID(),productId:'keynade-mx',quantity:1,total:599,city:'臺北市',district:'南港區',postalCode:'115',street:'測試路1號',unit:'3樓之2',contact:'測試收件人',phone:'0900000000',email:'test@example.com'};
+for (const invalid of [
+ {city:'不存在縣'}, {city:'臺北市',district:'板橋區'}, {district:'__proto__'},
+ {postalCode:'100'}, {postalCode:'100000'}, {city:'澎湖縣',district:'馬公市',postalCode:'880'},
+ {city:'臺東縣',district:'蘭嶼鄉',postalCode:'952'},
+ {city:'屏東縣',district:'琉球鄉',postalCode:'929'},
+]) assert.equal((await request('checkout',{...payload,...invalid})).status,400);
 assert.equal((await request('checkout',{...payload,total:559})).status,409);
 assert.equal((await request('checkout',payload,{...env,OGS_ECPAY_PAYMENT_ENABLED:'false'})).status,503);
 const checkout=await (await request('checkout',payload)).json();
