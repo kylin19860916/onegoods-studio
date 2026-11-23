@@ -13,3 +13,11 @@ Migration `0007_google_places_usage.sql` stores atomic counters only: salted/tru
 Application limits: 20 upstream requests per IP per minute and 3,000 per UTC month for this site's shared Google integration. Every autocomplete/detail attempt, including upstream failures, consumes a counter. The private preview uses the same guard. Missing migration/database, Google errors or exhausted limits fall back to manual entry. This caps this application, not other Google projects, direct key usage or an entire billing account. It is not a Google monetary billing cap.
 
 Checks: `node tests/address-search.mjs`, `node tests/taiwan-address.mjs`, `node tests/store-payment-integration.mjs`, TypeScript check, repeat static build. Tests use mocked Google and a temporary local D1; no real payment or shipment. Browser fixture confirmed address fill and floor preservation. Production verification is recorded below after publication.
+
+## Production verification
+
+Published version **101**, hosting source `f4e4135114dcecb293f9d9766b9aee82386349c4`, environment revision **9**. Deployment `appgdep_6b046811300081919f900a45621708fd` succeeded. Live database overview confirms `google_places_usage` exists.
+
+On https://onegoods.studio/checkout?product=keynade-mx, searched the public address `臺北市南港區三重路19之2號`. Real Google autocomplete returned `臺北市南港區三重里三重路19之2號`; real Place Details filled `臺北市 / 南港區 / 115 / 三重里三重路19之2號`. Synthetic `3樓` remained intact. Google Maps logo loaded. The page HTML contained no Google API key. The product/fee/total remained NT$499 / NT$100 / NT$599. Search config is enabled; existing payment config remains enabled with shipping 100. No order was submitted, card charged, or shipment created.
+
+Screenshot: workspace `outputs/google-address-live-20261124.jpg` (not committed).
