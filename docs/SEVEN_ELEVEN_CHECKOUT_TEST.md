@@ -26,3 +26,11 @@ Checks: `node tests/seven-checkout-integration.mjs`, `node tests/store-payment-i
 - These are actual sandbox transactions and callbacks; no real card or production shipment was used. Normal home-delivery checkout remains unchanged. Public 7-ELEVEN live collection/creation stays disabled; administrators use the test entry.
 
 Evidence in workspace outputs: `ecpay-logistics-enabled-20261124.jpg`, `seven-eleven-checkout-confirm-20261124.jpg`, `ecpay-stage-payment-success-20261124.jpg`, `seven-test-order-matched-20261124.jpg`, `seven-stage-query-20261124.json`. Credentials, callback secret paths, private sender details and sandbox card data are not included in this handoff.
+
+## Final publication and additional checks
+
+Published **v104**, hosting commit `ef7ece45001467b4e2151adeddf52082432c7ad5`, deployment `appgdep_6b0477392f18819196702f1640586b00`, environment revision 9 unchanged. GitHub implementation `7d77621` on `codex/ogs-7eleven-test-1124`. Final browser verifies the failed first order is 待處理 with the actual provider rejection; successful second order remains 待寄件 with callback and visible code D88619873383.
+
+Actual downloaded pending list matched order/shipment/store/code. The actual batch PDF is one A4 page with one intact provider sample label; it cannot prove destination or a usable barcode. Three locales were opened and checked at an actual 390px viewport, no horizontal overflow; switching home/pickup yields 599/559 and toggles address validation. Anonymous test config is HTTP 403. Final public checkout still offers only existing Black Cat delivery (100, total 599), with Google search preserved. No production charge/order/shipment was executed. No later in-transit/arrival/collection event was simulated or claimed.
+
+A detailed Traditional Chinese record with screenshots and artifacts is saved outside the repository at workspace `outputs/7ELEVEN_測試驗證紀錄_20261124.md`. No credentials or callback secret paths are included in the GitHub handoff.
