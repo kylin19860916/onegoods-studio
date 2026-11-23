@@ -15,7 +15,7 @@ type Delivery = {
   store?: { carrier: string; id: string; name?: string; address?: string }; address?: { city: string; district: string; postalCode: string; street: string; unit: string };
 };
 type Receipt = { subtotal: number; delivery?: Delivery };
-type Shipment = { order_id: string; trade_no: string; subtype: string; logistics_id: string | null; status: string | null; notice: string | null };
+type Shipment = { order_id: string; trade_no: string; subtype: string; logistics_id: string | null; status: string | null; notice: string | null; audit_json?:string | null };
 
 // Public sandbox credentials from ECPay's logistics integration guide.
 export function logisticsStageMac(fields: Fields) {
@@ -43,8 +43,9 @@ async function post(path: string, fields: Fields) {
   const response = await fetch(origin + path, {
     method: 'POST', body: new URLSearchParams(fields), redirect: 'manual', signal: AbortSignal.timeout(15000),
   });
-  if (!response.ok) throw new HttpError(502, '綠界物流測試暫時無法連線。');
-  return (await response.text()).trim();
+  const result=(await response.text()).trim();
+  if (!response.ok && !result.startsWith('0|')) throw new HttpError(502, '綠界物流測試暫時無法連線。');
+  return result;
 }
 
 function requireMatching(row: Shipment, fields: Fields) {
@@ -186,10 +187,21 @@ export async function logisticsPreview(request: Request, env: Env, user: Paramet
         'Cache-Control': 'no-store',
       } });
     }
-    if (!['create', 'query', 'code', 'print'].includes(path)) return json({}, 404);
+    if (!['create', 'retry-create', 'query', 'code', 'print'].includes(path)) return json({}, 404);
     const { id } = await request.json() as { id: string };
     if (!/^OGS-(?:[TE]|DEMO)-[A-F0-9]{12}$/.test(id)) return json({}, 400);
     let row = await db.prepare('SELECT * FROM checkout_preview_shipments WHERE order_id=?').bind(id).first<Shipment>();
+    if(path === 'retry-create') {
+      if(!row || row.logistics_id) throw new HttpError(409,'僅能重試尚未取得物流單號的測試單。');
+      const audit=row.audit_json?JSON.parse(row.audit_json):null;
+      if(audit?.attemptedAt && Date.now()-Date.parse(audit.attemptedAt)<45000) throw new HttpError(409,'請先等候原建單回覆。');
+      const existing=await post('/Helper/QueryLogisticsTradeInfo/V5',{MerchantID:merchant,MerchantTradeNo:row.trade_no,TimeStamp:String(Math.floor(Date.now()/1000))});
+      if(existing !== '0|找不到訂單') throw new HttpError(409,'尚無法確認原建單不存在，請先查詢，避免重複建單。');
+      // Sandbox only. Keep a separate audit record of the explicit recovery.
+      await db.prepare('UPDATE checkout_preview_shipments SET audit_json=?, status=? WHERE order_id=? AND logistics_id IS NULL')
+        .bind(JSON.stringify({...audit,recoveryQuery:existing,recoveryAt:new Date().toISOString()}),'retryable',id).run();
+      row=null;
+    }
     if (path === 'code' || path === 'print') {
       if (!row?.logistics_id || row.subtype !== sevenSubtype) throw new HttpError(404, '找不到這筆 7-ELEVEN 物流測試單。');
       const fields = await queryShipment(row);
@@ -231,14 +243,26 @@ export async function logisticsPreview(request: Request, env: Env, user: Paramet
           Temperature: '0001', Specification: '0001', Distance: '00', ScheduledPickupTime: '4', ScheduledDeliveryTime: '4',
         });
       }
-      const claimed = await db.prepare('INSERT INTO checkout_preview_shipments (order_id, trade_no, subtype) VALUES (?, ?, ?) ON CONFLICT DO NOTHING')
-        .bind(id, trade, subtype).run();
+      const sent=Object.fromEntries(['MerchantID','MerchantTradeNo','LogisticsType','LogisticsSubType','GoodsAmount','GoodsName','IsCollection','ReceiverStoreID','ServerReplyURL'].filter(k=>fields[k]!==undefined).map(k=>[k,fields[k]]));
+      // Persist the actual attempted request, without names, phone numbers, or signing material.
+      const audit=JSON.stringify({environment:'logistics-stage',attemptedAt:new Date().toISOString(),sent});
+      const claimed = await db.prepare(`INSERT INTO checkout_preview_shipments (order_id, trade_no, subtype, status, audit_json) VALUES (?, ?, ?, 'creating', ?)
+        ON CONFLICT(order_id) DO UPDATE SET status='creating',audit_json=excluded.audit_json WHERE status='retryable' AND logistics_id IS NULL`)
+        .bind(id, trade, subtype,audit).run();
       if (!claimed.meta.changes) throw new HttpError(409, '建單已送出，請查詢狀態。');
-      const response = await post('/Express/Create', fields);
+      let response:string;
+      try { response = await post('/Express/Create', fields); }
+      catch(error) {
+        await db.prepare("UPDATE checkout_preview_shipments SET audit_json=json_set(audit_json,'$.transportError',?) WHERE order_id=?")
+          .bind(error instanceof Error?error.message:'Unknown transport error',id).run();
+        throw error;
+      }
+      await db.prepare("UPDATE checkout_preview_shipments SET audit_json=json_set(audit_json,'$.providerResponse',?) WHERE order_id=?")
+        .bind(response.slice(0,6000),id).run();
       if (!response.startsWith('1|')) {
         const code = response.match(/^0\|(\d+)/)?.[1];
-        if (code) await db.prepare('DELETE FROM checkout_preview_shipments WHERE order_id=? AND logistics_id IS NULL').bind(id).run();
-        throw new HttpError(502, '綠界測試建單失敗' + (code ? '（' + code + '）' : '，請先查詢建單結果。'));
+        const detail=response.replace(/<[^>]*>/g,'').slice(0,240);
+        throw new HttpError(502, '綠界測試建單失敗：'+detail+'；請先查詢原單後再重試。');
       }
       const fieldsReturned = parseSigned(response.slice(2));
       requireMatching({ order_id: id, trade_no: trade, subtype, logistics_id: null, status: null, notice: null }, fieldsReturned);
