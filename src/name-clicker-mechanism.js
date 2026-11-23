@@ -2,13 +2,13 @@
 // Source SHA256: 9682b528c1f3e55b8c728e1e0ade95c96a272944fa1ced2342983aaa6f6ae133
 // Standard printer: Bambu Lab P2S / 0.4 mm. No external cosmetic mesh is reused.
 export const NAME_MX = Object.freeze({
-  floor: 0.746, deck: 4.52, mountTop: 10.517, rimTop: 13.123,
+  floor: 0.746, deck: 4.52, mountTop: 10.517, rimTop: 17.5,
   opening: 14.06, exteriorX: 18.844, exteriorY: 18.814,
   latchX: 16.065, latchY: 16.117, latchBottom: 8.207, latchTop: 9.713,
-  capDepth: 12.577, socketDepth: 4.993,
+  capDepth: 4.993, socketDepth: 4.993,
   bossDiameter: 5.856, crossSpan: 4.199, crossArmX: 1.554, crossArmY: 1.562,
   rootHeight: 1, rootDiameter: 6.88,
-  supportOuterDiameter: 6.9, supportInnerDiameter: 4.9, supportGap: 0.16,
+  capPocket: 15.4, capWall: 1, stopOverlap: 0.8, stopGap: 0.2,
   roof: 1.4, travel: 4,
 });
 export function nameMxStack() {

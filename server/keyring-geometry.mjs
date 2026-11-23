@@ -157,18 +157,17 @@ export function nameClickerContours(font, text) {
   }
   const fits = (area, outline) => polygons([area], outline, ClipType.ctDifference).length === 0;
 
-  // Fit the body under the lettering first. Cut the hidden skirt and rim
-  // around the housing so its outline never has to enter the visible face.
-  const offsets = [0, ...Array.from({ length: 12 }, (_, i) => [-(i + 1) / 4, (i + 1) / 4]).flat()];
+  // Fit the entire pocket plus a continuous wall inside the visible cap.
+  // Never cut the outside skirt to make room for a larger switch seat.
+  const offsets = [0, ...Array.from({ length: 24 }, (_, i) => [-(i + 1) / 4, (i + 1) / 4]).flat()];
   const glyphMountY = offsets.find(y => fits(squareAt(Math.max(NAME_MX.exteriorX, NAME_MX.exteriorY) + 1.6, y), shell)
-    && fits(circle(0, y * units, (NAME_MX.rootDiameter / 2 + 0.15) * units), face));
+    && fits(squareAt(NAME_MX.capPocket + 2 * NAME_MX.capWall, y), face));
   const mount = roundedPlate(20.8, 20.8, 4)
     .map(({ X, Y }) => ({ X: X - 10400, Y: Y - 10400 }));
   const contour = glyphMountY === undefined ? connectedOutline([mount, ...letterOutlines]) : glyphContour;
   const toMm = ring => ring.map(({ X, Y }) => [X / units, Y / units]);
   function housingRing(outerMargin, innerMargin) {
     const interior = offsetPaths(contour, innerMargin);
-    interior.push(squareAt(Math.max(NAME_MX.exteriorX, NAME_MX.exteriorY) + 0.8, glyphMountY ?? 0));
     const clearance = polygons(interior).flat();
     return polygons(offsetPaths(contour, outerMargin), clearance, ClipType.ctDifference)
       .map(rings => rings.map(toMm));

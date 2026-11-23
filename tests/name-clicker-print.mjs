@@ -21,12 +21,15 @@ await build({ absWorkingDir: root, entryPoints: ['server/clicker-print.ts'], out
   } }],
 });
 const { generateClicker3mf } = await import(pathToFileURL(bundle));
-const font = readFileSync(join(root, 'public/assets/fonts/keyring/Huninn-Regular.woff'));
+const huninn = readFileSync(join(root, 'public/assets/fonts/keyring/Huninn-Regular.woff'));
+const kuaile = readFileSync(join(root, 'public/assets/fonts/keyring/kuaile.woff'));
 const stack = nameMxStack();
 assert(Math.abs(stack.roofBottom - stack.skirtBottom - NAME_MX.capDepth) < 1e-8);
 assert(Math.abs(stack.roofBottom - stack.socketStart - NAME_MX.socketDepth) < 1e-8);
 assert(stack.skirtBottom - NAME_MX.travel > NAME_MX.deck);
-for (const [i,text] of ['濤','飛','Max','III','ONEGOODS','玩物工作室'].entries()) {
+const fixtures = ['濤','飛','Max','III','ONEGOODS','玩物工作室','林予曦'].map(text => ({ text, fontKey:'huninn', font:huninn }));
+fixtures.push({text:'林予曦',fontKey:'kuaile',font:kuaile});
+for (const [i,{text,fontKey,font}] of fixtures.entries()) {
   const contour = nameClickerContours(parseKeyringFont(font), text);
   const eyelet = mxChainEyelet(contour.profile(MX_NAME_FACE.shellMargin));
   const ramp = mxPrintableEyelet(eyelet.outline, eyelet.rootLeft);
@@ -40,7 +43,7 @@ for (const [i,text] of ['濤','飛','Max','III','ONEGOODS','玩物工作室'].en
     const xy = Math.hypot(points[k] - points[previous], points[k+1] - points[previous+1]);
     assert(xy / dz < 0.952, text + ' eyelet underside is too shallow');
   }
-  const file = await generateClicker3mf({ text, font:'huninn', colors:{border:'#f2c879',fill:'#efb39e',ink:'#fffcf5'} },new Response(font));
+  const file = await generateClicker3mf({ text, font:fontKey, colors:{border:'#f2c879',fill:'#efb39e',ink:'#fffcf5'} },new Response(font));
   const archive = unzipSync(file);
   const settings = JSON.parse(strFromU8(archive['Metadata/project_settings.config']));
   assert.equal(settings.printer_model,'Bambu Lab P2S');
@@ -50,7 +53,8 @@ for (const [i,text] of ['濤','飛','Max','III','ONEGOODS','玩物工作室'].en
   assert.equal(settings.raft_first_layer_expansion,'0');
   assert.equal(settings.brim_type,'no_brim');
   const xml = strFromU8(archive['3D/3dmodel.model']);
-  assert(xml.includes('REMOVE - local support below MX boss'));
+  assert(!xml.includes('REMOVE - local support below MX boss'));
+  assert.equal(NAME_MX.capDepth, NAME_MX.socketDepth);
   assert(xml.includes('Exclude supports inside MX cap cross socket'));
   assert(xml.includes('Exclude supports under printable eyelet'));
   writeFileSync(join(dir,`sample-${i+1}.3mf`),file);
