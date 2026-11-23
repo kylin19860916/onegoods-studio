@@ -159,6 +159,14 @@ function renderClickerOrder(order) {
     </article>`;
 }
 
+function physicalLogisticsTools(order) {
+  if(order.live || !order.matchedReference || !order.id.startsWith('OGS-DEMO-')) return '';
+  const shipment=order.shipment;
+  return `<div class="order-toolbar"><button type="button" class="text-action" data-logistics-action="${shipment?'query':'create'}" data-order-id="${esc(order.id)}">${shipment?'查詢綠界物流測試單':'建立綠界物流測試單'}</button>
+  ${shipment?.id && shipment.subtype==='UNIMARTC2C'?`<button type="button" class="text-action" data-logistics-action="code" data-order-id="${esc(order.id)}">複製交貨便代碼</button><button type="button" class="text-action" data-logistics-action="print" data-order-id="${esc(order.id)}">列印託運單</button>`:''}
+  ${shipment?.id?`<span>物流單號 ${esc(shipment.id)} · 貨態 ${esc(shipment.status)}${shipment.notice?' · 已收到通知':''}</span>`:''}<span role="status"></span></div>`;
+}
+
 function renderPhysicalOrder(order) {
   const { delivery } = order;
   const store = delivery?.store;
@@ -167,10 +175,11 @@ function renderPhysicalOrder(order) {
     ? [store.carrier, store.name, store.id, store.address].filter(Boolean).join(' · ')
     : address ? [address.postalCode, address.city + address.district + address.street, address.unit].filter(Boolean).join(' ') : '';
   return `<article class="panel clicker-order-item"><div class="panel-title"><h2>${esc(order.name)}</h2><span class="badge">${orderStatuses[orderStatus(order)]}</span></div>
-    <p><strong>${esc(order.id)}</strong> · 商品訂單 · ${formatOrderDate(order.createdAt)}</p>
+    <p><strong>${esc(order.id)}</strong> · ${order.live?'商品訂單':'商品訂單（綠界測試）'} · ${formatOrderDate(order.createdAt)}</p>
     <p>數量 ${esc(order.quantity)} · 商品小計 ${money(order.subtotal)} · 運費 ${money(order.shipping)} · 合計 ${money(order.amount)}</p>
     ${order.matchedReference ? `<p>綠界交易編號 ${esc(order.matchedReference)} · ${formatOrderDate(order.matchedAt)}</p>` : ''}
     ${destination ? `<fieldset><legend>${order.live ? '黑貓宅配' : '配送資料（測試）'}</legend><p>${esc(delivery.contact)} · ${esc(delivery.phone)}</p><p>${esc(destination)}</p>${order.live ? `<p>${esc(delivery.email)}</p>` : ''}</fieldset>` : ''}
+    ${physicalLogisticsTools(order)}
     </article>`;
 }
 

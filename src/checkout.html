@@ -33,7 +33,7 @@
       <h2 tabindex="-1">选择配送</h2>
       <label for="store-delivery">配送方式</label>
       <select id="store-delivery">
-        <option value="pickup">超商取货 · NT$60</option>
+        <option value="pickup">7-ELEVEN 超商取货 · NT$60</option>
         <option value="home">黑猫宅配 · NT$100</option>
       </select>
       <div id="store-carrier-field">
@@ -66,12 +66,14 @@
           <div id="address-search-attribution" hidden><img src="assets/google-maps-attribution.svg" alt="Google Maps" height="18"></div>
           <small>搜寻内容会传送至 Google。使用地址搜寻即适用 <a href="https://maps.google.com/help/terms_maps/" target="_blank" rel="noopener noreferrer">Google Maps 服务条款</a>及 <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google 隐私权政策</a>。请确认门牌与楼层后再下单。</small>
         </div>
+        <div id="store-home-fields">
         <label for="store-city">县市</label><select id="store-city" name="city" autocomplete="shipping address-level1" required><option value="">请选择县市</option></select>
         <label for="store-district">行政区</label><select id="store-district" name="district" autocomplete="shipping address-level2" required disabled><option value="">请选择行政区</option></select>
         <label for="store-postal">邮递区号</label><input id="store-postal" name="postalCode" readonly aria-describedby="store-postal-note" inputmode="numeric" autocomplete="shipping postal-code" pattern="[0-9]{3}([0-9]{2,3})?" maxlength="6" required>
         <small id="store-postal-note">选择行政区后自动带入 3 码邮递区号。</small>
         <label for="store-street">街道与门牌</label><input id="store-street" name="street" autocomplete="shipping address-line1" maxlength="100" required>
         <label for="store-unit">楼层或室号（选填）</label><input id="store-unit" name="unit" autocomplete="shipping address-line2" maxlength="35">
+        </div>
       </fieldset>
       <div class="store-checkout-actions">
         <button class="button yellow" type="submit">确认订单内容</button>

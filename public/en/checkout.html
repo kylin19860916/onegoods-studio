@@ -6,10 +6,10 @@
   <meta name="robots" content="noindex">
   <title>OGS checkout — One Goods Studio</title>
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=d3bf12aab83e">
-  <script src="../taiwan-address.js?v=d3bf12aab83e" defer></script>
-  <script src="checkout-address-search.js?v=d3bf12aab83e" defer></script>
-  <script src="../locale.js?v=d3bf12aab83e" defer></script><script src="app.js?v=d3bf12aab83e" defer></script>
+  <link rel="stylesheet" href="../style.css?v=18d5b03b6131">
+  <script src="../taiwan-address.js?v=18d5b03b6131" defer></script>
+  <script src="checkout-address-search.js?v=18d5b03b6131" defer></script>
+  <script src="../locale.js?v=18d5b03b6131" defer></script><script src="app.js?v=18d5b03b6131" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/checkout.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/checkout.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/checkout.html"><meta property="og:type" content="website"><meta property="og:title" content="OGS checkout — One Goods Studio"><meta property="og:description" content="OGS checkout — One Goods Studio"><meta property="og:url" content="https://onegoods.studio/en/checkout.html"><meta property="og:image" content="https://onegoods.studio/assets/ogs-sharing.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"></head>
 <body data-page="checkout">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="index.html">Home</a><a href="products.html">Goods</a><a href="custom.html">Customize</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../checkout.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/checkout.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/checkout.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header>
@@ -33,7 +33,7 @@
       <h2 tabindex="-1">Choose delivery</h2>
       <label for="store-delivery">Delivery method</label>
       <select id="store-delivery">
-        <option value="pickup">Convenience-store pickup · NT$60</option>
+        <option value="pickup">7-ELEVEN pickup · NT$60</option>
         <option value="home">Black Cat home delivery · NT$100</option>
       </select>
       <div id="store-carrier-field">
@@ -66,12 +66,14 @@
           <div id="address-search-attribution" hidden><img src="../assets/google-maps-attribution.svg" alt="Google Maps" height="18"></div>
           <small>Search queries are sent to Google. Address search is subject to the <a href="https://maps.google.com/help/terms_maps/" target="_blank" rel="noopener noreferrer">Google Maps Terms of Service</a> and <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>. Confirm the house number and floor before ordering.</small>
         </div>
+        <div id="store-home-fields">
         <label for="store-city">City or county</label><select id="store-city" name="city" autocomplete="shipping address-level1" required><option value="">Select city or county</option></select>
         <label for="store-district">District</label><select id="store-district" name="district" autocomplete="shipping address-level2" required disabled><option value="">Select district</option></select>
         <label for="store-postal">Postal code</label><input id="store-postal" name="postalCode" readonly aria-describedby="store-postal-note" inputmode="numeric" autocomplete="shipping postal-code" pattern="[0-9]{3}([0-9]{2,3})?" maxlength="6" required>
         <small id="store-postal-note">The 3-digit postal code is filled in after you select a district.</small>
         <label for="store-street">Street address</label><input id="store-street" name="street" autocomplete="shipping address-line1" maxlength="100" required>
         <label for="store-unit">Floor or unit (optional)</label><input id="store-unit" name="unit" autocomplete="shipping address-line2" maxlength="35">
+        </div>
       </fieldset>
       <div class="store-checkout-actions">
         <button class="button yellow" type="submit">Review order</button>

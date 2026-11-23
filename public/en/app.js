@@ -3,8 +3,10 @@ let storePayment = { enabled: false };
 async function paymentConfig() {
  if (!qs('#full-product') && !qs('#store-checkout')) return storePayment;
  try {
-   const response = await fetch('/api/store-payment/config', { cache: 'no-store' });
+   const testRequested = new URLSearchParams(location.search).get('shipping-test')==='1';
+   const response = await fetch(testRequested?'/api/checkout-preview/config':'/api/store-payment/config', { cache: 'no-store' });
    if (response.ok) return await response.json();
+   if(testRequested) return {enabled:false,testRequested:true};
  } catch {}
  return { enabled: false };
 }
@@ -53,8 +55,10 @@ function renderStoreCheckout(){
  const checkout=qs('#store-checkout');
  if(!checkout)return;
  const checkoutUrl=new URL(location.href);
+ const test=storePayment.test === true;
+ if(storePayment.testRequested){checkout.innerHTML='<p role="alert">This test checkout requires an OGS administrator sign-in.</p><a class="button cream" href="/signin-with-chatgpt?return_to='+encodeURIComponent(location.pathname+location.search)+'">Administrator sign-in</a>';return;}
  const mapToken=checkoutUrl.searchParams.get('store');
- const draftKey='ogs-pickup-preview';
+ const draftKey=test?'ogs-pickup-stage-test':'ogs-pickup-preview';
  let draft;
  try {
    const saved=JSON.parse(sessionStorage.getItem(draftKey));
@@ -88,10 +92,15 @@ function renderStoreCheckout(){
  let submission;
  if (storePayment.enabled) {
    qs('#store-preview-note').hidden = true;
-   delivery.querySelector('[value=pickup]').remove();
-   delivery.options[0].textContent = 'Black Cat home delivery · NT$' + storePayment.shipping;
+   if(!test) delivery.querySelector('[value=pickup]').remove();
+   else {
+     carrier.querySelectorAll('option').forEach(o=>{if(o.value!=='UNIMARTC2C')o.remove();});
+     delivery.value='pickup';
+     qs('#store-preview-note').hidden=false;qs('#store-preview-note').textContent='Internal test · Payment and shipping use the ECPay sandbox. No real charge or shipment.';
+   }
+   delivery.querySelector('[value=home]').textContent = 'Black Cat home delivery · NT$' + storePayment.shipping;
    address.hidden = address.disabled = false;
-   pay.textContent = 'Continue to ECPay';
+   pay.textContent = test?'Continue to ECPay test payment':'Continue to ECPay';
  }
  if(!storePayment.enabled)pay.textContent='View buying options';
  const money=amount=>'NT$'+amount.toLocaleString('en-TW');
@@ -107,7 +116,11 @@ function renderStoreCheckout(){
  function refresh(){
    const subtotal=price*Number(quantity.value);
    const isPickup=delivery.value==='pickup';
-   const fee=storePayment.enabled?storePayment.shipping:isPickup?60:100;
+   const fee=storePayment.enabled?(test&&isPickup?storePayment.pickupShipping:storePayment.shipping):isPickup?60:100;
+   if(storePayment.enabled){
+     const home=qs('#store-home-fields');home.hidden=isPickup;
+     home.querySelectorAll('input,select').forEach(field=>{field.disabled=isPickup || (field.name==='district'&&!form.elements.city.value);});
+   }
    store.hidden=!isPickup;
    const branch=isPickup && selectedBranch?.carrier===carrier.value ? selectedBranch : null;
    branchResult.hidden=!branch;
@@ -142,15 +155,16 @@ function renderStoreCheckout(){
    chooseBranch.disabled=true;
    branchError.hidden=true;
    try {
-     const response=await fetch(mapApi+'public-store-start',{
+     const response=await fetch(mapApi+(test?'store-start':'public-store-start'),{
        method:'POST',headers:{'Content-Type':'application/json'},
-       body:JSON.stringify({carrier:requestedCarrier,mobile:matchMedia('(max-width: 680px)').matches,language:document.documentElement.lang}),
+       body:JSON.stringify({carrier:requestedCarrier,mobile:matchMedia('(max-width: 680px)').matches,language:document.documentElement.lang,...(test?{flow:'storefront-test',map:checkoutUrl.searchParams.get('map')}:{} )}),
      });
      const selection=await response.json();
-     if(!response.ok || selection.action!=='https://logistics-stage.ecpay.com.tw/Express/map')throw new Error();
+     if(!response.ok || ![...(test?['https://logistics.ecpay.com.tw/Express/map']:[]),'https://logistics-stage.ecpay.com.tw/Express/map'].includes(selection.action))throw new Error();
      if(delivery.value!=='pickup' || carrier.value!==requestedCarrier || sections[1].hidden)return;
      sessionStorage.setItem(draftKey,JSON.stringify({
        token:selection.token,product:product.id,quantity:quantity.value,carrier:requestedCarrier,
+       ...(test?{contact:form.elements.contact.value,phone:form.elements.phone.value,email:form.elements.email.value}:{}),
      }));
      const mapForm=document.createElement('form');
      mapForm.method='POST';
@@ -169,11 +183,13 @@ function renderStoreCheckout(){
    }
  });
  async function restoreBranch(){
-   if(storePayment.enabled || draft?.product!==product.id || ![...carrier.options].some(option=>option.value===draft.carrier))return;
+   if((storePayment.enabled&&!test) || draft?.product!==product.id || ![...carrier.options].some(option=>option.value===draft.carrier))return;
    checkoutUrl.searchParams.set('product',product.id);
    history.replaceState(null,'',checkoutUrl);
+   delivery.value='pickup';
    carrier.value=draft.carrier;
    quantity.value=draft.quantity;
+   if(test) for(const name of ['contact','phone','email'])form.elements[name].value=draft[name]||'';
    refresh();
    showStep(1);
    chooseBranch.disabled=true;
@@ -208,7 +224,7 @@ function renderStoreCheckout(){
      if (storePayment.enabled) {
        const fields = form.elements;
        reviewAddress.textContent = [fields.contact.value, fields.phone.value, fields.email.value,
-         fields.postalCode.value + ' ' + fields.city.value + fields.district.value + fields.street.value + fields.unit.value].join(' · ');
+         delivery.value==='pickup'?qs('#store-branch-address').textContent:fields.postalCode.value + ' ' + fields.city.value + fields.district.value + fields.street.value + fields.unit.value].join(' · ');
        reviewAddress.hidden = false;
      }
      showStep(2);
@@ -223,19 +239,21 @@ function renderStoreCheckout(){
      error.replaceChildren(document.createTextNode(error.textContent),channels);
      return;
    }
-   const payload = { ...Object.fromEntries(new FormData(form)), productId: product.id, quantity: quantity.valueAsNumber,
-     total: price * quantity.valueAsNumber + storePayment.shipping };
+   const payload = { ...Object.fromEntries(new FormData(form)), productId: product.id, quantity: quantity.valueAsNumber,...(test?{storeToken:delivery.value==='pickup'?mapToken:null}:{}),
+     total: price * quantity.valueAsNumber + (test&&delivery.value==='pickup'?storePayment.pickupShipping:storePayment.shipping) };
    const snapshot = JSON.stringify(payload);
    if (submission?.snapshot !== snapshot) submission = { snapshot, requestId: crypto.randomUUID() };
    pay.disabled = true;
    error.hidden = true;
    try {
-     const response = await fetch('/api/store-payment/checkout', {
+     const testPayload={requestId:submission.requestId,provider:'ecpay',flow:'storefront-test',total:payload.total,item:{kind:'physical',id:product.id,quantity:quantity.valueAsNumber},method:delivery.value==='pickup'?'store':'home',storeToken:payload.storeToken,contact:payload.contact,phone:payload.phone,address:{city:payload.city,district:payload.district,postalCode:payload.postalCode,street:payload.street,unit:payload.unit}};
+     const response = await fetch(test?'/api/checkout-preview':'/api/store-payment/checkout', {
        method: 'POST', headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify({ ...payload, requestId: submission.requestId }),
+       body: JSON.stringify(test?testPayload:{ ...payload, requestId: submission.requestId }),
      });
      const result = await response.json();
      if (!response.ok) throw new Error(result.error || 'Payment is temporarily unavailable.');
+     if(test){if(!/^\/api\/checkout-preview\/payment\/OGS-DEMO-[A-F0-9]{12}$/.test(result.checkoutUrl||''))throw new Error('Payment is temporarily unavailable.');location.assign(result.checkoutUrl);return;}
      if (result.receipt) {
        location.assign(result.receipt);
        return;

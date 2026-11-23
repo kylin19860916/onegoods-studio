@@ -5,6 +5,7 @@ import { quoteClickerEcpayStage } from '../src/clicker-test-pricing.js';
 
 import { ecpayStageCheckout, ecpayStageReturnUrl, verifyEcpayStageTrade } from './ecpay-stage';
 import { readPreviewStore } from './checkout-delivery-preview';
+import { validHomeAddress } from './taiwan-address';
 import { previewShipping } from '../src/checkout-preview-shipping.js';
 const uuid = /^[0-9a-f-]{36}$/i;
 const cap = (value: unknown, max: number) => typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -18,6 +19,7 @@ export async function previewCheckout(request: Request, env: Cloudflare.Env, use
     return json({ error: '找不到此功能。' }, 404);
   }
   if (!isAdmin(user, env)) return json({ error: '請先登入 OGS 管理帳號。' }, 403);
+  if (url.pathname === '/api/checkout-preview/config' && request.method === 'GET') return json({ enabled:!!ecpayStageReturnUrl(env), test:true, shipping:previewShipping.home.fee, pickupShipping:previewShipping.store.fee });
   const checkoutId = /^\/api\/checkout-preview\/payment\/(OGS-DEMO-[A-F0-9]{12})$/.exec(url.pathname)?.[1];
   if (checkoutId && request.method === 'GET') {
     const callback = ecpayStageReturnUrl(env);
@@ -67,9 +69,10 @@ export async function previewCheckout(request: Request, env: Cloudflare.Env, use
       postalCode: cap(body.address?.postalCode, 6), street: cap(body.address?.street, 100),
       unit: cap(body.address?.unit, 40),
     } : null;
-    if (address && (!address.city || !address.district || !address.street || !/^\d{3}(?:\d{2,3})?$/.test(address.postalCode))) {
+    if (address && (!address.street || !validHomeAddress(address.city,address.district,address.postalCode))) {
       throw new HttpError(400, '請填寫縣市、行政區、郵遞區號與街道門牌。');
     }
+    if(body.flow === 'storefront-test' && (method === 'store' && store?.carrier !== '7-ELEVEN')) throw new HttpError(400,'此測試流程僅支援 7-ELEVEN。');
     const delivery = { method, contact, phone, store, address };
 
     const shipping = (method === 'store' ? previewShipping.store : previewShipping.home).fee;
@@ -105,6 +108,7 @@ export async function previewCheckout(request: Request, env: Cloudflare.Env, use
       productName = product.name;
       if (ecpay) checkoutUrl = '/api/checkout-preview/payment/' + id;
     }
+    if(body.flow === 'storefront-test' && body.total !== subtotal+shipping) throw new HttpError(409,'商品或運費金額已變更，請重新確認。');
     const receipt: Receipt = { id, createdAt: new Date().toISOString(), productName, subtotal, shipping, total: subtotal + shipping, checkoutUrl, delivery };
     await db.prepare('INSERT INTO checkout_preview_orders (request_id, receipt, payload) VALUES (?, ?, ?) ON CONFLICT (request_id) DO NOTHING')
       .bind(requestId, JSON.stringify(receipt), raw).run();

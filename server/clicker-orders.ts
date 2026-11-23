@@ -210,13 +210,13 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
         .bind(pattern, pattern, pattern, pattern).all<Order & { preview_receipt?: string; preview_status?: string; preview_shipment?: string }>();
       const checkoutTest = isCheckoutTestHost(url);
       const physical = checkoutTest ? await store.DB.prepare(`
-        SELECT p.receipt, p.status, json_extract(p.payload, '$.item.id') AS product_id,
+        SELECT p.receipt, p.status, (SELECT json_object('id',logistics_id,'status',status,'notice',notice,'subtype',subtype) FROM checkout_preview_shipments WHERE order_id=json_extract(p.receipt,'$.id')) AS shipment, json_extract(p.payload, '$.item.id') AS product_id,
           json_extract(p.payload, '$.item.quantity') AS quantity, json_extract(c.data, '$.name') AS product_name
         FROM checkout_preview_orders p
         LEFT JOIN catalog c ON c.id = json_extract(p.payload, '$.item.id')
         WHERE json_extract(p.payload, '$.item.kind') = 'physical'
         ORDER BY p.rowid DESC LIMIT 100
-      `).all<{ receipt: string; status: string; product_id: string; quantity: number; product_name: string | null }>() : null;
+      `).all<{ receipt: string; status: string; product_id: string; quantity: number; product_name: string | null; shipment: string | null }>() : null;
       const liveOrders = await store.DB.prepare(`
         SELECT id, snapshot, amount, created_at, payment_reference, paid_at FROM store_orders
         WHERE id LIKE ? OR payment_reference LIKE ? OR json_extract(snapshot, '$.name') LIKE ?
@@ -235,7 +235,7 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
           id: receipt.id, kind: 'physical', name: receipt.productName || row.product_name || row.product_id,
           quantity: row.quantity, amount: receipt.total, createdAt: receipt.createdAt,
           delivery: receipt.delivery, matchedReference: receipt.paymentReference, matchedAt: receipt.paidAt, previewPaid: row.status === 'success', paymentState: row.status,
-          subtotal: receipt.subtotal, shipping: receipt.shipping,
+          subtotal: receipt.subtotal, shipping: receipt.shipping, shipment:row.shipment?JSON.parse(row.shipment):undefined,
         };
       });
       return json({ ecpayStageAvailable: !!callback, shippingToolsAvailable: checkoutTest, physicalItems: [...liveItems, ...physicalItems], items: result.results.map(row => ({
