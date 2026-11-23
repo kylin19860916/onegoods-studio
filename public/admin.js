@@ -163,6 +163,7 @@ function physicalLogisticsTools(order) {
   if(order.live || !order.matchedReference || !order.id.startsWith('OGS-DEMO-')) return '';
   const shipment=order.shipment;
   return `<div class="order-toolbar"><button type="button" class="text-action" data-logistics-action="${shipment?'query':'create'}" data-order-id="${esc(order.id)}">${shipment?'查詢綠界物流測試單':'建立綠界物流測試單'}</button>
+  ${shipment && !shipment.id?`<button type="button" class="text-action" data-logistics-action="retry-create" data-order-id="${esc(order.id)}">查無原單後重試測試建單</button>`:''}
   ${shipment?.id && shipment.subtype==='UNIMARTC2C'?`<button type="button" class="text-action" data-logistics-action="code" data-order-id="${esc(order.id)}">複製交貨便代碼</button><button type="button" class="text-action" data-logistics-action="print" data-order-id="${esc(order.id)}">列印託運單</button>`:''}
   ${shipment?.id?`<span>物流單號 ${esc(shipment.id)} · 貨態 ${esc(shipment.status)}${shipment.notice?' · 已收到通知':''}</span>`:''}<span role="status"></span></div>`;
 }

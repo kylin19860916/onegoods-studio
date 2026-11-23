@@ -66,6 +66,7 @@ export const checkoutPreviewShipments = sqliteTable('checkout_preview_shipments'
   logisticsId: text('logistics_id').unique(),
   status: text('status'),
   notice: text('notice'),
+  auditJson: text('audit_json'),
 });
 
 export const storeOrders = sqliteTable('store_orders', {

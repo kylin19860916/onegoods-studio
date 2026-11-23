@@ -53,5 +53,11 @@ try{
  const home={...payload,requestId:randomUUID(),method:'home',total:599,address:{city:'臺北市',district:'南港區',postalCode:'115',street:'三重路19號',unit:'3樓'}};assert.equal((await (await checkout(home)).json()).total,599);
  assert.equal((await logistics('create','OGS-P-0123456789AB')).status,400);
  assert.equal((await logistics('create',receipt.id,null)).status,403);
+ const audit=JSON.parse((await DB.prepare('SELECT audit_json FROM checkout_preview_shipments WHERE order_id=?').bind(receipt.id).first()).audit_json);assert.equal(audit.sent.ReceiverStoreID,'238669');assert(!JSON.stringify(audit.sent).includes('CheckMacValue'));assert.equal(audit.environment,'logistics-stage');
+ assert.equal((await logistics('retry-create',receipt.id)).status,409);
+ await DB.prepare('UPDATE checkout_preview_shipments SET logistics_id=NULL,audit_json=? WHERE order_id=?').bind(JSON.stringify({attemptedAt:'2026-01-01T00:00:00Z'}),receipt.id).run();
+ globalThis.fetch=async(url)=>new Response(new URL(url).pathname.includes('QueryLogistics')?'0|找不到訂單':'0|測試錯誤', {status:new URL(url).pathname.includes('QueryLogistics')?500:200});
+ const retried=await logistics('retry-create',receipt.id);assert.equal(retried.status,502);assert((await retried.json()).error.includes('0|測試錯誤'));
+ const failedAudit=JSON.parse((await DB.prepare('SELECT audit_json FROM checkout_preview_shipments WHERE order_id=?').bind(receipt.id).first()).audit_json);assert.equal(failedAudit.providerResponse,'0|測試錯誤');
  console.log('PASS: admin-only official storefront test, read-only live map, sandbox-only payment/logistics, 499+60=559, unchanged 499+100=599 home delivery, same-order store/transaction/shipment/callback/12-code/label/pending-list, idempotency, and public/live-order rejection. No real ECPay calls.');
 } finally {globalThis.fetch=originalFetch;await mf.dispose();}
