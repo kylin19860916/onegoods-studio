@@ -48,13 +48,14 @@ for lang, folder, column in locales:
                 text = text.replace(tag, f'<script src="{prefix}locale.js" defer></script>' + tag)
         if lang == 'en':
             text = text.replace('makerworld.com/zh/', 'makerworld.com/en/')
-        for asset in ['style.css', 'app.js', 'locale.js', 'nameplate.js', 'taiwan-address.js']:
+        for asset in ['style.css', 'app.js', 'locale.js', 'nameplate.js', 'taiwan-address.js', 'checkout-address-search.js']:
             text = re.sub(r'((?:src|href)="[^"?]*' + re.escape(asset) + r')(")', lambda m: m[1] + "?v=" + build_id + m[2], text)
         (target / page.name).write_text(text)
     script = translate((src / 'app.js').read_text())
     if lang == 'en':
         script = script.replace('makerworld.com/zh/', 'makerworld.com/en/')
     (target / 'app.js').write_text(script)
+    (target / 'checkout-address-search.js').write_text(translate((src / 'checkout-address-search.js').read_text()))
 (dist / 'style.css').write_text((src / 'style.css').read_text())
 for script_name in ('checkout-preview.js', 'checkout-preview-shipping.js'):
     (dist / script_name).write_text((src / script_name).read_text())
