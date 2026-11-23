@@ -31,6 +31,9 @@ for (const [i,text] of ['濤','飛','Max','III','ONEGOODS','玩物工作室'].en
   assert.equal(settings.printer_model,'Bambu Lab P2S');
   assert.equal(settings.layer_height,'0.16');
   assert.equal(settings.enable_support,'1');
+  assert.equal(settings.support_style,'snug');
+  assert.equal(settings.raft_first_layer_expansion,'0');
+  assert.equal(settings.brim_type,'no_brim');
   const xml = strFromU8(archive['3D/3dmodel.model']);
   assert(xml.includes('REMOVE - local support below MX boss'));
   assert(xml.includes('Exclude supports inside MX cap cross socket'));

@@ -10,7 +10,7 @@
 - Only a small removable hollow support ring under the boss: OD6.9/ID4.9 mm, nominal top gap0.16 mm. It is a labelled sacrificial print part, not product geometry; remove it before installing the switch. Do not fill the cap floor with solid support. Other genuinely overhanging areas retain automatic support.
 - Block support in the cross and entire well (including latch relief). Check actual G-code, not only the enable-support field. A clear hole is insufficient if the boss starts in mid-air.
 
-Printer: **Bambu Lab P2S, 0.4 mm**, inherited P2S PLA/bed/machine G-code and filament vectors preserved. Source process values: 0.16 mm layers, 3 walls, 15% Gyroid, normal automatic support/default style, 15°, plate-only, 0.16 mm upper/lower support gap, 2/2 interface layers, auto pattern/0.5 mm spacing, 0.35 mm XY gap. Do not copy H2C machine settings, chamber flags or extruder vectors. This change applies the connected-name mechanism; existing independent/mechanical keycap source-template geometry is not silently redesigned.
+Printer: **Bambu Lab P2S, 0.4 mm**, inherited P2S PLA/bed/machine G-code and filament vectors preserved. Source process values: 0.16 mm layers, 3 walls, 15% Gyroid, normal automatic support/snug style, 15°, plate-only, 0.16 mm upper/lower support gap, 2/2 interface layers, auto pattern/0.5 mm spacing, 0.35 mm XY gap. Do not copy H2C machine settings, chamber flags or extruder vectors. This change applies the connected-name mechanism; existing independent/mechanical keycap source-template geometry is not silently redesigned.
 
 ## Verification / handoff
 
@@ -24,3 +24,7 @@ node_modules/.bin/tsc --noEmit
 The print test builds real 3MFs for 濤/飛/Max/III/ONEGOODS/玩物工作室. The generator rejects any full-press solid collision. Preview/export outlines are compared for all supported fonts. Native P2S slice, reopen/re-slice, socket and well support exclusion, closed mesh edges and embedded G-code checksum were checked on the exported 濤 artifact. Digital checks do not imply a new physical print occurred.
 
 Use the development branch for review/merge. No production deployment or payment/logistics change is part of this work.
+
+## Exterior support-pad correction (2026-11-23)
+
+User requested no support extending outside the name cap. The old automatic first-layer pads extended up to 4.666 mm outside the cap footprint. Use snug normal supports, no brim/zero brim width, zero raft expansion and zero support first-layer expansion. All product mesh bytes are preserved. Native P2S re-slice showed no support extrusion centerlines outside the cap footprint, while local boss support and socket/well exclusion remain validated. Do not fix this by switching all supports off or by adding ineffective blockers outside surfaces that never generate overhang contacts.
