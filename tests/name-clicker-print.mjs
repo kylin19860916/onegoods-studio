@@ -5,6 +5,8 @@ import { resolve, join } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { unzipSync, strFromU8 } from 'fflate';
+import { mxChainEyelet, mxPrintableEyelet, MX_NAME_FACE } from '../src/cherry-mx-spec.js';
+import { nameClickerContours, parseKeyringFont } from '../server/keyring-geometry.mjs';
 import { NAME_MX, nameMxStack } from '../src/name-clicker-mechanism.js';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const dir = process.argv[2] ? resolve(process.argv[2]) : mkdtempSync(join(tmpdir(), 'ogs-mx-'));
@@ -25,6 +27,19 @@ assert(Math.abs(stack.roofBottom - stack.skirtBottom - NAME_MX.capDepth) < 1e-8)
 assert(Math.abs(stack.roofBottom - stack.socketStart - NAME_MX.socketDepth) < 1e-8);
 assert(stack.skirtBottom - NAME_MX.travel > NAME_MX.deck);
 for (const [i,text] of ['濤','飛','Max','III','ONEGOODS','玩物工作室'].entries()) {
+  const contour = nameClickerContours(parseKeyringFont(font), text);
+  const eyelet = mxChainEyelet(contour.profile(MX_NAME_FACE.shellMargin));
+  const ramp = mxPrintableEyelet(eyelet.outline, eyelet.rootLeft);
+  assert(ramp.bottom > 3.7);
+  assert.equal(Math.max(...eyelet.outline.map(([,y])=>y)), 4.3);
+  const points = ramp.mesh.vertProperties, count = eyelet.outline.length;
+  // Every ramp vertex advances <= 0.95 mm XY per mm Z; the final duplicate
+  // outline is the straight top join, so it also satisfies this bound.
+  for (let k = count * 3; k < points.length; k += 3) {
+    const previous = k - count * 3, dz = points[k+2] - points[previous+2];
+    const xy = Math.hypot(points[k] - points[previous], points[k+1] - points[previous+1]);
+    assert(xy / dz < 0.952, text + ' eyelet underside is too shallow');
+  }
   const file = await generateClicker3mf({ text, font:'huninn', colors:{border:'#f2c879',fill:'#efb39e',ink:'#fffcf5'} },new Response(font));
   const archive = unzipSync(file);
   const settings = JSON.parse(strFromU8(archive['Metadata/project_settings.config']));
@@ -37,6 +52,7 @@ for (const [i,text] of ['濤','飛','Max','III','ONEGOODS','玩物工作室'].en
   const xml = strFromU8(archive['3D/3dmodel.model']);
   assert(xml.includes('REMOVE - local support below MX boss'));
   assert(xml.includes('Exclude supports inside MX cap cross socket'));
+  assert(xml.includes('Exclude supports under printable eyelet'));
   writeFileSync(join(dir,`sample-${i+1}.3mf`),file);
   console.log(text, 'generated with P2S supports; full-press collision check passed');
 }

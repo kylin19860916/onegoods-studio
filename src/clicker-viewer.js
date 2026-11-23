@@ -4,7 +4,7 @@ import {
   Shape, ShapePath, Vector2, WebGLRenderer,
 } from 'three';
 import { NAME_MX, nameMxStack } from './name-clicker-mechanism.js';
-import { MX, MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_FACE, MX_RECESS, mxChainEyelet, mxStack } from './cherry-mx-spec.js';
+import { MX, MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_FACE, MX_RECESS, mxChainEyelet, mxPrintableEyelet, mxStack } from './cherry-mx-spec.js';
 import { MECHANICAL_KEYCAP, mechanicalKeycapShell } from './mechanical-keycap.js';
 import { nameClickerOutline } from './name-clicker-outline.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -196,12 +196,13 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     }
     const extrude = (shape, height) => new ExtrudeGeometry(shape, { depth: height, bevelEnabled: false, curveSegments: 16 });
     function addChainEyelet(body, colour) {
-      const { outline, holeX } = mxChainEyelet(body.getPoints().map(({ x, y }) => [x, y]));
+      const { outline, holeX, rootLeft } = mxChainEyelet(body.getPoints().map(({ x, y }) => [x, y]));
       const ear = new Shape(outline.map(([x, y]) => new Vector2(x, y)));
       const hole = new Path();
       hole.absarc(holeX, 0, MX_CHAIN_EYELET.holeDiameter / 2, 0, 2 * Math.PI, true);
       ear.holes.push(hole);
-      add(extrude(ear, MX_CHAIN_EYELET.thickness), colour, MX_CHAIN_EYELET.bottom);
+      const bottom = style === 'name' ? mxPrintableEyelet(outline, rootLeft).bottom : MX_CHAIN_EYELET.bottom;
+      add(extrude(ear, MX_CHAIN_EYELET.thickness), colour, bottom);
     }
     function cross(width, arm, armY = arm) {
       const shape = new Shape(), h = width / 2, a = arm / 2, b = armY / 2;
