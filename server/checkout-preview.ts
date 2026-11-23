@@ -62,6 +62,7 @@ export async function previewCheckout(request: Request, env: Cloudflare.Env, use
     const contact = cap(body.contact, 80);
     const phone = cap(body.phone, 32);
     if (!contact || !phone) throw new HttpError(400, '請填寫收件人與電話。');
+    if(body.flow==='storefront-test' && method==='store' && String(body.storeToken).startsWith('v')) throw new HttpError(409,'正式地圖門市僅供選店驗證；完整測試請改選綠界固定測試門市。');
     const store = method === 'store' ? await readPreviewStore(db, body.storeToken) : null;
     if (method === 'store' && !store) throw new HttpError(400, '請重新選擇取貨門市。');
     const address = method === 'home' ? {

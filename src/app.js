@@ -96,7 +96,7 @@ function renderStoreCheckout(){
    else {
      carrier.querySelectorAll('option').forEach(o=>{if(o.value!=='UNIMARTC2C')o.remove();});
      delivery.value='pickup';
-     qs('#store-preview-note').hidden=false;qs('#store-preview-note').textContent='内部测试 · 付款和寄件使用绿界测试环境，不会实际扣款或寄件。';
+     qs('#store-preview-note').hidden=false;qs('#store-preview-note').textContent=checkoutUrl.searchParams.get('map')==='live'?'正式门市地图仅供选店验证；完整测试请使用固定测试门市。':'内部测试 · 使用绿界固定测试门市，不会实际扣款或寄件。';
    }
    delivery.querySelector('[value=home]').textContent = '黑猫宅配 · NT$' + storePayment.shipping;
    address.hidden = address.disabled = false;

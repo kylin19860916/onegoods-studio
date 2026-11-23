@@ -87,7 +87,7 @@ function orderStatus(order) {
   if (!order.previewPaid && !order.matchedReference) return 'unpaid';
   const status = String(order.shipment?.status ?? '');
   if (['2067','3022'].includes(status)) return 'complete';
-  if (['2074','3020','2099'].includes(status)) return 'attention';
+  if (['2074','3020','2099','create_failed','create_unknown'].includes(status)) return 'attention';
   if (status === '300' || (order.live && order.matchedReference)) return 'pending';
   return 'active';
 }
@@ -164,7 +164,9 @@ function physicalLogisticsTools(order) {
   const shipment=order.shipment;
   return `<div class="order-toolbar"><button type="button" class="text-action" data-logistics-action="${shipment?'query':'create'}" data-order-id="${esc(order.id)}">${shipment?'查詢綠界物流測試單':'建立綠界物流測試單'}</button>
   ${shipment && !shipment.id?`<button type="button" class="text-action" data-logistics-action="retry-create" data-order-id="${esc(order.id)}">查無原單後重試測試建單</button>`:''}
+  ${shipment?.id?'<small>測試面單是綠界固定示意，無法寄送；門市請核對原訂單及建單紀錄。</small>':''}
   ${shipment?.id && shipment.subtype==='UNIMARTC2C'?`<button type="button" class="text-action" data-logistics-action="code" data-order-id="${esc(order.id)}">複製交貨便代碼</button><button type="button" class="text-action" data-logistics-action="print" data-order-id="${esc(order.id)}">列印託運單</button>`:''}
+  ${shipment?.error?`<p role="alert">綠界測試建單失敗：${esc(shipment.error)}</p>`:''}
   ${shipment?.id?`<span>物流單號 ${esc(shipment.id)} · 貨態 ${esc(shipment.status)}${shipment.notice?' · 已收到通知':''}</span>`:''}<span role="status"></span></div>`;
 }
 
@@ -341,17 +343,16 @@ async function shippingAction(button, action, id) {
     const response = logisticsRequest(action === 'download-pending-pdf' ? 'render-pending-labels' : action, id);
     if (action === 'code') {
       const code = response.then(result => result.json()).then(result => result.code);
+      let copied=false;
       try {
         await navigator.clipboard.write([new ClipboardItem({ 'text/plain': code.then(value => new Blob([value], {type:'text/plain'})) })]);
-        status.textContent = '已複製 12 碼交貨便代碼。';
-      } catch {
-        const input = document.createElement('input');
-        input.value = await code;
-        input.readOnly = true;
-        input.setAttribute('aria-label', '12 碼交貨便代碼');
-        status.replaceChildren(input);
-        input.select();
-      }
+        copied=true;
+      } catch {}
+      const input=document.createElement('input');
+      input.value=await code;input.readOnly=true;
+      input.setAttribute('aria-label','12 碼交貨便代碼');
+      status.replaceChildren(document.createTextNode(copied?'已複製 12 碼交貨便代碼。':'請選取並複製 12 碼交貨便代碼。'),input);
+      if(!copied)input.select();
     } else if (printing) {
       openStageLabel(tab, await (await response).json());
       status.textContent = '已開啟綠界測試託運單。';

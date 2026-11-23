@@ -96,7 +96,7 @@ function renderStoreCheckout(){
    else {
      carrier.querySelectorAll('option').forEach(o=>{if(o.value!=='UNIMARTC2C')o.remove();});
      delivery.value='pickup';
-     qs('#store-preview-note').hidden=false;qs('#store-preview-note').textContent='Internal test · Payment and shipping use the ECPay sandbox. No real charge or shipment.';
+     qs('#store-preview-note').hidden=false;qs('#store-preview-note').textContent=checkoutUrl.searchParams.get('map')==='live'?'The live map is for store-selection verification only. Use a sandbox store for the complete test.':'Internal test · Uses an ECPay sandbox store. No real charge or shipment.';
    }
    delivery.querySelector('[value=home]').textContent = 'Black Cat home delivery · NT$' + storePayment.shipping;
    address.hidden = address.disabled = false;

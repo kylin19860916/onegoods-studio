@@ -253,13 +253,14 @@ export async function logisticsPreview(request: Request, env: Env, user: Paramet
       let response:string;
       try { response = await post('/Express/Create', fields); }
       catch(error) {
-        await db.prepare("UPDATE checkout_preview_shipments SET audit_json=json_set(audit_json,'$.transportError',?) WHERE order_id=?")
+        await db.prepare("UPDATE checkout_preview_shipments SET status='create_unknown', audit_json=json_set(audit_json,'$.transportError',?) WHERE order_id=?")
           .bind(error instanceof Error?error.message:'Unknown transport error',id).run();
         throw error;
       }
       await db.prepare("UPDATE checkout_preview_shipments SET audit_json=json_set(audit_json,'$.providerResponse',?) WHERE order_id=?")
         .bind(response.slice(0,6000),id).run();
       if (!response.startsWith('1|')) {
+        await db.prepare("UPDATE checkout_preview_shipments SET status='create_failed' WHERE order_id=? AND logistics_id IS NULL").bind(id).run();
         const code = response.match(/^0\|(\d+)/)?.[1];
         const detail=response.replace(/<[^>]*>/g,'').slice(0,240);
         throw new HttpError(502, '綠界測試建單失敗：'+detail+'；請先查詢原單後再重試。');

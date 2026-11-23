@@ -210,7 +210,7 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
         .bind(pattern, pattern, pattern, pattern).all<Order & { preview_receipt?: string; preview_status?: string; preview_shipment?: string }>();
       const checkoutTest = isCheckoutTestHost(url);
       const physical = checkoutTest ? await store.DB.prepare(`
-        SELECT p.receipt, p.status, (SELECT json_object('id',logistics_id,'status',status,'notice',notice,'subtype',subtype) FROM checkout_preview_shipments WHERE order_id=json_extract(p.receipt,'$.id')) AS shipment, json_extract(p.payload, '$.item.id') AS product_id,
+        SELECT p.receipt, p.status, (SELECT json_object('id',logistics_id,'status',CASE WHEN logistics_id IS NULL AND json_extract(audit_json,'$.providerResponse') LIKE '0|%' THEN 'create_failed' ELSE status END,'notice',notice,'subtype',subtype,'error',CASE WHEN logistics_id IS NULL AND json_extract(audit_json,'$.providerResponse') LIKE '0|%' THEN json_extract(audit_json,'$.providerResponse') END) FROM checkout_preview_shipments WHERE order_id=json_extract(p.receipt,'$.id')) AS shipment, json_extract(p.payload, '$.item.id') AS product_id,
           json_extract(p.payload, '$.item.quantity') AS quantity, json_extract(c.data, '$.name') AS product_name
         FROM checkout_preview_orders p
         LEFT JOIN catalog c ON c.id = json_extract(p.payload, '$.item.id')

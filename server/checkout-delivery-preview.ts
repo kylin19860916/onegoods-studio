@@ -49,7 +49,7 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
       const storefront = body.flow === 'storefront-test';
       if(storefront && (publicMap || !isAdmin(user,env) || body.carrier !== 'UNIMARTC2C')) throw new HttpError(403,'此入口僅供管理員測試 7-ELEVEN。');
       const liveMerchant = env.OGS_ECPAY_LOGISTICS_MERCHANT_ID;
-      const liveMap = storefront && body.map !== 'stage' && !!liveMerchant && !['2000933','2000132'].includes(liveMerchant);
+      const liveMap = storefront && body.map === 'live' && !!liveMerchant && !['2000933','2000132'].includes(liveMerchant);
       if (!mapReturn) throw new HttpError(503, '綠界測試選店尚未啟用。');
       await db.prepare('DELETE FROM checkout_preview_store_maps WHERE expires_at <= ?').bind(Date.now()).run();
       const random = crypto.randomUUID().replaceAll('-', '');
@@ -83,7 +83,7 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
           .bind(JSON.stringify(result), token).run();
       }
       if (isLocalCheckoutTest(url)) return json({ token });
-      const destination = isPublicToken ? checkoutPaths[token[1] as keyof typeof checkoutPaths] + (token[0]==='p'?'?':'?shipping-test=1&') : '/internal-checkout.html?preview=1&';
+      const destination = isPublicToken ? checkoutPaths[token[1] as keyof typeof checkoutPaths] + (token[0]==='p'?'?':'?shipping-test=1&map='+(token[0]==='v'?'live':'stage')+'&') : '/internal-checkout.html?preview=1&';
       return Response.redirect(url.origin + destination + 'store=' + token, 303);
     }
     if (path === 'places' && request.method === 'POST' && sameOrigin(request)) {
