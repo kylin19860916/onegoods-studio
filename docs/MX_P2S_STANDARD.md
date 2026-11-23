@@ -4,6 +4,8 @@ Updated 2026-11-23. The user accepted the supplied Mini Dumpling reference by ph
 
 `src/name-clicker-mechanism.js` is shared by preview and manufacturing. `server/keyring-geometry.mjs` supplies the same outlines and mount location to both. Dimensions below combine measured reference functions with the OGS closed-back revision; they are not a claim of universal MX hardware compatibility.
 
+Fixed future-change requirements: [NAME_CLICKER_GENERATION_CONTRACT.md](NAME_CLICKER_GENERATION_CONTRACT.md). Preview and export consume the same validated `capBack` section. The shared contour builder rejects a pocket that opens or weakens the exterior, before rendering or exporting.
+
 ## Cap, seat and travel
 
 - One central switch. Continuous cap back: 4.993 mm thick below a 1.4 mm roof, with a **local 15.4 × 15.4 mm recess**, at least 1 mm material between recess and outer contour. No notch may reach the exterior cap wall. Place the recess and socket together, searching Y in 0.25 mm increments up to ±6 mm. If the glyph cannot contain them, use the existing rounded mechanical minimum outline; never cut the outside wall to force a fit.

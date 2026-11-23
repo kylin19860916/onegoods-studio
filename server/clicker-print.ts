@@ -51,7 +51,11 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
   if ([...design.text].some(character => character !== ' ' && !font.charToGlyphIndex(character))) {
     throw new HttpError(400, '目前的字型缺少這些文字，請更換字型或調整文字。');
   }
-  const contours = nameClickerContours(font, design.text);
+  let contours;
+  try { contours = nameClickerContours(font, design.text); }
+  catch (error) {
+    throw new HttpError(400, error instanceof Error ? error.message : '無法生成完整上蓋，請調整文字或字型。');
+  }
   const { CrossSection: Section, Manifold: Solid, Mesh } = await getKernel();
   const allocated: Array<{ delete(): void }> = [];
   function own<T extends { delete(): void }>(value: T): T {
@@ -127,12 +131,11 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const socketStart = stack.socketStart;
     const boss = own(Section.circle(outerDiameter / 2, 64));
     const cross = own(Section.union(box(crossSpan, NAME_MX.crossArmY), box(NAME_MX.crossArmX, crossSpan)));
-    const recess = atMount(box(NAME_MX.capPocket, NAME_MX.capPocket));
     const wallCheck = own(Section.difference(atMount(box(NAME_MX.capPocket + 2 * NAME_MX.capWall, NAME_MX.capPocket + 2 * NAME_MX.capWall)), face));
     if (wallCheck.area() > 0.01) throw new HttpError(400, '字形沒有足夠的機械安裝空間，請更換字型。');
     const movingCap = join([
-      own(Solid.difference(slab(face, stack.skirtBottom, stack.capTop),
-        slab(recess, stack.skirtBottom - 0.01, stack.roofBottom))),
+      slab(section(contours.capBack.flat()), stack.skirtBottom, stack.roofBottom),
+      slab(face, stack.roofBottom, stack.capTop),
       slab(atMount(cut(boss, cross)), socketStart, stack.roofBottom),
       own(Solid.difference(
         own(Solid.cylinder(NAME_MX.rootHeight, outerDiameter / 2, NAME_MX.rootDiameter / 2, 64)
