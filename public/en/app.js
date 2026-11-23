@@ -81,6 +81,7 @@ function renderStoreCheckout(){
  const sections=[qs('#store-bag'),qs('#store-shipping'),confirmation];
  const address = qs('#store-address-fields');
  window.OGSTaiwanAddress.setup(form);
+ window.OGSAddressSearch.setup(form);
  const pay = qs('#store-pay');
  const error = qs('#store-payment-error');
  const reviewAddress = qs('#store-review-address');

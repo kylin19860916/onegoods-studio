@@ -1,3 +1,4 @@
+import { addressSearch } from '../../../server/address-search';
 import { storePayment } from '../../../server/store-payment';
 import { env } from 'cloudflare:workers';
 import { getChatGPTUser } from '../../chatgpt-auth';
@@ -12,6 +13,7 @@ export const dynamic = 'force-dynamic';
 
 async function handle(request: Request) {
   const path = new URL(request.url).pathname;
+  if (path.startsWith('/api/address-search/')) return addressSearch(request, env);
   if (path.startsWith('/api/store-payment/')) return storePayment(request, env);
   if (path === logisticsCallbackPath) return receiveLogisticsNotice(request, env);
   if (isEcpayStageCallback(path)) return clickerOrderApi(request, env, null);
