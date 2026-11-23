@@ -3,7 +3,7 @@ import createManifold, { type CrossSection, type Manifold, type ManifoldToplevel
 import wasm from 'manifold-3d/manifold.wasm?module';
 import { mechanicalKeyContours, nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
 import { keyringFonts } from '../src/keyring-font-picker.js';
-import { MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_EYELET_BLEND, MX_NAME_FACE, mxChainEyelet, mxEyeletBlendMesh, mxStack } from '../src/cherry-mx-spec.js';
+import { MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_EYELET_BLEND, MX_NAME_FACE, mxChainEyelet, mxPrintableEyelet, mxStack } from '../src/cherry-mx-spec.js';
 import { MECHANICAL_KEYCAP, mechanicalKeycapShell } from '../src/mechanical-keycap.js';
 import { HttpError } from './catalog';
 import p2sTrialProfile from './clicker-p2s-profile.json';
@@ -81,7 +81,9 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
       throw new HttpError(400, '字形超出可製作範圍，請縮短文字或換一種字型。');
     }
     const { outline: earOutline, holeX, rootLeft } = mxChainEyelet(shellPoints);
-    const { holeDiameter, bottom: earBottom, thickness: earThickness } = MX_CHAIN_EYELET;
+    const { holeDiameter, thickness: earThickness } = MX_CHAIN_EYELET;
+    const printableEar = mxPrintableEyelet(earOutline, rootLeft);
+    const earBottom = printableEar.bottom;
     const ear = own(new Section([earOutline]));
     const hole = own(own(Section.circle(holeDiameter / 2, 64)).translate([holeX, 0]));
     const underPlate = section([contours.profile(innerWallMargin)]);
@@ -92,7 +94,7 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const wellFrame = own(Section.intersection(shell, cut(wellExterior, wellVoid)));
     const latchVoid = atMount(box(NAME_MX.latchX, NAME_MX.latchY));
     const { leadInRadius, leadInTop } = MX_EYELET_BLEND;
-    const arc = own(new Solid(new Mesh(mxEyeletBlendMesh(earOutline, rootLeft))));
+    const arc = own(new Solid(new Mesh(printableEar.mesh)));
     const entry = join([
       own(Solid.cylinder(leadInTop + 0.01, leadInRadius, leadInRadius, 64)),
       own(own(Solid.cylinder(earBottom - leadInTop, leadInRadius, holeDiameter / 2, 64))
@@ -141,6 +143,11 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const crossSupportBlocker = own(slab(crossClearance, -printOffset[2], stack.roofBottom + 0.15).translate(printOffset));
     const parts: Array<{ name: string; filament: number; color: string; solid: Manifold; subtype?: 'support_blocker' }> = [
       { name: 'Case', filament: 1, color: design.colors.border, solid: base },
+      { name: 'Exclude supports under printable eyelet', filament: 1, color: design.colors.border,
+        subtype: 'support_blocker',
+        solid: slab(own(box(Math.abs(rootLeft - Math.min(...earOutline.map(([x]) => x))) + 4.8,
+          MX_CHAIN_EYELET.width + 1).translate([(Math.min(...earOutline.map(([x]) => x)) + rootLeft + 2.8) / 2, 0])),
+          0, earBottom + earThickness + 0.2) },
       { name: 'REMOVE - local support below MX boss', filament: 1, color: design.colors.border,
         solid: own(slab(atMount(cut(own(Section.circle(NAME_MX.supportOuterDiameter / 2, 64)),
           own(Section.circle(NAME_MX.supportInnerDiameter / 2, 64)))),

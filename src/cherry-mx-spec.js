@@ -91,3 +91,41 @@ export function mxStack() {
   return { bodyBottom, mountTop, plateBottom: mountTop - MX_CASE.plate, housingTop, stemTop,
     skirtBottom: housingTop + 0.4, roofBottom, capTop, rimTop: capTop - MX_RECESS.capRise };
 }
+
+// P2S-printable name-clicker eyelet. Keep the XY outline/hole/thickness,
+// but give the underside enough rise for <= 1 mm XY growth per mm Z.
+// The piecewise-quadratic easing has a continuous first derivative and
+// ends tangent to the vertical eyelet wall. The old V3 helper is retained
+// for fixed mechanical-base templates, which are separate products.
+export function mxPrintableEyelet(outline, rootLeft) {
+  const lowerZ = 0.5, transition = 0.1, maxGrowth = 0.95;
+  const anchor = rootLeft + 0.35;
+  const reach = Math.max(...outline.map(([x, y]) => Math.hypot(x - anchor, y)));
+  const rise = reach / ((1 - transition) * maxGrowth);
+  const bottom = lowerZ + rise;
+  const segments = Math.max(96, Math.ceil(rise / 0.08));
+  const positions = [], faces = [], count = outline.length;
+  function eased(p) {
+    if (p < transition) return p * p / (2 * transition * (1 - transition));
+    if (p > 1 - transition) return 1 - (1 - p) ** 2 / (2 * transition * (1 - transition));
+    return (p - transition / 2) / (1 - transition);
+  }
+  for (let layer = 0; layer <= segments + 1; layer++) {
+    const progress = Math.min(layer / segments, 1);
+    const scale = Math.max(0.001, eased(progress));
+    const z = layer <= segments ? lowerZ + rise * progress : bottom + 0.3;
+    for (const [x, y] of outline) positions.push(anchor + (x - anchor) * scale, y * scale, z);
+  }
+  for (let layer = 0; layer <= segments; layer++) {
+    const first = layer * count;
+    for (let i = 0; i < count; i++) {
+      const a = first + i, b = first + (i + 1) % count;
+      faces.push(a, b, b + count, a, b + count, a + count);
+    }
+  }
+  const top = (segments + 1) * count;
+  for (let i = 1; i < count - 1; i++) faces.push(0, i + 1, i, top, top + i, top + i + 1);
+  return { bottom, reach, lowerZ, maxGrowth, mesh: {
+    numProp: 3, vertProperties: new Float32Array(positions), triVerts: new Uint32Array(faces),
+  } };
+}
