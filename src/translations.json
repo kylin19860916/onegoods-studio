@@ -2150,5 +2150,13 @@
   "前往绿界测试付款": [
     "前往綠界測試付款",
     "Continue to ECPay test payment"
+  ],
+  "正式门市地图仅供选店验证；完整测试请使用固定测试门市。": [
+    "正式門市地圖僅供選店驗證；完整測試請使用固定測試門市。",
+    "The live map is for store-selection verification only. Use a sandbox store for the complete test."
+  ],
+  "内部测试 · 使用绿界固定测试门市，不会实际扣款或寄件。": [
+    "內部測試 · 使用綠界固定測試門市，不會實際扣款或寄件。",
+    "Internal test · Uses an ECPay sandbox store. No real charge or shipment."
   ]
 }
