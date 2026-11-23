@@ -166,6 +166,17 @@ export function nameClickerContours(font, text) {
     .map(({ X, Y }) => ({ X: X - 10400, Y: Y - 10400 }));
   const contour = glyphMountY === undefined ? connectedOutline([mount, ...letterOutlines]) : glyphContour;
   const toMm = ring => ring.map(({ X, Y }) => [X / units, Y / units]);
+  // Customer-generation invariant: only a local enclosed pocket may remove cap material.
+  // Both preview and export consume this validated section; do not reconstruct a skirt.
+  const capFace = offsetPaths(contour, MX_NAME_FACE.faceMargin);
+  const mountY = glyphMountY ?? 0;
+  const pocket = squareAt(NAME_MX.capPocket, mountY);
+  const wallEnvelope = squareAt(NAME_MX.capPocket + 2 * NAME_MX.capWall, mountY);
+  const capBack = polygons(capFace, [pocket], ClipType.ctDifference);
+  if (!fits(wallEnvelope, capFace) || capBack.length !== 1 || capBack[0].length !== 2
+      || Math.abs(Math.abs(Clipper.Area(capBack[0][0])) - Math.abs(Clipper.Area(polygons(capFace)[0][0]))) > units * units * 0.001) {
+    throw new Error('字形無法保留完整上蓋外壁，請更換字型或調整文字。');
+  }
   function housingRing(outerMargin, innerMargin) {
     const interior = offsetPaths(contour, innerMargin);
     const clearance = polygons(interior).flat();
@@ -173,11 +184,12 @@ export function nameClickerContours(font, text) {
       .map(rings => rings.map(toMm));
   }
   return {
+    capBack: capBack.map(rings => rings.map(toMm)),
     skirt: housingRing(MX_NAME_FACE.faceMargin, MX_NAME_FACE.innerSkirtMargin),
     rim: housingRing(MX_NAME_FACE.shellMargin, MX_NAME_FACE.faceMargin + MX_RECESS.sideClearance),
     lettering: letters.map(rings => rings.map(toMm)),
     dividerXs,
-    mountY: glyphMountY ?? 0,
+    mountY,
     profile(margin) {
       const rings = polygons(offsetPaths(contour, margin));
       if (rings.length !== 1) throw new Error('Name clicker contour is disconnected');

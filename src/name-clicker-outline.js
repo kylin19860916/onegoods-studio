@@ -23,6 +23,7 @@ export function nameClickerOutline(font, text) {
     mountY: contours.mountY,
     profile: margin => draw(new Shape(), contours.profile(margin)),
     lettering: shapes(contours.lettering),
+    capBack: shapes(contours.capBack),
     skirt: shapes(contours.skirt),
     rim: shapes(contours.rim),
   };

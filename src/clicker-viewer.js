@@ -258,7 +258,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     }
     if (style === 'name') {
       const { font, text } = keys[0];
-      const { profile, lettering, mountY } = nameClickerOutline(font, text);
+      const { profile, lettering, mountY, capBack } = nameClickerOutline(font, text);
       const caseColour = new Color(base).multiplyScalar(0.62);
       const { shellMargin, innerWallMargin, faceMargin, insetMargin, insetHeight, letteringHeight } = MX_NAME_FACE;
       const stopTop = stack.skirtBottom - NAME_MX.travel - NAME_MX.stopGap;
@@ -288,9 +288,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
 
       const face = mountSwitch(0, 0, mountY);
       face.position.y = -mountY;
-      const back = profile(faceMargin);
-      back.holes.push(rounded(NAME_MX.capPocket, NAME_MX.capPocket, 0, 0, mountY));
-      add(extrude(back, NAME_MX.capDepth), base, stack.skirtBottom, face).userData.keyIndex = 0;
+      add(extrude(capBack, NAME_MX.capDepth), base, stack.skirtBottom, face).userData.keyIndex = 0;
       add(extrude(profile(faceMargin), MX_CASE.roof), base, stack.roofBottom, face).userData.keyIndex = 0;
       add(extrude(profile(insetMargin), insetHeight), cap, stack.capTop, face).userData.keyIndex = 0;
       if (lettering.length) {

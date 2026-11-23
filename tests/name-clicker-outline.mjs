@@ -27,6 +27,11 @@ for (const key of Object.keys(keyringFonts)) {
     const perimeter = model.skirt.reduce((largest, polygon) => !largest || area(polygon[0]) > area(largest[0]) ? polygon : largest, null);
     assert.equal(perimeter.length, 2, key + ' ' + text + ' cut-open outer skirt');
     assert(Math.abs(area(perimeter[0]) - area(model.profile(MX_NAME_FACE.faceMargin))) < 0.001);
+    assert.equal(model.capBack.length, 1);
+    assert.equal(model.capBack[0].length, 2);
+    const sharedBack = preview.capBack[0];
+    assert.deepEqual(sharedBack.getPoints().slice(0, -1).map(({x,y}) => [x,y]), model.capBack[0][0]);
+    assert.deepEqual(sharedBack.holes[0].getPoints().slice(0, -1).map(({x,y}) => [x,y]), model.capBack[0][1]);
     const shell = model.profile(MX_NAME_FACE.shellMargin);
     const eyelet = mxChainEyelet(shell);
     assert.deepEqual(eyelet, mxChainEyelet(preview.profile(MX_NAME_FACE.shellMargin)
