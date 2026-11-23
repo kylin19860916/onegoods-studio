@@ -10,6 +10,7 @@ OGS_ADMIN_EMAILS="seedy@sites.test"
 
 # Production credentials intentionally omitted. Keep these empty locally.
 # Source checkout must not enable production collection or shipment.
+# OGS_ECPAY_PAYMENT_ENABLED=false
 # OGS_ECPAY_PAYMENT_MERCHANT_ID=
 # OGS_ECPAY_PAYMENT_HASH_KEY=
 # OGS_ECPAY_PAYMENT_HASH_IV=
