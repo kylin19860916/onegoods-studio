@@ -21,7 +21,7 @@ for lang, folder, column in locales:
         text = translate(page.read_text()).replace('lang="zh-Hans"', f'lang="{lang}"')
         if folder:
             text = text.replace('href="assets/', 'href="../assets/').replace('src="assets/', 'src="../assets/')
-            for asset in ('href="style.css"', 'src="nameplate.js"', 'src="locale.js"'):
+            for asset in ('href="style.css"', 'src="nameplate.js"', 'src="locale.js"', 'src="taiwan-address.js"'):
                 text = text.replace(asset, asset.replace('="', '="../'))
         # All locale pages have static content and metadata even without JavaScript.
         canonical = f'{origin}/{folder + "/" if folder else ""}{page.name}'
@@ -48,7 +48,7 @@ for lang, folder, column in locales:
                 text = text.replace(tag, f'<script src="{prefix}locale.js" defer></script>' + tag)
         if lang == 'en':
             text = text.replace('makerworld.com/zh/', 'makerworld.com/en/')
-        for asset in ['style.css', 'app.js', 'locale.js', 'nameplate.js']:
+        for asset in ['style.css', 'app.js', 'locale.js', 'nameplate.js', 'taiwan-address.js']:
             text = re.sub(r'((?:src|href)="[^"?]*' + re.escape(asset) + r')(")', lambda m: m[1] + "?v=" + build_id + m[2], text)
         (target / page.name).write_text(text)
     script = translate((src / 'app.js').read_text())
@@ -58,6 +58,7 @@ for lang, folder, column in locales:
 (dist / 'style.css').write_text((src / 'style.css').read_text())
 for script_name in ('checkout-preview.js', 'checkout-preview-shipping.js'):
     (dist / script_name).write_text((src / script_name).read_text())
+(dist / 'taiwan-address.js').write_text((src / 'taiwan-address.js').read_text().replace('__OGS_TW_ADDRESS_DATA__', (src / 'taiwan-address-data.json').read_text().strip()))
 (dist / 'locale.js').write_text((src / 'locale.js').read_text())
 subprocess.run([
     str(root / 'node_modules' / '.bin' / 'esbuild'), 'src/nameplate.js',

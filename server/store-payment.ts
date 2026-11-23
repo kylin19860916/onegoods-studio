@@ -1,3 +1,4 @@
+import { validHomeAddress } from './taiwan-address';
 import { timingSafeEqual } from 'node:crypto';
 import { HttpError, json } from './catalog';
 
@@ -114,8 +115,7 @@ export async function storePayment(request: Request, env: Env) {
     if (!requestIdPattern.test(requestId) || !/^[a-z0-9][a-z0-9-]{0,79}$/.test(productId) ||
         !Number.isInteger(quantity) || quantity < 1 || quantity > 99 ||
         !contact || !/^[+\d() -]{8,20}$/.test(phone) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-        !address.city || !address.district || !address.street || !/^\d{3}(?:\d{2,3})?$/.test(address.postalCode) ||
-        ['金門縣', '連江縣', '澎湖縣'].includes(address.city)) {
+        !address.street || !validHomeAddress(address.city, address.district, address.postalCode)) {
       throw new HttpError(400, '請確認聯絡資料與台灣本島配送地址。');
     }
     const details = { productId, quantity, delivery: { contact, phone, email, address } };
