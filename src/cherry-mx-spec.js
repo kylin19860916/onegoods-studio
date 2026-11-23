@@ -1,3 +1,5 @@
+import { NAME_MX } from './name-clicker-mechanism.js';
+
 // Nominal CHERRY MX reference dimensions, not an approved printable fit.
 // Source: CHERRY MX Series drawing, page 2 (manufacturer sheet mirrored by Maltron)
 // https://www.maltron.com/uploads/6/1/2/5/61250099/mx1a_11nn_data_sheet.pdf
@@ -8,12 +10,14 @@ export const MX_CASE = Object.freeze({ floor: 1.8, pinClearance: 0.7, plate: 1.5
 export const MX_RECESS = Object.freeze({ sideClearance: 0.55, capRise: 0.8 });
 // Continuous circular boss with a female cross, fused to the keycap roof.
 export const MX_CAP_SOCKET = Object.freeze({ outerDiameter: 6, crossSpan: 4.2, crossArm: 1.5, engagement: 2.8 });
-export const MX_NAME_CAP_SOCKET = Object.freeze({ ...MX_CAP_SOCKET, outerDiameter: 5.8 });
+export const MX_NAME_CAP_SOCKET = Object.freeze({ ...MX_CAP_SOCKET,
+  outerDiameter: NAME_MX.bossDiameter, crossSpan: NAME_MX.crossSpan,
+  crossArm: NAME_MX.crossArmX, engagement: NAME_MX.socketDepth - 0.8 });
 // Buried dividers bridge the case floor to the switch plate, leaving the switch clear.
 export const MX_BASE_DIVIDER = Object.freeze({ thickness: 1.4 });
 export const MX_SWITCH_WELL = Object.freeze({ clearance: MX.width + 1.6, wall: 1.4 });
 export const MX_NAME_FACE = Object.freeze({
-  shellMargin: 3.3, innerWallMargin: 1.6, faceMargin: 1.75,
+  shellMargin: 3.9, innerWallMargin: 2.3, faceMargin: 1.75,
   insetMargin: 0.35, innerSkirtMargin: 0.25, insetHeight: 0.5, letteringHeight: 1.35,
 });
 export const MX_CHAIN_EYELET = Object.freeze({ width: 8.6, thickness: 2.6, holeDiameter: 5, bottom: 3.7 });
