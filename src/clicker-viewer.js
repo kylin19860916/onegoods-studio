@@ -258,17 +258,21 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     }
     if (style === 'name') {
       const { font, text } = keys[0];
-      const { profile, lettering, mountY, skirt, rim } = nameClickerOutline(font, text);
+      const { profile, lettering, mountY } = nameClickerOutline(font, text);
       const caseColour = new Color(base).multiplyScalar(0.62);
       const { shellMargin, innerWallMargin, faceMargin, insetMargin, insetHeight, letteringHeight } = MX_NAME_FACE;
-      const wall = profile(shellMargin);
-      wall.holes.push(profile(innerWallMargin));
+      const stopTop = stack.skirtBottom - NAME_MX.travel - NAME_MX.stopGap;
+      const stopWall = profile(shellMargin);
+      stopWall.holes.push(profile(faceMargin - NAME_MX.stopOverlap));
+      const guideWall = profile(shellMargin);
+      guideWall.holes.push(profile(innerWallMargin));
       const floor = profile(shellMargin);
       const deck = profile(shellMargin);
       deck.holes.push(rounded(NAME_MX.opening, NAME_MX.opening, 0, 0, mountY));
       add(extrude(floor, NAME_MX.floor), caseColour, 0);
       add(extrude(deck, NAME_MX.deck - NAME_MX.floor), caseColour, NAME_MX.floor);
-      add(extrude(wall, stack.mountTop - NAME_MX.deck), caseColour, NAME_MX.deck);
+      add(extrude(stopWall, stopTop - NAME_MX.deck), caseColour, NAME_MX.deck);
+      add(extrude(guideWall, stack.rimTop - stopTop), caseColour, stopTop);
       for (const [bottom, top, width, height] of [
         [NAME_MX.floor, NAME_MX.latchBottom, NAME_MX.opening, NAME_MX.opening],
         [NAME_MX.latchBottom, NAME_MX.latchTop, NAME_MX.latchX, NAME_MX.latchY],
@@ -276,15 +280,17 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       ]) {
         const frame = rounded(NAME_MX.exteriorX, NAME_MX.exteriorY, 0, 0, mountY);
         frame.holes.push(rounded(width, height, 0, 0, mountY));
-        add(extrude(frame, top - bottom), caseColour, bottom);
+        const visibleBottom = Math.max(bottom, NAME_MX.deck);
+        if (top > visibleBottom) add(extrude(frame, top - visibleBottom), caseColour, visibleBottom);
       }
-      add(extrude(rim, stack.rimTop - stack.mountTop), caseColour, stack.mountTop);
 
       addChainEyelet(floor, caseColour);
 
       const face = mountSwitch(0, 0, mountY);
       face.position.y = -mountY;
-      add(extrude(skirt, stack.roofBottom - stack.skirtBottom), base, stack.skirtBottom, face).userData.keyIndex = 0;
+      const back = profile(faceMargin);
+      back.holes.push(rounded(NAME_MX.capPocket, NAME_MX.capPocket, 0, 0, mountY));
+      add(extrude(back, NAME_MX.capDepth), base, stack.skirtBottom, face).userData.keyIndex = 0;
       add(extrude(profile(faceMargin), MX_CASE.roof), base, stack.roofBottom, face).userData.keyIndex = 0;
       add(extrude(profile(insetMargin), insetHeight), cap, stack.capTop, face).userData.keyIndex = 0;
       if (lettering.length) {

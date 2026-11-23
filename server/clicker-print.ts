@@ -102,16 +102,23 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     ]);
     const supportOpening = slab(wellVoid, NAME_MX.floor, stack.mountTop);
     const blendedEar = own(Solid.difference([arc, own(entry.translate([holeX, 0, 0])), supportOpening]));
-    const earCapClearance = slab(section(contours.skirt.flat()),
-      stack.skirtBottom - NAME_MX.travel - 0.2, earBottom + earThickness + 0.1);
+    const clearanceBottom = stack.skirtBottom - NAME_MX.travel - NAME_MX.stopGap;
+    const clearanceTop = earBottom + earThickness + 0.1;
+    const earCapClearance = clearanceTop > clearanceBottom
+      ? slab(face, clearanceBottom, clearanceTop) : null;
+    const clearEar = (solid: Manifold) => earCapClearance
+      ? own(Solid.difference(solid, earCapClearance)) : solid;
+    const stopInterior = section([contours.profile(faceMargin - NAME_MX.stopOverlap)]);
+    const stopTop = stack.skirtBottom - NAME_MX.travel - NAME_MX.stopGap;
     const caseWithEar = join([
       slab(shell, 0, NAME_MX.floor),
       slab(cut(shell, wellVoid), NAME_MX.floor, NAME_MX.deck),
       slab(cut(shell, underPlate), NAME_MX.deck, stack.mountTop),
       slab(wellFrame, NAME_MX.floor, stack.mountTop),
-      slab(section(contours.rim.flat()), stack.mountTop, stack.rimTop),
-      own(Solid.difference(slab(ear, earBottom, earBottom + earThickness), earCapClearance)),
-      own(Solid.difference(blendedEar, earCapClearance)),
+      slab(cut(shell, underPlate), stack.mountTop, stack.rimTop),
+      slab(cut(shell, stopInterior), NAME_MX.deck, stopTop),
+      clearEar(slab(ear, earBottom, earBottom + earThickness)),
+      clearEar(blendedEar),
     ]);
     const base = own(Solid.difference([caseWithEar,
       slab(hole, 0, earBottom + earThickness + 0.1),
@@ -120,9 +127,12 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const socketStart = stack.socketStart;
     const boss = own(Section.circle(outerDiameter / 2, 64));
     const cross = own(Section.union(box(crossSpan, NAME_MX.crossArmY), box(NAME_MX.crossArmX, crossSpan)));
+    const recess = atMount(box(NAME_MX.capPocket, NAME_MX.capPocket));
+    const wallCheck = own(Section.difference(atMount(box(NAME_MX.capPocket + 2 * NAME_MX.capWall, NAME_MX.capPocket + 2 * NAME_MX.capWall)), face));
+    if (wallCheck.area() > 0.01) throw new HttpError(400, '字形沒有足夠的機械安裝空間，請更換字型。');
     const movingCap = join([
-      slab(section(contours.skirt.flat()), stack.skirtBottom, stack.roofBottom),
-      slab(face, stack.roofBottom, stack.capTop),
+      own(Solid.difference(slab(face, stack.skirtBottom, stack.capTop),
+        slab(recess, stack.skirtBottom - 0.01, stack.roofBottom))),
       slab(atMount(cut(boss, cross)), socketStart, stack.roofBottom),
       own(Solid.difference(
         own(Solid.cylinder(NAME_MX.rootHeight, outerDiameter / 2, NAME_MX.rootDiameter / 2, 64)
@@ -133,6 +143,14 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const collision = own(Solid.intersection(base, pressed));
     if (!collision.isEmpty() && collision.volume() > 0.01) {
       throw new HttpError(400, '字形與軸座活動空間重疊，請更換字型或調整文字。');
+    }
+    const housing = slab(atMount(cut(box(14.8,14.8), box(6.8,6.8))), stack.mountTop + 0.8, stack.housingTop);
+    for (const stroke of [0,1,2,3,4]) {
+      const position = own(movingCap.translate([0,0,-stroke]));
+      const interference = own(Solid.intersection(position, housing));
+      if (!interference.isEmpty() && interference.volume() > 0.001) throw new HttpError(400, '字形與軸體活動空間重疊，請更換字型。');
+      const baseInterference = own(Solid.intersection(position, base));
+      if (!baseInterference.isEmpty() && baseInterference.volume() > 0.001) throw new HttpError(400, '字形與底座活動空間重疊，請更換字型。');
     }
     const insetTop = stack.capTop + insetHeight;
     // Lay the case and the moving assembly separately on the print plate.
@@ -148,10 +166,6 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
         solid: slab(own(box(Math.abs(rootLeft - Math.min(...earOutline.map(([x]) => x))) + 4.8,
           MX_CHAIN_EYELET.width + 1).translate([(Math.min(...earOutline.map(([x]) => x)) + rootLeft + 2.8) / 2, 0])),
           0, earBottom + earThickness + 0.2) },
-      { name: 'REMOVE - local support below MX boss', filament: 1, color: design.colors.border,
-        solid: own(slab(atMount(cut(own(Section.circle(NAME_MX.supportOuterDiameter / 2, 64)),
-          own(Section.circle(NAME_MX.supportInnerDiameter / 2, 64)))),
-          -printOffset[2], socketStart - NAME_MX.supportGap).translate(printOffset)) },
       { name: 'Moving cap', filament: 1, color: design.colors.border, solid: own(movingCap.translate(printOffset)) },
       { name: 'Inset', filament: 2, color: design.colors.fill, solid: own(slab(inner, stack.capTop, insetTop).translate(printOffset)) },
       { name: 'Raised lettering', filament: 3, color: design.colors.ink, solid: own(slab(glyphs, insetTop, insetTop + letteringHeight).translate(printOffset)) },

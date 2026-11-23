@@ -1,36 +1,37 @@
 # Connected-name MX clicker / P2S standard
 
-2026-11-23. The user physically accepted the supplied Mini Dumpling 3MF and explicitly selected its measured functional dimensions as the reference, with P2S as the standard printer. Do not ask the user to repeat that reference validation. Source SHA256: `9682b528c1f3e55b8c728e1e0ade95c96a272944fa1ced2342983aaa6f6ae133`. No external cosmetic mesh is distributed or copied here.
+Updated 2026-11-23. The user accepted the supplied Mini Dumpling reference by physical printing, selected P2S as the standard printer, and subsequently required a continuous closed cap back with only a local switch pocket. Do not restore the older long hollow skirt with a seat-sized cut through its perimeter. Reference source SHA256: `9682b528c1f3e55b8c728e1e0ade95c96a272944fa1ced2342983aaa6f6ae133`. No external cosmetic mesh is copied or distributed.
 
-`src/name-clicker-mechanism.js` is the shared mechanical source for the connected-name preview and manufacturing export. Measurements include the reference's saved component/build scale. Values are rounded mesh measurements, not universal MX hardware tolerances.
+`src/name-clicker-mechanism.js` is shared by preview and manufacturing. `server/keyring-geometry.mjs` supplies the same outlines and mount location to both. Dimensions below combine measured reference functions with the OGS closed-back revision; they are not a claim of universal MX hardware compatibility.
 
-- Continuous female-cross boss: OD 5.856 mm, span 4.199 mm, arms 1.554/1.562 mm, blind depth 4.993 mm. The root blends into the flat OGS roof. Cap internal depth is 12.577 mm. One central switch; preserve the personalized lettering and colour layers.
-- Raised switch seat: mount Z10.517, well floor Z0.746, main opening 14.06 mm, exterior 18.844 × 18.814 mm. Continuous vertical walls with local latch clearance at Z8.207–9.713, bounded by 16.065 × 16.117 mm. Do not replace the closed seat with a full-height oversized cavity or eliminate the latch clearance. These are parametric functional dimensions; the OGS roof/case shapes remain independent.
-- Surrounding reference-style deck Z4.52, upper rim Z13.123. Compute the cap assembly from switch height and 4 mm travel. Nominal pressed skirt/deck gap: 0.42 mm. Verify generated solids do not intersect through the stroke. The left-middle OGS eyelet retains its placement; its hidden root is trimmed to clear the cap stroke.
-- Only a small removable hollow support ring under the boss: OD6.9/ID4.9 mm, nominal top gap0.16 mm. It is a labelled sacrificial print part, not product geometry; remove it before installing the switch. Do not fill the cap floor with solid support. Other genuinely overhanging areas retain automatic support.
-- Block support in the cross and entire well (including latch relief). Check actual G-code, not only the enable-support field. A clear hole is insufficient if the boss starts in mid-air.
+## Cap, seat and travel
 
-Printer: **Bambu Lab P2S, 0.4 mm**, inherited P2S PLA/bed/machine G-code and filament vectors preserved. Source process values: 0.16 mm layers, 3 walls, 15% Gyroid, normal automatic support/snug style, 15°, plate-only, 0.16 mm upper/lower support gap, 2/2 interface layers, auto pattern/0.5 mm spacing, 0.35 mm XY gap. Do not copy H2C machine settings, chamber flags or extruder vectors. This change applies the connected-name mechanism; existing independent/mechanical keycap source-template geometry is not silently redesigned.
+- One central switch. Continuous cap back: 4.993 mm thick below a 1.4 mm roof, with a **local 15.4 × 15.4 mm recess**, at least 1 mm material between recess and outer contour. No notch may reach the exterior cap wall. Place the recess and socket together, searching Y in 0.25 mm increments up to ±6 mm. If the glyph cannot contain them, use the existing rounded mechanical minimum outline; never cut the outside wall to force a fit.
+- Female-cross boss: OD 5.856 mm, cross span 4.199 mm, arms 1.554/1.562 mm, blind depth 4.993 mm. Root flare 6.88 mm, height 1 mm. Boss and cap start on the same print plane. No raised unsupported boss and no sacrificial ring under it. Keep socket support exclusion.
+- Four vertical seat walls: opening 14.06 mm, exterior 18.844 × 18.814 mm, floor Z0.746, seat top Z10.517. Preserve the bounded latch relief at Z8.207–9.713, 16.065 × 16.117 mm; do not hollow the entire seat with an oversized hole.
+- Base deck Z4.52, upper guide Z17.5. The shoulder is Z12.324, cap resting bottom Z16.524. At the nominal 4 mm stroke, the cap bottom is Z12.524, leaving 0.2 mm before the shoulder. Guide overlap is 0.976 mm at rest and 4.976 mm pressed. Side contour offset is nominally 0.55 mm. The cap perimeter remains continuous through all these levels.
+- Reject solid overlap against the base at strokes 0/1/2/3/4 mm and against a simplified switch housing envelope. This envelope is a digital interference guard, not a scan or physical tolerance certification.
+- Preserve personalized lettering and three colour layers. This does not change the website default font or impose proposed future customer character/length limits. 林予曦 in 站酷快樂 is a regression fixture.
 
-## Verification / handoff
+## Eyelet and support
+
+Keep the left-middle eyelet XY outline at Y=0, 5 mm hole, 8.6 mm width and 2.6 mm thickness. `mxPrintableEyelet` raises it according to reach; its C1-continuous piecewise-quadratic underside grows no more than 0.95 mm XY per 1 mm Z, ending tangent to the outer wall. Trim its root for the entire cap stroke. Do not return to a shallow unsupported V3 arc. Preview displays a simplified ear; manufacturing includes the full underside.
+
+Use local blockers inside the cross socket, seat/latch relief and under the printable eyelet. Other genuine overhangs retain automatic support. Never disable all supports merely to hide exterior pads. Use snug support, no brim, zero raft expansion and zero support first-layer expansion. Verify actual extrusion paths after native slicing, not only settings flags.
+
+Printer: **Bambu Lab P2S, 0.4 mm**. Preserve inherited P2S PLA/bed/machine G-code and filament vectors. Process: 0.16 mm layers, 3 walls, 15% Gyroid, normal automatic/snug support, 15°, plate-only, 0.16 mm top/bottom support gap, 2/2 interface layers, auto pattern/0.5 mm spacing, 0.35 mm XY gap. Do not copy H2C machine settings or extruder vectors. Independent mechanical-base templates are outside this connected-name revision.
+
+## Verification and handoff
 
 ```
 node tests/name-clicker-outline.mjs
 node tests/name-clicker-print.mjs /tmp/ogs-mx-samples
 node_modules/.bin/tsc --noEmit
-.venv/bin/python build.py
+python build.py
 ```
 
-The print test builds real 3MFs for 濤/飛/Max/III/ONEGOODS/玩物工作室. The generator rejects any full-press solid collision. Preview/export outlines are compared for all supported fonts. Native P2S slice, reopen/re-slice, socket and well support exclusion, closed mesh edges and embedded G-code checksum were checked on the exported 濤 artifact. Digital checks do not imply a new physical print occurred.
+Compare preview/export outlines for every supported font. Generate real 3MFs for 濤/飛/Max/III/ONEGOODS/玩物工作室/林予曦, plus 站酷快樂 林予曦. Check closed outer sections, pocket clearance, watertight meshes, native P2S slice/reopen, actual socket/well/eyelet support paths and G-code checksums. Also inspect the browser preview. Digital verification does not claim a new physical print or guarantee fit, support removal or surface finish.
 
-Use the development branch for review/merge. No production deployment or payment/logistics change is part of this work.
+Review on `codex/ogs-mx-reference-p2s-1123`; Alpha/Mac mini validates and merges into the development mainline. No production deployment, payment or logistics changes are authorized here.
 
-## Exterior support-pad correction (2026-11-23)
-
-User requested no support extending outside the name cap. The old automatic first-layer pads extended up to 4.666 mm outside the cap footprint. Use snug normal supports, no brim/zero brim width, zero raft expansion and zero support first-layer expansion. All product mesh bytes are preserved. Native P2S re-slice showed no support extrusion centerlines outside the cap footprint, while local boss support and socket/well exclusion remain validated. Do not fix this by switching all supports off or by adding ineffective blockers outside surfaces that never generate overhang contacts.
-
-## Raised, printable eyelet underside (2026-11-23)
-
-Keep the approved eyelet XY outline, Y=0, 5 mm hole and 2.6 mm thickness. The V3 underside expanded roughly 8 mm over a 3.2 mm rise, requiring support contact under its shallow arc. For connected-name exports use `mxPrintableEyelet`: the eyelet is raised according to actual reach; its underside uses C1-continuous piecewise-quadratic easing with <=0.95 mm XY growth per 1 mm Z (>=46.5° from horizontal), ending tangent to the outer vertical wall. Y span also grows from the body instead of appearing in mid-air. The 濤 eyelet bottom rises from Z3.7 to about Z10.35; it remains above the bed and the upper plate stays below the case rim. A local support blocker prevents the 15° global support detector from adding support beneath the printable slope.
-
-The cap assembly, cylindrical socket, removable ring, well and their exclusions are unchanged. Native P2S reopen/re-slice has zero support extrusion under this eyelet; cap/well exclusions and ring extrusion still pass. Slope changes reduce support-contact damage; no new physical surface test is claimed. Fixed mechanical-base template geometry is unchanged. The preview updates the flat ear's height; its simplified display still does not contain the full manufactured underside trim.
+Latest development verification: 76 font/text outline pairs match, including the continuous-skirt regression. Eight actual exports have closed, watertight meshes and identical outer cap sections at Z0.2/1/2/3/4/4.8/5.3/6.2 mm. Minimum measured recess wall is 1.047 mm across these fixtures. Kuaile 林予曦 passed native P2S slice and reopen/re-slice with no plate warnings, no support paths inside the cross/well or under the eyelet, zero support centerlines outside the cap footprint, and a matching embedded G-code MD5. Browser desktop/mobile previews rendered without page errors. Two consecutive builds were byte-identical; generated page copy was unchanged apart from cache hashes.
