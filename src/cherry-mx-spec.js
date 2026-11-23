@@ -17,8 +17,8 @@ export const MX_NAME_CAP_SOCKET = Object.freeze({ ...MX_CAP_SOCKET,
 export const MX_BASE_DIVIDER = Object.freeze({ thickness: 1.4 });
 export const MX_SWITCH_WELL = Object.freeze({ clearance: MX.width + 1.6, wall: 1.4 });
 export const MX_NAME_FACE = Object.freeze({
-  shellMargin: 3.9, innerWallMargin: 2.3, faceMargin: 1.75,
-  insetMargin: 0.35, innerSkirtMargin: 0.25, insetHeight: 0.5, letteringHeight: 1.35,
+  shellMargin: 4.9, innerWallMargin: 3.3, faceMargin: 2.75,
+  insetMargin: 1.35, innerSkirtMargin: 0.25, insetHeight: 0.5, letteringHeight: 1.35,
 });
 export const MX_CHAIN_EYELET = Object.freeze({ width: 8.6, thickness: 2.6, holeDiameter: 5, bottom: 3.7 });
 

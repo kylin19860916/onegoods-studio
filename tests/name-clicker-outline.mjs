@@ -15,11 +15,18 @@ function contains(points, x, y) {
 let checked = 0;
 for (const key of Object.keys(keyringFonts)) {
   const font = parseKeyringFont(readFileSync(new URL('../public/assets/fonts/keyring/' + keyringFonts[key], import.meta.url)));
-  for (const text of ['Max', 'III', 'WIDE', 'A B', '玩好物', '飛']) {
+  for (const text of ['Max', 'III', 'WIDE', 'A B', '玩好物', '飛', '林予曦']) {
     if ([...text].some(char => char !== ' ' && !font.charToGlyphIndex(char))) continue;
     const model = nameClickerContours(font, text);
     const preview = nameClickerOutline(font, text);
     assert.equal(preview.mountY, model.mountY);
+    // A seat-clearance subtraction must never open a notch through the cap skirt.
+    const area = ring => Math.abs(ring.reduce((sum, [x,y], i) => {
+      const [nx,ny] = ring[(i + 1) % ring.length]; return sum + x*ny - nx*y;
+    }, 0) / 2);
+    const perimeter = model.skirt.reduce((largest, polygon) => !largest || area(polygon[0]) > area(largest[0]) ? polygon : largest, null);
+    assert.equal(perimeter.length, 2, key + ' ' + text + ' cut-open outer skirt');
+    assert(Math.abs(area(perimeter[0]) - area(model.profile(MX_NAME_FACE.faceMargin))) < 0.001);
     const shell = model.profile(MX_NAME_FACE.shellMargin);
     const eyelet = mxChainEyelet(shell);
     assert.deepEqual(eyelet, mxChainEyelet(preview.profile(MX_NAME_FACE.shellMargin)
@@ -40,7 +47,7 @@ for (const key of Object.keys(keyringFonts)) {
     }
     if (key === 'huninn' && text === 'Max') {
       // The old prototype's outer mounting pads filled these points above a and x.
-      const inset = model.profile(MX_NAME_FACE.insetMargin);
+      const inset = model.profile(0.35); // Keep the original anti-pad probe independent of colour-border width.
       const shell = model.profile(MX_NAME_FACE.shellMargin);
       assert.equal(model.mountY, -0.5);
       assert(!contains(inset, 0, 7.5));
