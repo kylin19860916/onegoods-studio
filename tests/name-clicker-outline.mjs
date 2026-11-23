@@ -48,7 +48,7 @@ for (const key of Object.keys(keyringFonts)) {
       assert(contains(inset, 0, 4));
       for (const x of [14, 22]) {
         assert(!contains(inset, x, 8));
-        assert(!contains(shell, x, 10));
+        assert(!contains(shell, x, 10 + (MX_NAME_FACE.shellMargin - 3.3)));
         assert(contains(inset, x, 0));
       }
     }
