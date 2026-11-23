@@ -126,11 +126,11 @@ async function pendingSevenShipments(db: D1Database) {
   const result = await db.prepare(`
     SELECT s.*, p.receipt
     FROM checkout_preview_shipments s
-    JOIN clicker_orders c ON c.id = s.order_id
-    JOIN checkout_preview_orders p USING (request_id)
+    JOIN checkout_preview_orders p ON json_extract(p.receipt,'$.id') = s.order_id
+    LEFT JOIN clicker_orders c ON c.request_id = p.request_id
     WHERE s.subtype = ? AND s.logistics_id IS NOT NULL AND s.status = ?
       AND (p.status = 'success' OR c.matched_reference IS NOT NULL)
-    ORDER BY c.created_at DESC
+    ORDER BY json_extract(p.receipt,'$.createdAt') DESC
     LIMIT 101
   `).bind(sevenSubtype, waitingForHandoff).all<Shipment & { receipt: string }>();
   if (result.results.length > 100) throw new HttpError(409, '測試物流單超過 100 筆，請先處理既有寄件單。');
@@ -188,7 +188,7 @@ export async function logisticsPreview(request: Request, env: Env, user: Paramet
     }
     if (!['create', 'query', 'code', 'print'].includes(path)) return json({}, 404);
     const { id } = await request.json() as { id: string };
-    if (!/^OGS-[TE]-[A-F0-9]{12}$/.test(id)) return json({}, 400);
+    if (!/^OGS-(?:[TE]|DEMO)-[A-F0-9]{12}$/.test(id)) return json({}, 400);
     let row = await db.prepare('SELECT * FROM checkout_preview_shipments WHERE order_id=?').bind(id).first<Shipment>();
     if (path === 'code' || path === 'print') {
       if (!row?.logistics_id || row.subtype !== sevenSubtype) throw new HttpError(404, '找不到這筆 7-ELEVEN 物流測試單。');
@@ -204,13 +204,16 @@ export async function logisticsPreview(request: Request, env: Env, user: Paramet
     } else if (!row) {
       const callback = local ? env.OGS_ECPAY_LOGISTICS_STAGE_RETURN_URL : callbackPath && url.origin + root + callbackPath;
       if (!callback?.startsWith('https://')) throw new HttpError(503, '綠界測試回傳網址尚未設定。');
-      const order = await db.prepare('SELECT p.receipt, p.status, c.matched_reference FROM checkout_preview_orders p JOIN clicker_orders c USING(request_id) WHERE c.id=?')
+      const order = await db.prepare(`SELECT p.receipt, p.status, c.matched_reference
+        FROM checkout_preview_orders p LEFT JOIN clicker_orders c USING(request_id)
+        WHERE json_extract(p.receipt,'$.id')=? AND json_extract(p.payload,'$.provider')='ecpay'`)
         .bind(id).first<{ receipt: string; status: string; matched_reference: string | null }>();
-      if (!order || (order.status !== 'success' && !order.matched_reference)) throw new HttpError(409, '請先完成測試付款。');
+      if (!order || (id.startsWith('OGS-DEMO-') ? order.status !== 'success' || !JSON.parse(order.receipt).paymentReference : order.status !== 'success' && !order.matched_reference)) throw new HttpError(409, '請先完成測試付款。');
       const { delivery, subtotal } = JSON.parse(order.receipt) as Receipt;
       const subtype = delivery?.method === 'store' && delivery.store ? carriers[delivery.store.carrier] : delivery?.address ? 'TCAT' : null;
       if (!delivery || !subtype) throw new HttpError(400, '訂單缺少有效的配送資料。');
       const trade = 'OGSL' + id.replaceAll('-', '').slice(3);
+      if(trade.length > 20) throw new HttpError(400,'測試交易編號過長。');
       const fields: Fields = {
         MerchantID: merchant, MerchantTradeNo: trade,
         MerchantTradeDate: new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Taipei', dateStyle: 'short', timeStyle: 'medium' }).format(new Date()).replaceAll('-', '/'),

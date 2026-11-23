@@ -2130,5 +2130,25 @@
   "Google 隱私權政策": [
     "Google 隱私權政策",
     "Google Privacy Policy"
+  ],
+  "7-ELEVEN 超商取货 · NT$60": [
+    "7-ELEVEN 超商取貨 · NT$60",
+    "7-ELEVEN pickup · NT$60"
+  ],
+  "内部测试 · 付款和寄件使用绿界测试环境，不会实际扣款或寄件。": [
+    "內部測試 · 付款和寄件使用綠界測試環境，不會實際扣款或寄件。",
+    "Internal test · Payment and shipping use the ECPay sandbox. No real charge or shipment."
+  ],
+  "此入口仅供 OGS 管理员测试，请先登入。": [
+    "此入口僅供 OGS 管理員測試，請先登入。",
+    "This test checkout requires an OGS administrator sign-in."
+  ],
+  "登入管理帐号": [
+    "登入管理帳號",
+    "Administrator sign-in"
+  ],
+  "前往绿界测试付款": [
+    "前往綠界測試付款",
+    "Continue to ECPay test payment"
   ]
 }
