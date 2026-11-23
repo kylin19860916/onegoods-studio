@@ -3,7 +3,8 @@ import {
   Mesh, MeshStandardMaterial, OrthographicCamera, Path, Raycaster, Scene,
   Shape, ShapePath, Vector2, WebGLRenderer,
 } from 'three';
-import { MX, MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_CAP_SOCKET, MX_NAME_FACE, MX_RECESS, mxChainEyelet, mxStack } from './cherry-mx-spec.js';
+import { NAME_MX, nameMxStack } from './name-clicker-mechanism.js';
+import { MX, MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_FACE, MX_RECESS, mxChainEyelet, mxStack } from './cherry-mx-spec.js';
 import { MECHANICAL_KEYCAP, mechanicalKeycapShell } from './mechanical-keycap.js';
 import { nameClickerOutline } from './name-clicker-outline.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -186,7 +187,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     keyGroups = [];
     capGroups = [];
     assembly.position.x = 0;
-    const stack = mxStack();
+    const stack = style === 'name' ? nameMxStack() : mxStack();
     function add(geometry, colour, z, parent = assembly) {
       const mesh = new Mesh(geometry, new MeshStandardMaterial({ color: colour, roughness: 0.6, metalness: 0.02 }));
       mesh.position.z = z;
@@ -202,9 +203,9 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       ear.holes.push(hole);
       add(extrude(ear, MX_CHAIN_EYELET.thickness), colour, MX_CHAIN_EYELET.bottom);
     }
-    function cross(width, arm) {
-      const shape = new Shape(), h = width / 2, a = arm / 2;
-      const points = [[-a,-h],[a,-h],[a,-a],[h,-a],[h,a],[a,a],[a,h],[-a,h],[-a,a],[-h,a],[-h,-a],[-a,-a]];
+    function cross(width, arm, armY = arm) {
+      const shape = new Shape(), h = width / 2, a = arm / 2, b = armY / 2;
+      const points = [[-a,-h],[a,-h],[a,-b],[h,-b],[h,b],[a,b],[a,h],[-a,h],[-a,b],[-h,b],[-h,-b],[-a,-b]];
       points.forEach(([x,y], index) => index ? shape.lineTo(x,y) : shape.moveTo(x,y));
       shape.closePath();
       return shape;
@@ -213,9 +214,10 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       const { outerDiameter, crossSpan, crossArm, engagement } = specification;
       const socket = new Shape();
       socket.absarc(0, 0, outerDiameter / 2, 0, 2 * Math.PI, false);
-      socket.holes.push(cross(crossSpan, crossArm));
+      socket.holes.push(cross(crossSpan, crossArm, specification.crossArmY ?? crossArm));
       const bottom = stack.stemTop - engagement;
-      add(extrude(socket, stack.roofBottom - bottom), colour, bottom, parent).userData.keyIndex = index;
+      const mesh = add(extrude(socket, stack.roofBottom - bottom), colour, bottom, parent);
+      mesh.userData.keyIndex = index; return mesh;
     }
     function mountSwitch(x, index, y = 0) {
       function fixed(geometry, colour, z) { const mesh = add(geometry, colour, z); mesh.position.x = x; mesh.position.y = y; return mesh; }
@@ -258,27 +260,39 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       const { profile, lettering, mountY, skirt, rim } = nameClickerOutline(font, text);
       const caseColour = new Color(base).multiplyScalar(0.62);
       const { shellMargin, innerWallMargin, faceMargin, insetMargin, insetHeight, letteringHeight } = MX_NAME_FACE;
-      const rimTop = stack.skirtBottom + 1.25;
       const wall = profile(shellMargin);
       wall.holes.push(profile(innerWallMargin));
-      const plate = profile(shellMargin);
-      plate.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3, 0, mountY));
       const floor = profile(shellMargin);
-      add(extrude(floor, MX_CASE.floor), caseColour, 0);
-      add(extrude(wall, stack.plateBottom - MX_CASE.floor), caseColour, MX_CASE.floor);
-      add(extrude(plate, MX_CASE.plate), caseColour, stack.plateBottom);
-      add(extrude(rim, rimTop - stack.mountTop), caseColour, stack.mountTop);
+      const deck = profile(shellMargin);
+      deck.holes.push(rounded(NAME_MX.opening, NAME_MX.opening, 0, 0, mountY));
+      add(extrude(floor, NAME_MX.floor), caseColour, 0);
+      add(extrude(deck, NAME_MX.deck - NAME_MX.floor), caseColour, NAME_MX.floor);
+      add(extrude(wall, stack.mountTop - NAME_MX.deck), caseColour, NAME_MX.deck);
+      for (const [bottom, top, width, height] of [
+        [NAME_MX.floor, NAME_MX.latchBottom, NAME_MX.opening, NAME_MX.opening],
+        [NAME_MX.latchBottom, NAME_MX.latchTop, NAME_MX.latchX, NAME_MX.latchY],
+        [NAME_MX.latchTop, stack.mountTop, NAME_MX.opening, NAME_MX.opening],
+      ]) {
+        const frame = rounded(NAME_MX.exteriorX, NAME_MX.exteriorY, 0, 0, mountY);
+        frame.holes.push(rounded(width, height, 0, 0, mountY));
+        add(extrude(frame, top - bottom), caseColour, bottom);
+      }
+      add(extrude(rim, stack.rimTop - stack.mountTop), caseColour, stack.mountTop);
 
       addChainEyelet(floor, caseColour);
 
       const face = mountSwitch(0, 0, mountY);
+      face.position.y = -mountY;
       add(extrude(skirt, stack.roofBottom - stack.skirtBottom), base, stack.skirtBottom, face).userData.keyIndex = 0;
       add(extrude(profile(faceMargin), MX_CASE.roof), base, stack.roofBottom, face).userData.keyIndex = 0;
       add(extrude(profile(insetMargin), insetHeight), cap, stack.capTop, face).userData.keyIndex = 0;
       if (lettering.length) {
         add(extrude(lettering, letteringHeight), ink, stack.capTop + insetHeight, face).userData.keyIndex = 0;
       }
-      addCapSocket(base, face, 0, MX_NAME_CAP_SOCKET);
+      const socket = addCapSocket(base, face, 0, { outerDiameter: NAME_MX.bossDiameter,
+        crossSpan: NAME_MX.crossSpan, crossArm: NAME_MX.crossArmX, crossArmY: NAME_MX.crossArmY,
+        engagement: stack.stemTop - stack.socketStart });
+      socket.position.y = mountY;
       const bounds = new Box3().setFromObject(assembly);
       const width = bounds.max.x - bounds.min.x;
       const height = bounds.max.y - bounds.min.y;
