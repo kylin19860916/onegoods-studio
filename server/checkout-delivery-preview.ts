@@ -1,3 +1,4 @@
+import { addressSearch } from './address-search';
 import { isCheckoutTestHost, isLocalCheckoutTest } from './checkout-test-host';
 import { HttpError, isAdmin, json } from './catalog';
 
@@ -32,7 +33,7 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
   if (!publicMap && path !== 'store-return' && !isAdmin(user, env)) return json({}, 403);
   try {
     if (path === 'config' && request.method === 'GET') {
-      return json({ storeMap: !!mapReturn, googlePlaces: !!env.OGS_GOOGLE_PLACES_KEY });
+      return json({ storeMap: !!mapReturn, googlePlaces: !!env.OGS_GOOGLE_PLACES_KEY && env.OGS_GOOGLE_PLACES_ENABLED === 'true' });
     }
     if (path === 'store' && request.method === 'GET') {
       return json({ store: await readPreviewStore(db, url.searchParams.get('token')) });
@@ -82,23 +83,16 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
       return Response.redirect(url.origin + destination + 'store=' + token, 303);
     }
     if (path === 'places' && request.method === 'POST' && sameOrigin(request)) {
-      if (!env.OGS_GOOGLE_PLACES_KEY) throw new HttpError(503, 'Google 地址搜尋尚未設定。');
-      const body = await request.json() as { input?: string; placeId?: string; sessionToken?: string };
-      if (!/^[a-zA-Z0-9_-]{1,36}$/.test(body.sessionToken || '')) throw new HttpError(400, '地址搜尋識別碼無效。');
-      const headers = { 'X-Goog-Api-Key': env.OGS_GOOGLE_PLACES_KEY };
-      const endpoint = 'https://places.googleapis.com/v1/';
-      const placeId = body.placeId;
-      if (placeId && !/^[\w-]{1,250}$/.test(placeId)) throw new HttpError(400, '地址識別碼無效。');
-      const input = typeof body.input === 'string' ? body.input.trim().slice(0, 180) : '';
-      if (!placeId && input.length < 3) return json({ suggestions: [] });
-      const response = await (placeId
-        ? fetch(endpoint + 'places/' + placeId + '?' + new URLSearchParams({ sessionToken: body.sessionToken!, languageCode: 'zh-TW', regionCode: 'TW' }),
-            { headers: { ...headers, 'X-Goog-FieldMask': 'formattedAddress,addressComponents' }, signal: AbortSignal.timeout(8000) })
-        : fetch(endpoint + 'places:autocomplete', { method: 'POST', headers: { ...headers, 'Content-Type': 'application/json',
-            'X-Goog-FieldMask': 'suggestions.placePrediction.placeId,suggestions.placePrediction.text' }, signal: AbortSignal.timeout(8000),
-            body: JSON.stringify({ input, sessionToken: body.sessionToken, includedRegionCodes: ['tw'], languageCode: 'zh-TW', regionCode: 'TW' }) }));
-      if (!response.ok) throw new HttpError(502, '暫時無法搜尋地址，請手動填寫。');
-      return json(await response.json());
+      // Private previews share the public rate and monthly usage guard.
+      const response = await addressSearch(new Request(url.origin + '/api/address-search/places', request), env);
+      if (!response.ok) return response;
+      const data = await response.json() as any;
+      if (data.address) return json({formattedAddress:data.formattedAddress,addressComponents:[
+        {types:['administrative_area_level_1'],longText:data.address.city},
+        {types:['administrative_area_level_3'],longText:data.address.district},
+        {types:['postal_code'],longText:data.address.postalCode}
+      ]});
+      return json({suggestions:data.suggestions.map((s:any)=>({placePrediction:{placeId:s.placeId,text:{text:s.text}}}))});
     }
     return json({}, 404);
   } catch (error) {

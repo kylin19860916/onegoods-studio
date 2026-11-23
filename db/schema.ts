@@ -77,3 +77,9 @@ export const storeOrders = sqliteTable('store_orders', {
   paymentReference: text('payment_reference').unique(),
   paidAt: text('paid_at'),
 });
+
+export const googlePlacesUsage = sqliteTable('google_places_usage', {
+  bucket: text('bucket').primaryKey(),
+  used: integer('used').notNull().default(0),
+  expiresAt: integer('expires_at').notNull(),
+});

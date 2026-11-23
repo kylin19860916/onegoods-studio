@@ -2058,5 +2058,77 @@
   "选择行政区后自动带入 3 码邮递区号。": [
     "選擇行政區後自動帶入 3 碼郵遞區號。",
     "The 3-digit postal code is filled in after you select a district."
+  ],
+  "地址搜寻（选填）": [
+    "地址搜尋（選填）",
+    "Address search (optional)"
+  ],
+  "地址搜寻结果": [
+    "地址搜尋結果",
+    "Address suggestions"
+  ],
+  "输入街道或地点，选择结果后自动带入地址；也可直接填写下方栏位。": [
+    "輸入街道或地點，選擇結果後自動帶入地址；也可直接填寫下方欄位。",
+    "Search for a street or place and select a result, or fill in the fields below."
+  ],
+  "搜寻内容会传送至 Google。使用地址搜寻即适用 ": [
+    "搜尋內容會傳送至 Google。使用地址搜尋即適用 ",
+    "Search queries are sent to Google. Address search is subject to the "
+  ],
+  "Google Maps 服务条款": [
+    "Google Maps 服務條款",
+    "Google Maps Terms of Service"
+  ],
+  "Google 隐私权政策": [
+    "Google 隱私權政策",
+    "Google Privacy Policy"
+  ],
+  "。请确认门牌与楼层后再下单。": [
+    "。請確認門牌與樓層後再下單。",
+    ". Confirm the house number and floor before ordering."
+  ],
+  "正在搜寻地址…": [
+    "正在搜尋地址…",
+    "Searching for addresses…"
+  ],
+  "没有找到地址，请继续输入或直接填写下方栏位。": [
+    "沒有找到地址，請繼續輸入或直接填寫下方欄位。",
+    "No addresses found. Try more detail or fill in the fields below."
+  ],
+  "正在带入地址…": [
+    "正在帶入地址…",
+    "Loading address…"
+  ],
+  "已带入地址，请确认门牌，并补上楼层或室号。": [
+    "已帶入地址，請確認門牌，並補上樓層或室號。",
+    "Address added. Check the house number and add a floor or unit if needed."
+  ],
+  "暂时无法搜寻地址，请直接填写下方栏位。": [
+    "暫時無法搜尋地址，請直接填寫下方欄位。",
+    "Address search is unavailable. Please fill in the fields below."
+  ],
+  "这个地址不在目前配送范围，请直接填写下方栏位。": [
+    "這個地址不在目前配送範圍，請直接填寫下方欄位。",
+    "This address is outside the current delivery area. Please fill in the fields below."
+  ],
+  "及 <a href=\"https://policies.google.com/privacy\"": [
+    "及 <a href=\"https://policies.google.com/privacy\"",
+    " and <a href=\"https://policies.google.com/privacy\""
+  ],
+  "Google 地址搜尋": [
+    "Google 地址搜尋",
+    "Google address search"
+  ],
+  "使用選填的地址搜尋時，輸入的搜尋內容會傳送至 Google Maps Platform，以取得地址建議。我們不儲存搜尋紀錄或 Google 結果清單；訂單僅保存你確認送出的收件地址。你也可以直接手動填寫地址。此功能適用 ": [
+    "使用選填的地址搜尋時，輸入的搜尋內容會傳送至 Google Maps Platform，以取得地址建議。我們不儲存搜尋紀錄或 Google 結果清單；訂單僅保存你確認送出的收件地址。你也可以直接手動填寫地址。此功能適用 ",
+    "Optional address search sends your query to Google Maps Platform for suggestions. We do not store search history or Google result lists. Orders retain only the delivery address you confirm. You may also enter your address manually. This feature is subject to the "
+  ],
+  "Google Maps 服務條款": [
+    "Google Maps 服務條款",
+    "Google Maps Terms of Service"
+  ],
+  "Google 隱私權政策": [
+    "Google 隱私權政策",
+    "Google Privacy Policy"
   ]
 }

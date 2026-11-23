@@ -4,6 +4,7 @@ OGS_ADMIN_EMAILS="seedy@sites.test"
 
 # Optional integrations. Leave empty for basic local development.
 # OGS_GOOGLE_PLACES_KEY=
+# OGS_GOOGLE_PLACES_ENABLED=false
 # OGS_ECPAY_STAGE_RETURN_URL=
 # OGS_ECPAY_MAP_RETURN_URL=
 # OGS_ECPAY_LOGISTICS_STAGE_RETURN_URL=
