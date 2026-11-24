@@ -1,3 +1,4 @@
+import { validPickupName } from './pickup-names';
 import { validHomeAddress } from './taiwan-address';
 import { timingSafeEqual } from 'node:crypto';
 import { HttpError, json } from './catalog';
@@ -53,7 +54,7 @@ function tradeNumber(id: string) {
   return 'OGSP' + id.slice('OGS-P-'.length);
 }
 
-async function priceOrder(db: D1Database, productId: string, quantity: number, shipping: number) {
+async function priceOrder(db: D1Database, productId: string, quantity: number, shipping: number, pickup = false) {
   const row = await db.prepare("SELECT data FROM catalog WHERE id=? AND kind='physical' AND status='published'")
     .bind(productId).first<{ data: string }>();
   const item = row && JSON.parse(row.data);
@@ -61,6 +62,7 @@ async function priceOrder(db: D1Database, productId: string, quantity: number, s
     throw new HttpError(409, '這件商品目前無法在官網下單。');
   }
   const subtotal = item.price * quantity;
+  if (pickup && subtotal > 20000) throw new HttpError(400, '超商取貨的單筆商品金額上限為 NT$20,000，請調整數量或改選宅配。');
   const amount = subtotal + shipping;
   if (!Number.isSafeInteger(amount) || amount > 200000) throw new HttpError(400, '訂單超過單筆付款上限，請調整數量。');
   return { name: item.name, quantity, subtotal, shipping, amount };
@@ -133,15 +135,15 @@ export async function storePayment(request: Request, env: Env) {
     const store = isPickup && pickupEnabled ? await readLivePickupStore(db, request, body.storeToken) : null;
     if (isPickup && !store) throw new HttpError(400, '請重新選擇 7-ELEVEN 取貨門市。');
     const shipping = store ? pickupShipping : fee;
-    if (action === '/quote') return json(await priceOrder(db, productId, quantity, shipping));
+    if (action === '/quote') return json(await priceOrder(db, productId, quantity, shipping, isPickup));
     const address = { city: cap(body.city, 12), district: cap(body.district, 16), postalCode: cap(body.postalCode, 6), street: cap(body.street, 100), unit: cap(body.unit, 35) };
     const contact = cap(body.contact, 40);
     const phone = cap(body.phone, 20);
     const email = cap(body.email, 100);
     if (!requestIdPattern.test(requestId) || !contact || !/^[+\d() -]{8,20}$/.test(phone) ||
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-        (store ? !/^09\d{8}$/.test(phone) : !address.street || !validHomeAddress(address.city, address.district, address.postalCode))) {
-      throw new HttpError(400, store ? '請確認收件姓名、台灣手機號碼及電子郵件。' : '請確認聯絡資料與台灣本島配送地址。');
+        (store ? !validPickupName(contact) || !/^09\d{8}$/.test(phone) : !address.street || !validHomeAddress(address.city, address.district, address.postalCode))) {
+      throw new HttpError(400, store ? '請填寫與證件相符的收件姓名（中文 2–5 字或英文 4–10 字元）、台灣手機號碼及電子郵件。' : '請確認聯絡資料與台灣本島配送地址。');
     }
     const details = { productId, quantity, delivery: store
       ? { method: 'store', contact, phone, email, store }
@@ -150,7 +152,7 @@ export async function storePayment(request: Request, env: Env) {
     const lookup = db.prepare('SELECT * FROM store_orders WHERE request_id=?').bind(requestId);
     let order = await lookup.first<Order>();
     if (!order) {
-      const { name, subtotal, amount } = await priceOrder(db, productId, quantity, shipping);
+      const { name, subtotal, amount } = await priceOrder(db, productId, quantity, shipping, isPickup);
       if (body.total !== amount) throw new HttpError(409, '商品或運費金額已變更，請重新整理後確認。');
       const snapshot = JSON.stringify({ ...details, name, subtotal, shipping, requestSnapshot });
       const id = 'OGS-P-' + crypto.randomUUID().replaceAll('-', '').slice(0, 12).toUpperCase();

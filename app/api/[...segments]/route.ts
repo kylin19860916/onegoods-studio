@@ -1,5 +1,6 @@
 import { addressSearch } from '../../../server/address-search';
 import { storePayment } from '../../../server/store-payment';
+import { storePickupShipment } from '../../../server/store-pickup-shipment';
 import { env } from 'cloudflare:workers';
 import { getChatGPTUser } from '../../chatgpt-auth';
 import { logisticsCallbackPath, receiveLogisticsNotice } from '../../../server/ecpay-logistics';
@@ -20,6 +21,7 @@ async function handle(request: Request) {
   if (/^\/api\/checkout-delivery-preview\/(?:store-return|public-store-start|public-store|public-branches)$/.test(path)) return deliveryPreview(request, env, null);
   if (/^\/api\/checkout-logistics-preview\/notice(?:\/|$)/.test(path)) return logisticsPreview(request, env, null);
   const user = await getChatGPTUser();
+  if (path.startsWith('/api/admin/store-pickup-shipment/')) return storePickupShipment(request, env, user);
   if (path.startsWith('/api/checkout-delivery-preview/')) return deliveryPreview(request, env, user);
   if (path.startsWith('/api/checkout-logistics-preview/')) return logisticsPreview(request, env, user);
   if (path === '/api/checkout-preview' || path === '/api/checkout-preview/config' || path.startsWith('/api/checkout-preview/payment/')) return previewCheckout(request, env, user);

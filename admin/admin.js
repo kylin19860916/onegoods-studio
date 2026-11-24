@@ -85,10 +85,10 @@ function orderStatus(order) {
   if (order.tier === 'mechanical-test') return 'complete';
   if (order.paymentState === 'failure') return 'attention';
   if (!order.previewPaid && !order.matchedReference) return 'unpaid';
-  const status = String(order.shipment?.status ?? '');
+  const status = String(order.shipment?.notice || order.shipment?.status || '');
   if (['2067','3022'].includes(status)) return 'complete';
   if (['2074','3020','2099','create_failed','create_unknown'].includes(status)) return 'attention';
-  if (status === '300' || (order.live && order.matchedReference)) return 'pending';
+  if (status === '300' || (order.live && !order.shipment && order.matchedReference)) return 'pending';
   return 'active';
 }
 
@@ -160,12 +160,30 @@ function renderClickerOrder(order) {
 }
 
 function physicalLogisticsTools(order) {
-  if(order.live || !order.matchedReference || !order.id.startsWith('OGS-DEMO-')) return '';
+  if (order.live) {
+    if (!order.matchedReference || order.delivery?.store?.carrier !== '7-ELEVEN') return '';
+    const shipment = order.shipment;
+    if (shipment?.id || (shipment && shipment.status !== 'retryable')) {
+      return `<div class="order-toolbar">
+        <button type="button" class="text-action" data-live-logistics data-logistics-action="query" data-order-id="${esc(order.id)}">查詢正式物流單</button>
+        ${shipment.id ? `<button type="button" class="text-action" data-live-logistics data-logistics-action="print" data-order-id="${esc(order.id)}">開啟綠界正式面單</button>
+        <span>物流單號 ${esc(shipment.id)} · 貨態 ${esc(shipment.notice || shipment.status)}</span>` : ''}
+        <span role="status"></span></div>`;
+    }
+    if (!order.canCreatePickup) return '<p>正式 7-ELEVEN 建單尚未啟用。</p>';
+    return `<form class="order-match" data-live-pickup-order="${esc(order.id)}">
+      <label>寄件人證件姓名<input name="senderName" required maxlength="10" autocomplete="off"></label>
+      <label>寄件人手機<input name="senderPhone" type="tel" required pattern="09[0-9]{8}" maxlength="10"></label>
+      <label><input name="confirmShipment" type="checkbox" required>確認使用此訂單的門市建立正式物流單，綠界可能收取物流費。</label>
+      <button class="primary">建立正式寄件單</button><span role="status"></span></form>`;
+  }
+  if(!order.matchedReference || !order.id.startsWith('OGS-DEMO-')) return '';
   const shipment=order.shipment;
   return `<div class="order-toolbar"><button type="button" class="text-action" data-logistics-action="${shipment?'query':'create'}" data-order-id="${esc(order.id)}">${shipment?'查詢綠界物流測試單':'建立綠界物流測試單'}</button>
   ${shipment && !shipment.id?`<button type="button" class="text-action" data-logistics-action="retry-create" data-order-id="${esc(order.id)}">查無原單後重試測試建單</button>`:''}
-  ${shipment?.id?'<small>測試面單是綠界固定示意，無法寄送；門市請核對原訂單及建單紀錄。</small>':''}
-  ${shipment?.id && shipment.subtype==='UNIMARTC2C'?`<button type="button" class="text-action" data-logistics-action="code" data-order-id="${esc(order.id)}">複製交貨便代碼</button><button type="button" class="text-action" data-logistics-action="print" data-order-id="${esc(order.id)}">列印託運單</button>`:''}
+  ${shipment?.id?'<small>綠界測試面單為固定示意。使用 OGS 寄件核對單逐筆對門市與代碼。</small>':''}
+  ${shipment?.id && shipment.subtype==='UNIMARTC2C'?`<button type="button" class="text-action" data-logistics-action="code" data-order-id="${esc(order.id)}">複製交貨便代碼</button><button type="button" class="text-action" data-logistics-action="print" data-order-id="${esc(order.id)}">開啟綠界測試面單</button>
+    <a class="text-action" href="/api/checkout-logistics-preview/check-label?id=${esc(order.id)}" target="_blank" rel="noopener">開啟寄件核對單（測試）</a>`:''}
   ${shipment?.error?`<p role="alert">綠界測試建單失敗：${esc(shipment.error)}</p>`:''}
   ${shipment?.id?`<span>物流單號 ${esc(shipment.id)} · 貨態 ${esc(shipment.status)}${shipment.notice?' · 已收到通知':''}</span>`:''}<span role="status"></span></div>`;
 }
@@ -301,20 +319,22 @@ $('#order-status-filters').addEventListener('click', event => {
   }
   renderOrderView();
 });
-async function logisticsRequest(action, id) {
-  const response = await fetch('/api/checkout-logistics-preview/' + action, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }),
+async function logisticsRequest(action, id, live = false, sender) {
+  const path = live ? '/api/admin/store-pickup-shipment/' : '/api/checkout-logistics-preview/';
+  const response = await fetch(path + action, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, ...sender }),
   });
   if (!response.ok) {
     const result = await response.json().catch(() => ({}));
-    throw new Error(result.error || '無法讀取物流測試單。');
+    throw new Error(result.error || '無法讀取物流單。');
   }
   return response;
 }
 
-function openStageLabel(tab, { action, fields }) {
-  const destination = 'https://logistics-stage.ecpay.com.tw/Express/PrintUniMartC2COrderInfo';
-  if (action !== destination) throw new Error('列印網址與綠界測試環境不符。');
+function openShippingLabel(tab, { action, fields }, live) {
+  const origin = live ? 'https://logistics.ecpay.com.tw' : 'https://logistics-stage.ecpay.com.tw';
+  const destination = origin + '/Express/PrintUniMartC2COrderInfo';
+  if (action !== destination) throw new Error('列印網址與選定的綠界環境不符。');
   const form = tab.document.createElement('form');
   form.method = 'POST';
   form.action = destination;
@@ -327,20 +347,20 @@ function openStageLabel(tab, { action, fields }) {
   form.submit();
 }
 
-async function shippingAction(button, action, id) {
-  const status = button.parentElement.querySelector('[role="status"]');
+async function shippingAction(button, action, id, live = false, sender) {
+  const status = (button.closest('form') || button.parentElement).querySelector('[role="status"]');
   const printing = action === 'print' || action === 'print-pending';
   let tab;
   button.disabled = true;
-  status.textContent = '正在讀取綠界測試單…';
+  status.textContent = live ? '正在處理綠界正式物流單…' : '正在讀取綠界測試單…';
   try {
     if (printing) {
       tab = window.open('about:blank', '_blank');
       if (!tab) throw new Error('請允許開啟新分頁後重試。');
       tab.opener = null;
-      tab.document.body.textContent = '正在開啟綠界測試託運單…';
+      tab.document.body.textContent = '正在開啟綠界託運單…';
     }
-    const response = logisticsRequest(action === 'download-pending-pdf' ? 'render-pending-labels' : action, id);
+    const response = logisticsRequest(action === 'download-pending-pdf' ? 'render-pending-labels' : action, id, live, sender);
     if (action === 'code') {
       const code = response.then(result => result.json()).then(result => result.code);
       let copied=false;
@@ -354,8 +374,8 @@ async function shippingAction(button, action, id) {
       status.replaceChildren(document.createTextNode(copied?'已複製 12 碼交貨便代碼。':'請選取並複製 12 碼交貨便代碼。'),input);
       if(!copied)input.select();
     } else if (printing) {
-      openStageLabel(tab, await (await response).json());
-      status.textContent = '已開啟綠界測試託運單。';
+      openShippingLabel(tab, await (await response).json(), live);
+      status.textContent = live ? '已開啟綠界正式託運單。' : '已開啟綠界測試託運單。';
     } else if (action === 'download-pending-pdf') {
       const [{ downloadShippingPdf }, labels] = await Promise.all([import('/admin-shipping-pdf.js'), response]);
       await downloadShippingPdf(labels);
@@ -374,7 +394,12 @@ async function shippingAction(button, action, id) {
     }
   } catch (error) {
     tab?.close();
-    status.textContent = error.message;
+    if (live && action === 'create') {
+      await loadClickerOrders();
+      notify(error.message, true);
+    } else {
+      status.textContent = error.message;
+    }
   } finally {
     button.disabled = false;
   }
@@ -386,13 +411,20 @@ $('#pending-shipments').addEventListener('click', event => {
 });
 detailContent.addEventListener('click', event => {
   const button = event.target.closest('[data-logistics-action]');
-  if (button) shippingAction(button, button.dataset.logisticsAction, button.dataset.orderId);
+  if (button) shippingAction(button, button.dataset.logisticsAction, button.dataset.orderId, button.hasAttribute('data-live-logistics'));
 });
 detailContent.addEventListener('submit', async event => {
   event.preventDefault();
   const form = event.target;
   if (!form.reportValidity()) return;
   const button = form.querySelector('button');
+  if (form.dataset.livePickupOrder) {
+    await shippingAction(button, 'create', form.dataset.livePickupOrder, true, {
+      senderName: form.elements.senderName.value, senderPhone: form.elements.senderPhone.value,
+      confirmed: form.elements.confirmShipment.checked,
+    });
+    return;
+  }
   const status = form.querySelector('[role="status"]');
   button.disabled = true;
   try {

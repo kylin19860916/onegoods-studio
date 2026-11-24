@@ -1,3 +1,4 @@
+import { canCreateLivePickup } from './store-pickup-shipment';
 import { isCheckoutTestHost } from './checkout-test-host';
 import { isAdmin, json, HttpError } from './catalog';
 import { generateClicker3mf, generateMechanical3mf, type ClickerDesign, type MechanicalDesign } from './clicker-print';
@@ -218,16 +219,21 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
         ORDER BY p.rowid DESC LIMIT 100
       `).all<{ receipt: string; status: string; product_id: string; quantity: number; product_name: string | null; shipment: string | null }>() : null;
       const liveOrders = await store.DB.prepare(`
-        SELECT id, snapshot, amount, created_at, payment_reference, paid_at FROM store_orders
+        SELECT id, snapshot, amount, created_at, payment_reference, paid_at,
+          (SELECT json_object('id', s.logistics_id, 'status', s.status, 'subtype', 'UNIMARTC2C',
+            'notice', (SELECT status_code FROM logistics_notifications WHERE trade_no=s.trade_no ORDER BY received_at DESC LIMIT 1))
+            FROM store_pickup_shipments s WHERE s.order_id=store_orders.id) AS pickup_shipment
+        FROM store_orders
         WHERE id LIKE ? OR payment_reference LIKE ? OR json_extract(snapshot, '$.name') LIKE ?
           OR json_extract(snapshot, '$.delivery.contact') LIKE ?
         ORDER BY created_at DESC LIMIT 100
-      `).bind(pattern, pattern, pattern, pattern).all<{ id: string; snapshot: string; amount: number; created_at: string; payment_reference: string | null; paid_at: string | null }>();
+      `).bind(pattern, pattern, pattern, pattern).all<{ id: string; snapshot: string; amount: number; created_at: string; payment_reference: string | null; paid_at: string | null; pickup_shipment: string | null }>();
       const liveItems = liveOrders.results.map(row => {
         const details = JSON.parse(row.snapshot);
         return { id: row.id, kind: 'physical', live: true, name: details.name, quantity: details.quantity,
           amount: row.amount, subtotal: details.subtotal, shipping: details.shipping, delivery: details.delivery,
-          createdAt: row.created_at, matchedReference: row.payment_reference, matchedAt: row.paid_at };
+          createdAt: row.created_at, matchedReference: row.payment_reference, matchedAt: row.paid_at,
+          canCreatePickup: canCreateLivePickup(env), shipment: row.pickup_shipment ? JSON.parse(row.pickup_shipment) : undefined };
       });
       const physicalItems = (physical?.results ?? []).map(row => {
         const receipt = JSON.parse(row.receipt);

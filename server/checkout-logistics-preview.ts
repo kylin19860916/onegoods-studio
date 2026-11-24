@@ -123,6 +123,46 @@ async function printableStageLabels(shipments: Fields[]) {
   } });
 }
 
+async function testLabel(db: D1Database, id: string) {
+  if (!/^OGS-DEMO-[A-F0-9]{12}$/.test(id)) return json({}, 404);
+  const row = await db.prepare(`SELECT s.*, p.receipt FROM checkout_preview_shipments s
+    JOIN checkout_preview_orders p ON json_extract(p.receipt,'$.id')=s.order_id
+    WHERE s.order_id=? AND s.subtype=? AND p.status='success'`)
+    .bind(id, sevenSubtype).first<Shipment & { receipt: string }>();
+  const receipt = row && JSON.parse(row.receipt) as Receipt | null;
+  const store = receipt?.delivery?.store;
+  const audit = row?.audit_json ? JSON.parse(row.audit_json) : null;
+  if (!row?.logistics_id || !store || !receipt || audit?.environment !== 'logistics-stage' ||
+      audit.sent?.ReceiverStoreID !== store.id || audit.sent?.MerchantTradeNo !== row.trade_no ||
+      audit.sent?.GoodsAmount !== String(receipt.subtotal) || audit.sent?.IsCollection !== 'N') {
+    throw new HttpError(409, '測試物流建單紀錄與原訂單門市無法核對。');
+  }
+  const fields = await queryShipment(row);
+  if (fields.GoodsAmount !== String(receipt.subtotal) || (fields.CollectionAmount && fields.CollectionAmount !== '0') ||
+      (fields.ReceiverStoreID && fields.ReceiverStoreID !== store.id)) {
+    throw new HttpError(409, '綠界測試物流查單與原訂單不符。');
+  }
+  const code = shippingCode(fields);
+  const rows = [
+    ['OGS 測試訂單', id],
+    ['7-ELEVEN 取貨門市', store.name + '（' + store.id + '）'],
+    ['取貨地址', store.address],
+    ['商家物流交易編號', row.trade_no],
+    ['綠界測試物流單號', row.logistics_id],
+    ['測試交貨便代碼', code],
+    ['商品金額', 'NT$' + receipt.subtotal],
+    ['取貨付款', '不代收'],
+    ['綠界查單貨態', fields.LogisticsStatus],
+  ].map(([key,value])=>'<dt>'+escapeHtml(key)+'</dt><dd>'+escapeHtml(value)+'</dd>').join('');
+  return new Response(`<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>7-ELEVEN 寄件核對單（測試）</title>
+    <style>body{font:16px system-ui,sans-serif;max-width:42rem;margin:2rem auto;padding:0 1rem;color:#161616}h1{font-size:1.5rem}strong{display:block;border:3px solid #9c2222;padding:.65rem;color:#9c2222}dl{display:grid;grid-template-columns:minmax(8rem,auto) 1fr;gap:.6rem 1rem}dt{font-weight:600}dd{margin:0;overflow-wrap:anywhere}</style>
+    <h1>7-ELEVEN 寄件核對單</h1><strong>測試核對用 · 不可交寄</strong>
+    <dl>${rows}</dl><p>門市取自原訂單與實際建單紀錄；物流單號及測試代碼取自綠界驗簽查單。本頁由 OGS 產生。</p></html>`,
+    { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store',
+      'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'" } });
+}
+
 async function pendingSevenShipments(db: D1Database) {
   const result = await db.prepare(`
     SELECT s.*, p.receipt
@@ -170,6 +210,7 @@ export async function logisticsPreview(request: Request, env: Env, user: Paramet
       return new Response('1|OK');
     }
     if (!isAdmin(user, env)) return json({}, 403);
+    if (path === 'check-label' && request.method === 'GET') return await testLabel(db, url.searchParams.get('id') || '');
     if (request.method !== 'POST' || request.headers.get('Origin') !== url.origin) return json({}, 403);
     if (path === 'export-pending' || path === 'print-pending' || path === 'render-pending-labels') {
       const pending = await pendingSevenShipments(db);

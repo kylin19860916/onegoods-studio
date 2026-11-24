@@ -70,6 +70,25 @@ export async function receiveLogisticsNotice(request: Request, env: Env) {
     return reply('Invalid logistics fields', 400);
   }
 
+  // A C2C notice can arrive before the synchronous create reply.
+  if (subtype === 'UNIMARTC2C' && /^OGSPCVS[A-F0-9]{12}$/.test(trade)) {
+    const attempt = await env.DB.prepare(
+      'SELECT order_id,store_id,goods_amount,logistics_id FROM store_pickup_shipments WHERE trade_no=?'
+    ).bind(trade).first<{ order_id: string; store_id: string; goods_amount: number; logistics_id: string | null }>();
+    if (!attempt || (attempt.logistics_id && attempt.logistics_id !== logisticsId) ||
+        (fields.has('GoodsAmount') && fields.get('GoodsAmount') !== String(attempt.goods_amount)) ||
+        (fields.has('ReceiverStoreID') && fields.get('ReceiverStoreID') !== attempt.store_id)) {
+      return reply('Shipment does not match', 409);
+    }
+    await env.DB.batch([
+      env.DB.prepare(`UPDATE store_pickup_shipments SET logistics_id=?,status=CASE WHEN logistics_id IS NULL THEN ? ELSE status END
+        WHERE trade_no=? AND (logistics_id IS NULL OR logistics_id=?)`).bind(logisticsId, code, trade, logisticsId),
+      env.DB.prepare(`INSERT INTO logistics_shipments (trade_no,order_id,logistics_id,subtype)
+        SELECT trade_no,order_id,logistics_id,? FROM store_pickup_shipments WHERE trade_no=? AND logistics_id=?
+        ON CONFLICT(trade_no) DO NOTHING`).bind(subtype, trade, logisticsId),
+    ]);
+  }
+
   const matched = await env.DB.prepare(
     'SELECT trade_no FROM logistics_shipments WHERE trade_no=? AND logistics_id=? AND subtype=?'
   ).bind(trade, logisticsId, subtype).first();

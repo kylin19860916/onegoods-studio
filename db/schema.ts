@@ -84,3 +84,13 @@ export const googlePlacesUsage = sqliteTable('google_places_usage', {
   used: integer('used').notNull().default(0),
   expiresAt: integer('expires_at').notNull(),
 });
+
+export const storePickupShipments = sqliteTable('store_pickup_shipments', {
+  orderId: text('order_id').primaryKey().notNull().references(() => storeOrders.id),
+  tradeNo: text('trade_no').notNull().unique(),
+  logisticsId: text('logistics_id').unique(),
+  storeId: text('store_id').notNull(),
+  goodsAmount: integer('goods_amount').notNull(),
+  status: text('status').notNull(),
+  attemptedAt: integer('attempted_at').notNull(),
+});
