@@ -1,4 +1,4 @@
-import { NAME_MX, nameMxStack } from '../src/name-clicker-mechanism.js';
+import { NAME_MX, NAME_MX_PIN_RELIEF, nameMxStack } from '../src/name-clicker-mechanism.js';
 import createManifold, { type CrossSection, type Manifold, type ManifoldToplevel } from 'manifold-3d';
 import wasm from 'manifold-3d/manifold.wasm?module';
 import { mechanicalKeyContours, nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
@@ -91,12 +91,15 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const ear = own(new Section([earOutline]));
     const hole = own(own(Section.circle(holeDiameter / 2, 64)).translate([holeX, 0]));
     const underPlate = section([contours.profile(innerWallMargin)]);
-    const clearance = NAME_MX.opening;
-    const atMount = (shape: CrossSection) => own(shape.translate([0, contours.mountY]));
-    const wellVoid = atMount(box(clearance, clearance));
-    const wellExterior = atMount(box(NAME_MX.exteriorX, NAME_MX.exteriorY));
+    const { mounts } = contours;
+    const atMount = (shape: CrossSection, { x, y }: { x: number; y: number }) => own(shape.translate([x, y]));
+    const atMounts = (shape: CrossSection) => own(Section.union(mounts.map(mount => atMount(shape, mount))));
+    const wellVoid = atMounts(box(NAME_MX.opening, NAME_MX.opening));
+    const wellExterior = atMounts(box(NAME_MX.exteriorX, NAME_MX.exteriorY));
     const wellFrame = own(Section.intersection(shell, cut(wellExterior, wellVoid)));
-    const latchVoid = atMount(box(NAME_MX.latchX, NAME_MX.latchY));
+    const latchVoid = atMounts(box(NAME_MX.latchX, NAME_MX.latchY));
+    const pinRelief = NAME_MX_PIN_RELIEF.map(([x, y, radius]) =>
+      atMounts(own(own(Section.circle(radius, 40)).translate([x, y]))));
     const { leadInRadius, leadInTop } = MX_EYELET_BLEND;
     const arc = own(new Solid(new Mesh(printableEar.mesh)));
     const entry = join([
@@ -116,6 +119,7 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const stopTop = stack.skirtBottom - NAME_MX.travel - NAME_MX.stopGap;
     const caseWithEar = join([
       slab(shell, 0, NAME_MX.floor),
+      ...contours.dividers.map((rings: [number, number][][]) => slab(section(rings), NAME_MX.floor, stack.mountTop)),
       slab(cut(shell, wellVoid), NAME_MX.floor, NAME_MX.deck),
       slab(cut(shell, underPlate), NAME_MX.deck, stack.mountTop),
       slab(wellFrame, NAME_MX.floor, stack.mountTop),
@@ -126,29 +130,24 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     ]);
     const base = own(Solid.difference([caseWithEar,
       slab(hole, 0, earBottom + earThickness + 0.1),
-      slab(latchVoid, NAME_MX.latchBottom, NAME_MX.latchTop)]));
+      slab(latchVoid, NAME_MX.latchBottom, NAME_MX.latchTop),
+      ...pinRelief.map(relief => slab(relief, -0.01, NAME_MX.floor + 0.01))]));
     const outerDiameter = NAME_MX.bossDiameter, crossSpan = NAME_MX.crossSpan;
     const socketStart = stack.socketStart;
     const boss = own(Section.circle(outerDiameter / 2, 64));
     const cross = own(Section.union(box(crossSpan, NAME_MX.crossArmY), box(NAME_MX.crossArmX, crossSpan)));
-    const wallCheck = own(Section.difference(atMount(box(NAME_MX.capPocket + 2 * NAME_MX.capWall, NAME_MX.capPocket + 2 * NAME_MX.capWall)), face));
-    if (wallCheck.area() > 0.01) throw new HttpError(400, '字形沒有足夠的機械安裝空間，請更換字型。');
+    const socketWall = cut(boss, cross);
     const movingCap = join([
       slab(section(contours.capBack.flat()), stack.skirtBottom, stack.roofBottom),
       slab(face, stack.roofBottom, stack.capTop),
-      slab(atMount(cut(boss, cross)), socketStart, stack.roofBottom),
-      own(Solid.difference(
+      slab(atMounts(socketWall), socketStart, stack.roofBottom),
+      ...mounts.map(({ x, y }) => own(Solid.difference(
         own(Solid.cylinder(NAME_MX.rootHeight, outerDiameter / 2, NAME_MX.rootDiameter / 2, 64)
-          .translate([0, contours.mountY, stack.roofBottom - NAME_MX.rootHeight])),
-        slab(atMount(cross), socketStart, stack.roofBottom + 0.01))),
+          .translate([x, y, stack.roofBottom - NAME_MX.rootHeight])),
+        slab(atMount(cross, { x, y }), socketStart, stack.roofBottom + 0.01)))),
     ]);
-    const pressed = own(movingCap.translate([0, 0, -NAME_MX.travel]));
-    const collision = own(Solid.intersection(base, pressed));
-    if (!collision.isEmpty() && collision.volume() > 0.01) {
-      throw new HttpError(400, '字形與軸座活動空間重疊，請更換字型或調整文字。');
-    }
-    const housing = slab(atMount(cut(box(14.8,14.8), box(6.8,6.8))), stack.mountTop + 0.8, stack.housingTop);
-    for (const stroke of [0,1,2,3,4]) {
+    const housing = slab(atMounts(cut(box(14.8, 14.8), box(6.8, 6.8))), stack.mountTop + 0.8, stack.housingTop);
+    for (let stroke = 0; stroke <= NAME_MX.travel; stroke += 0.5) {
       const position = own(movingCap.translate([0,0,-stroke]));
       const interference = own(Solid.intersection(position, housing));
       if (!interference.isEmpty() && interference.volume() > 0.001) throw new HttpError(400, '字形與軸體活動空間重疊，請更換字型。');
@@ -160,8 +159,8 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const printOffset: [number, number, number] = [0, 39, -Math.min(socketStart, stack.skirtBottom)];
     // Grid support can spill across the opening on its first layers. Give
     // the socket a 5 mm exclusion radius without removing support elsewhere.
-    const crossClearance = atMount(own(Section.circle(5, 64)));
-    const crossSupportBlocker = own(slab(crossClearance, -printOffset[2], stack.roofBottom + 0.15).translate(printOffset));
+    const crossClearance = own(Section.circle(5, 64));
+    const wellClearance = box(NAME_MX.latchX + 0.3, NAME_MX.latchY + 0.3);
     const parts: Array<{ name: string; filament: number; color: string; solid: Manifold; subtype?: 'support_blocker' }> = [
       { name: 'Case', filament: 1, color: design.colors.border, solid: base },
       { name: 'Exclude supports under printable eyelet', filament: 1, color: design.colors.border,
@@ -172,20 +171,14 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
       { name: 'Moving cap', filament: 1, color: design.colors.border, solid: own(movingCap.translate(printOffset)) },
       { name: 'Inset', filament: 2, color: design.colors.fill, solid: own(slab(inner, stack.capTop, insetTop).translate(printOffset)) },
       { name: 'Raised lettering', filament: 3, color: design.colors.ink, solid: own(slab(glyphs, insetTop, insetTop + letteringHeight).translate(printOffset)) },
-      {
-        name: 'Exclude supports inside MX well 1',
-        filament: 1,
-        color: design.colors.border,
-        subtype: 'support_blocker',
-        solid: slab(atMount(box(NAME_MX.latchX + 0.3, NAME_MX.latchY + 0.3)), NAME_MX.floor - 0.15, stack.mountTop + 0.05),
-      },
-      {
-        name: 'Exclude supports inside MX cap cross socket',
-        filament: 1,
-        color: design.colors.border,
-        subtype: 'support_blocker',
-        solid: crossSupportBlocker,
-      },
+      ...mounts.flatMap((mount, index) => [
+        { name: `Exclude supports inside MX well ${index + 1}`, filament: 1, color: design.colors.border,
+          subtype: 'support_blocker' as const,
+          solid: slab(atMount(wellClearance, mount), -0.15, stack.mountTop + 0.05) },
+        { name: `Exclude supports inside MX cap cross socket ${index + 1}`, filament: 1, color: design.colors.border,
+          subtype: 'support_blocker' as const,
+          solid: own(slab(atMount(crossClearance, mount), -printOffset[2], stack.roofBottom + 0.15).translate(printOffset)) },
+      ]),
     ];
     const meshes = parts.map(({ name, color, filament, solid, subtype }) => {
       if (solid.isEmpty() || solid.status() !== 'NoError') throw new HttpError(400, '無法生成完整的模型，請調整文字或字型。');

@@ -27,6 +27,11 @@ const stack = nameMxStack();
 assert(Math.abs(stack.roofBottom - stack.skirtBottom - NAME_MX.capDepth) < 1e-8);
 assert(Math.abs(stack.roofBottom - stack.socketStart - NAME_MX.socketDepth) < 1e-8);
 assert(stack.skirtBottom - NAME_MX.travel > NAME_MX.deck);
+assert.equal(NAME_MX.capDepth, 2.993);
+assert.equal(NAME_MX.socketDepth, 2.993);
+assert.equal(NAME_MX.bossDiameter, 5.65);
+assert.equal(NAME_MX.mountTop, 8.517);
+assert(Math.abs(stack.rimTop - stack.skirtBottom - 0.976) < 1e-8);
 const fixtures = ['濤','飛','Max','III','ONEGOODS','玩物工作室','林予曦'].map(text => ({ text, fontKey:'huninn', font:huninn }));
 fixtures.push({text:'林予曦',fontKey:'kuaile',font:kuaile});
 for (const [i,{text,fontKey,font}] of fixtures.entries()) {
@@ -54,8 +59,9 @@ for (const [i,{text,fontKey,font}] of fixtures.entries()) {
   assert.equal(settings.brim_type,'no_brim');
   const xml = strFromU8(archive['3D/3dmodel.model']);
   assert(!xml.includes('REMOVE - local support below MX boss'));
-  assert.equal(NAME_MX.capDepth, NAME_MX.socketDepth);
-  assert(xml.includes('Exclude supports inside MX cap cross socket'));
+  const expectedSwitches = text === '林予曦' ? 3 : 1;
+  assert.equal((xml.match(/name="Exclude supports inside MX well /g) ?? []).length, expectedSwitches);
+  assert.equal((xml.match(/name="Exclude supports inside MX cap cross socket /g) ?? []).length, expectedSwitches);
   assert(xml.includes('Exclude supports under printable eyelet'));
   writeFileSync(join(dir,`sample-${i+1}.3mf`),file);
   console.log(text, 'generated with P2S supports; full-press collision check passed');

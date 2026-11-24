@@ -19,7 +19,10 @@ for (const key of Object.keys(keyringFonts)) {
     if ([...text].some(char => char !== ' ' && !font.charToGlyphIndex(char))) continue;
     const model = nameClickerContours(font, text);
     const preview = nameClickerOutline(font, text);
-    assert.equal(preview.mountY, model.mountY);
+    const expected = /^\p{Script=Han}{3}$/u.test(text) ? 3 : 1;
+    assert.equal(model.mounts.length, expected);
+    assert.equal(model.dividers.length, expected - 1);
+    assert.deepEqual(preview.mounts, model.mounts);
     // A seat-clearance subtraction must never open a notch through the cap skirt.
     const area = ring => Math.abs(ring.reduce((sum, [x,y], i) => {
       const [nx,ny] = ring[(i + 1) % ring.length]; return sum + x*ny - nx*y;
@@ -28,10 +31,10 @@ for (const key of Object.keys(keyringFonts)) {
     assert.equal(perimeter.length, 2, key + ' ' + text + ' cut-open outer skirt');
     assert(Math.abs(area(perimeter[0]) - area(model.profile(MX_NAME_FACE.faceMargin))) < 0.001);
     assert.equal(model.capBack.length, 1);
-    assert.equal(model.capBack[0].length, 2);
+    assert.equal(model.capBack[0].length, expected + 1);
     const sharedBack = preview.capBack[0];
     assert.deepEqual(sharedBack.getPoints().slice(0, -1).map(({x,y}) => [x,y]), model.capBack[0][0]);
-    assert.deepEqual(sharedBack.holes[0].getPoints().slice(0, -1).map(({x,y}) => [x,y]), model.capBack[0][1]);
+    assert.deepEqual(sharedBack.holes.map(hole => hole.getPoints().slice(0, -1).map(({x,y}) => [x,y])), model.capBack[0].slice(1));
     const shell = model.profile(MX_NAME_FACE.shellMargin);
     const eyelet = mxChainEyelet(shell);
     assert.deepEqual(eyelet, mxChainEyelet(preview.profile(MX_NAME_FACE.shellMargin)
@@ -54,7 +57,7 @@ for (const key of Object.keys(keyringFonts)) {
       // The old prototype's outer mounting pads filled these points above a and x.
       const inset = model.profile(0.35); // Keep the original anti-pad probe independent of colour-border width.
       const shell = model.profile(MX_NAME_FACE.shellMargin);
-      assert.equal(model.mountY, -0.5);
+      assert.deepEqual(model.mounts, [{ x: 0, y: -0.5 }]);
       assert(!contains(inset, 0, 7.5));
       assert(!contains(inset, 4, 8));
       assert(contains(inset, 0, 4));
