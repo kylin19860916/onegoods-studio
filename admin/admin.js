@@ -181,7 +181,7 @@ function renderPhysicalOrder(order) {
     <p><strong>${esc(order.id)}</strong> · ${order.live?'商品訂單':'商品訂單（綠界測試）'} · ${formatOrderDate(order.createdAt)}</p>
     <p>數量 ${esc(order.quantity)} · 商品小計 ${money(order.subtotal)} · 運費 ${money(order.shipping)} · 合計 ${money(order.amount)}</p>
     ${order.matchedReference ? `<p>綠界交易編號 ${esc(order.matchedReference)} · ${formatOrderDate(order.matchedAt)}</p>` : ''}
-    ${destination ? `<fieldset><legend>${order.live ? '黑貓宅配' : '配送資料（測試）'}</legend><p>${esc(delivery.contact)} · ${esc(delivery.phone)}</p><p>${esc(destination)}</p>${order.live ? `<p>${esc(delivery.email)}</p>` : ''}</fieldset>` : ''}
+    ${destination ? `<fieldset><legend>${order.live ? (store ? '7-ELEVEN 超商取貨' : '黑貓宅配') : '配送資料（測試）'}</legend><p>${esc(delivery.contact)} · ${esc(delivery.phone)}</p><p>${esc(destination)}</p>${order.live ? `<p>${esc(delivery.email)}</p>` : ''}</fieldset>` : ''}
     ${physicalLogisticsTools(order)}
     </article>`;
 }

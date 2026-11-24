@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import {readFileSync,mkdtempSync,readdirSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';import {pathToFileURL} from 'node:url';import {randomUUID} from 'node:crypto';import {build} from 'esbuild';import {Miniflare} from 'miniflare';
 const dir=mkdtempSync(join(tmpdir(),'ogs-seven-'));
-for(const name of ['checkout-preview','checkout-delivery-preview','checkout-logistics-preview','ecpay-stage','clicker-orders']) await build({entryPoints:['server/'+name+'.ts'],outfile:join(dir,name+'.mjs'),bundle:true,platform:'node',format:'esm',define:{'import.meta.env.DEV':'false'},plugins:[{name:'physical-only-test',setup(b){b.onResolve({filter:/clicker-print$/},()=>({path:'unused-custom-print',namespace:'test'}));b.onLoad({filter:/.*/,namespace:'test'},()=>({contents:"export function generateClicker3mf(){throw Error('Custom print is outside this test')} export const generateMechanical3mf=generateClicker3mf;",loader:'js'}));}}]});
+for(const name of ['checkout-preview','checkout-delivery-preview','checkout-logistics-preview','ecpay-stage','clicker-orders','store-payment']) await build({entryPoints:['server/'+name+'.ts'],outfile:join(dir,name+'.mjs'),bundle:true,platform:'node',format:'esm',define:{'import.meta.env.DEV':'false'},plugins:[{name:'physical-only-test',setup(b){b.onResolve({filter:/clicker-print$/},()=>({path:'unused-custom-print',namespace:'test'}));b.onLoad({filter:/.*/,namespace:'test'},()=>({contents:"export function generateClicker3mf(){throw Error('Custom print is outside this test')} export const generateMechanical3mf=generateClicker3mf;",loader:'js'}));}}]});
 const load=async n=>import(pathToFileURL(join(dir,n+'.mjs')));
 const {previewCheckout,recordPhysicalStagePayment}=await load('checkout-preview');const {deliveryPreview}=await load('checkout-delivery-preview');const {logisticsPreview,logisticsStageMac}=await load('checkout-logistics-preview');const {stageCheckMac}=await load('ecpay-stage');const {clickerOrderApi}=await load('clicker-orders');
+const {storePayment}=await load('store-payment');
 const mf=new Miniflare({modules:true,script:'export default {fetch(){return new Response("test")}}',compatibilityDate:'2026-05-22',d1Databases:['DB'],inspectorPort:0});const originalFetch=globalThis.fetch;
 try{
  const DB=await mf.getD1Database('DB');
@@ -61,5 +62,48 @@ try{
  globalThis.fetch=async(url)=>new Response(new URL(url).pathname.includes('QueryLogistics')?'0|找不到訂單':'0|測試錯誤', {status:new URL(url).pathname.includes('QueryLogistics')?500:200});
  const retried=await logistics('retry-create',receipt.id);assert.equal(retried.status,502);assert((await retried.json()).error.includes('0|測試錯誤'));
  const failedAudit=JSON.parse((await DB.prepare('SELECT audit_json FROM checkout_preview_shipments WHERE order_id=?').bind(receipt.id).first()).audit_json);assert.equal(failedAudit.providerResponse,'0|測試錯誤');
+ // Exercise the public selection and payment payload without a transaction or shipment.
+ const liveEnv={...env,OGS_PUBLIC_PICKUP_ENABLED:'true',OGS_ECPAY_LOGISTICS_HASH_KEY:'test-logistics-k',OGS_ECPAY_LOGISTICS_HASH_IV:'test-logistics-i',OGS_ECPAY_PAYMENT_ENABLED:'true',
+   OGS_ECPAY_PAYMENT_MERCHANT_ID:'9876543',OGS_ECPAY_PAYMENT_HASH_KEY:'testtesttest1234',OGS_ECPAY_PAYMENT_HASH_IV:'testtesttest4321',OGS_STORE_HOME_SHIPPING_FEE:'100'};
+ const pay=(path,data,session='',settings=liveEnv)=>storePayment(new Request(base+'/api/store-payment/'+path,data?{
+   method:'POST',headers:{Origin:base,'Content-Type':'application/json',Cookie:session},body:JSON.stringify(data),
+ }:undefined),settings);
+ assert.equal((await (await pay('config')).json()).pickupEnabled,true);
+ assert.equal((await (await pay('config',null,'',{...liveEnv,OGS_PUBLIC_PICKUP_ENABLED:undefined})).json()).pickupEnabled,false);
+ const openMap=await deliveryPreview(post('/api/checkout-delivery-preview/public-store-start',{carrier:'UNIMARTC2C',language:'zh-Hant'}),liveEnv,null);
+ assert.equal(openMap.status,200);
+ const liveSelection=await openMap.json();
+ const session=openMap.headers.get('Set-Cookie').split(';',1)[0];
+ assert.equal(liveSelection.action,'https://logistics.ecpay.com.tw/Express/map');
+ assert(liveSelection.token.startsWith('lt'));
+ // Mock the signed read-only directory response; no provider order is sent.
+ globalThis.fetch=async(url,options)=>{
+   assert.equal(url,'https://logistics.ecpay.com.tw/Helper/GetStoreList');
+   assert.equal(options.body.get('CvsType'),'UNIMART');
+   assert.match(options.body.get('CheckMacValue'),/^[A-F0-9]{32}$/);
+   return Response.json({RtnCode:1,StoreList:[{CvsType:'UNIMART',StoreInfo:[{StoreId:'294278',StoreName:'經貿',StoreAddr:'台北市南港區三重路19號1樓'}]}]});
+ };
+ const mapReturn=(changes={})=>deliveryPreview(new Request(base+'/api/checkout-delivery-preview/store-return',{method:'POST',body:new URLSearchParams({
+   ...fields,MerchantTradeNo:liveSelection.token,ExtraData:liveSelection.token,CVSStoreID:'294278',CVSOutSide:'0',...changes,
+ })}),liveEnv,null);
+ assert.equal((await mapReturn({CVSStoreID:'999999'})).status,400);
+ assert.equal((await mapReturn({CVSOutSide:'1'})).status,400);
+ const liveReturned=await mapReturn();
+ assert.equal(liveReturned.status,303);
+ assert.equal(liveReturned.headers.get('Location'),base+'/checkout.html?store='+liveSelection.token);
+ const quoteData={productId:'keynade-mx',quantity:1,method:'pickup',storeToken:liveSelection.token};
+ assert.equal((await pay('quote',quoteData)).status,400);
+ assert.equal((await pay('quote',{...quoteData,storeToken:stageMap.token},session)).status,400);
+ assert.deepEqual(await (await pay('quote',quoteData,session)).json(),{name:'Keynade MX',quantity:1,subtotal:499,shipping:60,amount:559});
+ assert.equal((await (await pay('quote',{...quoteData,method:'home'},session)).json()).amount,599);
+ assert.equal((await DB.prepare('SELECT COUNT(*) AS n FROM store_orders').first()).n,0);
+ const cart={...quoteData,requestId:randomUUID(),total:559,contact:'驗收測試',phone:'0900000000',email:'test@example.com'};
+ assert.equal((await pay('checkout',{...cart,total:599},session)).status,409);
+ const paymentForm=await (await pay('checkout',cart,session)).json();
+ assert.equal(paymentForm.fields.TotalAmount,'559');
+ assert(paymentForm.fields.ItemName.endsWith('7-ELEVEN 超商取貨'));
+ const orders=await (await clickerOrderApi(get('/api/admin/clicker-orders'),liveEnv,admin)).json();
+ assert.deepEqual(orders.physicalItems.find(x=>x.id===paymentForm.fields.CustomField1).delivery.store,
+   {id:'294278',carrier:'7-ELEVEN',name:'經貿',address:'台北市南港區三重路19號1樓'});
  console.log('PASS: admin-only official storefront test, read-only live map, sandbox-only payment/logistics, 499+60=559, unchanged 499+100=599 home delivery, same-order store/transaction/shipment/callback/12-code/label/pending-list, idempotency, and public/live-order rejection. No real ECPay calls.');
 } finally {globalThis.fetch=originalFetch;await mf.dispose();}

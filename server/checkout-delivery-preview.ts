@@ -1,20 +1,63 @@
 import { addressSearch } from './address-search';
 import { isCheckoutTestHost, isLocalCheckoutTest } from './checkout-test-host';
 import { HttpError, isAdmin, json } from './catalog';
+import { logisticsMac } from './ecpay-logistics';
 
 const carriers = { UNIMARTC2C: '7-ELEVEN', FAMIC2C: '全家', HILIFEC2C: '萊爾富' } as const;
 const mapEndpoint = 'https://logistics-stage.ecpay.com.tw/Express/map';
 const tokenPattern = /^[a-f0-9]{20}$/;
-const publicTokenPattern = /^[pvx][tes][a-f0-9]{18}$/;
+const publicTokenPattern = /^[lpvx][tes][a-f0-9]{18}$/;
+const liveTokenPattern = /^l[tes][a-f0-9]{18}$/;
+const liveMapEndpoint = 'https://logistics.ecpay.com.tw/Express/map';
 const checkoutPaths = { t: '/checkout.html', s: '/zh-cn/checkout.html', e: '/en/checkout.html' } as const;
 type MapRow = { carrier: keyof typeof carriers; result: string | null };
-type PreviewEnv = Cloudflare.Env & { OGS_ECPAY_MAP_RETURN_URL?: string; OGS_GOOGLE_PLACES_KEY?: string; OGS_ECPAY_LOGISTICS_MERCHANT_ID?: string };
+type PreviewEnv = Cloudflare.Env & { OGS_ECPAY_MAP_RETURN_URL?: string; OGS_GOOGLE_PLACES_KEY?: string; OGS_ECPAY_LOGISTICS_MERCHANT_ID?: string; OGS_ECPAY_LOGISTICS_HASH_KEY?: string; OGS_ECPAY_LOGISTICS_HASH_IV?: string; OGS_PUBLIC_PICKUP_ENABLED?: string };
 const root = '/api/checkout-delivery-preview/';
 const sameOrigin = (request: Request) => request.headers.get('Origin') === new URL(request.url).origin;
 
 export async function readPreviewStore(db: D1Database, token: unknown) {
   if (typeof token !== 'string' || !(tokenPattern.test(token) || publicTokenPattern.test(token))) return null;
   return readMapResult(db, token);
+}
+
+export function livePickupMerchant(env: PreviewEnv) {
+  const merchant = env.OGS_ECPAY_LOGISTICS_MERCHANT_ID?.trim();
+  return merchant && /^\d{7,10}$/.test(merchant) && !['2000132', '2000933', '3002607'].includes(merchant) ? merchant : null;
+}
+
+export function livePickupReady(env: PreviewEnv) {
+  return Boolean(livePickupMerchant(env) && env.OGS_ECPAY_LOGISTICS_HASH_KEY?.trim() && env.OGS_ECPAY_LOGISTICS_HASH_IV?.trim());
+}
+
+type LiveBranch = { StoreId: string; StoreName: string; StoreAddr: string };
+let liveDirectory: { merchant: string; expiry: number; entries: Promise<Map<string, LiveBranch>> } | undefined;
+
+async function officialPickupBranch(env: PreviewEnv, merchant: string, id: string) {
+  if (!liveDirectory || liveDirectory.merchant !== merchant || liveDirectory.expiry <= Date.now()) {
+    const fields = new URLSearchParams({ MerchantID: merchant, CvsType: 'UNIMART' });
+    fields.set('CheckMacValue', logisticsMac(fields, env.OGS_ECPAY_LOGISTICS_HASH_KEY!.trim(), env.OGS_ECPAY_LOGISTICS_HASH_IV!.trim()));
+    const entries = (async () => {
+      const response = await fetch('https://logistics.ecpay.com.tw/Helper/GetStoreList', {
+        method: 'POST', body: fields, signal: AbortSignal.timeout(7000),
+      });
+      if (!response.ok) throw new Error('Store directory unavailable');
+      const result = await response.json() as { RtnCode: number; StoreList?: { CvsType: string; StoreInfo: LiveBranch[] }[] };
+      const stores = result.StoreList?.find(group => group.CvsType === 'UNIMART')?.StoreInfo;
+      if (String(result.RtnCode) !== '1' || !Array.isArray(stores) || !stores.length) throw new Error('Store directory unavailable');
+      return new Map(stores.map(store => [String(store.StoreId), store]));
+    })();
+    liveDirectory = { merchant, expiry: Date.now() + 10 * 60_000, entries };
+    void entries.catch(() => { if (liveDirectory?.entries === entries) liveDirectory = undefined; });
+  }
+  return (await liveDirectory.entries).get(id);
+}
+
+export async function readLivePickupStore(db: D1Database, request: Request, token: unknown) {
+  if (typeof token !== 'string' || !liveTokenPattern.test(token)) return null;
+  const cookie = request.headers.get('Cookie')?.split(';').some(value => value.trim() === 'ogs_pickup_' + token + '=1');
+  if (!cookie) return null;
+  const store = await readMapResult(db, token);
+  return store?.carrier === '7-ELEVEN' ? store : null;
 }
 
 async function readMapResult(db: D1Database, token: string) {
@@ -41,27 +84,36 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
     if (path === 'public-store' && request.method === 'GET') {
       const token = url.searchParams.get('token') || '';
       if (!publicTokenPattern.test(token)) return json({}, 404);
-      return json({ store: await readMapResult(db, token) });
+      return json({ store: liveTokenPattern.test(token) ? await readLivePickupStore(db, request, token) : await readMapResult(db, token) });
     }
     if ((path === 'store-start' || path === 'public-store-start') && request.method === 'POST' && sameOrigin(request)) {
       const body = await request.json() as { carrier: keyof typeof carriers; mobile: boolean; language?: string; flow?: string; map?: string };
       if (!Object.hasOwn(carriers, body.carrier)) throw new HttpError(400, '請選擇超商品牌。');
       const storefront = body.flow === 'storefront-test';
       if(storefront && (publicMap || !isAdmin(user,env) || body.carrier !== 'UNIMARTC2C')) throw new HttpError(403,'此入口僅供管理員測試 7-ELEVEN。');
-      const liveMerchant = env.OGS_ECPAY_LOGISTICS_MERCHANT_ID;
-      const liveMap = storefront && body.map === 'live' && !!liveMerchant && !['2000933','2000132'].includes(liveMerchant);
-      if (!mapReturn) throw new HttpError(503, '綠界測試選店尚未啟用。');
+      const liveMerchant = livePickupMerchant(env);
+      const publicLive = publicMap && url.protocol === 'https:';
+      const liveMap = (publicLive || (storefront && body.map === 'live')) && liveMerchant;
+      if (publicLive && (body.carrier !== 'UNIMARTC2C' || env.OGS_PUBLIC_PICKUP_ENABLED !== 'true' || !livePickupReady(env))) {
+        throw new HttpError(503, '7-ELEVEN 選店暫時無法使用。');
+      }
+      if (!mapReturn) throw new HttpError(503, '綠界選店尚未啟用。');
       await db.prepare('DELETE FROM checkout_preview_store_maps WHERE expires_at <= ?').bind(Date.now()).run();
       const random = crypto.randomUUID().replaceAll('-', '');
       const locale = body.language === 'en' ? 'e' : body.language === 'zh-Hans' ? 's' : 't';
-      const token = storefront ? (liveMap?'v':'x')+locale+random.slice(0,18) : publicMap ? 'p' + locale + random.slice(0, 18) : random.slice(0, 20);
+      const token = publicLive ? 'l' + locale + random.slice(0, 18)
+        : storefront ? (liveMap ? 'v' : 'x') + locale + random.slice(0, 18)
+        : publicMap ? 'p' + locale + random.slice(0, 18) : random.slice(0, 20);
       await db.prepare('INSERT INTO checkout_preview_store_maps (token, carrier, expires_at) VALUES (?, ?, ?)')
         .bind(token, body.carrier, Date.now() + 30 * 60_000).run();
-      return json({ action: liveMap ? 'https://logistics.ecpay.com.tw/Express/map' : mapEndpoint, token, fields: {
-        MerchantID: liveMap ? liveMerchant! : '2000933', MerchantTradeNo: token, LogisticsType: 'CVS',
+      const response = json({ action: liveMap ? liveMapEndpoint : mapEndpoint, token, fields: {
+        MerchantID: liveMap || '2000933', MerchantTradeNo: token, LogisticsType: 'CVS',
         LogisticsSubType: body.carrier, IsCollection: 'N', Device: body.mobile ? '1' : '0',
         ServerReplyURL: mapReturn, ExtraData: token,
       } });
+      if (publicLive) response.headers.append('Set-Cookie',
+        'ogs_pickup_' + token + '=1; Path=/api/; Max-Age=1800; Secure; HttpOnly; SameSite=Lax');
+      return response;
     }
     if (path === 'store-return' && request.method === 'POST') {
       const raw = await request.text();
@@ -69,7 +121,12 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
       const fields = new URLSearchParams(raw);
       const token = fields.get('ExtraData') || '';
       const isPublicToken = publicTokenPattern.test(token);
-      if ((!isPublicToken && !tokenPattern.test(token)) || fields.get('MerchantID') !== (token.startsWith('v') ? env.OGS_ECPAY_LOGISTICS_MERCHANT_ID : '2000933')) throw new HttpError(400, '門市資料無效。');
+      const live = liveTokenPattern.test(token);
+      const merchant = live || token.startsWith('v') ? livePickupMerchant(env) : '2000933';
+      if ((!isPublicToken && !tokenPattern.test(token)) || !merchant || fields.get('MerchantID') !== merchant ||
+          (live && fields.get('MerchantTradeNo') !== token)) {
+        throw new HttpError(400, '門市資料無效。');
+      }
       const row = await db.prepare('SELECT carrier, result FROM checkout_preview_store_maps WHERE token=? AND expires_at>?')
         .bind(token, Date.now()).first<MapRow>();
       const id = fields.get('CVSStoreID') || '';
@@ -77,13 +134,19 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
       const address = fields.get('CVSAddress')?.trim() || '';
       if (!row || fields.get('LogisticsSubType') !== row.carrier || !/^\d{3,9}$/.test(id) ||
           !name || name.length > 40 || !address || address.length > 180) throw new HttpError(400, '門市資料不完整或選店已逾時。');
-      const result = { carrier: carriers[row.carrier], id, name, address };
       if (!row.result) {
+        let result = { carrier: carriers[row.carrier], id, name, address };
+        if (live || (token.startsWith('v') && livePickupReady(env))) {
+          if (!livePickupReady(env) || fields.get('CVSOutSide') === '1') throw new HttpError(400, '請返回結帳並選擇台灣本島取貨門市。');
+          const selected = await officialPickupBranch(env, merchant, id);
+          if (!selected?.StoreName || !selected.StoreAddr) throw new HttpError(400, '此門市目前無法選用，請重新選擇。');
+          result = { ...result, name: selected.StoreName.trim(), address: selected.StoreAddr.trim() };
+        }
         await db.prepare('UPDATE checkout_preview_store_maps SET result=? WHERE token=? AND result IS NULL')
           .bind(JSON.stringify(result), token).run();
       }
       if (isLocalCheckoutTest(url)) return json({ token });
-      const destination = isPublicToken ? checkoutPaths[token[1] as keyof typeof checkoutPaths] + (token[0]==='p'?'?':'?shipping-test=1&map='+(token[0]==='v'?'live':'stage')+'&') : '/internal-checkout.html?preview=1&';
+      const destination = isPublicToken ? checkoutPaths[token[1] as keyof typeof checkoutPaths] + (['p','l'].includes(token[0])?'?':'?shipping-test=1&map='+(token[0]==='v'?'live':'stage')+'&') : '/internal-checkout.html?preview=1&';
       return Response.redirect(url.origin + destination + 'store=' + token, 303);
     }
     if (path === 'places' && request.method === 'POST' && sameOrigin(request)) {

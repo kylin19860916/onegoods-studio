@@ -56,9 +56,10 @@ function renderStoreCheckout(){
  if(!checkout)return;
  const checkoutUrl=new URL(location.href);
  const test=storePayment.test === true;
+ const livePickup=storePayment.enabled && !test && storePayment.pickupEnabled === true;
  if(storePayment.testRequested){checkout.innerHTML='<p role="alert">此入口僅供 OGS 管理員測試，請先登入。</p><a class="button cream" href="/signin-with-chatgpt?return_to='+encodeURIComponent(location.pathname+location.search)+'">登入管理帳號</a>';return;}
  const mapToken=checkoutUrl.searchParams.get('store');
- const draftKey=test?'ogs-pickup-stage-test':'ogs-pickup-preview';
+ const draftKey=test?'ogs-pickup-stage-test':'ogs-pickup-live';
  let draft;
  try {
    const saved=JSON.parse(sessionStorage.getItem(draftKey));
@@ -89,12 +90,11 @@ function renderStoreCheckout(){
  const pay = qs('#store-pay');
  const error = qs('#store-payment-error');
  const reviewAddress = qs('#store-review-address');
+ const toReview = qs('#store-to-review');
  let submission;
  if (storePayment.enabled) {
    qs('#store-preview-note').hidden = true;
-   if(!test) delivery.querySelector('[value=pickup]').remove();
-   else {
-     carrier.querySelectorAll('option').forEach(o=>{if(o.value!=='UNIMARTC2C')o.remove();});
+   if(test) {
      delivery.value='pickup';
      qs('#store-preview-note').hidden=false;qs('#store-preview-note').textContent=checkoutUrl.searchParams.get('map')==='live'?'正式門市地圖僅供選店驗證；完整測試請使用固定測試門市。':'內部測試 · 使用綠界固定測試門市，不會實際扣款或寄件。';
    }
@@ -102,7 +102,14 @@ function renderStoreCheckout(){
    address.hidden = address.disabled = false;
    pay.textContent = test?'前往綠界測試付款':'前往綠界付款';
  }
+ if (!test) delivery.value='home';
+ if (!livePickup && !test) delivery.querySelector('[value=pickup]').remove();
+ else {
+   carrier.querySelectorAll('option').forEach(option=>{if(option.value!=='UNIMARTC2C')option.remove();});
+   delivery.querySelector('[value=pickup]').textContent='7-ELEVEN 超商取貨 · NT$'+storePayment.pickupShipping;
+ }
  if(!storePayment.enabled)pay.textContent='查看購買方式';
+ const shippingFee=()=>delivery.value==='pickup'?storePayment.pickupShipping:(storePayment.shipping??100);
  const money=amount=>'NT$'+amount.toLocaleString('en-TW');
 
  qs('#store-back').href='product.html?id='+encodeURIComponent(product.id);
@@ -116,7 +123,7 @@ function renderStoreCheckout(){
  function refresh(){
    const subtotal=price*Number(quantity.value);
    const isPickup=delivery.value==='pickup';
-   const fee=storePayment.enabled?(test&&isPickup?storePayment.pickupShipping:storePayment.shipping):isPickup?60:100;
+   const fee=shippingFee();
    if(storePayment.enabled){
      const home=qs('#store-home-fields');home.hidden=isPickup;
      home.querySelectorAll('input,select').forEach(field=>{field.disabled=isPickup || (field.name==='district'&&!form.elements.city.value);});
@@ -160,7 +167,7 @@ function renderStoreCheckout(){
        body:JSON.stringify({carrier:requestedCarrier,mobile:matchMedia('(max-width: 680px)').matches,language:document.documentElement.lang,...(test?{flow:'storefront-test',map:checkoutUrl.searchParams.get('map')}:{} )}),
      });
      const selection=await response.json();
-     if(!response.ok || ![...(test?['https://logistics.ecpay.com.tw/Express/map']:[]),'https://logistics-stage.ecpay.com.tw/Express/map'].includes(selection.action))throw new Error();
+     if(!response.ok || !(test ? ['https://logistics.ecpay.com.tw/Express/map','https://logistics-stage.ecpay.com.tw/Express/map'] : ['https://logistics.ecpay.com.tw/Express/map']).includes(selection.action))throw new Error();
      if(delivery.value!=='pickup' || carrier.value!==requestedCarrier || sections[1].hidden)return;
      sessionStorage.setItem(draftKey,JSON.stringify({
        token:selection.token,product:product.id,quantity:quantity.value,carrier:requestedCarrier,
@@ -183,7 +190,7 @@ function renderStoreCheckout(){
    }
  });
  async function restoreBranch(){
-   if((storePayment.enabled&&!test) || draft?.product!==product.id || ![...carrier.options].some(option=>option.value===draft.carrier))return;
+   if((!livePickup&&!test) || draft?.product!==product.id || ![...carrier.options].some(option=>option.value===draft.carrier))return;
    checkoutUrl.searchParams.set('product',product.id);
    history.replaceState(null,'',checkoutUrl);
    delivery.value='pickup';
@@ -227,6 +234,26 @@ function renderStoreCheckout(){
          delivery.value==='pickup'?qs('#store-branch-address').textContent:fields.postalCode.value + ' ' + fields.city.value + fields.district.value + fields.street.value + fields.unit.value].join(' · ');
        reviewAddress.hidden = false;
      }
+     if (storePayment.enabled && !test) {
+       const method=delivery.value;
+       const count=quantity.valueAsNumber;
+       const expectedTotal=price*count+shippingFee();
+       toReview.disabled=true;
+       branchError.hidden=true;
+       try {
+         const response=await fetch('/api/store-payment/quote',{
+           method:'POST',headers:{'Content-Type':'application/json'},
+           body:JSON.stringify({productId:product.id,quantity:count,method,storeToken:method==='pickup'?mapToken:null}),
+         });
+         const quote=await response.json();
+         if(!response.ok)throw new Error(quote.error||'暂时无法核对運費，请重试。');
+         if(sections[1].hidden || delivery.value!==method || quantity.valueAsNumber!==count)return;
+         if(quote.amount!==expectedTotal || quote.shipping!==shippingFee())throw new Error('商品或運費已变更，请重新整理后确认。');
+       } catch (failure) {
+         showBranchError(failure.message);
+         return;
+       } finally { toReview.disabled=false; }
+     }
      showStep(2);
      return;
    }
@@ -239,8 +266,8 @@ function renderStoreCheckout(){
      error.replaceChildren(document.createTextNode(error.textContent),channels);
      return;
    }
-   const payload = { ...Object.fromEntries(new FormData(form)), productId: product.id, quantity: quantity.valueAsNumber,...(test?{storeToken:delivery.value==='pickup'?mapToken:null}:{}),
-     total: price * quantity.valueAsNumber + (test&&delivery.value==='pickup'?storePayment.pickupShipping:storePayment.shipping) };
+   const payload = { ...Object.fromEntries(new FormData(form)), productId: product.id, quantity: quantity.valueAsNumber,method:delivery.value,storeToken:delivery.value==='pickup'?mapToken:null,
+     total: price * quantity.valueAsNumber + shippingFee() };
    const snapshot = JSON.stringify(payload);
    if (submission?.snapshot !== snapshot) submission = { snapshot, requestId: crypto.randomUUID() };
    pay.disabled = true;

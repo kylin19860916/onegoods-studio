@@ -13,7 +13,7 @@ const serviceTypes = new Map([
   ['UNIMARTC2C', 'CVS'], ['FAMIC2C', 'CVS'], ['HILIFEC2C', 'CVS'], ['TCAT', 'HOME'],
 ]);
 
-function sign(fields: URLSearchParams, key: string, iv: string) {
+export function logisticsMac(fields: URLSearchParams, key: string, iv: string) {
   const sorted = [...fields].filter(([name]) => name !== 'CheckMacValue')
     .sort(([a], [b]) => a.toLowerCase().localeCompare(b.toLowerCase(), 'en'));
   const source = 'HashKey=' + key + '&' + sorted.map(([name, value]) => name + '=' + value).join('&') + '&HashIV=' + iv;
@@ -57,7 +57,7 @@ export async function receiveLogisticsNotice(request: Request, env: Env) {
   if (new Set(fields.keys()).size !== [...fields.keys()].length) return reply('Duplicate fields', 400);
   const mac = fields.get('CheckMacValue') ?? '';
   if (!/^[A-F0-9]{32}$/.test(mac) || fields.get('MerchantID') !== merchant ||
-      !timingSafeEqual(Buffer.from(mac), Buffer.from(sign(fields, key, iv)))) {
+      !timingSafeEqual(Buffer.from(mac), Buffer.from(logisticsMac(fields, key, iv)))) {
     return reply('Invalid logistics signature', 400);
   }
   const trade = fields.get('MerchantTradeNo') ?? '';

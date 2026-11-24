@@ -49,7 +49,6 @@
             <strong id="store-branch-name"></strong>
             <p id="store-branch-address"></p>
           </div>
-          <p id="store-branch-error" role="alert" hidden></p>
         </div>
       </div>
       <fieldset id="store-address-fields" hidden disabled>
@@ -75,8 +74,9 @@
         <label for="store-unit">楼层或室号（选填）</label><input id="store-unit" name="unit" autocomplete="shipping address-line2" maxlength="35">
         </div>
       </fieldset>
+      <p id="store-branch-error" role="alert" hidden></p>
       <div class="store-checkout-actions">
-        <button class="button yellow" type="submit">确认订单内容</button>
+        <button id="store-to-review" class="button yellow" type="submit">确认订单内容</button>
         <button id="store-to-bag" class="button cream" type="button">返回购物袋</button>
       </div>
     </section>
