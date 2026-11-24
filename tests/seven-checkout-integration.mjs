@@ -135,6 +135,18 @@ try{
  };
  const liveNotice=fields=>receiveLogisticsNotice(new Request(liveCfg.OGS_ECPAY_LOGISTICS_RETURN_URL,{method:'POST',body:signLive(fields)}),liveCfg);
  globalThis.fetch=async(url,options)=>{
+   assert.equal(options.headers.Accept,'text/html');
+   if(new URL(url).pathname==='/Express/Create') return new Response('0|您的綠界帳戶可用餘額不足');
+   assert.equal(new URL(url).pathname,'/Helper/QueryLogisticsTradeInfo/V5');
+   return new Response('0|找不到訂單');
+ };
+ const rejectedLive=await fulfillment('create');
+ assert.equal(rejectedLive.status,502);
+ assert.match((await rejectedLive.json()).error,/餘額或可建單額度不足/);
+ assert.equal((await fulfillment('create')).status,409);
+ await DB.prepare('UPDATE store_pickup_shipments SET attempted_at=? WHERE order_id=?').bind(Date.now()-46000,id).run();
+ assert.equal((await (await fulfillment('query')).json()).status,'retryable');
+ globalThis.fetch=async(url,options)=>{
    const uri=new URL(url);
    assert.equal(uri.origin,'https://logistics.ecpay.com.tw');
    assert.equal(options.body.get('MerchantTradeNo'),responseFields.MerchantTradeNo);

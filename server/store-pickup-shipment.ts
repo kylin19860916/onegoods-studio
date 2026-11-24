@@ -49,7 +49,8 @@ async function callProvider(config: Credentials, path: string, fields: Fields) {
   let response: Response;
   try {
     response = await fetch(provider + path, {
-      method: 'POST', body: params, redirect: 'manual', signal: AbortSignal.timeout(15000),
+      method: 'POST', headers: { Accept: 'text/html' }, body: params,
+      redirect: 'manual', signal: AbortSignal.timeout(15000),
     });
   } catch (error) {
     console.error('ECPay logistics request failed', path, error instanceof Error ? error.name : 'UnknownError');
@@ -64,6 +65,21 @@ async function callProvider(config: Credentials, path: string, fields: Fields) {
       : '綠界物流暫時無法回應，請保留原單。');
   }
   return body;
+}
+
+function createRejection(result: string) {
+  const detail = result.slice(2).trim();
+  const code = /^(\d{4,12})\b/.exec(detail)?.[1];
+  const reasons = [
+    [/餘額不足|可用餘額|可建單額度|物流保留款不足|insufficient balance/i, 'balance', '綠界物流可用餘額或可建單額度不足。請在綠界後台確認預付物流款。'],
+    [/找不到加密金鑰|未開通|暫停使用/, 'service', '綠界物流服務尚未開通、暫停使用，或物流類型與帳號設定不符。'],
+    [/檢查碼|CheckMacValue/i, 'signature', '綠界拒絕物流簽章，請檢查正式物流串接設定。'],
+    [/交易編號.*重複|訂單.*已存在|duplicate/i, 'duplicate', '綠界已使用此物流交易編號，請查詢原單。'],
+    [/門市.*(?:關轉|不存在|無效|錯誤)|ReceiverStoreID/i, 'store', '綠界未接受原訂單的取貨門市，請查詢原單並核對門市狀態。'],
+  ] as const;
+  const reason = reasons.find(([pattern]) => pattern.test(detail));
+  console.error('ECPay logistics creation rejected', reason?.[1] ?? 'unknown', code ?? '');
+  return reason?.[2] ?? ('綠界拒絕建單' + (code ? '（' + code + '）' : '') + '，請查詢原單後再處理。');
 }
 
 function verifyProvider(raw: string, shipment: Shipment, config: Credentials) {
@@ -159,8 +175,7 @@ export async function storePickupShipment(request: Request, env: Env, user: Para
         });
         if (result.startsWith('0|')) {
           await db.prepare("UPDATE store_pickup_shipments SET status='create_failed' WHERE order_id=? AND logistics_id IS NULL").bind(id).run();
-          const code = /^0\|(\d{4,12})/.exec(result)?.[1];
-          throw new HttpError(502, '綠界拒絕建單' + (code ? '（' + code + '）' : '') + '，請查詢原單後再處理。');
+          throw new HttpError(502, createRejection(result));
         }
         if (!result.startsWith('1|') || !shipment) throw new Error('Unrecognized response');
         const fields = verifyProvider(result.slice(2), shipment, config);
