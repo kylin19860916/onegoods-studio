@@ -233,7 +233,7 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
         return { id: row.id, kind: 'physical', live: true, name: details.name, quantity: details.quantity,
           amount: row.amount, subtotal: details.subtotal, shipping: details.shipping, delivery: details.delivery,
           createdAt: row.created_at, matchedReference: row.payment_reference, matchedAt: row.paid_at,
-          canCreatePickup: canCreateLivePickup(env), shipment: row.pickup_shipment ? JSON.parse(row.pickup_shipment) : undefined };
+          canCreatePickup: canCreateLivePickup(env, row.id), shipment: row.pickup_shipment ? JSON.parse(row.pickup_shipment) : undefined };
       });
       const physicalItems = (physical?.results ?? []).map(row => {
         const receipt = JSON.parse(row.receipt);

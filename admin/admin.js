@@ -167,6 +167,7 @@ function physicalLogisticsTools(order) {
       return `<div class="order-toolbar">
         <button type="button" class="text-action" data-live-logistics data-logistics-action="query" data-order-id="${esc(order.id)}">查詢正式物流單</button>
         ${shipment.id ? `<button type="button" class="text-action" data-live-logistics data-logistics-action="print" data-order-id="${esc(order.id)}">開啟綠界正式面單</button>
+        <button type="button" class="text-action" data-live-logistics data-logistics-action="code" data-order-id="${esc(order.id)}">查詢正式交貨便代碼</button>
         <span>物流單號 ${esc(shipment.id)} · 貨態 ${esc(shipment.notice || shipment.status)}</span>` : ''}
         <span role="status"></span></div>`;
     }

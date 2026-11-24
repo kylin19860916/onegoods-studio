@@ -120,6 +120,7 @@ try{
  assert.equal((await fulfillment('create')).status,409);
  await DB.prepare('UPDATE store_orders SET payment_reference=?,paid_at=? WHERE id=?').bind('TEST12345678',new Date().toISOString(),id).run();
  assert.equal((await fulfillment('create',createBody,{...liveCfg,OGS_LIVE_PICKUP_FULFILLMENT_ENABLED:'false'})).status,503);
+ assert.equal((await fulfillment('create',createBody,{...liveCfg,OGS_LIVE_PICKUP_FULFILLMENT_ORDER_ID:'OGS-P-000000000000'})).status,503);
  assert.equal((await fulfillment('create',{...createBody,confirmed:false})).status,400);
  let liveCreateCalls=0;
  const responseFields={MerchantID:'9876543',MerchantTradeNo:'OGSPCVS'+id.slice(-12),AllPayLogisticsID:'70000012',GoodsAmount:'499',CollectionAmount:'0',LogisticsType:'CVS',LogisticsSubType:'UNIMARTC2C'};
@@ -144,7 +145,9 @@ try{
    assert.equal(uri.pathname,'/Helper/QueryLogisticsTradeInfo/V5');
    return new Response(signLive({...responseFields,LogisticsStatus:'300',CVSPaymentNo:'D0123456',CVSValidationNo:'0123'}).toString());
  };
- const createdLive=await fulfillment('create');
+ const createdLive=await fulfillment('create',createBody,{
+   ...liveCfg,OGS_LIVE_PICKUP_FULFILLMENT_ENABLED:'false',OGS_LIVE_PICKUP_FULFILLMENT_ORDER_ID:id,
+ });
  assert.equal(createdLive.status,200,await createdLive.clone().text());
  assert.equal((await createdLive.json()).logistics_id,'70000012');
  assert.equal((await fulfillment('create')).status,409);

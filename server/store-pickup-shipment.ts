@@ -10,6 +10,7 @@ const subtype = 'UNIMARTC2C';
 
 type Env = Cloudflare.Env & {
   OGS_LIVE_PICKUP_FULFILLMENT_ENABLED?: string;
+  OGS_LIVE_PICKUP_FULFILLMENT_ORDER_ID?: string;
   OGS_ECPAY_LOGISTICS_MERCHANT_ID?: string;
   OGS_ECPAY_LOGISTICS_HASH_KEY?: string;
   OGS_ECPAY_LOGISTICS_HASH_IV?: string;
@@ -34,8 +35,12 @@ function credentials(env: Env): Credentials | null {
     env.OGS_ECPAY_LOGISTICS_RETURN_URL === shop + logisticsCallbackPath ? { merchant, key, iv } : null;
 }
 
-export function canCreateLivePickup(env: Env) {
-  return env.OGS_LIVE_PICKUP_FULFILLMENT_ENABLED === 'true' && Boolean(credentials(env));
+export function canCreateLivePickup(env: Env, orderId: string) {
+  const restrictedOrder = env.OGS_LIVE_PICKUP_FULFILLMENT_ORDER_ID?.trim();
+  const allowed = restrictedOrder
+    ? /^OGS-P-[A-F0-9]{12}$/.test(restrictedOrder) && restrictedOrder === orderId
+    : env.OGS_LIVE_PICKUP_FULFILLMENT_ENABLED === 'true';
+  return allowed && Boolean(credentials(env));
 }
 
 async function callProvider(config: Credentials, path: string, fields: Fields) {
@@ -108,7 +113,7 @@ export async function storePickupShipment(request: Request, env: Env, user: Para
     let shipment = await lookup.first<Shipment>();
 
     if (action === 'create') {
-      if (!canCreateLivePickup(env)) throw new HttpError(503, '正式寄件單尚未啟用。');
+      if (!canCreateLivePickup(env, id)) throw new HttpError(503, '正式寄件單尚未啟用。');
       if (confirmed !== true) throw new HttpError(400, '請確認建立正式物流單。');
       if (shipment && shipment.status !== 'retryable') {
         throw new HttpError(409, '本單已送出建單請求，請先查詢原單。');
