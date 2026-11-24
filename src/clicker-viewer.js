@@ -3,7 +3,7 @@ import {
   Mesh, MeshStandardMaterial, OrthographicCamera, Path, Raycaster, Scene,
   Shape, ShapePath, Vector2, WebGLRenderer,
 } from 'three';
-import { NAME_MX, nameMxStack } from './name-clicker-mechanism.js';
+import { NAME_MX, NAME_MX_PIN_RELIEF, nameMxStack } from './name-clicker-mechanism.js';
 import { MX, MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_FACE, MX_RECESS, mxChainEyelet, mxPrintableEyelet, mxStack } from './cherry-mx-spec.js';
 import { MECHANICAL_KEYCAP, mechanicalKeycapShell } from './mechanical-keycap.js';
 import { nameClickerOutline } from './name-clicker-outline.js';
@@ -220,7 +220,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       const mesh = add(extrude(socket, stack.roofBottom - bottom), colour, bottom, parent);
       mesh.userData.keyIndex = index; return mesh;
     }
-    function mountSwitch(x, index, y = 0) {
+    function mountSwitch(x, index, y = 0, sharedMotion = null) {
       function fixed(geometry, colour, z) { const mesh = add(geometry, colour, z); mesh.position.x = x; mesh.position.y = y; return mesh; }
       fixed(extrude(rounded(14,14,0.6), MX.lowerBody), '#25242a', stack.bodyBottom);
       fixed(extrude(rounded(MX.width,MX.width,0.7),0.8), '#343239', stack.mountTop);
@@ -249,16 +249,19 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       postGeometry.rotateX(Math.PI/2);
       fixed(postGeometry,'#25242a',stack.bodyBottom-MX.pins/2);
       const group = new Group();
-      group.position.x=x;group.position.y=y;assembly.add(group);keyGroups.push(group);
+      group.position.x=x;group.position.y=y;
+      (sharedMotion ?? assembly).add(group);
+      if (!sharedMotion) keyGroups.push(group);
       const stem = add(extrude(cross(4,1.2),MX.stem),'#cf4b52',stack.housingTop,group);
       stem.userData.keyIndex=index;
+      if (sharedMotion) return;
       const capGroup = new Group();
       capGroup.visible=showCaps;group.add(capGroup);capGroups.push(capGroup);
       return capGroup;
     }
     if (style === 'name') {
       const { font, text } = keys[0];
-      const { profile, lettering, mountY, capBack } = nameClickerOutline(font, text);
+      const { profile, lettering, mounts, capBack, dividers } = nameClickerOutline(font, text);
       const caseColour = new Color(base).multiplyScalar(0.62);
       const { shellMargin, innerWallMargin, faceMargin, insetMargin, insetHeight, letteringHeight } = MX_NAME_FACE;
       const stopTop = stack.skirtBottom - NAME_MX.travel - NAME_MX.stopGap;
@@ -268,7 +271,14 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       guideWall.holes.push(profile(innerWallMargin));
       const floor = profile(shellMargin);
       const deck = profile(shellMargin);
-      deck.holes.push(rounded(NAME_MX.opening, NAME_MX.opening, 0, 0, mountY));
+      for (const { x, y } of mounts) {
+        deck.holes.push(rounded(NAME_MX.opening, NAME_MX.opening, 0, x, y));
+        for (const [dx, dy, radius] of NAME_MX_PIN_RELIEF) {
+          const hole = new Path();
+          hole.absarc(x + dx, y + dy, radius, 0, Math.PI * 2, true);
+          floor.holes.push(hole);
+        }
+      }
       add(extrude(floor, NAME_MX.floor), caseColour, 0);
       add(extrude(deck, NAME_MX.deck - NAME_MX.floor), caseColour, NAME_MX.floor);
       add(extrude(stopWall, stopTop - NAME_MX.deck), caseColour, NAME_MX.deck);
@@ -278,26 +288,38 @@ export function createClickerViewer(canvas, host, reset, inspect) {
         [NAME_MX.latchBottom, NAME_MX.latchTop, NAME_MX.latchX, NAME_MX.latchY],
         [NAME_MX.latchTop, stack.mountTop, NAME_MX.opening, NAME_MX.opening],
       ]) {
-        const frame = rounded(NAME_MX.exteriorX, NAME_MX.exteriorY, 0, 0, mountY);
-        frame.holes.push(rounded(width, height, 0, 0, mountY));
         const visibleBottom = Math.max(bottom, NAME_MX.deck);
-        if (top > visibleBottom) add(extrude(frame, top - visibleBottom), caseColour, visibleBottom);
+        if (top <= visibleBottom) continue;
+        for (const { x, y } of mounts) {
+          const frame = rounded(NAME_MX.exteriorX, NAME_MX.exteriorY, 0, x, y);
+          frame.holes.push(rounded(width, height, 0, x, y));
+          add(extrude(frame, top - visibleBottom), caseColour, visibleBottom);
+        }
       }
+      if (dividers.length) add(extrude(dividers, stack.mountTop - NAME_MX.deck), caseColour, NAME_MX.deck);
 
       addChainEyelet(floor, caseColour);
 
-      const face = mountSwitch(0, 0, mountY);
-      face.position.y = -mountY;
+      const moving = new Group();
+      assembly.add(moving);
+      keyGroups.push(moving);
+      const face = new Group();
+      face.visible = showCaps;
+      moving.add(face);
+      capGroups.push(face);
+      for (const { x, y } of mounts) mountSwitch(x, 0, y, moving);
       add(extrude(capBack, NAME_MX.capDepth), base, stack.skirtBottom, face).userData.keyIndex = 0;
-      add(extrude(profile(faceMargin), MX_CASE.roof), base, stack.roofBottom, face).userData.keyIndex = 0;
+      add(extrude(profile(faceMargin), NAME_MX.roof), base, stack.roofBottom, face).userData.keyIndex = 0;
       add(extrude(profile(insetMargin), insetHeight), cap, stack.capTop, face).userData.keyIndex = 0;
       if (lettering.length) {
         add(extrude(lettering, letteringHeight), ink, stack.capTop + insetHeight, face).userData.keyIndex = 0;
       }
-      const socket = addCapSocket(base, face, 0, { outerDiameter: NAME_MX.bossDiameter,
-        crossSpan: NAME_MX.crossSpan, crossArm: NAME_MX.crossArmX, crossArmY: NAME_MX.crossArmY,
-        engagement: stack.stemTop - stack.socketStart });
-      socket.position.y = mountY;
+      for (const { x, y } of mounts) {
+        const socket = addCapSocket(base, face, 0, { outerDiameter: NAME_MX.bossDiameter,
+          crossSpan: NAME_MX.crossSpan, crossArm: NAME_MX.crossArmX, crossArmY: NAME_MX.crossArmY,
+          engagement: stack.stemTop - stack.socketStart });
+        socket.position.set(x, y, socket.position.z);
+      }
       const bounds = new Box3().setFromObject(assembly);
       const width = bounds.max.x - bounds.min.x;
       const height = bounds.max.y - bounds.min.y;

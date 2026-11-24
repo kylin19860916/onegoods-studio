@@ -20,7 +20,8 @@ export function nameClickerOutline(font, text) {
     });
   }
   return {
-    mountY: contours.mountY,
+    mounts: contours.mounts,
+    dividers: shapes(contours.dividers),
     profile: margin => draw(new Shape(), contours.profile(margin)),
     lettering: shapes(contours.lettering),
     capBack: shapes(contours.capBack),
