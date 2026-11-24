@@ -83,10 +83,14 @@ try{
    assert.equal(url,'https://logistics.ecpay.com.tw/Helper/GetStoreList');
    assert.equal(options.body.get('CvsType'),'UNIMART');
    assert.match(options.body.get('CheckMacValue'),/^[A-F0-9]{32}$/);
-   return Response.json({RtnCode:1,StoreList:[{CvsType:'UNIMART',StoreInfo:[{StoreId:'294278',StoreName:'經貿',StoreAddr:'台北市南港區三重路19號1樓'}]}]});
+   return Response.json({RtnCode:1,StoreList:[{CvsType:'UNIMART',StoreInfo:[{StoreId:'294278',StoreName:'經貿',StoreAddr:'台北市南港區三重路19號1樓'},{StoreId:'249278',StoreName:'欣東勢',StoreAddr:'臺中市東勢區第一橫街153號'}]}]});
  };
  const directory=await deliveryPreview(get('/api/checkout-delivery-preview/public-branches?q='+encodeURIComponent('經貿')),liveEnv,null);
  assert.deepEqual(await directory.json(),{branches:[{id:'294278',name:'經貿',address:'台北市南港區三重路19號1樓'}]});
+ for (const query of ['东势','東勢','台中市 东势区','２４９２７８']) {
+   const match=await deliveryPreview(get('/api/checkout-delivery-preview/public-branches?q='+encodeURIComponent(query)),liveEnv,null);
+   assert.deepEqual(await match.json(),{branches:[{id:'249278',name:'欣東勢',address:'臺中市東勢區第一橫街153號'}]});
+ }
  const selectBranch=branchId=>deliveryPreview(post('/api/checkout-delivery-preview/public-store-start',{carrier:'UNIMARTC2C',branchId}),liveEnv,null);
  assert.equal((await selectBranch('999999')).status,400);
  const openMap=await selectBranch('294278');

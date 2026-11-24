@@ -2,6 +2,7 @@ import { addressSearch } from './address-search';
 import { isCheckoutTestHost, isLocalCheckoutTest } from './checkout-test-host';
 import { HttpError, isAdmin, json } from './catalog';
 import { logisticsMac } from './ecpay-logistics';
+import simplifiedCharacters from '../vendor/opencc-search/traditional-to-simplified.json';
 
 const carriers = { UNIMARTC2C: '7-ELEVEN', FAMIC2C: '全家', HILIFEC2C: '萊爾富' } as const;
 const mapEndpoint = 'https://logistics-stage.ecpay.com.tw/Express/map';
@@ -30,7 +31,18 @@ export function livePickupReady(env: PreviewEnv) {
 }
 
 type LiveBranch = { StoreId: string; StoreName: string; StoreAddr: string };
-let liveDirectory: { merchant: string; expiry: number; entries: Map<string, LiveBranch> } | undefined;
+type IndexedBranch = LiveBranch & { searchableName: string; searchableAddress: string };
+let liveDirectory: { merchant: string; expiry: number; entries: Map<string, IndexedBranch> } | undefined;
+
+function branchSearchKey(value: string) {
+  const characters: Readonly<Record<string, string>> = simplifiedCharacters;
+  return Array.from(value.normalize('NFKC').replaceAll('臺', '台').replace(/\s+/gu, '').toLowerCase(),
+    char => characters[char] ?? char).join('');
+}
+
+function publicBranch(branch: LiveBranch) {
+  return { id: branch.StoreId, name: branch.StoreName.trim(), address: branch.StoreAddr.trim() };
+}
 
 async function officialPickupBranches(env: PreviewEnv, merchant: string) {
   if (liveDirectory?.merchant === merchant && liveDirectory.expiry > Date.now()) return liveDirectory.entries;
@@ -46,7 +58,10 @@ async function officialPickupBranches(env: PreviewEnv, merchant: string) {
   const entries = new Map(stores.filter(store =>
     /^\d{3,9}$/.test(store.StoreId) && store.StoreName?.trim() && store.StoreAddr?.trim() &&
     !/^(澎湖縣|金門縣|連江縣|[臺台]東縣(?:蘭嶼|綠島)鄉|屏東縣琉球鄉)/.test(store.StoreAddr.trim())
-  ).map(store => [String(store.StoreId), store]));
+  ).map(store => [String(store.StoreId), {
+    ...store, searchableName: branchSearchKey(store.StoreName), searchableAddress: branchSearchKey(store.StoreAddr),
+  }]));
+
   liveDirectory = { merchant, expiry: Date.now() + 10 * 60_000, entries };
   return entries;
 }
@@ -75,15 +90,17 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
   if (!publicMap && path !== 'store-return' && !isAdmin(user, env)) return json({}, 403);
   try {
     if ((path === 'public-branches' || (path === 'config' && url.searchParams.has('branches'))) && request.method === 'GET') {
-      const query = (url.searchParams.get('q') || '').trim().replaceAll('臺', '台');
+      const query = branchSearchKey((url.searchParams.get('q') || '').slice(0, 61));
       const merchant = livePickupMerchant(env);
       if (!merchant || !livePickupReady(env) || (publicMap && env.OGS_PUBLIC_PICKUP_ENABLED !== 'true')) return json({}, 503);
       if (query.length < 2 || query.length > 60) return json({ branches: [] });
       const branches = await officialPickupBranches(env, merchant);
+      const exact = branches.get(query);
+      if (exact) return json({ branches: [publicBranch(exact)] });
       const matches = [];
       for (const branch of branches.values()) {
-        if (branch.StoreId === query || (branch.StoreName + branch.StoreAddr).replaceAll('臺', '台').includes(query)) {
-          matches.push({ id: branch.StoreId, name: branch.StoreName.trim(), address: branch.StoreAddr.trim() });
+        if (branch.searchableName.includes(query) || branch.searchableAddress.includes(query)) {
+          matches.push(publicBranch(branch));
           if (matches.length === 12) break;
         }
       }
@@ -116,7 +133,7 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
       if (publicLive) {
         const selected = (await officialPickupBranches(env, liveMerchant!)).get(body.branchId || '');
         if (!selected?.StoreName || !selected.StoreAddr) throw new HttpError(400, '此門市目前無法選用，請重新選擇。');
-        branch = { carrier: '7-ELEVEN', id: selected.StoreId, name: selected.StoreName.trim(), address: selected.StoreAddr.trim() };
+        branch = { carrier: '7-ELEVEN', ...publicBranch(selected) };
       }
       await db.prepare('DELETE FROM checkout_preview_store_maps WHERE expires_at <= ?').bind(Date.now()).run();
       const random = crypto.randomUUID().replaceAll('-', '');
