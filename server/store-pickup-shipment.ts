@@ -46,11 +46,23 @@ export function canCreateLivePickup(env: Env, orderId: string) {
 async function callProvider(config: Credentials, path: string, fields: Fields) {
   const params = new URLSearchParams({ ...fields, MerchantID: config.merchant });
   params.set('CheckMacValue', logisticsMac(params, config.key, config.iv));
-  const response = await fetch(provider + path, {
-    method: 'POST', body: params, redirect: 'error', signal: AbortSignal.timeout(15000),
-  });
+  let response: Response;
+  try {
+    response = await fetch(provider + path, {
+      method: 'POST', body: params, redirect: 'manual', signal: AbortSignal.timeout(15000),
+    });
+  } catch (error) {
+    console.error('ECPay logistics request failed', path, error instanceof Error ? error.name : 'UnknownError');
+    throw new HttpError(502, '目前無法連線至綠界物流，請先查詢原單。');
+  }
   const body = (await response.text()).trim();
-  if (!response.ok && !body.startsWith('0|')) throw new HttpError(502, '綠界暫時無法連線，請先查詢原單。');
+  if (!response.ok && !body.startsWith('0|')) {
+    const code = /^(\d{5,12})\|/.exec(body)?.[1];
+    console.error('ECPay logistics HTTP response', path, response.status, code ?? '');
+    throw new HttpError(502, code
+      ? '綠界物流回傳錯誤（' + code + '）。請保留原單。'
+      : '綠界物流暫時無法回應，請保留原單。');
+  }
   return body;
 }
 
@@ -188,6 +200,7 @@ export async function storePickupShipment(request: Request, env: Env, user: Para
   } catch (error) {
     if (error instanceof HttpError) return json({ error: error.message }, error.status);
     if (error instanceof SyntaxError) return json({ error: '請確認建單資料格式。' }, 400);
+    console.error('ECPay shipment processing failed', action, error instanceof Error ? error.name : 'UnknownError');
     return json({ error: '目前無法取得綠界物流結果，請先查詢原單。' }, 502);
   }
 }
