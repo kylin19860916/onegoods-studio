@@ -1,8 +1,9 @@
+import { NAME_MX } from '../src/name-clicker-mechanism.js';
 import opentype from 'opentype.js';
 import ClipperLib from 'clipper-lib';
 import earcut from 'earcut';
 import { strToU8, zipSync } from 'fflate';
-import { MX, MX_NAME_CAP_SOCKET, MX_NAME_FACE, MX_RECESS, MX_SWITCH_WELL } from '../src/cherry-mx-spec.js';
+import { MX_NAME_FACE, MX_RECESS } from '../src/cherry-mx-spec.js';
 
 const units = 1000;
 const core = 'http://schemas.microsoft.com/3dmanufacturing/core/2015/02';
@@ -84,7 +85,7 @@ export function nameClickerContours(font, text) {
   const glyphs = text ? font.getPaths(text, 0, 0, 100, { kerning: true }).map(path => flatten(path.commands)) : [];
   const points = glyphs.flat(2);
   let letters = [];
-  let dividerXs = [];
+  let switchXs = [0];
   function offsetPaths(paths, distance, end = EndType.etClosedPolygon) {
     if (!paths.length) return [];
     const offset = new ClipperOffset(2, 35);
@@ -102,19 +103,17 @@ export function nameClickerContours(font, text) {
     const centerX = (minX + maxX) / 2;
     const characters = [...text.normalize('NFC')];
     const visible = characters.flatMap((character, index) => /\s/u.test(character) ? [] : [index]);
-    // Use the neighboring rendered glyph edges. If the font combines glyphs,
-    // preserve one divider per input boundary using the character advances.
-    const bounds = visible.map(index => {
-      const xs = glyphs[index]?.flat().map(([x]) => x) ?? [];
-      return xs.length ? [Math.min(...xs), Math.max(...xs)] : null;
-    });
-    const edgesMatch = characters.length === glyphs.length && bounds.every(Boolean);
-    const advance = index => font.getAdvanceWidth(characters.slice(0, index).join(''), 100, { kerning: true });
-    dividerXs = visible.slice(1).map((index, gap) => {
-      const x = edgesMatch ? (bounds[gap][1] + bounds[gap + 1][0]) / 2
-        : minX + (maxX - minX) * (advance(visible[gap] + 1) + advance(index)) / (2 * advance(characters.length));
-      return (x - centerX) * scale;
-    });
+    // A three-character cap is carried under the outer glyphs.
+    if (visible.length === 3 && visible.every(index => /\p{Script=Han}/u.test(characters[index]))) {
+      const outerCenters = [visible[0], visible[2]].map(index => {
+        const xs = glyphs[index]?.flat().map(([x]) => x) ?? [];
+        return characters.length === glyphs.length && xs.length ? ((Math.min(...xs) + Math.max(...xs)) / 2 - centerX) * scale : null;
+      });
+      const [left, right] = outerCenters;
+      const midpoint = left !== null && right !== null ? (left + right) / 2 : 0;
+      const halfPitch = Math.max(left !== null && right !== null ? (right - left) / 2 : 0, NAME_MX.switchPitch / 2);
+      switchXs = [midpoint - halfPitch, midpoint + halfPitch];
+    }
     const holeAreas = shapes => shapes.flatMap(([, ...holes]) => holes.map(hole => Math.abs(Clipper.Area(hole)))).sort((a, b) => a - b);
     letters = glyphs.flatMap(glyph => {
       const original = polygons(glyph.map(ring => ring.map(([x, y]) => ({
@@ -149,35 +148,57 @@ export function nameClickerContours(font, text) {
   const glyphContour = connectedOutline(letterOutlines);
   const face = offsetPaths(glyphContour, MX_NAME_FACE.faceMargin);
   const shell = offsetPaths(glyphContour, MX_NAME_FACE.shellMargin);
-  function squareAt(width, y) {
+  function squareAt(width, x, y) {
     const h = Math.round(width * units / 2);
-    const cy = Math.round(y * units);
-    return [{ X: -h, Y: cy - h }, { X: h, Y: cy - h }, { X: h, Y: cy + h }, { X: -h, Y: cy + h }];
+    const cx = Math.round(x * units), cy = Math.round(y * units);
+    return [{ X: cx - h, Y: cy - h }, { X: cx + h, Y: cy - h },
+      { X: cx + h, Y: cy + h }, { X: cx - h, Y: cy + h }];
   }
   const fits = (area, outline) => polygons([area], outline, ClipType.ctDifference).length === 0;
-
-  // Fit the body under the lettering first. Cut the hidden skirt and rim
-  // around the housing so its outline never has to enter the visible face.
-  const offsets = [0, ...Array.from({ length: 12 }, (_, i) => [-(i + 1) / 4, (i + 1) / 4]).flat()];
-  const glyphMountY = offsets.find(y => fits(squareAt(MX_SWITCH_WELL.clearance + 1.6, y), shell)
-    && fits(circle(0, y * units, (MX_NAME_CAP_SOCKET.outerDiameter / 2 + 0.15) * units), face));
-  const mount = roundedPlate(16.4, 16.4, 4)
-    .map(({ X, Y }) => ({ X: X - 8200, Y: Y - 8200 }));
-  const contour = glyphMountY === undefined ? connectedOutline([mount, ...letterOutlines]) : glyphContour;
-  const toMm = ring => ring.map(({ X, Y }) => [X / units, Y / units]);
+  const offsets = [0, ...Array.from({ length: 24 }, (_, i) => [-(i + 1) / 4, (i + 1) / 4]).flat()];
+  const seatEnvelope = Math.max(NAME_MX.exteriorX, NAME_MX.exteriorY) + 1.6;
+  const wallEnvelope = NAME_MX.capPocket + 2 * NAME_MX.capWall;
+  const fittedMounts = switchXs.map(x => ({
+    x, y: offsets.find(y => fits(squareAt(seatEnvelope, x, y), shell)
+      && fits(squareAt(wallEnvelope, x, y), face)),
+  }));
+  const mountingPads = fittedMounts.filter(({ y }) => y === undefined).map(({ x }) =>
+    roundedPlate(20.8, 20.8, 4)
+      .map(({ X, Y }) => ({ X: X - 10400 + Math.round(x * units), Y: Y - 10400 })));
+  const mounts = fittedMounts.map(({ x, y }) => ({ x, y: y ?? 0 }));
+  const contour = mountingPads.length ? connectedOutline([...mountingPads, ...letterOutlines]) : glyphContour;
+  const toMm = ring => ring.map(({ X, Y }) => /** @type {[number, number]} */ ([X / units, Y / units]));
+  // Cut only enclosed pockets; the validated outer contour is shared by both outputs.
+  const capFace = offsetPaths(contour, MX_NAME_FACE.faceMargin);
+  const pockets = mounts.map(({ x, y }) => squareAt(NAME_MX.capPocket, x, y));
+  const capBack = polygons(capFace, pockets, ClipType.ctDifference);
+  if (mounts.some(({ x, y }) => !fits(squareAt(wallEnvelope, x, y), capFace))
+      || capBack.length !== 1 || capBack[0].length !== 1 + mounts.length
+      || Math.abs(Math.abs(Clipper.Area(capBack[0][0])) - Math.abs(Clipper.Area(polygons(capFace)[0][0]))) > units * units * 0.001) {
+    throw new Error('字形無法保留完整上蓋外壁，請更換字型或調整文字。');
+  }
+  const halfDivider = NAME_MX.dividerWidth * units / 2;
+  const dividerStrips = switchXs.slice(1).map((x, i) => {
+    const center = (x + switchXs[i]) * units / 2;
+    const left = Math.round(center - halfDivider), right = Math.round(center + halfDivider);
+    return [{ X: left, Y: -30000 }, { X: right, Y: -30000 },
+      { X: right, Y: 30000 }, { X: left, Y: 30000 }];
+  });
+  const dividers = polygons(dividerStrips, capFace, ClipType.ctIntersection);
+  if (dividers.length !== dividerStrips.length) throw new Error('字形無法保留底座隔板，請調整文字。');
   function housingRing(outerMargin, innerMargin) {
     const interior = offsetPaths(contour, innerMargin);
-    if (glyphMountY !== undefined) interior.push(squareAt(MX.width + 0.3, glyphMountY));
     const clearance = polygons(interior).flat();
     return polygons(offsetPaths(contour, outerMargin), clearance, ClipType.ctDifference)
       .map(rings => rings.map(toMm));
   }
   return {
+    capBack: capBack.map(rings => rings.map(toMm)),
     skirt: housingRing(MX_NAME_FACE.faceMargin, MX_NAME_FACE.innerSkirtMargin),
     rim: housingRing(MX_NAME_FACE.shellMargin, MX_NAME_FACE.faceMargin + MX_RECESS.sideClearance),
     lettering: letters.map(rings => rings.map(toMm)),
-    dividerXs,
-    mountY: glyphMountY ?? 0,
+    dividers: dividers.map(rings => rings.map(toMm)),
+    mounts,
     profile(margin) {
       const rings = polygons(offsetPaths(contour, margin));
       if (rings.length !== 1) throw new Error('Name clicker contour is disconnected');

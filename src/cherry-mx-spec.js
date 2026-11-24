@@ -1,3 +1,5 @@
+import { NAME_MX } from './name-clicker-mechanism.js';
+
 // Nominal CHERRY MX reference dimensions, not an approved printable fit.
 // Source: CHERRY MX Series drawing, page 2 (manufacturer sheet mirrored by Maltron)
 // https://www.maltron.com/uploads/6/1/2/5/61250099/mx1a_11nn_data_sheet.pdf
@@ -8,13 +10,15 @@ export const MX_CASE = Object.freeze({ floor: 1.8, pinClearance: 0.7, plate: 1.5
 export const MX_RECESS = Object.freeze({ sideClearance: 0.55, capRise: 0.8 });
 // Continuous circular boss with a female cross, fused to the keycap roof.
 export const MX_CAP_SOCKET = Object.freeze({ outerDiameter: 6, crossSpan: 4.2, crossArm: 1.5, engagement: 2.8 });
-export const MX_NAME_CAP_SOCKET = Object.freeze({ ...MX_CAP_SOCKET, outerDiameter: 5.8 });
+export const MX_NAME_CAP_SOCKET = Object.freeze({ ...MX_CAP_SOCKET,
+  outerDiameter: NAME_MX.bossDiameter, crossSpan: NAME_MX.crossSpan,
+  crossArm: NAME_MX.crossArmX, engagement: NAME_MX.socketDepth - 0.8 });
 // Buried dividers bridge the case floor to the switch plate, leaving the switch clear.
 export const MX_BASE_DIVIDER = Object.freeze({ thickness: 1.4 });
 export const MX_SWITCH_WELL = Object.freeze({ clearance: MX.width + 1.6, wall: 1.4 });
 export const MX_NAME_FACE = Object.freeze({
-  shellMargin: 3.3, innerWallMargin: 1.6, faceMargin: 1.75,
-  insetMargin: 0.35, innerSkirtMargin: 0.25, insetHeight: 0.5, letteringHeight: 1.35,
+  shellMargin: 4.9, innerWallMargin: 3.3, faceMargin: 2.75,
+  insetMargin: 1.35, innerSkirtMargin: 0.25, insetHeight: 0.5, letteringHeight: 1.35,
 });
 export const MX_CHAIN_EYELET = Object.freeze({ width: 8.6, thickness: 2.6, holeDiameter: 5, bottom: 3.7 });
 
@@ -86,4 +90,42 @@ export function mxStack() {
   const capTop = roofBottom + MX_CASE.roof;
   return { bodyBottom, mountTop, plateBottom: mountTop - MX_CASE.plate, housingTop, stemTop,
     skirtBottom: housingTop + 0.4, roofBottom, capTop, rimTop: capTop - MX_RECESS.capRise };
+}
+
+// P2S-printable name-clicker eyelet. Keep the XY outline/hole/thickness,
+// but give the underside enough rise for <= 1 mm XY growth per mm Z.
+// The piecewise-quadratic easing has a continuous first derivative and
+// ends tangent to the vertical eyelet wall. The old V3 helper is retained
+// for fixed mechanical-base templates, which are separate products.
+export function mxPrintableEyelet(outline, rootLeft) {
+  const lowerZ = 0.5, transition = 0.1, maxGrowth = 0.95;
+  const anchor = rootLeft + 0.35;
+  const reach = Math.max(...outline.map(([x, y]) => Math.hypot(x - anchor, y)));
+  const rise = reach / ((1 - transition) * maxGrowth);
+  const bottom = lowerZ + rise;
+  const segments = Math.max(96, Math.ceil(rise / 0.08));
+  const positions = [], faces = [], count = outline.length;
+  function eased(p) {
+    if (p < transition) return p * p / (2 * transition * (1 - transition));
+    if (p > 1 - transition) return 1 - (1 - p) ** 2 / (2 * transition * (1 - transition));
+    return (p - transition / 2) / (1 - transition);
+  }
+  for (let layer = 0; layer <= segments + 1; layer++) {
+    const progress = Math.min(layer / segments, 1);
+    const scale = Math.max(0.001, eased(progress));
+    const z = layer <= segments ? lowerZ + rise * progress : bottom + 0.3;
+    for (const [x, y] of outline) positions.push(anchor + (x - anchor) * scale, y * scale, z);
+  }
+  for (let layer = 0; layer <= segments; layer++) {
+    const first = layer * count;
+    for (let i = 0; i < count; i++) {
+      const a = first + i, b = first + (i + 1) % count;
+      faces.push(a, b, b + count, a, b + count, a + count);
+    }
+  }
+  const top = (segments + 1) * count;
+  for (let i = 1; i < count - 1; i++) faces.push(0, i + 1, i, top, top + i, top + i + 1);
+  return { bottom, reach, lowerZ, maxGrowth, mesh: {
+    numProp: 3, vertProperties: new Float32Array(positions), triVerts: new Uint32Array(faces),
+  } };
 }

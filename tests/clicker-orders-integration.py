@@ -37,8 +37,8 @@ def request(path, method='GET', body=None, client=owner, origin=base):
 SUPPORT_PRESET = {
     'enable_support': '1',
     'support_type': 'normal(auto)',
-    'support_style': 'grid',
-    'support_threshold_angle': '25',
+    'support_style': 'snug',
+    'support_threshold_angle': '15',
     'support_on_build_plate_only': '1',
     'support_remove_small_overhang': '1',
     'support_top_z_distance': '0.16',
@@ -47,9 +47,9 @@ SUPPORT_PRESET = {
     'support_base_pattern_spacing': '2.5',
     'support_angle': '0',
     'support_interface_top_layers': '2',
-    'support_interface_bottom_layers': '5',
-    'support_interface_pattern': 'rectilinear_interlaced',
-    'support_interface_spacing': '0.35',
+    'support_interface_bottom_layers': '2',
+    'support_interface_pattern': 'auto',
+    'support_interface_spacing': '0.5',
     'support_expansion': '0',
     'support_object_xy_distance': '0.35',
 }
@@ -84,26 +84,24 @@ def check_cap_socket(model, namespace, centers=(0,), mount_y=0):
         for center in centers:
             for degrees in range(0, 360, 5):
                 angle = math.radians(degrees)
-                assert inside(center + 2.88 * math.cos(angle), 39 + mount_y + 2.88 * math.sin(angle))
-                assert not inside(center + 2.92 * math.cos(angle), 39 + mount_y + 2.92 * math.sin(angle))
+                assert inside(center + 2.80 * math.cos(angle), 39 + mount_y + 2.80 * math.sin(angle))
+                assert not inside(center + 2.85 * math.cos(angle), 39 + mount_y + 2.85 * math.sin(angle))
             for x, y in ((0, 0), (1.93, 0), (-1.93, 0), (0, 1.93), (0, -1.93)):
                 assert not inside(center + x, 39 + mount_y + y)
             for x, y in ((1, 1), (-1, -1), (-1, 1), (1, -1)):
                 assert inside(center + x, 39 + mount_y + y)
 
 
-def check_switch_well(model, namespace, centers=(0,), mount_y=0):
-    for z in (1.7, 1.9, 5.5, 9.2, 9.4):
+def check_switch_well(model, namespace, centers):
+    for z in (0.6, 0.9, 5.5, 8.5, 10):
         inside = mesh_section(model, namespace, 'Case', z)
-        for center in centers:
-            assert inside(center, mount_y) == (z < 1.8)
-            for sign in (-1, 1):
-                for along in (-8.25, -6.2, -3.1, 0, 3.1, 6.2, 8.25):
-                    assert inside(center + sign * 8.85, mount_y + along), (center, z, 'x', sign, along)
-                    assert inside(center + along, mount_y + sign * 8.85), (center, z, 'y', sign, along)
-                    if 1.8 < z < 9.3:
-                        assert not inside(center + sign * 8.45, mount_y + along)
-                        assert not inside(center + along, mount_y + sign * 8.45)
+        for cx, cy in centers:
+            assert inside(cx, cy) == (z < 0.746)
+            if 0.746 < z:
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    assert inside(cx + dx * 9, cy + dy * 9), (cx, cy, z, dx, dy)
+                    inner = 7.9 if 8.207 < z < 9.713 else 6.95
+                    assert not inside(cx + dx * inner, cy + dy * inner)
 
 
 assert request(endpoint, client=anonymous)[0] == 401
@@ -162,46 +160,40 @@ for text, tier, amount, other_tier, other_amount in [
         namespace = {'m': 'http://schemas.microsoft.com/3dmanufacturing/core/2015/02'}
         model = ET.fromstring(project.read('3D/3dmodel.model'))
         assert model.attrib['unit'] == 'millimeter'
-        assert len(model.findall('.//m:mesh', namespace)) == 6
-        blocker = model.find('.//m:object[@name="Exclude supports inside MX well 1"]', namespace)
-        ys = [float(v.attrib['y']) for v in blocker.findall('.//m:vertex', namespace)]
-        mount_y = (min(ys) + max(ys)) / 2
-        check_switch_well(model, namespace, mount_y=mount_y)
-        check_cap_socket(model, namespace, mount_y=mount_y)
+        switch_count = 2 if text == '玩好物' else 1
+        assert len(model.findall('.//m:mesh', namespace)) == 5 + 2 * switch_count
+        centers = []
+        for number in range(1, switch_count + 1):
+            well_name = f'Exclude supports inside MX well {number}'
+            blocker = model.find(f'.//m:object[@name="{well_name}"]', namespace)
+            vertices = blocker.findall('.//m:vertex', namespace)
+            xs = [float(v.attrib['x']) for v in vertices]
+            ys = [float(v.attrib['y']) for v in vertices]
+            cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+            centers.append((cx, cy))
+            check_cap_socket(model, namespace, centers=(cx,), mount_y=cy)
+            socket_name = f'Exclude supports inside MX cap cross socket {number}'
+            cap_blocker = mesh_section(model, namespace, socket_name, 1.8)
+            assert cap_blocker(cx, 39 + cy)
+            assert not cap_blocker(cx + 5.1, 39 + cy)
+        check_switch_well(model, namespace, centers)
+        if switch_count == 2:
+            assert abs(centers[0][0] - centers[1][0]) >= 21
         body = model.find('.//m:object[@name="Case"]', namespace)
-        points = [(float(v.attrib['x']), float(v.attrib['y'])) for v in body.findall('.//m:vertex', namespace)]
-        outer_left = min(x for x, y in points if abs(y) < 0.01)
-        hole_x = outer_left + 4.3
-        for z in (3.85, 5.0, 6.2):
-            inside = mesh_section(model, namespace, 'Case', z)
-            assert not inside(hole_x, 0)
-            assert inside(hole_x, -3.5) and inside(hole_x, 3.5)
-            assert inside(hole_x - 3.5, 0)
-
-        cap_blocker = mesh_section(model, namespace, 'Exclude supports inside MX cap cross socket', 1.8)
-        for x, y in ((0, 0), (2.1, 0.7), (-2.1, 0.7), (0.7, 2.1), (0.7, -2.1)):
-            assert cap_blocker(x, 39 + mount_y + y)
-        for x, y in ((4.0, 4.0), (5.1, 0), (0, -5.1)):
-            assert not cap_blocker(x, 39 + mount_y + y)
-
-        if text == 'Max':
-            assert math.isclose(mount_y, -0.5)
-            inset = mesh_section(model, namespace, 'Inset', 5.65)
-            shell = mesh_section(model, namespace, 'Case', 10.0)
-            assert not inset(0, 46.5) and not inset(4, 47)
-            assert inset(0, 43)
-            for x in (14, 22):
-                assert not inset(x, 47) and not shell(x, 10)
-                assert inset(x, 39)
+        heights = [float(v.attrib['z']) for v in body.findall('.//m:vertex', namespace)]
+        assert max(heights) == 19.5
         settings = json.loads(project.read('Metadata/project_settings.config'))
         assert {key: settings[key] for key in SUPPORT_PRESET} == SUPPORT_PRESET
         assert settings['filament_colour'] == ['#F2C879', '#EFB39E', '#FFFCF5']
         models = ET.fromstring(project.read('Metadata/model_settings.config'))
-        assert len(models.findall('.//part[@subtype="support_blocker"]')) == 2
+        assert len(models.findall('.//part[@subtype="support_blocker"]')) == 1 + 2 * switch_count
+        if switch_count == 2:
+            assert settings['curr_bed_type'] == 'Textured PEI Plate'
+            assert settings['filament_settings_id'][1:] == ['Bambu PLA Matte @BBL P2S'] * 2
         assert [p.attrib['value'] for p in models.findall('.//part/metadata[@key="extruder"]')] == ['1', '1', '2', '3']
     output = os.environ.get('OGS_TEST_EXPORT')
     if output and text == '玩好物工作':
         Path(output).write_bytes(file)
     results.append({'order': order['id'], 'tier': tier, 'testPrice': amount, 'simulatedMyShipOrder': reference})
 
-print(json.dumps({'orders': results, 'checks': ['automatic pricing', 'correct checkout', 'order match', 'private 3MF download', '5.8 mm circular MX socket', 'four vertical walls per switch recess']}, ensure_ascii=False))
+print(json.dumps({'orders': results, 'checks': ['automatic pricing', 'correct checkout', 'order match', 'private 3MF download', '5.65 mm circular MX socket', 'four vertical walls per switch recess']}, ensure_ascii=False))
