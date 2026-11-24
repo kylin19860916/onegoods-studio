@@ -8,11 +8,11 @@ Fixed future-change requirements: [NAME_CLICKER_GENERATION_CONTRACT.md](NAME_CLI
 
 ## Cap, seat and travel
 
-- Exactly three Han characters share one rigid cap with three switches, one beneath each glyph, and two hidden 1.4 mm base dividers between the wells. Ignore whitespace for the count. Keep at least 21 mm between neighboring switch centers along X. Other supported names use the existing single central switch layout.
-- The continuous cap back is 2.993 mm deep under a 1.4 mm roof. Each local recess is 15.4 × 15.4 mm with at least 1 mm to the outer contour. Find each recess and socket together, searching Y in 0.25 mm steps up to ±6 mm. Use a rounded mechanical minimum contour where required.
-- Female-cross boss: OD 5.65 mm, cross span 4.199 mm, arms 1.554/1.562 mm and blind depth 2.993 mm. Root flare: OD 6.88 mm, height 1 mm. The opening and cap back start on the same print plane. Keep local socket support exclusions.
-- Lower the seat and latch relief 2 mm so the assembled roof also sits 2 mm lower. Four vertical seat walls: opening 14.06 mm, exterior 18.844 × 18.814 mm, floor Z0.746, seat top Z8.517. The bounded latch relief is 16.065 × 16.117 mm at Z6.207–7.713. Add individual floor openings at the switch pin and locator positions to clear the lowered switch.
-- Base deck Z4.52, upper guide Z17.5. The shoulder is Z12.324, cap resting bottom Z16.524. At the nominal 4 mm stroke, the cap bottom is Z12.524, leaving 0.2 mm before the shoulder. Guide overlap is 0.976 mm at rest and 4.976 mm pressed. Side contour offset is nominally 0.55 mm. The cap perimeter remains continuous through all these levels.
+- Exactly three Han characters share one rigid cap with two MX switches under the outer glyphs and one hidden 1.4 mm base divider between the wells. Ignore whitespace for the count. Keep at least 21 mm between both switch centers along X. Names of one or two characters and other supported names have one centered switch along X.
+- The continuous cap back is 4.993 mm deep under a 1.4 mm roof. Each local recess is 15.4 × 15.4 mm with at least 1 mm to the outer contour. Find each recess and socket together, searching Y in 0.25 mm steps up to ±6 mm. Use a rounded mechanical minimum contour where required.
+- Female-cross boss: OD 5.65 mm, cross span 4.199 mm, arms 1.554/1.562 mm and blind depth 4.993 mm. Root flare: OD 6.88 mm, height 1 mm. The opening and cap back start on the same print plane. Keep local socket support exclusions.
+- Four vertical seat walls: opening 14.06 mm, exterior 18.844 × 18.814 mm, floor Z0.746, seat top Z10.517. The bounded latch relief is 16.065 × 16.117 mm at Z8.207–9.713.
+- Base deck Z4.52. The outside guide wall rises 2 mm to Z19.5. The shoulder is Z12.324, cap resting bottom Z16.524. At the nominal 4 mm stroke, the cap bottom is Z12.524, leaving 0.2 mm before the shoulder. Guide overlap is 2.976 mm at rest and 6.976 mm pressed. Side contour offset is nominally 0.55 mm. The cap perimeter remains continuous through all these levels.
 - Reject solid overlap against the base at strokes from 0 to 4 mm in 0.5 mm increments and against a simplified switch housing envelope. This envelope is a digital interference guard, not a scan or physical tolerance certification.
 - Preserve personalized lettering and three colour layers. This does not change the website default font or impose proposed future customer character/length limits. 林予曦 in 站酷快樂 is a regression fixture.
 
@@ -33,6 +33,6 @@ node_modules/.bin/tsc --noEmit
 python build.py
 ```
 
-Compare preview/export outlines for every supported font. Generate real 3MFs for 濤/飛/Max/III/ONEGOODS/玩物工作室/林予曦, plus 站酷快樂 林予曦. Check closed outer sections, pocket clearance, watertight meshes, native P2S slice/reopen, actual socket/well/eyelet support paths and G-code checksums. Also inspect the browser preview. Digital verification does not claim a new physical print or guarantee fit, support removal or surface finish.
+Compare preview/export outlines for every supported font. Generate real 3MFs for 濤/飛/Max/III/ONEGOODS/玩物工作室/林予曦, plus 站酷快樂 林予曦 and 林予. Check closed outer sections, pocket clearance, watertight meshes, native P2S slice/reopen, actual socket/well/eyelet support paths and G-code checksums. Also inspect the browser preview. Digital verification does not claim a new physical print or guarantee fit, support removal or surface finish.
 
-Review on `codex/ogs-three-switch-name-1124`; Alpha/Mac mini validates and merges into the development mainline. No production deployment, payment or logistics changes are authorized here.
+Review on `codex/ogs-dual-switch-name-1124`; Alpha/Mac mini validates and merges into the development mainline. No production deployment, payment or logistics changes are authorized here.

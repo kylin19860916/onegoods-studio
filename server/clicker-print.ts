@@ -1,4 +1,4 @@
-import { NAME_MX, NAME_MX_PIN_RELIEF, nameMxStack } from '../src/name-clicker-mechanism.js';
+import { NAME_MX, nameMxStack } from '../src/name-clicker-mechanism.js';
 import createManifold, { type CrossSection, type Manifold, type ManifoldToplevel } from 'manifold-3d';
 import wasm from 'manifold-3d/manifold.wasm?module';
 import { mechanicalKeyContours, nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
@@ -98,8 +98,6 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     const wellExterior = atMounts(box(NAME_MX.exteriorX, NAME_MX.exteriorY));
     const wellFrame = own(Section.intersection(shell, cut(wellExterior, wellVoid)));
     const latchVoid = atMounts(box(NAME_MX.latchX, NAME_MX.latchY));
-    const pinRelief = NAME_MX_PIN_RELIEF.map(([x, y, radius]) =>
-      atMounts(own(own(Section.circle(radius, 40)).translate([x, y]))));
     const { leadInRadius, leadInTop } = MX_EYELET_BLEND;
     const arc = own(new Solid(new Mesh(printableEar.mesh)));
     const entry = join([
@@ -130,8 +128,7 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
     ]);
     const base = own(Solid.difference([caseWithEar,
       slab(hole, 0, earBottom + earThickness + 0.1),
-      slab(latchVoid, NAME_MX.latchBottom, NAME_MX.latchTop),
-      ...pinRelief.map(relief => slab(relief, -0.01, NAME_MX.floor + 0.01))]));
+      slab(latchVoid, NAME_MX.latchBottom, NAME_MX.latchTop)]));
     const outerDiameter = NAME_MX.bossDiameter, crossSpan = NAME_MX.crossSpan;
     const socketStart = stack.socketStart;
     const boss = own(Section.circle(outerDiameter / 2, 64));
@@ -174,7 +171,7 @@ export async function generateClicker3mf(design: ClickerDesign, fontFile: Respon
       ...mounts.flatMap((mount, index) => [
         { name: `Exclude supports inside MX well ${index + 1}`, filament: 1, color: design.colors.border,
           subtype: 'support_blocker' as const,
-          solid: slab(atMount(wellClearance, mount), -0.15, stack.mountTop + 0.05) },
+          solid: slab(atMount(wellClearance, mount), NAME_MX.floor - 0.15, stack.mountTop + 0.05) },
         { name: `Exclude supports inside MX cap cross socket ${index + 1}`, filament: 1, color: design.colors.border,
           subtype: 'support_blocker' as const,
           solid: own(slab(atMount(crossClearance, mount), -printOffset[2], stack.roofBottom + 0.15).translate(printOffset)) },

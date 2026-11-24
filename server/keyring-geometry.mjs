@@ -103,17 +103,16 @@ export function nameClickerContours(font, text) {
     const centerX = (minX + maxX) / 2;
     const characters = [...text.normalize('NFC')];
     const visible = characters.flatMap((character, index) => /\s/u.test(character) ? [] : [index]);
-    // Three Han characters share one rigid cap carried by three real switches.
+    // A three-character cap is carried under the outer glyphs.
     if (visible.length === 3 && visible.every(index => /\p{Script=Han}/u.test(characters[index]))) {
-      const bounds = visible.map(index => {
+      const outerCenters = [visible[0], visible[2]].map(index => {
         const xs = glyphs[index]?.flat().map(([x]) => x) ?? [];
-        return characters.length === glyphs.length && xs.length ? (Math.min(...xs) + Math.max(...xs)) / 2 : null;
+        return characters.length === glyphs.length && xs.length ? ((Math.min(...xs) + Math.max(...xs)) / 2 - centerX) * scale : null;
       });
-      const centers = bounds.every(x => x !== null) ? bounds.map(x => (x - centerX) * scale)
-        : [-NAME_MX.switchPitch, 0, NAME_MX.switchPitch];
-      const middle = centers[1];
-      switchXs = [Math.min(centers[0], middle - NAME_MX.switchPitch), middle,
-        Math.max(centers[2], middle + NAME_MX.switchPitch)];
+      const [left, right] = outerCenters;
+      const midpoint = left !== null && right !== null ? (left + right) / 2 : 0;
+      const halfPitch = Math.max(left !== null && right !== null ? (right - left) / 2 : 0, NAME_MX.switchPitch / 2);
+      switchXs = [midpoint - halfPitch, midpoint + halfPitch];
     }
     const holeAreas = shapes => shapes.flatMap(([, ...holes]) => holes.map(hole => Math.abs(Clipper.Area(hole)))).sort((a, b) => a - b);
     letters = glyphs.flatMap(glyph => {

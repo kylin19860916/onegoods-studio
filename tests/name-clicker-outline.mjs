@@ -15,13 +15,19 @@ function contains(points, x, y) {
 let checked = 0;
 for (const key of Object.keys(keyringFonts)) {
   const font = parseKeyringFont(readFileSync(new URL('../public/assets/fonts/keyring/' + keyringFonts[key], import.meta.url)));
-  for (const text of ['Max', 'III', 'WIDE', 'A B', '玩好物', '飛', '林予曦']) {
+  for (const text of ['Max', 'III', 'WIDE', 'A B', '玩好物', '飛', '林予', '林予曦']) {
     if ([...text].some(char => char !== ' ' && !font.charToGlyphIndex(char))) continue;
     const model = nameClickerContours(font, text);
     const preview = nameClickerOutline(font, text);
-    const expected = /^\p{Script=Han}{3}$/u.test(text) ? 3 : 1;
+    const expected = /^\p{Script=Han}{3}$/u.test(text) ? 2 : 1;
     assert.equal(model.mounts.length, expected);
     assert.equal(model.dividers.length, expected - 1);
+    if (expected === 2) {
+      assert(model.mounts[0].x < 0 && model.mounts[1].x > 0);
+      assert(model.mounts[1].x - model.mounts[0].x >= 21 - 1e-8);
+    } else {
+      assert.equal(model.mounts[0].x, 0);
+    }
     assert.deepEqual(preview.mounts, model.mounts);
     // A seat-clearance subtraction must never open a notch through the cap skirt.
     const area = ring => Math.abs(ring.reduce((sum, [x,y], i) => {

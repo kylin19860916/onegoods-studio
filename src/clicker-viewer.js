@@ -3,7 +3,7 @@ import {
   Mesh, MeshStandardMaterial, OrthographicCamera, Path, Raycaster, Scene,
   Shape, ShapePath, Vector2, WebGLRenderer,
 } from 'three';
-import { NAME_MX, NAME_MX_PIN_RELIEF, nameMxStack } from './name-clicker-mechanism.js';
+import { NAME_MX, nameMxStack } from './name-clicker-mechanism.js';
 import { MX, MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_FACE, MX_RECESS, mxChainEyelet, mxPrintableEyelet, mxStack } from './cherry-mx-spec.js';
 import { MECHANICAL_KEYCAP, mechanicalKeycapShell } from './mechanical-keycap.js';
 import { nameClickerOutline } from './name-clicker-outline.js';
@@ -273,11 +273,6 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       const deck = profile(shellMargin);
       for (const { x, y } of mounts) {
         deck.holes.push(rounded(NAME_MX.opening, NAME_MX.opening, 0, x, y));
-        for (const [dx, dy, radius] of NAME_MX_PIN_RELIEF) {
-          const hole = new Path();
-          hole.absarc(x + dx, y + dy, radius, 0, Math.PI * 2, true);
-          floor.holes.push(hole);
-        }
       }
       add(extrude(floor, NAME_MX.floor), caseColour, 0);
       add(extrude(deck, NAME_MX.deck - NAME_MX.floor), caseColour, NAME_MX.floor);
