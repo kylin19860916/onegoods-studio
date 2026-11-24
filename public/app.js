@@ -58,7 +58,7 @@ function renderStoreCheckout(){
  const test=storePayment.test === true;
  const livePickup=storePayment.enabled && !test && storePayment.pickupEnabled === true;
  if(storePayment.testRequested){checkout.innerHTML='<p role="alert">此入口僅供 OGS 管理員測試，請先登入。</p><a class="button cream" href="/signin-with-chatgpt?return_to='+encodeURIComponent(location.pathname+location.search)+'">登入管理帳號</a>';return;}
- const mapToken=checkoutUrl.searchParams.get('store');
+ let mapToken=checkoutUrl.searchParams.get('store');
  const draftKey=test?'ogs-pickup-stage-test':'ogs-pickup-live';
  let draft;
  try {
@@ -156,7 +156,61 @@ function renderStoreCheckout(){
  for(const input of [carrier,delivery]){
    input.addEventListener('change',()=>{ branchError.hidden=true; });
  }
- chooseBranch.addEventListener('click',async()=>{
+ if (livePickup) {
+   const directory=qs('#store-branch-directory');
+   const query=qs('#store-branch-query');
+   const search=qs('#store-branch-search');
+   const searchStatus=qs('#store-branch-search-status');
+   const results=qs('#store-branch-options');
+   search.addEventListener('click',async()=>{
+     const term=query.value.trim();
+     results.replaceChildren();
+     results.hidden=true;
+     if(term.length<2){searchStatus.textContent='請輸入至少兩個字。';return;}
+     search.disabled=true;
+     searchStatus.textContent='正在搜尋門市…';
+     try {
+       const response=await fetch(mapApi+'public-branches?q='+encodeURIComponent(term),{cache:'no-store'});
+       if(!response.ok)throw new Error();
+       const {branches}=await response.json();
+       searchStatus.textContent=branches.length?'請選擇取貨門市。':'找不到門市，請換個關鍵字。';
+       for(const branch of branches){
+         const item=document.createElement('li');
+         const button=document.createElement('button');
+         button.type='button';
+         button.className='button cream';
+         button.textContent=branch.name+'（'+branch.id+'） · '+branch.address;
+         button.addEventListener('click',async()=>{
+           results.querySelectorAll('button').forEach(button=>button.disabled=true);
+           try {
+             const response=await fetch(mapApi+'public-store-start',{method:'POST',headers:{'Content-Type':'application/json'},
+               body:JSON.stringify({carrier:'UNIMARTC2C',branchId:branch.id})});
+             const selection=await response.json();
+             if(!response.ok || !selection.branch)throw new Error();
+             mapToken=selection.token;
+             selectedBranch={...selection.branch,carrier:'UNIMARTC2C'};
+             directory.hidden=true;
+             branchError.hidden=true;
+             refresh();
+             chooseBranch.focus();
+           } catch { searchStatus.textContent='暫時無法選擇這個門市，請重試。'; }
+           finally { results.querySelectorAll('button').forEach(button=>button.disabled=false); }
+         });
+         item.append(button);
+         results.append(item);
+       }
+       results.hidden=!branches.length;
+     } catch { searchStatus.textContent='暫時無法搜尋門市，請重試。'; }
+     finally { search.disabled=false; }
+   });
+   query.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();search.click();}});
+   chooseBranch.addEventListener('click',()=>{
+     directory.hidden=!directory.hidden;
+     branchError.hidden=true;
+     if(!directory.hidden)query.focus();
+   });
+ }
+ if(test) chooseBranch.addEventListener('click',async()=>{
    if(!quantity.reportValidity())return;
    const requestedCarrier=carrier.value;
    chooseBranch.disabled=true;
@@ -190,7 +244,7 @@ function renderStoreCheckout(){
    }
  });
  async function restoreBranch(){
-   if((!livePickup&&!test) || draft?.product!==product.id || ![...carrier.options].some(option=>option.value===draft.carrier))return;
+   if(!test || draft?.product!==product.id || ![...carrier.options].some(option=>option.value===draft.carrier))return;
    checkoutUrl.searchParams.set('product',product.id);
    history.replaceState(null,'',checkoutUrl);
    delivery.value='pickup';
@@ -246,9 +300,9 @@ function renderStoreCheckout(){
            body:JSON.stringify({productId:product.id,quantity:count,method,storeToken:method==='pickup'?mapToken:null}),
          });
          const quote=await response.json();
-         if(!response.ok)throw new Error(quote.error||'暂时无法核对運費，请重试。');
+         if(!response.ok)throw new Error(quote.error||'暫時無法核對運費，請重試。');
          if(sections[1].hidden || delivery.value!==method || quantity.valueAsNumber!==count)return;
-         if(quote.amount!==expectedTotal || quote.shipping!==shippingFee())throw new Error('商品或運費已变更，请重新整理后确认。');
+         if(quote.amount!==expectedTotal || quote.shipping!==shippingFee())throw new Error('商品或運費已變更，請重新整理後確認。');
        } catch (failure) {
          showBranchError(failure.message);
          return;

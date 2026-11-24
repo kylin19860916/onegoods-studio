@@ -630,6 +630,10 @@ body[data-page] .section-with-accent {
 .store-order-panel label { display: block; margin: 14px 0 6px; }
 .store-order-panel input, .store-order-panel select { max-width: 100%; min-height: 44px; padding: 8px; font: inherit; color: inherit; background: transparent; border: 1px solid #a69faa; border-radius: 6px; }
 .store-pickup-choice { display: grid; justify-items: start; gap: 10px; margin-top: 12px; }
+#store-branch-directory { width: 100%; }
+#store-branch-options { list-style: none; padding: 0; display: grid; gap: 8px; }
+#store-branch-options[hidden] { display: none; }
+#store-branch-options button { width: 100%; justify-content: start; text-align: left; white-space: normal; }
 #store-branch-address, #store-branch-error { margin: 0; }
 #store-branch-error { color: #963437; }
 .store-checkout-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }

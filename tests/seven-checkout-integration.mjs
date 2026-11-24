@@ -70,27 +70,23 @@ try{
  }:undefined),settings);
  assert.equal((await (await pay('config')).json()).pickupEnabled,true);
  assert.equal((await (await pay('config',null,'',{...liveEnv,OGS_PUBLIC_PICKUP_ENABLED:undefined})).json()).pickupEnabled,false);
- const openMap=await deliveryPreview(post('/api/checkout-delivery-preview/public-store-start',{carrier:'UNIMARTC2C',language:'zh-Hant'}),liveEnv,null);
- assert.equal(openMap.status,200);
- const liveSelection=await openMap.json();
- const session=openMap.headers.get('Set-Cookie').split(';',1)[0];
- assert.equal(liveSelection.action,'https://logistics.ecpay.com.tw/Express/map');
- assert(liveSelection.token.startsWith('lt'));
- // Mock the signed read-only directory response; no provider order is sent.
+ // Read and select from the authoritative directory without calling a transaction endpoint.
  globalThis.fetch=async(url,options)=>{
    assert.equal(url,'https://logistics.ecpay.com.tw/Helper/GetStoreList');
    assert.equal(options.body.get('CvsType'),'UNIMART');
    assert.match(options.body.get('CheckMacValue'),/^[A-F0-9]{32}$/);
    return Response.json({RtnCode:1,StoreList:[{CvsType:'UNIMART',StoreInfo:[{StoreId:'294278',StoreName:'經貿',StoreAddr:'台北市南港區三重路19號1樓'}]}]});
  };
- const mapReturn=(changes={})=>deliveryPreview(new Request(base+'/api/checkout-delivery-preview/store-return',{method:'POST',body:new URLSearchParams({
-   ...fields,MerchantTradeNo:liveSelection.token,ExtraData:liveSelection.token,CVSStoreID:'294278',CVSOutSide:'0',...changes,
- })}),liveEnv,null);
- assert.equal((await mapReturn({CVSStoreID:'999999'})).status,400);
- assert.equal((await mapReturn({CVSOutSide:'1'})).status,400);
- const liveReturned=await mapReturn();
- assert.equal(liveReturned.status,303);
- assert.equal(liveReturned.headers.get('Location'),base+'/checkout.html?store='+liveSelection.token);
+ const directory=await deliveryPreview(get('/api/checkout-delivery-preview/public-branches?q='+encodeURIComponent('經貿')),liveEnv,null);
+ assert.deepEqual(await directory.json(),{branches:[{id:'294278',name:'經貿',address:'台北市南港區三重路19號1樓'}]});
+ const selectBranch=branchId=>deliveryPreview(post('/api/checkout-delivery-preview/public-store-start',{carrier:'UNIMARTC2C',branchId}),liveEnv,null);
+ assert.equal((await selectBranch('999999')).status,400);
+ const openMap=await selectBranch('294278');
+ assert.equal(openMap.status,200);
+ const liveSelection=await openMap.json();
+ assert.equal(liveSelection.branch.id,'294278');
+ const session=openMap.headers.get('Set-Cookie').split(';',1)[0];
+ assert(liveSelection.token.startsWith('lt'));
  const quoteData={productId:'keynade-mx',quantity:1,method:'pickup',storeToken:liveSelection.token};
  assert.equal((await pay('quote',quoteData)).status,400);
  assert.equal((await pay('quote',{...quoteData,storeToken:stageMap.token},session)).status,400);

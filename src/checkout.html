@@ -45,6 +45,13 @@
         </select>
         <div class="store-pickup-choice">
           <button id="store-choose-branch" class="button cream" type="button">选择取货门市</button>
+          <div id="store-branch-directory" hidden>
+            <label for="store-branch-query">门市名称、店号或地址</label>
+            <input id="store-branch-query" type="search" maxlength="60" autocomplete="off">
+            <button id="store-branch-search" class="button cream" type="button">搜寻门市</button>
+            <p id="store-branch-search-status" role="status"></p>
+            <ul id="store-branch-options" hidden></ul>
+          </div>
           <div id="store-branch-result" aria-live="polite" hidden>
             <strong id="store-branch-name"></strong>
             <p id="store-branch-address"></p>

@@ -30,26 +30,25 @@ export function livePickupReady(env: PreviewEnv) {
 }
 
 type LiveBranch = { StoreId: string; StoreName: string; StoreAddr: string };
-let liveDirectory: { merchant: string; expiry: number; entries: Promise<Map<string, LiveBranch>> } | undefined;
+let liveDirectory: { merchant: string; expiry: number; entries: Map<string, LiveBranch> } | undefined;
 
-async function officialPickupBranch(env: PreviewEnv, merchant: string, id: string) {
-  if (!liveDirectory || liveDirectory.merchant !== merchant || liveDirectory.expiry <= Date.now()) {
-    const fields = new URLSearchParams({ MerchantID: merchant, CvsType: 'UNIMART' });
-    fields.set('CheckMacValue', logisticsMac(fields, env.OGS_ECPAY_LOGISTICS_HASH_KEY!.trim(), env.OGS_ECPAY_LOGISTICS_HASH_IV!.trim()));
-    const entries = (async () => {
-      const response = await fetch('https://logistics.ecpay.com.tw/Helper/GetStoreList', {
-        method: 'POST', body: fields, signal: AbortSignal.timeout(7000),
-      });
-      if (!response.ok) throw new Error('Store directory unavailable');
-      const result = await response.json() as { RtnCode: number; StoreList?: { CvsType: string; StoreInfo: LiveBranch[] }[] };
-      const stores = result.StoreList?.find(group => group.CvsType === 'UNIMART')?.StoreInfo;
-      if (String(result.RtnCode) !== '1' || !Array.isArray(stores) || !stores.length) throw new Error('Store directory unavailable');
-      return new Map(stores.map(store => [String(store.StoreId), store]));
-    })();
-    liveDirectory = { merchant, expiry: Date.now() + 10 * 60_000, entries };
-    void entries.catch(() => { if (liveDirectory?.entries === entries) liveDirectory = undefined; });
-  }
-  return (await liveDirectory.entries).get(id);
+async function officialPickupBranches(env: PreviewEnv, merchant: string) {
+  if (liveDirectory?.merchant === merchant && liveDirectory.expiry > Date.now()) return liveDirectory.entries;
+  const fields = new URLSearchParams({ MerchantID: merchant, CvsType: 'UNIMART' });
+  fields.set('CheckMacValue', logisticsMac(fields, env.OGS_ECPAY_LOGISTICS_HASH_KEY!.trim(), env.OGS_ECPAY_LOGISTICS_HASH_IV!.trim()));
+  const response = await fetch('https://logistics.ecpay.com.tw/Helper/GetStoreList', {
+    method: 'POST', body: fields, signal: AbortSignal.timeout(7000),
+  });
+  if (!response.ok) throw new Error('Store directory unavailable');
+  const result = await response.json() as { RtnCode: number; StoreList?: { CvsType: string; StoreInfo: LiveBranch[] }[] };
+  const stores = result.StoreList?.find(group => group.CvsType === 'UNIMART')?.StoreInfo;
+  if (String(result.RtnCode) !== '1' || !Array.isArray(stores) || !stores.length) throw new Error('Store directory unavailable');
+  const entries = new Map(stores.filter(store =>
+    /^\d{3,9}$/.test(store.StoreId) && store.StoreName?.trim() && store.StoreAddr?.trim() &&
+    !/^(澎湖縣|金門縣|連江縣|[臺台]東縣(?:蘭嶼|綠島)鄉|屏東縣琉球鄉)/.test(store.StoreAddr.trim())
+  ).map(store => [String(store.StoreId), store]));
+  liveDirectory = { merchant, expiry: Date.now() + 10 * 60_000, entries };
+  return entries;
 }
 
 export async function readLivePickupStore(db: D1Database, request: Request, token: unknown) {
@@ -72,9 +71,24 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
   const path = url.pathname.slice(root.length);
   const db = env.DB!;
   const mapReturn = isLocalCheckoutTest(url) ? env.OGS_ECPAY_MAP_RETURN_URL : url.origin + root + 'store-return';
-  const publicMap = path === 'public-store-start' || path === 'public-store';
+  const publicMap = path === 'public-store-start' || path === 'public-store' || path === 'public-branches';
   if (!publicMap && path !== 'store-return' && !isAdmin(user, env)) return json({}, 403);
   try {
+    if ((path === 'public-branches' || (path === 'config' && url.searchParams.has('branches'))) && request.method === 'GET') {
+      const query = (url.searchParams.get('q') || '').trim().replaceAll('臺', '台');
+      const merchant = livePickupMerchant(env);
+      if (!merchant || !livePickupReady(env) || (publicMap && env.OGS_PUBLIC_PICKUP_ENABLED !== 'true')) return json({}, 503);
+      if (query.length < 2 || query.length > 60) return json({ branches: [] });
+      const branches = await officialPickupBranches(env, merchant);
+      const matches = [];
+      for (const branch of branches.values()) {
+        if (branch.StoreId === query || (branch.StoreName + branch.StoreAddr).replaceAll('臺', '台').includes(query)) {
+          matches.push({ id: branch.StoreId, name: branch.StoreName.trim(), address: branch.StoreAddr.trim() });
+          if (matches.length === 12) break;
+        }
+      }
+      return json({ branches: matches });
+    }
     if (path === 'config' && request.method === 'GET') {
       return json({ storeMap: !!mapReturn, googlePlaces: !!env.OGS_GOOGLE_PLACES_KEY && env.OGS_GOOGLE_PLACES_ENABLED === 'true' });
     }
@@ -87,7 +101,7 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
       return json({ store: liveTokenPattern.test(token) ? await readLivePickupStore(db, request, token) : await readMapResult(db, token) });
     }
     if ((path === 'store-start' || path === 'public-store-start') && request.method === 'POST' && sameOrigin(request)) {
-      const body = await request.json() as { carrier: keyof typeof carriers; mobile: boolean; language?: string; flow?: string; map?: string };
+      const body = await request.json() as { carrier: keyof typeof carriers; mobile: boolean; language?: string; flow?: string; map?: string; branchId?: string };
       if (!Object.hasOwn(carriers, body.carrier)) throw new HttpError(400, '請選擇超商品牌。');
       const storefront = body.flow === 'storefront-test';
       if(storefront && (publicMap || !isAdmin(user,env) || body.carrier !== 'UNIMARTC2C')) throw new HttpError(403,'此入口僅供管理員測試 7-ELEVEN。');
@@ -98,15 +112,21 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
         throw new HttpError(503, '7-ELEVEN 選店暫時無法使用。');
       }
       if (!mapReturn) throw new HttpError(503, '綠界選店尚未啟用。');
+      let branch;
+      if (publicLive) {
+        const selected = (await officialPickupBranches(env, liveMerchant!)).get(body.branchId || '');
+        if (!selected?.StoreName || !selected.StoreAddr) throw new HttpError(400, '此門市目前無法選用，請重新選擇。');
+        branch = { carrier: '7-ELEVEN', id: selected.StoreId, name: selected.StoreName.trim(), address: selected.StoreAddr.trim() };
+      }
       await db.prepare('DELETE FROM checkout_preview_store_maps WHERE expires_at <= ?').bind(Date.now()).run();
       const random = crypto.randomUUID().replaceAll('-', '');
       const locale = body.language === 'en' ? 'e' : body.language === 'zh-Hans' ? 's' : 't';
       const token = publicLive ? 'l' + locale + random.slice(0, 18)
         : storefront ? (liveMap ? 'v' : 'x') + locale + random.slice(0, 18)
         : publicMap ? 'p' + locale + random.slice(0, 18) : random.slice(0, 20);
-      await db.prepare('INSERT INTO checkout_preview_store_maps (token, carrier, expires_at) VALUES (?, ?, ?)')
-        .bind(token, body.carrier, Date.now() + 30 * 60_000).run();
-      const response = json({ action: liveMap ? liveMapEndpoint : mapEndpoint, token, fields: {
+      await db.prepare('INSERT INTO checkout_preview_store_maps (token, carrier, expires_at, result) VALUES (?, ?, ?, ?)')
+        .bind(token, body.carrier, Date.now() + 30 * 60_000, branch ? JSON.stringify(branch) : null).run();
+      const response = branch ? json({ token, branch }) : json({ action: liveMap ? liveMapEndpoint : mapEndpoint, token, fields: {
         MerchantID: liveMap || '2000933', MerchantTradeNo: token, LogisticsType: 'CVS',
         LogisticsSubType: body.carrier, IsCollection: 'N', Device: body.mobile ? '1' : '0',
         ServerReplyURL: mapReturn, ExtraData: token,
@@ -122,9 +142,8 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
       const token = fields.get('ExtraData') || '';
       const isPublicToken = publicTokenPattern.test(token);
       const live = liveTokenPattern.test(token);
-      const merchant = live || token.startsWith('v') ? livePickupMerchant(env) : '2000933';
-      if ((!isPublicToken && !tokenPattern.test(token)) || !merchant || fields.get('MerchantID') !== merchant ||
-          (live && fields.get('MerchantTradeNo') !== token)) {
+      const merchant = token.startsWith('v') ? livePickupMerchant(env) : '2000933';
+      if (live || (!isPublicToken && !tokenPattern.test(token)) || !merchant || fields.get('MerchantID') !== merchant) {
         throw new HttpError(400, '門市資料無效。');
       }
       const row = await db.prepare('SELECT carrier, result FROM checkout_preview_store_maps WHERE token=? AND expires_at>?')
@@ -136,9 +155,9 @@ export async function deliveryPreview(request: Request, env: PreviewEnv, user: P
           !name || name.length > 40 || !address || address.length > 180) throw new HttpError(400, '門市資料不完整或選店已逾時。');
       if (!row.result) {
         let result = { carrier: carriers[row.carrier], id, name, address };
-        if (live || (token.startsWith('v') && livePickupReady(env))) {
+        if (token.startsWith('v') && livePickupReady(env)) {
           if (!livePickupReady(env) || fields.get('CVSOutSide') === '1') throw new HttpError(400, '請返回結帳並選擇台灣本島取貨門市。');
-          const selected = await officialPickupBranch(env, merchant, id);
+          const selected = (await officialPickupBranches(env, merchant)).get(id);
           if (!selected?.StoreName || !selected.StoreAddr) throw new HttpError(400, '此門市目前無法選用，請重新選擇。');
           result = { ...result, name: selected.StoreName.trim(), address: selected.StoreAddr.trim() };
         }

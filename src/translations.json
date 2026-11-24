@@ -2158,5 +2158,45 @@
   "内部测试 · 使用绿界固定测试门市，不会实际扣款或寄件。": [
     "內部測試 · 使用綠界固定測試門市，不會實際扣款或寄件。",
     "Internal test · Uses an ECPay sandbox store. No real charge or shipment."
+  ],
+  "门市名称、店号或地址": [
+    "門市名稱、店號或地址",
+    "Store name, ID or address"
+  ],
+  "搜寻门市": [
+    "搜尋門市",
+    "Search stores"
+  ],
+  "请输入至少两个字。": [
+    "請輸入至少兩個字。",
+    "Enter at least two characters."
+  ],
+  "正在搜寻门市…": [
+    "正在搜尋門市…",
+    "Searching stores…"
+  ],
+  "请选择取货门市。": [
+    "請選擇取貨門市。",
+    "Select a pickup store."
+  ],
+  "找不到门市，请换个关键字。": [
+    "找不到門市，請換個關鍵字。",
+    "No stores found. Try a different keyword."
+  ],
+  "暂时无法选择这个门市，请重试。": [
+    "暫時無法選擇這個門市，請重試。",
+    "Could not select this store. Try again."
+  ],
+  "暂时无法搜寻门市，请重试。": [
+    "暫時無法搜尋門市，請重試。",
+    "Store search is unavailable. Try again."
+  ],
+  "暂时无法核对运费，请重试。": [
+    "暫時無法核對運費，請重試。",
+    "Could not verify the shipping fee. Try again."
+  ],
+  "商品或运费已变更，请重新整理后确认。": [
+    "商品或運費已變更，請重新整理後確認。",
+    "The item price or shipping fee changed. Refresh and review your order."
   ]
 }
