@@ -631,6 +631,7 @@ body[data-page] .section-with-accent {
 .store-order-panel input, .store-order-panel select { max-width: 100%; min-height: 44px; padding: 8px; font: inherit; color: inherit; background: transparent; border: 1px solid #a69faa; border-radius: 6px; }
 .store-branch-search-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: stretch; }
 .store-branch-search-row input { width: 100%; min-width: 0; }
+#store-branch-query::placeholder { color: #6b6570; opacity: 1; }
 #store-branch-search { min-height: 44px; white-space: nowrap; padding-inline: clamp(10px, 2vw, 18px); }
 #store-branch-search-status:empty { display: none; }
 #store-branch-result, #store-choose-branch { margin-top: 12px; }
