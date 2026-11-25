@@ -6,10 +6,10 @@
   <meta name="robots" content="noindex">
   <title>官網結帳 — One Goods Studio</title>
   <link rel="icon" href="assets/icon.png">
-  <link rel="stylesheet" href="style.css?v=e0d6069554dd">
-  <script src="taiwan-address.js?v=e0d6069554dd" defer></script>
-  <script src="checkout-address-search.js?v=e0d6069554dd" defer></script>
-  <script src="locale.js?v=e0d6069554dd" defer></script><script src="app.js?v=e0d6069554dd" defer></script>
+  <link rel="stylesheet" href="style.css?v=464aa248fee7">
+  <script src="taiwan-address.js?v=464aa248fee7" defer></script>
+  <script src="checkout-address-search.js?v=464aa248fee7" defer></script>
+  <script src="locale.js?v=464aa248fee7" defer></script><script src="app.js?v=464aa248fee7" defer></script>
 <link rel="canonical" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/checkout.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/checkout.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/checkout.html"><meta property="og:type" content="website"><meta property="og:title" content="官網結帳 — One Goods Studio"><meta property="og:description" content="官網結帳 — One Goods Studio"><meta property="og:url" content="https://onegoods.studio/checkout.html"><meta property="og:image" content="https://onegoods.studio/assets/ogs-sharing.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"></head>
 <body data-page="checkout">
 <header><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="index.html">首頁</a><a href="products.html">好物</a><a href="custom.html">客製</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="checkout.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/checkout.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">簡體中文</a><a href="en/checkout.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header>
@@ -36,26 +36,20 @@
         <option value="pickup">7-ELEVEN 超商取貨 · NT$60</option>
         <option value="home">黑貓宅配 · NT$100</option>
       </select>
-      <div id="store-carrier-field">
-        <label for="store-carrier">取貨超商</label>
-        <select id="store-carrier">
-          <option value="UNIMARTC2C">7-ELEVEN</option>
-          <option value="FAMIC2C">全家</option>
-          <option value="HILIFEC2C">萊爾富</option>
-        </select>
-        <div class="store-pickup-choice">
-          <button id="store-choose-branch" class="button cream" type="button">選擇取貨門市</button>
-          <div id="store-branch-directory" hidden>
-            <label for="store-branch-query">門市名稱、店號或地址</label>
-            <input id="store-branch-query" type="search" maxlength="60" autocomplete="off">
+      <div id="store-pickup-fields" hidden>
+        <div id="store-branch-directory" hidden>
+          <label for="store-branch-query">門市名稱、店號或地址</label>
+          <div class="store-branch-search-row">
+            <input id="store-branch-query" type="search" maxlength="60" autocomplete="off" aria-controls="store-branch-options">
             <button id="store-branch-search" class="button cream" type="button">搜尋門市</button>
-            <p id="store-branch-search-status" role="status"></p>
-            <ul id="store-branch-options" hidden></ul>
           </div>
-          <div id="store-branch-result" aria-live="polite" hidden>
-            <strong id="store-branch-name"></strong>
-            <p id="store-branch-address"></p>
-          </div>
+          <p id="store-branch-search-status" role="status"></p>
+          <ul id="store-branch-options" hidden></ul>
+        </div>
+        <button id="store-choose-branch" class="button cream" type="button" hidden>選擇取貨門市</button>
+        <div id="store-branch-result" aria-live="polite" hidden>
+          <strong id="store-branch-name"></strong>
+          <p id="store-branch-address"></p>
         </div>
       </div>
       <fieldset id="store-address-fields" hidden disabled>

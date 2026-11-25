@@ -59,7 +59,7 @@ function renderStoreCheckout(){
  const livePickup=storePayment.enabled && !test && storePayment.pickupEnabled === true;
  if(storePayment.testRequested){checkout.innerHTML='<p role="alert">此入口僅供 OGS 管理員測試，請先登入。</p><a class="button cream" href="/signin-with-chatgpt?return_to='+encodeURIComponent(location.pathname+location.search)+'">登入管理帳號</a>';return;}
  let mapToken=checkoutUrl.searchParams.get('store');
- const draftKey=test?'ogs-pickup-stage-test':'ogs-pickup-live';
+ const draftKey='ogs-pickup-stage-test';
  let draft;
  try {
    const saved=JSON.parse(sessionStorage.getItem(draftKey));
@@ -75,13 +75,18 @@ function renderStoreCheckout(){
  const form=qs('#store-order-form');
  const quantity=qs('#store-quantity');
  const delivery=qs('#store-delivery');
- const carrier=qs('#store-carrier');
- const store=qs('#store-carrier-field');
+ const pickupCarrier='UNIMARTC2C';
+ const store=qs('#store-pickup-fields');
+ const directory=qs('#store-branch-directory');
+ const query=qs('#store-branch-query');
  const chooseBranch=qs('#store-choose-branch');
+ directory.hidden=!livePickup;
+ chooseBranch.hidden=!test;
  const branchResult=qs('#store-branch-result');
  const branchError=qs('#store-branch-error');
  const mapApi='/api/checkout-delivery-preview/';
  let selectedBranch;
+ let selectingBranch=false;
  const confirmation=qs('#store-confirmation');
  const sections=[qs('#store-bag'),qs('#store-shipping'),confirmation];
  const address = qs('#store-address-fields');
@@ -105,7 +110,6 @@ function renderStoreCheckout(){
  if (!test) delivery.value='home';
  if (!livePickup && !test) delivery.querySelector('[value=pickup]').remove();
  else {
-   carrier.querySelectorAll('option').forEach(option=>{if(option.value!=='UNIMARTC2C')option.remove();});
    delivery.querySelector('[value=pickup]').textContent='7-ELEVEN 超商取貨 · NT$'+storePayment.pickupShipping;
  }
  if(!storePayment.enabled)pay.textContent='查看購買方式';
@@ -129,9 +133,9 @@ function renderStoreCheckout(){
      home.querySelectorAll('input,select').forEach(field=>{field.disabled=isPickup || (field.name==='district'&&!form.elements.city.value);});
    }
    store.hidden=!isPickup;
-   const branch=isPickup && selectedBranch?.carrier===carrier.value ? selectedBranch : null;
+   const branch=isPickup ? selectedBranch : null;
    branchResult.hidden=!branch;
-   chooseBranch.textContent=branch?'更換取貨門市':'選擇取貨門市';
+   if(test)chooseBranch.textContent=branch?'更換取貨門市':'選擇取貨門市';
    const branchLabel=branch ? branch.name+'（'+branch.id+'）' : '';
    qs('#store-branch-name').textContent=branchLabel;
    qs('#store-branch-address').textContent=branch?.address || '';
@@ -143,7 +147,7 @@ function renderStoreCheckout(){
    qs('#store-fee').textContent=money(fee);
    qs('#store-total').textContent=money(subtotal+fee);
    qs('#store-review-item').textContent=product.name+' × '+quantity.value;
-   qs('#store-review-shipping').textContent=isPickup?delivery.selectedOptions[0].text.split(' · ')[0]+' · '+carrier.selectedOptions[0].text+(branch?' · '+branchLabel:''):delivery.selectedOptions[0].text.split(' · ')[0];
+   qs('#store-review-shipping').textContent=isPickup?delivery.selectedOptions[0].text.split(' · ')[0]+(branch?' · '+branchLabel:''):delivery.selectedOptions[0].text.split(' · ')[0];
  }
  function showStep(step){
    sections.forEach((section,index)=>{section.hidden=index!==step;});
@@ -153,12 +157,8 @@ function renderStoreCheckout(){
    branchError.textContent=message;
    branchError.hidden=false;
  }
- for(const input of [carrier,delivery]){
-   input.addEventListener('change',()=>{ branchError.hidden=true; });
- }
+ delivery.addEventListener('change',()=>{ branchError.hidden=true; });
  if (livePickup) {
-   const directory=qs('#store-branch-directory');
-   const query=qs('#store-branch-query');
    const search=qs('#store-branch-search');
    const searchStatus=qs('#store-branch-search-status');
    const results=qs('#store-branch-options');
@@ -173,6 +173,7 @@ function renderStoreCheckout(){
        const response=await fetch(mapApi+'public-branches?q='+encodeURIComponent(term),{cache:'no-store'});
        if(!response.ok)throw new Error();
        const {branches}=await response.json();
+       if(query.value.trim()!==term){searchStatus.textContent='';return;}
        searchStatus.textContent=branches.length?'請選擇取貨門市。':'找不到門市，請換個關鍵字。';
        for(const branch of branches){
          const item=document.createElement('li');
@@ -181,20 +182,30 @@ function renderStoreCheckout(){
          button.className='button cream';
          button.textContent=branch.name+'（'+branch.id+'） · '+branch.address;
          button.addEventListener('click',async()=>{
+           selectingBranch=true;
+           search.disabled=true;
            results.querySelectorAll('button').forEach(button=>button.disabled=true);
            try {
              const response=await fetch(mapApi+'public-store-start',{method:'POST',headers:{'Content-Type':'application/json'},
-               body:JSON.stringify({carrier:'UNIMARTC2C',branchId:branch.id})});
+               body:JSON.stringify({carrier:pickupCarrier,branchId:branch.id})});
              const selection=await response.json();
-             if(!response.ok || !selection.branch)throw new Error();
+             if(!response.ok || !selection.branch || !selection.token)throw new Error();
+             if(delivery.value!=='pickup' || sections[1].hidden)return;
              mapToken=selection.token;
-             selectedBranch={...selection.branch,carrier:'UNIMARTC2C'};
-             directory.hidden=true;
+             selectedBranch=selection.branch;
+             query.value=selectedBranch.name;
+             results.replaceChildren();
+             results.hidden=true;
+             searchStatus.textContent='';
              branchError.hidden=true;
              refresh();
-             chooseBranch.focus();
+             query.focus();
            } catch { searchStatus.textContent='暫時無法選擇這個門市，請重試。'; }
-           finally { results.querySelectorAll('button').forEach(button=>button.disabled=false); }
+           finally {
+             selectingBranch=false;
+             search.disabled=false;
+             results.querySelectorAll('button').forEach(button=>button.disabled=false);
+           }
          });
          item.append(button);
          results.append(item);
@@ -204,28 +215,22 @@ function renderStoreCheckout(){
      finally { search.disabled=false; }
    });
    query.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();search.click();}});
-   chooseBranch.addEventListener('click',()=>{
-     directory.hidden=!directory.hidden;
-     branchError.hidden=true;
-     if(!directory.hidden)query.focus();
-   });
  }
  if(test) chooseBranch.addEventListener('click',async()=>{
    if(!quantity.reportValidity())return;
-   const requestedCarrier=carrier.value;
    chooseBranch.disabled=true;
    branchError.hidden=true;
    try {
-     const response=await fetch(mapApi+(test?'store-start':'public-store-start'),{
+     const response=await fetch(mapApi+'store-start',{
        method:'POST',headers:{'Content-Type':'application/json'},
-       body:JSON.stringify({carrier:requestedCarrier,mobile:matchMedia('(max-width: 680px)').matches,language:document.documentElement.lang,...(test?{flow:'storefront-test',map:checkoutUrl.searchParams.get('map')}:{} )}),
+       body:JSON.stringify({carrier:pickupCarrier,mobile:matchMedia('(max-width: 680px)').matches,language:document.documentElement.lang,flow:'storefront-test',map:checkoutUrl.searchParams.get('map')}),
      });
      const selection=await response.json();
-     if(!response.ok || !(test ? ['https://logistics.ecpay.com.tw/Express/map','https://logistics-stage.ecpay.com.tw/Express/map'] : ['https://logistics.ecpay.com.tw/Express/map']).includes(selection.action))throw new Error();
-     if(delivery.value!=='pickup' || carrier.value!==requestedCarrier || sections[1].hidden)return;
+     if(!response.ok || !['https://logistics.ecpay.com.tw/Express/map','https://logistics-stage.ecpay.com.tw/Express/map'].includes(selection.action))throw new Error();
+     if(delivery.value!=='pickup' || sections[1].hidden)return;
      sessionStorage.setItem(draftKey,JSON.stringify({
-       token:selection.token,product:product.id,quantity:quantity.value,carrier:requestedCarrier,
-       ...(test?{contact:form.elements.contact.value,phone:form.elements.phone.value,email:form.elements.email.value}:{}),
+       token:selection.token,product:product.id,quantity:quantity.value,carrier:pickupCarrier,
+       contact:form.elements.contact.value,phone:form.elements.phone.value,email:form.elements.email.value,
      }));
      const mapForm=document.createElement('form');
      mapForm.method='POST';
@@ -244,11 +249,10 @@ function renderStoreCheckout(){
    }
  });
  async function restoreBranch(){
-   if(!test || draft?.product!==product.id || ![...carrier.options].some(option=>option.value===draft.carrier))return;
+   if(!test || draft?.product!==product.id || draft.carrier!==pickupCarrier)return;
    checkoutUrl.searchParams.set('product',product.id);
    history.replaceState(null,'',checkoutUrl);
    delivery.value='pickup';
-   carrier.value=draft.carrier;
    quantity.value=draft.quantity;
    if(test) for(const name of ['contact','phone','email'])form.elements[name].value=draft[name]||'';
    refresh();
@@ -277,9 +281,10 @@ function renderStoreCheckout(){
    event.preventDefault();
    refresh();
    if (!sections[1].hidden) {
-     if(delivery.value==='pickup' && selectedBranch?.carrier!==carrier.value){
+     if(delivery.value==='pickup' && selectingBranch)return;
+     if(delivery.value==='pickup' && !selectedBranch){
        showBranchError('請先選擇取貨門市。');
-       chooseBranch.focus();
+       (test?chooseBranch:query).focus();
        return;
      }
      if (storePayment.enabled) {
@@ -291,17 +296,18 @@ function renderStoreCheckout(){
      if (storePayment.enabled && !test) {
        const method=delivery.value;
        const count=quantity.valueAsNumber;
+       const storeToken=method==='pickup'?mapToken:null;
        const expectedTotal=price*count+shippingFee();
        toReview.disabled=true;
        branchError.hidden=true;
        try {
          const response=await fetch('/api/store-payment/quote',{
            method:'POST',headers:{'Content-Type':'application/json'},
-           body:JSON.stringify({productId:product.id,quantity:count,method,storeToken:method==='pickup'?mapToken:null}),
+           body:JSON.stringify({productId:product.id,quantity:count,method,storeToken}),
          });
          const quote=await response.json();
          if(!response.ok)throw new Error(quote.error||'暫時無法核對運費，請重試。');
-         if(sections[1].hidden || delivery.value!==method || quantity.valueAsNumber!==count)return;
+         if(sections[1].hidden || delivery.value!==method || quantity.valueAsNumber!==count || (method==='pickup' && (selectingBranch || storeToken!==mapToken)))return;
          if(quote.amount!==expectedTotal || quote.shipping!==shippingFee())throw new Error('商品或運費已變更，請重新整理後確認。');
        } catch (failure) {
          showBranchError(failure.message);
