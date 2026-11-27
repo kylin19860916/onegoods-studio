@@ -23,7 +23,7 @@ scene.cycles.samples = 256
 scene.cycles.adaptive_threshold = 0.10
 scene.cycles.use_denoising = True
 scene.cycles.seed = 27
-scene.render.resolution_x = scene.render.resolution_y = 1024 if face_view else 2048
+scene.render.resolution_x = scene.render.resolution_y = 2048
 scene.render.resolution_percentage = 100
 scene.render.film_transparent = True
 scene.render.image_settings.color_mode = 'RGBA'
@@ -116,22 +116,26 @@ def frame(sample, distance):
     x0, x1 = min(p.x for p in projected), max(p.x for p in projected)
     y0, y1 = min(p.y for p in projected), max(p.y for p in projected)
     lens.shift_x = (x0 + x1) / 2 - .5
-    lens.shift_y = (y0 + y1) / 2 - .5 if face_view else y0 - .22
+    lens.shift_y = y0 - .22
     return max(x1-x0,y1-y0)
 
-near, far = 100, 900
-for _ in range(13):
-    middle = (near+far)/2
-    largest = max(frame(samples[name], middle) for name in ('nameplate','press','articulated'))
-    if largest > (.76 if face_view else .64): near = middle
-    else: far = middle
-distance = round(far, 3)
+def fit(names):
+    near, far = 30, 900
+    for _ in range(13):
+        middle = (near + far) / 2
+        if max(frame(samples[name], middle) for name in names) > .64:
+            near = middle
+        else:
+            far = middle
+    return round(far, 3)
+
+distance = fit(('nameplate', 'press', 'articulated'))
 
 for name, sample in samples.items():
-    required = ('.png','.json') if face_view else ('.png','_shadow-raw.png','.json')
+    required = ('.png', '_shadow-raw.png', '.json')
     if all((output / f'{name}_{view}{suffix}').is_file() for suffix in required):
         continue
-    sample_distance = round(distance * 1.65, 3) if name == 'press-abc' else distance
+    sample_distance = fit((name,)) if face_view else (round(distance * 1.65, 3) if name == 'press-abc' else distance)
     span = frame(sample, sample_distance)
     objects = []
     for index, part in enumerate(sample['meshes']):
@@ -159,21 +163,20 @@ for name, sample in samples.items():
     scene.cycles.samples = 96 if face_view else 256
     if not Path(scene.render.filepath).is_file():
         bpy.ops.render.render(write_still=True)
-    if not face_view:
-        floor.hide_render = False
-        for obj in objects:
-            obj.visible_camera = False
-        scene.render.filepath = str(output / f'{name}_front34_shadow-raw.png')
-        scene.render.resolution_percentage = 50
-        scene.cycles.samples = 24
-        bpy.ops.render.render(write_still=True)
-        scene.render.resolution_percentage = 100
+    floor.hide_render = False
+    for obj in objects:
+        obj.visible_camera = False
+    scene.render.filepath = str(output / f'{name}_{view}_shadow-raw.png')
+    scene.render.resolution_percentage = 50
+    scene.cycles.samples = 24
+    bpy.ops.render.render(write_still=True)
+    scene.render.resolution_percentage = 100
     metadata = {k: sample[k] for k in ('name','font','source','palette')}
     metadata.update(
         renderer=f'Blender {bpy.app.version_string} Cycles', resolution=[scene.render.resolution_x,scene.render.resolution_y],
         dimensions_mm=list(sample['dimensions']),
         camera={'lens_mm':85,'sensor_mm':36,'azimuth':camera_azimuth,'elevation':camera_elevation,'distance_mm':sample_distance,
-                'product_span':round(span,4),'product_baseline':None if face_view else .78},
+                'product_span':round(span,4),'product_baseline':.78},
         lamps=lamps, samples=96 if face_view else 256, denoise=True, layer_period_mm=.2, roughness=.60, bevel_mm=.3,
     )
     (output / f'{name}_{view}.json').write_text(json.dumps(metadata,ensure_ascii=False,indent=2)+'\n')

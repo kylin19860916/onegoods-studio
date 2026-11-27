@@ -395,7 +395,7 @@ if (customTabs) {
     header.append(button);
     headings.append(header);
     play.insertCell().textContent = type.play[localeIndex];
-    prices.insertCell().textContent = type.startingPrice ? ('NT$' + type.startingPrice + (localeIndex === 2 ? '+' : ' 起')) : '—';
+    prices.insertCell().textContent = type.priceLabel?.[localeIndex] ?? (type.startingPrice ? ('NT$' + type.startingPrice + (localeIndex === 2 ? '+' : ' 起')) : '—');
     row.insertCell().textContent = type.description[localeIndex];
     dispatch.insertCell().textContent = localeIndex === 2 ? `Within ${type.dispatchDays} days` : `${type.dispatchDays} 天內`;
   });

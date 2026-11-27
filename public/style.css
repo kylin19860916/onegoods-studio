@@ -1114,7 +1114,11 @@ body[data-page="about"] main.r2-policy { width: min(720px,calc(100% - 2 * var(--
 .r2-grid-note { grid-column: 1/-1; }
 .r2-custom-intro-grid { display: grid; grid-template-columns: 5fr 7fr; align-items: center; gap: 20px; }
 .r2-custom-intro-grid figure { position: relative; margin: 0; }
-.r2-custom-intro-grid img { display: block; width: 100%; height: auto; }
+.r2-custom-intro-photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.r2-custom-intro-photos img { display: block; width: 100%; height: auto; }
+.r2-custom-intro-photos img,
+.r2-product-custom figure img,
+.r2-custom-cards img { object-position: 50% 60%; }
 .r2-custom-intro-grid figcaption { text-align: end; color: var(--on-stage-2); font-size: 13px; }
 @media (max-width:767px) {
   .r2-custom-intro-grid { grid-template-columns: 1fr; }

@@ -3,12 +3,13 @@ import sys
 from pathlib import Path
 from PIL import Image, ImageChops, ImageFilter, ImageOps
 
-source, output, evidence = map(Path, sys.argv[1:])
+source, output, evidence = map(Path, sys.argv[1:4])
 output.mkdir(parents=True,exist_ok=True)
 evidence.mkdir(parents=True,exist_ok=True)
-variants = ['nameplate','press','articulated','press-abc']
+face = '--face' in sys.argv[4:]
+variants = ['nameplate', 'press', 'articulated'] + ([] if face else ['press-abc'])
 for name in variants:
-    stem = name+'_front34'
+    stem = name + ('_face' if face else '_front34')
     product = Image.open(source/(stem+'.png')).convert('RGBA')
     raw = Image.open(source/(stem+'_shadow-raw.png')).getchannel('A')
     alpha = raw.resize(product.size,Image.Resampling.LANCZOS).filter(ImageFilter.GaussianBlur(1.5))
@@ -22,11 +23,14 @@ for name in variants:
     shadow.putalpha(alpha)
     shadow.save(output/(stem+'_shadow.png'),optimize=True)
     image = Image.alpha_composite(shadow,product)
-    image.save(evidence/(stem+'.png'),optimize=True)
+    image.save((output if face else evidence)/(stem+'.png'),optimize=True)
     for size in (2048,1024):
         name_for_web = stem + ('-1024' if size == 1024 else '') + '.webp'
         image.resize((size,size),Image.Resampling.LANCZOS).save(output/name_for_web,quality=85,method=4)
     (output/(stem+'.json')).write_bytes((source/(stem+'.json')).read_bytes())
+
+if face:
+    sys.exit(0)
 
 for label, colors in [('stage',('#30243b','#30243b')),('studio',('#ede6f5','#ded4ec'))]:
     width, height = 1500, 500

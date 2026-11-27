@@ -99,7 +99,7 @@ export function setupClicker({ active = true, updateSummary = () => {} } = {}) {
   const add = document.querySelector('#clicker-add');
   const keySettings = document.querySelector('#clicker-key-settings');
   const settingsTemplate = document.querySelector('#clicker-key-settings-template');
-  let count = 2;
+  let count = 3;
   let activeKey = 0;
   let version = 0;
   const maximum = 6;
@@ -257,7 +257,7 @@ export function setupClicker({ active = true, updateSummary = () => {} } = {}) {
   function showOrderPrice() {
     const quote = quoteConnectedClicker(clickerName.value);
     orderPanel.hidden = !orderEnabled || clickerStyle.value !== 'name';
-    startingPrice.hidden = orderPanel.hidden || Boolean(quote);
+    startingPrice.hidden = !orderPanel.hidden && Boolean(quote);
     orderStart.hidden = orderPanel.hidden;
     contactPanel.hidden = !orderPanel.hidden;
     orderPrice.textContent = quote ? 'NT$' + quote.amount : '';
