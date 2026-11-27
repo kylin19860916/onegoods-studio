@@ -40,7 +40,10 @@ for lang, folder, column in locales:
                 options.append(f'<a href="{url}" lang="{alternate}" hreflang="{alternate}" data-language="{alternate}"{current}>{label}</a>')
             current_label = {'zh-Hant': '繁', 'zh-Hans': '简', 'en': 'en'}[lang]
             switch_label = {'zh-Hant': '切換語言，目前：繁體中文', 'zh-Hans': '切换语言，当前：简体中文', 'en': 'Change language. Current: English'}[lang]
-            nav = f'<nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="{switch_label}">{current_label}<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options">' + ''.join(options) + '</div></details></nav>'
+            chevron = '<span class="language-chevron" aria-hidden="true"></span>'
+            if '<header class="r2-header">' in text:
+                chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
+            nav = f'<nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="{switch_label}">{current_label}{chevron}</summary><div class="language-options">' + ''.join(options) + '</div></details></nav>'
             text = text.replace('</header>', nav + '</header>')
             prefix = '../' if folder else ''
             for script_name in ('app.js', f'{prefix}nameplate.js'):
