@@ -1121,3 +1121,10 @@ body[data-page="about"] main.r2-policy { width: min(720px,calc(100% - 2 * var(--
   .r2-custom-intro-grid { grid-template-columns: 1fr; }
   .r2-custom-intro-grid figure { display: none; }
 }
+
+.r2-collection-photo { position: relative; margin-block: 0 var(--sp-5); }
+.r2-collection-photo img { display: block; width: 100%; height: auto; border-radius: 16px; }
+.r2-collection-photo figcaption { position: absolute; bottom: 8px; right: calc(var(--gutter) + 8px); background: var(--ground); color: var(--ink-2); border-radius: 999px; padding: 3px 9px; font-size: 13px; }
+@media (min-width:768px) {
+  .r2-hero figure { margin-inline-end: min(0px, calc((1200px - 100vw) / 2)); }
+}

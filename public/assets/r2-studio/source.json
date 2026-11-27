@@ -1,0 +1,22 @@
+{
+  "keynade-mx": {
+    "siteImage": "assets/keynade/01-front-retouched-v2.jpg",
+    "source": "public/assets/keynade/01-front.jpg",
+    "sha256": "0065189515aac6caeda24cbad4000125284370cfbb1e51c50f0bbbd6b3d0d76c"
+  },
+  "cai-shi-yun": {
+    "siteImage": "/media/33a9e528-53c9-4091-9c03-0e2264915a2c",
+    "source": "https://onegoods.studio/media/33a9e528-53c9-4091-9c03-0e2264915a2c",
+    "sha256": "19b891a5822bb5a57fdfe9b8e243302e9b539db6b344f0060f75e84924ba9529"
+  },
+  "enerkey-magnetic-keychain": {
+    "siteImage": "/media/2e1e80aa-ddac-4b22-bb49-871879854497",
+    "source": "https://onegoods.studio/media/2e1e80aa-ddac-4b22-bb49-871879854497",
+    "sha256": "0abc5e6b70b86f5ee4529463b2a70f35b48b44917c306c1782d4aea94b502cc7"
+  },
+  "lucky-stir-stick": {
+    "siteImage": "/media/a4473e71-8e1f-4981-a0d9-467fb71662d9",
+    "source": "https://onegoods.studio/media/a4473e71-8e1f-4981-a0d9-467fb71662d9",
+    "sha256": "ef735f6af746eaeb8d371b2fd74521a65291c4dddcdde57ae141461411ab72de"
+  }
+}
