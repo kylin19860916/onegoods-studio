@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#a087c1"><title>One Goods Studio — 给日常一点好玩</title><meta name="description" content="原创 3D 打印小物与数字设计。探索原创按压小物与随身挂饰。"><link rel="icon" href="assets/icon.png"><link rel="stylesheet" href="style.css"><script src="app.js" defer></script></head>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#a087c1"><title>One Goods Studio — 给日常一点好玩</title><meta name="description" content="原创 3D 打印小物与数字设计。探索原创按压小物与随身挂饰。"><link rel="icon" href="assets/icon.png"><link rel="stylesheet" href="style.css"><script src="/custom-types.js" defer></script><script src="app.js" defer></script></head>
 <body data-page="home">
 <header class="r2-header"><a class="brand" href="index.html" aria-label="One Goods Studio 首页"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主导航"><a href="products.html">好物</a><a href="custom.html">客制</a><a href="about.html">关于 OGS</a></nav></header>
 <main class="r2-home">
@@ -28,11 +28,7 @@
       <p>选择名牌款、按压款或关节字块，换上你的名字和配色，即时看 3D 效果。</p>
       <label for="home-custom-name">先输入名字</label>
       <input id="home-custom-name" data-custom-name placeholder="例如 Mia、小飞" autocomplete="off">
-      <div class="r2-custom-cards">
-        <article><img src="assets/custom-name-tag-studio.webp" width="720" height="540" alt="客制名牌款（示意）" loading="lazy"><div><h3>名牌款</h3><a class="btn-secondary" href="custom.html?type=nameplate" data-custom-link>客制名牌款</a></div></article>
-        <article><img src="assets/custom-name-clicker-studio.webp" width="720" height="540" alt="客制按压款（示意）" loading="lazy"><div><h3>按压款</h3><a class="btn-secondary" href="custom.html?type=press" data-custom-link>客制按压款</a></div></article>
-        <article><img src="assets/custom-name-articulated-studio.webp" width="720" height="540" alt="客制关节字块（示意）" loading="lazy"><div><h3>关节字块</h3><a class="btn-secondary" href="custom.html?type=articulated" data-custom-link>客制关节字块</a></div></article>
-      </div>
+      <div class="r2-custom-cards" data-custom-cards></div>
       <p class="r2-image-note">商品图为示意合成</p>
     </div>
   </section>

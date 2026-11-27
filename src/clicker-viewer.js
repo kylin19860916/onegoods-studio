@@ -59,6 +59,8 @@ export function createClickerViewer(canvas, host, reset, inspect) {
   let renderer;
   try { renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true }); }
   catch { return null; }
+  const listeners = new AbortController();
+  const { signal } = listeners;
   const scene = new Scene();
   const assembly = new Group();
   scene.add(assembly, new AmbientLight(0xffffff, 1.7));
@@ -94,8 +96,8 @@ export function createClickerViewer(canvas, host, reset, inspect) {
   inspect.addEventListener('click', () => {
     setCapVisibility(!showCaps);
     render();
-  });
-  reset.addEventListener('click', () => controls.reset());
+  }, { signal });
+  reset.addEventListener('click', () => controls.reset(), { signal });
   function resize() {
     const w = host.clientWidth, h = host.clientHeight;
     if (!w || !h) return;
@@ -108,7 +110,8 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     renderer.setSize(w, h, false);
     render();
   }
-  new ResizeObserver(resize).observe(host);
+  const observer = new ResizeObserver(resize);
+  observer.observe(host);
   function press(index) {
     const group = keyGroups[index];
     if (!group || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -127,7 +130,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
   const raycaster = new Raycaster();
   const pointer = new Vector2();
   let down;
-  canvas.addEventListener('pointerdown', event => { down = [event.clientX, event.clientY]; });
+  canvas.addEventListener('pointerdown', event => { down = [event.clientX, event.clientY]; }, { signal });
   canvas.addEventListener('pointerup', event => {
     if (!down || Math.hypot(event.clientX - down[0], event.clientY - down[1]) > 5) return;
     const rect = canvas.getBoundingClientRect();
@@ -136,14 +139,12 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     const hit = raycaster.intersectObject(assembly, true).find(({ object }) => object.parent.visible);
     if (hit?.object.userData.keyIndex !== undefined) press(hit.object.userData.keyIndex);
     down = undefined;
-  });
+  }, { signal });
   host.addEventListener('keydown', event => {
     if (event.key === ' ' || event.key === 'Enter') { event.preventDefault(); press(0); }
-  });
+  }, { signal });
 
-  function update({ keys, base, cap, ink, style }) {
-    if (lastStyle !== style) setCapVisibility(true);
-    lastStyle = style;
+  function clear() {
     for (const request of animations.values()) cancelAnimationFrame(request);
     animations.clear();
     assembly.traverse(object => {
@@ -152,6 +153,11 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     assembly.clear();
     keyGroups = [];
     capGroups = [];
+  }
+  function update({ keys, base, cap, ink, style }) {
+    if (lastStyle !== style) setCapVisibility(true);
+    lastStyle = style;
+    clear();
     assembly.position.x = 0;
     const stack = style === 'name' ? nameMxStack() : mxStack();
     function add(geometry, colour, z, parent = assembly) {
@@ -337,5 +343,15 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     return [width, height, bounds.max.z];
   }
   resize();
-  return { update, press };
+  return {
+    update, press,
+    dispose() {
+      listeners.abort();
+      observer.disconnect();
+      controls.removeEventListener('change', render);
+      controls.dispose();
+      clear();
+      renderer.dispose();
+    },
+  };
 }

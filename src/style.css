@@ -1033,3 +1033,34 @@ body[data-page] .eyebrow { display: none; }
   .r2-product-layout .keynade-price { font-size: 26px; }
   .r2-related .r2-product-card:nth-child(n+3) { display: none; }
 }
+
+body[data-page="custom"] > main.r2-custom { width: 100%; }
+.r2-custom-intro { padding-block: var(--sp-7) var(--sp-5); }
+.r2-custom-intro h1 { font-size: clamp(36px, 6vw, 56px); margin: 0; color: var(--on-stage); }
+.r2-custom-intro p { margin: var(--sp-3) 0 0; }
+.r2-custom-tabbar { background: var(--stage); z-index: 5; }
+.r2-custom-tabbar [role="tablist"] { display: flex; gap: var(--sp-3); overflow-x: auto; scroll-snap-type: x proximity; }
+.r2-custom-tabbar [role="tab"] {
+  display: flex; align-items: center; gap: var(--sp-2); flex: none; padding: 0 var(--sp-3);
+  min-height: 64px; color: var(--on-stage-2); background: transparent;
+  border: 0; border-bottom: 2px solid transparent; font-size: 16px; font-weight: 700; scroll-snap-align: start; white-space: nowrap;
+}
+.r2-custom-tabbar [role="tab"][aria-selected=true] { color: var(--on-stage); border-bottom-color: var(--brand); }
+.r2-custom-tabbar img { object-fit: contain; width: 56px; height: 56px; border-radius: 8px; }
+.r2-custom-editor { padding-block: var(--sp-5) var(--sp-7); }
+.r2-custom-editor > label { display: block; font-size: 14px; font-weight: 700; }
+.r2-custom-editor > input { display: block; width: min(100%,440px); height: 56px; margin: var(--sp-2) 0 var(--sp-5); padding-inline: var(--sp-4); font: inherit; border: 1px solid var(--line-strong); border-radius: var(--r-input); background: var(--ground); }
+.r2-custom-editor > .nameplate-heading { display: none; }
+.r2-custom-editor :is(label[for="plate-name"], #plate-name, label[for="clicker-name-text"], #clicker-name-text) { display: none; }
+.r2-custom-guide table { width: 100%; border-collapse: collapse; margin-block: var(--sp-4) var(--sp-7); }
+.r2-custom-guide :is(th,td) { padding: var(--sp-2); text-align: start; border-bottom: 1px solid var(--line); font-size: 14px; }
+.r2-custom-guide th button { white-space: normal; text-align: start; }
+.r2-custom-guide details { border-bottom: 1px solid var(--line); }
+.r2-custom-guide details summary { min-height: 48px; align-content: center; cursor: pointer; }
+@media (max-width:767px) {
+ .r2-custom-tabbar { position: sticky; top: 0; }
+ .r2-custom-tabbar [role="tab"] { padding-inline: var(--sp-2); }
+ .r2-custom-tabbar img { width: 44px; height: 44px; }
+}
+.r2-custom-editor :is(#name-tag, #name-clicker, #design-contact)[hidden] { display: none !important; }
+.r2-custom-editor > .custom-back { display: none; }

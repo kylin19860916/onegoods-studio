@@ -10,6 +10,9 @@ origin = 'https://onegoods.studio'
 build_id = hashlib.sha256(b''.join(p.read_bytes() for p in sorted(src.glob('*')) if p.is_file()) + (root / 'server' / 'keyring-geometry.mjs').read_bytes()).hexdigest()[:12]
 locales = [('zh-Hant', '', 0), ('zh-Hans', 'zh-cn', None), ('en', 'en', 1)]
 
+workspace_source = (src / 'nameplate.html').read_text()
+workspace_markup = re.search(r'<main[^>]*>(.*?)</main>', workspace_source, flags=re.S)[1].strip()
+
 for lang, folder, column in locales:
     target = dist / folder
     target.mkdir(exist_ok=True)
@@ -18,7 +21,10 @@ for lang, folder, column in locales:
     for page in src.glob('*.html'):
         if page.name == 'internal-checkout.html' and folder:
             continue
-        text = translate(page.read_text()).replace('lang="zh-Hans"', f'lang="{lang}"')
+        raw = page.read_text()
+        if page.name == 'custom.html':
+            raw = raw.replace('<!-- customization-workspace -->', workspace_markup)
+        text = translate(raw).replace('lang="zh-Hans"', f'lang="{lang}"')
         if folder:
             text = text.replace('href="assets/', 'href="../assets/').replace('src="assets/', 'src="../assets/')
             for asset in ('href="style.css"', 'src="nameplate.js"', 'src="locale.js"', 'src="taiwan-address.js"'):
@@ -51,7 +57,7 @@ for lang, folder, column in locales:
                 text = text.replace(tag, f'<script src="{prefix}locale.js" defer></script>' + tag)
         if lang == 'en':
             text = text.replace('makerworld.com/zh/', 'makerworld.com/en/')
-        for asset in ['style.css', 'app.js', 'locale.js', 'nameplate.js', 'taiwan-address.js', 'checkout-address-search.js']:
+        for asset in ['style.css', 'app.js', 'locale.js', 'nameplate.js', 'taiwan-address.js', 'checkout-address-search.js', 'custom-types.js']:
             text = re.sub(r'((?:src|href)="[^"?]*' + re.escape(asset) + r')(")', lambda m: m[1] + "?v=" + build_id + m[2], text)
         (target / page.name).write_text(text)
     script = translate((src / 'app.js').read_text())
@@ -64,6 +70,7 @@ for script_name in ('checkout-preview.js', 'checkout-preview-shipping.js'):
     (dist / script_name).write_text((src / script_name).read_text())
 (dist / 'taiwan-address.js').write_text((src / 'taiwan-address.js').read_text().replace('__OGS_TW_ADDRESS_DATA__', (src / 'taiwan-address-data.json').read_text().strip()))
 (dist / 'locale.js').write_text((src / 'locale.js').read_text())
+(dist / 'custom-types.js').write_text((src / 'custom-types.js').read_text())
 subprocess.run([
     str(root / 'node_modules' / '.bin' / 'esbuild'), 'src/nameplate.js',
     '--bundle', '--platform=browser', '--format=iife', '--minify', '--legal-comments=eof',

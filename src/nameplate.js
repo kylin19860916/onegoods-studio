@@ -10,8 +10,20 @@ const position = document.querySelector('#plate-position');
 const canvas = document.querySelector('#plate-canvas');
 const host = document.querySelector('#plate-view');
 const reset = document.querySelector('#plate-reset-view');
-const viewer = createKeyringViewer(canvas, host, reset);
-if (viewer) {
+const customTabs = document.querySelector('#r2-type-tabs');
+const params = new URLSearchParams(location.search);
+const customTypes = window.OGSCustomTypes || [];
+if (!customTabs && customTypes.length) {
+  const oldStyle = params.get('style') || location.hash.slice(1);
+  params.delete('style');
+  params.set('type', customTypes.find(type => type.style === oldStyle)?.id || 'nameplate');
+  location.replace('custom?' + params.toString());
+}
+let viewer = null;
+function showKeyringViewer() {
+  if (viewer) return;
+  viewer = createKeyringViewer(canvas, host, reset);
+  if (!viewer) return;
   canvas.hidden = false;
   preview.setAttribute('hidden', '');
   reset.hidden = false;
@@ -139,6 +151,7 @@ async function render(version) {
 }
 
 function queuePreview() {
+  if (keyringPanel.hidden) return;
   const version = ++previewVersion;
   generate.disabled = true;
   accent.hidden = !useAccent.checked;
@@ -225,6 +238,9 @@ form.addEventListener('submit', event => {
   if (!generate.disabled) exportImage();
 });
 function requestedProduct() {
+  if (customTabs) {
+    return customTypes.find(type => type.id === new URLSearchParams(location.search).get('type'))?.style || 'name-tag';
+  }
   const styles = ['name-tag', 'name-clicker', 'name-articulated'];
   const requested = location.hash.slice(1);
   const queryStyle = new URLSearchParams(location.search).get('style');
@@ -247,12 +263,96 @@ function showProduct() {
     group.querySelector('legend').textContent = label.textContent;
   }
   download.download = articulated ? 'OGS-articulated-preview.png' : 'OGS-keyring-preview.png';
-  if (!keyringPanel.hidden) {
+  if (keyringPanel.hidden) {
+    previewVersion++;
+    viewer?.dispose();
+    viewer = null;
+  } else {
+    showKeyringViewer();
     showStep(currentStep, false);
     queuePreview();
   }
 }
 
-window.addEventListener('hashchange', showProduct);
+const clicker = setupClicker({ active: requestedProduct() === 'name-clicker' });
 showProduct();
-setupClicker();
+if (customTabs) {
+  const panel = document.querySelector('#r2-custom-panel');
+  const shared = document.querySelector('#r2-shared-name');
+  const localeIndex = document.documentElement.lang === 'en' ? 2 : document.documentElement.lang === 'zh-Hans' ? 1 : 0;
+  shared.value = params.get('name')?.trim() || (params.has('custom-order') ? clicker.getName() : '');
+  const tabs = customTypes.map(type => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.id = 'r2-tab-' + type.id;
+    button.setAttribute('role','tab');
+    button.setAttribute('aria-controls',panel.id);
+    const photo = document.createElement('img');
+    photo.src = '/assets/' + type.image;
+    photo.alt = '';
+    photo.width = photo.height = 56;
+    button.append(photo, type.text[localeIndex]);
+    customTabs.append(button);
+    button.addEventListener('click',() => choose(type));
+    return button;
+  });
+  function mirrorName() {
+    nameText.value = shared.value;
+    nameText.dispatchEvent(new Event('input',{ bubbles: true }));
+    clicker.setName(shared.value);
+  }
+  function choose(type, { focus = false } = {}) {
+    const url = new URL(location.href);
+    const switched = url.searchParams.get('type') !== type.id;
+    url.searchParams.set('type',type.id);
+    history.replaceState(null,'',url);
+    showProduct();
+    clicker.setActive(type.id === 'press');
+    if (type.id === 'press') clicker.showNamedStyle();
+    tabs.forEach((button,index) => {
+      const selected = customTypes[index] === type;
+      button.tabIndex = selected ? 0 : -1;
+      button.setAttribute('aria-selected',String(selected));
+      if (selected) {
+        panel.setAttribute('aria-labelledby',button.id);
+        if (focus) button.focus();
+      }
+    });
+    if (switched && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      panel.animate([{opacity:.65},{opacity:1}],{duration:150});
+    }
+    mirrorName();
+  }
+  customTabs.addEventListener('keydown',event => {
+    const current = tabs.indexOf(event.target);
+    if (current < 0) return;
+    const next = {ArrowRight:(current+1)%tabs.length, ArrowLeft:(current+tabs.length-1)%tabs.length, Home:0, End:tabs.length-1}[event.key];
+    if (next === undefined) return;
+    event.preventDefault();
+    choose(customTypes[next],{focus:true});
+  });
+  shared.addEventListener('input',event => { if (!event.isComposing) mirrorName(); });
+  shared.addEventListener('compositionend',mirrorName);
+  const comparison = document.querySelector('#r2-custom-comparison');
+  const headings = comparison.createTHead().insertRow();
+  headings.append(document.createElement('th'));
+  const row = comparison.createTBody().insertRow();
+  row.insertCell().textContent = ['可選設定','可选设置','Options'][localeIndex];
+  const dispatch = comparison.tBodies[0].insertRow();
+  dispatch.insertCell().textContent = ['出貨','出货','Dispatch'][localeIndex];
+  customTypes.forEach(type => {
+    const header = document.createElement('th');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn-text';
+    button.textContent = type.text[localeIndex];
+    button.addEventListener('click',() => { choose(type,{focus:true}); customTabs.scrollIntoView({block:'nearest'}); });
+    header.append(button);
+    headings.append(header);
+    row.insertCell().textContent = type.description[localeIndex];
+    dispatch.insertCell().textContent = localeIndex === 2 ? `Within ${type.dispatchDays} days` : `${type.dispatchDays} 天內`;
+  });
+  choose(customTypes.find(type => type.id === params.get('type')) || customTypes[0]);
+} else {
+  window.addEventListener('hashchange', showProduct);
+}

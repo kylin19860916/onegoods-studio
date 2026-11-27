@@ -8,68 +8,28 @@
   <meta name="description" content="选择想客制的款式，加入名字和配色，即时预览你的 3D 作品。">
   <link rel="icon" href="assets/icon.png">
   <link rel="stylesheet" href="style.css">
-  <script src="locale.js" defer></script>
-  <script src="assets/custom-style-tabs.js" defer></script>
+  <script src="/custom-types.js" defer></script>
+  <script src="nameplate.js" defer></script>
 </head>
 <body data-page="custom">
-<header class="r2-header"><a class="brand" href="index.html" aria-label="One Goods Studio 首页"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主导航"><a href="products.html">好物</a><a href="custom.html" aria-current="page">客制</a><a href="about.html">关于 OGS</a></nav></header>
-<main class="custom-page">
-  <section class="custom-hero">
-    <div class="custom-hero-copy">
-      <h1>哇塞，<br>这是我的！</h1>
-      <p>把你的名字变成一件 3D 列印小物。挂在包上、拿在手上，颜色和字型都由你决定。</p>
-      <a class="button primary" href="#custom-styles">选一个款式</a>
-    </div>
-    <div class="custom-hero-visual">
-      <img class="custom-hero-image" src="assets/custom-studio-hero.webp" alt="紫色姓名吊牌、三色按压小物和绿色关节字块的样品" width="1440" height="1100" fetchpriority="high">
-    </div>
+<header class="r2-header on-stage"><a class="brand" href="index.html" aria-label="One Goods Studio 首页"><img class="brand-icon" src="assets/icon.png" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主导航"><a href="products.html">好物</a><a href="custom.html" aria-current="page">客制</a><a href="about.html">关于 OGS</a></nav></header>
+<main class="r2-custom">
+  <section class="r2-stage on-stage r2-custom-intro">
+    <div class="wrap"><h1>哇塞，这是我的！</h1><p>选择想客制的款式，加入名字和配色，即时预览你的 3D 作品。</p></div>
   </section>
-
-  <section class="custom-styles" id="custom-styles" aria-labelledby="custom-styles-title">
-    <div class="custom-styles-heading section-with-accent">
-      <h2 id="custom-styles-title">今天想做哪一款？</h2>
-      <img class="section-accent" src="assets/studio-geometry.webp" width="740" height="540" alt="" loading="lazy" decoding="async">
-    </div>
-    <div class="custom-style-tabs" hidden>
-      <button type="button" id="tab-name-tag" data-custom-panel="sample-name-tag">名牌款</button>
-      <button type="button" id="tab-name-clicker" data-custom-panel="sample-name-clicker">按压款</button>
-      <button type="button" id="tab-name-articulated" data-custom-panel="sample-name-articulated">关节字块</button>
-    </div>
-    <div class="custom-samples">
-      <article class="custom-sample" id="sample-name-tag">
-        <img src="assets/custom-name-tag-studio.webp" alt="Mia 字样的紫底白字姓名吊牌" width="1280" height="720" loading="lazy">
-        <div class="custom-sample-copy">
-          <h3>名牌款</h3>
-          <p>让包包一眼就认得你。选字型、造型和尺寸，再配上你的颜色。</p>
-          <a class="button" href="nameplate.html?style=name-tag">客制名牌款</a>
-        </div>
-      </article>
-      <article class="custom-sample" id="sample-name-clicker">
-        <img src="assets/custom-name-clicker-studio.webp" alt="飞字连字按压款的三色立体样品" width="1280" height="720" loading="lazy">
-        <div class="custom-sample-copy">
-          <h3>按压款</h3>
-          <p>叩叩，试按一下你的名字。可选机械键盘款或连字按压款。</p>
-          <a class="button" href="nameplate.html?style=name-clicker">客制按压款</a>
-        </div>
-      </article>
-      <article class="custom-sample" id="sample-name-articulated">
-        <img src="assets/custom-name-articulated-studio.webp" alt="LEO 字样的绿色关节字块，字母之间可见接头" width="1280" height="720" loading="lazy">
-        <div class="custom-sample-copy">
-          <h3>关节字块</h3>
-          <p>你的名字也会扭一扭。每个字块用关节相连，转一转就能摆出不同角度。</p>
-          <a class="button" href="nameplate.html?style=name-articulated">客制关节字块</a>
-        </div>
-      </article>
-    </div>
+  <div class="r2-custom-tabbar on-stage"><div class="wrap" role="tablist" aria-label="客制类型" id="r2-type-tabs"></div></div>
+  <section class="wrap r2-custom-editor nameplate-page" role="tabpanel" id="r2-custom-panel">
+    <label for="r2-shared-name">先输入名字</label>
+    <input id="r2-shared-name" autocomplete="off" placeholder="例如 Mia、小飞">
+    <!-- customization-workspace -->
   </section>
-
-  <section class="custom-steps" aria-labelledby="custom-steps-title">
-    <h2 id="custom-steps-title">从名字开始</h2>
-    <ol>
-      <li><strong>挑款式</strong><span>选你想挂在包上或拿在手上玩的造型。</span></li>
-      <li><strong>加上名字</strong><span>输入文字，再试试不同的字型和配色。</span></li>
-      <li><strong>转一圈看看</strong><span>用即时 3D 预览，从不同角度看成品造型。</span></li>
-    </ol>
+  <section class="wrap r2-block r2-custom-guide">
+    <h2>三款怎么选</h2><table id="r2-custom-comparison"></table>
+    <h2>从名字开始</h2><ol><li>选款式</li><li>输入名字</li><li>选字型与配色</li><li>确认 3D 预览</li></ol>
+    <h2>常见问题</h2>
+    <details><summary>客制多久出货？</summary><p>客制商品 3 天内出货。</p></details>
+    <details><summary>可以退换吗？</summary><p>一般商品收到后七日内可申请退货；客制商品如涉及例外，会在下单前告知。</p></details>
+    <details><summary>名字会照我输入的印吗？</summary><p>会照你在预览里看到的内容制作，送出前请确认拼写。</p></details>
   </section>
 </main>
 <footer class="site-footer r2-footer"><div class="footer-brand">One Goods Studio<span>解压、有趣，自成一格。</span></div><div><a href="products.html">好物</a><a href="custom.html">客制</a><a href="about.html">关于 OGS</a></div><section class="footer-contact" aria-label="联系我们"><h2>联系我们</h2><p class="footer-store-name">One Goods Studio</p><p>商品、客制或订单问题，欢迎与我们联系。</p><address><a href="mailto:aka051118@gmail.com"><span>客服信箱</span><strong>aka051118@gmail.com</strong></a><a href="tel:0916662580"><span>客服电话</span><strong>0916662580</strong></a><a href="https://onegoods.studio"><span>官方网站</span><strong>https://onegoods.studio</strong></a></address><div class="footer-policy-links"><a href="purchase-policy.html">購買與售後說明</a><a href="privacy.html">隱私權說明</a></div><a class="footer-instagram" href="https://www.instagram.com/one.goods.studio/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="18" cy="6" r=".8" fill="currentColor" stroke="none"/></svg>Instagram</a></section><small>© 2026 One Goods Studio</small></footer>

@@ -22,14 +22,15 @@ function loadFont(key) {
   return fontCache.get(key);
 }
 
-export function setupClicker() {
+export function setupClicker({ active = true } = {}) {
   const form = document.querySelector('#clicker-form');
   const labels = document.querySelector('#clicker-labels');
   const template = document.querySelector('#clicker-label-template');
   const swatches = document.querySelector('#plate-swatch-options');
   const controls = labels.querySelector('.clicker-inline-controls');
   const status = document.querySelector('#clicker-status');
-  const viewer = createClickerViewer(document.querySelector('#clicker-canvas'), document.querySelector('#clicker-view'), document.querySelector('#clicker-reset'), document.querySelector('#clicker-inspect'));
+  const makeViewer = () => createClickerViewer(document.querySelector('#clicker-canvas'), document.querySelector('#clicker-view'), document.querySelector('#clicker-reset'), document.querySelector('#clicker-inspect'));
+  let viewer = active ? makeViewer() : null;
   form.addEventListener('toggle', event => {
     const picker = event.target;
     if (!picker.open || !picker.matches('.keyring-font-picker, [data-compact-colour]')) return;
@@ -180,6 +181,7 @@ export function setupClicker() {
     clickerName.setAttribute('aria-invalid', String(tooLong));
     clickerName.setCustomValidity(tooLong ? textLimit.textContent : '');
     if (tooLong) return;
+    if (!active) return;
     if (!viewer) { status.textContent = status.dataset.noWebgl; return; }
     try {
       const sources = wholeName
@@ -273,4 +275,27 @@ export function setupClicker() {
       : document.documentElement.lang === 'zh-Hans' ? '请在邮件程序中发送设计资料给我们。' : '請在郵件程式中寄出設計資料給我們。';
   });
   render();
+  return {
+    setActive(next) {
+      if (active === next) return;
+      active = next;
+      version++;
+      if (active) {
+        viewer = makeViewer();
+        void render();
+      } else {
+        viewer?.dispose();
+        viewer = null;
+      }
+    },
+    setName(text) {
+      clickerName.value = text;
+      clickerName.dispatchEvent(new Event('input',{ bubbles: true }));
+    },
+    showNamedStyle() {
+      clickerStyle.value = 'name';
+      form.dispatchEvent(new Event('input',{ bubbles: true }));
+    },
+    getName() { return clickerName.value; },
+  };
 }

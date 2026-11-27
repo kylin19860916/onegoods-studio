@@ -2382,5 +2382,33 @@
   "商品照片為實拍，背景經統一處理。": [
     "商品照片為實拍，背景經統一處理。",
     "Product photos are real. Backgrounds have been standardized."
+  ],
+  "三款怎么选": [
+    "三款怎麼選",
+    "Compare styles"
+  ],
+  "选款式": [
+    "選款式",
+    "Choose a style"
+  ],
+  "选字型与配色": [
+    "選字型與配色",
+    "Choose typeface and colors"
+  ],
+  "确认 3D 预览": [
+    "確認 3D 預覽",
+    "Review the 3D preview"
+  ],
+  "名字会照我输入的印吗？": [
+    "名字會照我輸入的印嗎？",
+    "Will you print the name I enter?"
+  ],
+  "会照你在预览里看到的内容制作，送出前请确认拼写。": [
+    "會照你在預覽裡看到的內容製作，送出前請確認拼寫。",
+    "We make what you see in the preview. Check the spelling before you submit."
+  ],
+  "哇塞，这是我的！": [
+    "哇塞，這是我的！",
+    "Wow, that’s mine!"
   ]
 }

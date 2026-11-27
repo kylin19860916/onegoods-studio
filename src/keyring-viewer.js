@@ -12,6 +12,8 @@ export function createKeyringViewer(canvas, host, resetButton) {
     return null;
   }
 
+  const listeners = new AbortController();
+  const { signal } = listeners;
   const scene = new Scene();
   const model = new Group();
   scene.add(model, new AmbientLight(0xffffff, 1.65));
@@ -32,7 +34,7 @@ export function createKeyringViewer(canvas, host, resetButton) {
   controls.saveState();
   const render = () => renderer.render(scene, camera);
   controls.addEventListener('change', render);
-  resetButton.addEventListener('click', () => controls.reset());
+  resetButton.addEventListener('click', () => controls.reset(), { signal });
 
   let halfWidth = 45;
 
@@ -49,7 +51,8 @@ export function createKeyringViewer(canvas, host, resetButton) {
     renderer.setSize(width, height, false);
     render();
   }
-  new ResizeObserver(resize).observe(host);
+  const observer = new ResizeObserver(resize);
+  observer.observe(host);
   resize();
 
   host.addEventListener('keydown', event => {
@@ -61,7 +64,7 @@ export function createKeyringViewer(canvas, host, resetButton) {
     camera.position.z += offset[1];
     controls.update();
     render();
-  });
+  }, { signal });
 
   function setMeshes(meshes, { fit = false } = {}) {
     for (const part of [...model.children]) {
@@ -94,6 +97,14 @@ export function createKeyringViewer(canvas, host, resetButton) {
 
   return {
     setMeshes,
+    dispose() {
+      listeners.abort();
+      observer.disconnect();
+      controls.removeEventListener('change', render);
+      controls.dispose();
+      setMeshes([]);
+      renderer.dispose();
+    },
     image() {
       render();
       return canvas.toDataURL('image/png');

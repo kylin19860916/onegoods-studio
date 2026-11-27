@@ -39,16 +39,18 @@ function productCard(product) {
     <div class="r2-product-art">${image}</div><h3>${escapeHtml(product.name)}</h3>
     <p>${escapeHtml(product.desc)}</p>${priceLabel(product)?`<strong>${priceLabel(product)}</strong>`:''}</a>`;
 }
-const customCardItems = [
-  { type: 'nameplate', name: '名牌款', photo: 'custom-name-tag-studio.webp' },
-  { type: 'press', name: 'Clicker', photo: 'custom-name-clicker-studio.webp' },
-  { type: 'articulated', name: 'Articulated letters', photo: 'custom-name-articulated-studio.webp' },
-];
+const customCardItems = window.OGSCustomTypes || [];
+const customLocaleIndex=locale==='en'?2:locale==='zh-Hans'?1:0;
 function customCatalogCard(item) {
-  return `<a class="r2-product-card" href="custom.html?type=${item.type}">
-    <div class="r2-product-art"><img src="${assetUrl(item.photo)}" alt="${item.name}（Illustration）" loading="lazy"></div>
-    <h3>${item.name}</h3><p>Custom orders ship within 3 days</p><strong>Start customizing</strong></a>`;
+  return `<a class="r2-product-card" href="custom?type=${item.id}">
+    <div class="r2-product-art"><img src="${assetUrl(item.image)}" alt="${item.text[customLocaleIndex]}（Illustration）" loading="lazy"></div>
+    <h3>${item.text[customLocaleIndex]}</h3><p>Custom orders ship within 3 days</p><strong>Start customizing</strong></a>`;
 }
+const customCards=qs('[data-custom-cards]');
+if(customCards)customCards.innerHTML=customCardItems.map(item=>`<article>
+  <img src="${assetUrl(item.image)}" width="720" height="540" alt="${item.text[customLocaleIndex]}（Illustration）" loading="lazy">
+  <div><h3>${item.text[customLocaleIndex]}</h3><p>${item.description[customLocaleIndex]}</p>
+  <p>Custom orders ship within 3 days</p><a href="custom?type=${item.id}" class="btn-secondary" data-custom-link>Start customizing</a></div></article>`).join('');
 function renderProducts(){
  const grid=qs('#products');
  if(!grid)return;
@@ -226,7 +228,7 @@ function renderStoreCheckout(){
  const shippingFee=()=>delivery.value==='pickup'?storePayment.pickupShipping:(storePayment.shipping??100);
  const money=amount=>'NT$'+amount.toLocaleString('en-TW');
 
- qs('#store-back').href=custom?'nameplate.html?style=name-clicker&custom-order=1':'product.html?id='+encodeURIComponent(product.id);
+ qs('#store-back').href=custom?'custom?type=press&custom-order=1':'product.html?id='+encodeURIComponent(product.id);
  if(custom){
    quantity.readOnly=true;
    const item=qs('#store-custom-design');
