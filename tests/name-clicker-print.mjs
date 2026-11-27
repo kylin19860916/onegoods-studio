@@ -117,14 +117,19 @@ for (const [index, template] of templates.entries()) {
     assert.deepEqual(changed.boundingBox(), stock.boundingBox());
     assert(Math.abs(added.volume()) < 0.001);
     assert(Math.abs(inside.volume()) < 0.001, 'Grooves must only remove material outside the switch wells');
-    const holeX = mechanicalBaseLeft(count) - 2.9;
-    for (const [z, radius] of [[2.4, 3.24], [10.0, 2.49], [11.8, 2.49]]) {
-      const ring = changed.slice(z);
-      const bore = Section.circle(radius, 64);
-      const centered = bore.translate([holeX, 0]);
-      const occupied = Section.intersection(ring, centered);
-      try { assert(occupied.area() < 0.001, count + ' key curved eyelet entry'); }
-      finally { for (const shape of [occupied, centered, bore, ring]) shape.delete(); }
+    const left = mechanicalBaseLeft(count);
+    const exterior = Section.square([20, 20]).translate([left - 20, -10]);
+    try {
+      for (const [z, radius] of [[2.4, 3.24], [10.0, 2.49], [11.8, 2.49]]) {
+        const ring = changed.slice(z);
+        const bore = Section.circle(radius, 64);
+        const centered = bore.translate([left - 2.9, 0]);
+        const occupied = Section.intersection([ring, centered, exterior]);
+        try { assert(occupied.area() < 0.001, `${count} key curved eyelet at Z=${z}`); }
+        finally { for (const shape of [occupied, centered, bore, ring]) shape.delete(); }
+      }
+    } finally {
+      exterior.delete();
     }
     const grooves = mechanicalBaseGrooves(count);
     assert.equal(grooves.length, count - 1);
