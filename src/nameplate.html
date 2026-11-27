@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#a087c1">
   <title>客制名牌 — One Goods Studio</title>
-  <meta name="description" content="选一款造型和尺寸，为你的名字配上喜欢的颜色。">
+  <meta name="description" content="选造型和尺寸，再配颜色。">
   <link rel="icon" href="assets/icon.png">
   <link rel="stylesheet" href="style.css">
   <script src="/custom-types.js" defer></script>
@@ -15,30 +15,30 @@
 <header class="r2-header"><a class="brand" href="index.html" aria-label="One Goods Studio 首页"><img class="brand-icon" src="assets/ogs-symbol-header.png" width="337" height="330" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主导航"><a href="products.html">好物</a><a href="custom.html" aria-current="page">客制</a><a href="about.html">关于 OGS</a></nav></header>
 
 <main class="section nameplate-page">
-  <a class="custom-back" href="custom.html">返回客制款式</a>
+  <a class="custom-back" href="custom.html">返回</a>
   <div class="nameplate-heading" data-keyring-intro="name-tag">
 
     <h1>客制你的名牌。</h1>
-    <p>选一款造型和尺寸，为你的名字配上喜欢的颜色。</p>
+    <p>选造型和尺寸，再配颜色。</p>
   </div>
   <div class="nameplate-heading" data-keyring-intro="name-clicker" hidden>
 
-    <h1>客制你的姓名按压款。</h1>
-    <p>选键帽款式，加入姓名和配色，试按你的 3D 预览。</p>
+    <h1>客制你的按压款。</h1>
+    <p>选键帽、打名字、配颜色，在 3D 里按按看。</p>
   </div>
   <div class="nameplate-heading" data-keyring-intro="name-articulated" hidden>
 
     <h1>客制你的关节字块。</h1>
-    <p>输入名字、选好配色，查看字块和卡扣的 3D 结构。</p>
+    <p>打名字、配颜色，转一圈看卡扣。</p>
   </div>
   <div class="nameplate-workspace" id="name-tag" data-keyring-panel>
     <figure class="keyring-preview">
       <div class="nameplate-stage keyring-preview-frame">
       <div class="plate-view-header">
 
-        <button class="btn-text" id="plate-reset-view" type="button" hidden><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 3 7M3 5v6h6"/></svg>重置视角</button>
+        <button class="btn-text" id="plate-reset-view" type="button" hidden><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 3 7M3 5v6h6"/></svg>重置</button>
       </div>
-      <div class="plate-view" id="plate-view" tabindex="0" aria-label="3D 预览，拖动或使用方向键旋转">
+      <div class="plate-view" id="plate-view" tabindex="0" aria-label="3D 预览，可拖动或用方向键旋转">
         <canvas id="plate-canvas" hidden></canvas>
       <svg id="plate-preview" viewBox="0 0 90 43" role="img" aria-label="名牌即时预览" fill-rule="evenodd">
         <g id="plate-position">
@@ -51,23 +51,23 @@
       </div>
       </div>
       <div class="keyring-preview-meta">
-      <p class="plate-view-hint" id="plate-view-hint" hidden>拖动旋转 · 捏合缩放</p>
-      <p id="plate-preview-status" role="status" data-loading="正在生成轮廓…" data-error="这组文字无法生成完整底板，请缩短姓名或更换字体。" data-unsupported="所选字体不支持这些文字，请更换字体或姓名。" data-articulated-length="关节字块最多 8 字，空格不计。" data-approximate="约" data-nameplate-length="文字超过长度上限，请缩短后再试。"></p>
+      <p class="plate-view-hint" id="plate-view-hint" hidden>拖动旋转 · 双指缩放</p>
+      <p id="plate-preview-status" role="status" data-loading="生成中…" data-error="底板做不出来，缩短名字或换个字体。" data-unsupported="这个字体打不出这些字，换个字体试试。" data-articulated-length="最多 8 字，空格不算。" data-approximate="约" data-nameplate-length="太长了，缩短一点。"></p>
       <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="模型尺寸"></p>
-      <figcaption>画面为设计示意，实际成品颜色与尺寸依制作确认为准。</figcaption>
+      <figcaption>示意图，实际颜色和尺寸以成品为准。</figcaption>
       </div>
     </figure>
     <form id="nameplate-form" class="nameplate-form">
       <section class="keyring-shared" aria-labelledby="keyring-shared-title">
         <p class="r2-shape-label" data-name-tag-only>随字轮廓</p>
-        <h2 id="keyring-shared-title" class="r2-editor-heading">姓名与字体</h2>
+        <h2 id="keyring-shared-title" class="r2-editor-heading">名字与字体</h2>
         <div class="nameplate-field">
-          <label for="plate-name">姓名文字</label>
+          <label for="plate-name">名字</label>
           <input id="plate-name" name="nameText" maxlength="20" placeholder="你的名字" required pattern=".*\S.*" autocomplete="off">
-          <p class="nameplate-order-note" data-articulated-only hidden>单一字块规格，整串长度随字数与字形变化。</p>
+          <p class="nameplate-order-note" data-articulated-only hidden>长度随字数和字形变化。</p>
         </div>
         <div class="nameplate-field">
-          <label for="plate-style">字形风格</label>
+          <label for="plate-style">字体</label>
           <select id="plate-style" name="style">
             <optgroup label="中文字型">
               <option value="sans-tc">繁体黑体</option>
@@ -98,14 +98,14 @@
       </section>
       <div class="keyring-step-panel">
       <section class="keyring-step" id="keyring-colors">
-        <h2 tabindex="-1">选颜色</h2>
+        <h2 tabindex="-1">配色</h2>
         <details class="keyring-colour-section">
           <summary><span data-name-tag-only>轮廓颜色</span><span data-articulated-only hidden>字块颜色</span><span class="clicker-colour-current" data-keyring-current="baseColor"><i aria-hidden="true"></i><span></span></span></summary>
           <div class="nameplate-field"><label for="plate-base-color">轮廓颜色</label><select id="plate-base-color" name="baseColor" data-swatch data-default="#a087c1"></select></div>
         </details>
         <details class="keyring-colour-section">
-          <summary><span data-name-tag-only>字面颜色</span><span data-articulated-only hidden>字面颜色</span><span class="clicker-colour-current" data-keyring-current="textColor"><i aria-hidden="true"></i><span></span></span></summary>
-          <div class="nameplate-field"><label for="plate-text-color">字面颜色</label><select id="plate-text-color" name="textColor" data-swatch data-default="#fffcf5"></select></div>
+          <summary><span data-name-tag-only>字色</span><span data-articulated-only hidden>字色</span><span class="clicker-colour-current" data-keyring-current="textColor"><i aria-hidden="true"></i><span></span></span></summary>
+          <div class="nameplate-field"><label for="plate-text-color">字色</label><select id="plate-text-color" name="textColor" data-swatch data-default="#fffcf5"></select></div>
         </details>
         <template id="plate-swatch-options">
           <option value="#a087c1">薰衣草紫</option>
@@ -116,11 +116,11 @@
           <option value="#efb39e">蜜桃粉</option>
         </template>
       </section>
-<details class="r2-order-review"><summary>订单摘要</summary><dl data-r2-summary></dl></details><label class="r2-spelling"><input type="checkbox" data-r2-spelling> 名字会照你输入的内容制作，请确认拼写。</label><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>3 天内出货</span><p class="nameplate-order-note" id="articulated-price" hidden>预估价格 <strong><output for="plate-name" data-start="NT$%s 起"></output></strong></p></div><button class="btn-primary" id="keyring-generate" type="submit" disabled>提交确认</button></div>
+<details class="r2-order-review"><summary>摘要</summary><dl data-r2-summary></dl></details><label class="r2-spelling"><input type="checkbox" data-r2-spelling> 拼写我确认过了</label><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>3 天内出货</span><p class="nameplate-order-note" id="articulated-price" hidden>预估 <strong><output for="plate-name" data-start="NT$%s 起"></output></strong></p></div><button class="btn-primary" id="keyring-generate" type="submit" disabled>提交</button></div>
         <div class="nameplate-actions">
           <a class="button cream" id="plate-download" download="OGS-keyring-preview.png" hidden>下载 PNG</a>
-          <button class="button yellow" id="plate-payment" type="button" disabled hidden>前往付款</button>
-          <p id="plate-status" role="status" data-error="预览图生成失败，请再试一次。" data-ready="已确认。可下载 PNG，付款暂未开放。"></p>
+          <button class="button yellow" id="plate-payment" type="button" disabled hidden>付款</button>
+          <p id="plate-status" role="status" data-error="预览图生成失败，再试一次。" data-ready="已确认，可下载 PNG；付款还没开放。"></p>
         </div>
 
       </div>
@@ -129,74 +129,74 @@
   <div class="nameplate-workspace" id="name-clicker" data-keyring-panel hidden>
     <figure class="keyring-preview">
       <div class="nameplate-stage keyring-preview-frame">
-        <div class="plate-view-header"><div class="plate-view-tools"><button class="btn-text" type="button" id="clicker-inspect" aria-pressed="false" data-inspect="检视键轴" data-assemble="显示键帽"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8v8l9 5 9-5V8zM3 8l9 5 9-5m-9 5v8"/></svg><span>检视键轴</span></button><button class="btn-text" type="button" id="clicker-reset"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 3 7M3 5v6h6"/></svg>重置视角</button></div></div>
-        <div class="plate-view" id="clicker-view" tabindex="0" aria-label="3D 按压款预览，可拖动旋转与缩放"><canvas id="clicker-canvas"></canvas></div>
+        <div class="plate-view-header"><div class="plate-view-tools"><button class="btn-text" type="button" id="clicker-inspect" aria-pressed="false" data-inspect="看键轴" data-assemble="看键帽"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8v8l9 5 9-5V8zM3 8l9 5 9-5m-9 5v8"/></svg><span>看键轴</span></button><button class="btn-text" type="button" id="clicker-reset"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 3 7M3 5v6h6"/></svg>重置</button></div></div>
+        <div class="plate-view" id="clicker-view" tabindex="0" aria-label="3D 预览，可拖动或用方向键旋转"><canvas id="clicker-canvas"></canvas></div>
       </div>
       <div class="keyring-preview-meta">
-        <p class="plate-view-hint" id="clicker-hint" data-keys="拖动旋转 · 捏合缩放 · 点按键帽" data-name="拖动旋转 · 捏合缩放 · 点按姓名面板">拖动旋转 · 捏合缩放 · 点按键帽</p>
+        <p class="plate-view-hint" id="clicker-hint" data-keys="拖动旋转 · 双指缩放 · 点键帽" data-name="拖动旋转 · 双指缩放 · 点名字">拖动旋转 · 双指缩放 · 点键帽</p>
         <p class="keyring-dimensions" id="clicker-dimensions" data-label="模型尺寸"></p>
-        <p id="clicker-status" role="status" data-unsupported="所选字体不支持这些文字，请更换字体或姓名。" data-error="3D 预览载入失败，请再试一次。" data-no-webgl="目前浏览器无法显示 3D，请使用支持 WebGL 的浏览器。"></p>
-        <figcaption>画面为设计示意，实际成品颜色与尺寸依制作确认为准。</figcaption>
+        <p id="clicker-status" role="status" data-unsupported="这个字体打不出这些字，换个字体试试。" data-error="3D 载入失败，再试一次。" data-no-webgl="这个浏览器不支持 3D（WebGL），换一个试试。"></p>
+        <figcaption>示意图，实际颜色和尺寸以成品为准。</figcaption>
       </div>
     </figure>
     <form class="nameplate-form" id="clicker-form">
       <div class="keyring-step-panel">
         <div class="nameplate-field">
-          <label for="clicker-name-text">姓名或文字</label>
+          <label for="clicker-name-text">名字</label>
           <input id="clicker-name-text" name="clickerName" maxlength="16" placeholder="好物" autocomplete="off" spellcheck="false" aria-describedby="clicker-name-limit clicker-name-limit-error">
-          <small class="nameplate-order-note" id="clicker-name-limit" hidden>中文最多 5 字，英文最多 8 个字母。</small>
+          <small class="nameplate-order-note" id="clicker-name-limit" hidden>中文 5 字、英文 8 字母以内。</small>
           <small class="nameplate-order-note" id="clicker-key-limit">每个字一个键帽，最多 6 个。</small>
-          <small class="clicker-name-limit-error" id="clicker-name-limit-error" role="status" hidden>文字超过长度上限，请缩短后再试。</small>
+          <small class="clicker-name-limit-error" id="clicker-name-limit-error" role="status" hidden>太长了，缩短一点。</small>
         </div>
         <fieldset class="clicker-style-picker">
-          <legend>按压款式</legend>
-          <label><input type="radio" name="clickerStyle" value="mechanical" checked> 机械键盘款</label>
-          <label><input type="radio" name="clickerStyle" value="name"> 连字按压款</label>
+          <legend>款式</legend>
+          <label><input type="radio" name="clickerStyle" value="mechanical" checked> 键盘款</label>
+          <label><input type="radio" name="clickerStyle" value="name"> 连字款</label>
         </fieldset>
         <div class="clicker-style-settings" id="clicker-mechanical-settings">
-          <div class="nameplate-field" id="clicker-key-font-field"><label for="clicker-key-font">整组字型</label></div>
+          <div class="nameplate-field" id="clicker-key-font-field"><label for="clicker-key-font">字体</label></div>
           <div class="clicker-key-colours">
             <details class="clicker-colour-picker" data-compact-colour>
-              <summary><span>键帽颜色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
-              <div class="nameplate-field clicker-colour-menu"><label for="clicker-cap">键帽颜色</label><select id="clicker-cap" name="keyCap"></select></div>
+              <summary><span>键帽色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
+              <div class="nameplate-field clicker-colour-menu"><label for="clicker-cap">键帽色</label><select id="clicker-cap" name="keyCap"></select></div>
             </details>
             <details class="clicker-colour-picker" data-compact-colour>
-              <summary><span>文字颜色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
-              <div class="nameplate-field clicker-colour-menu"><label for="clicker-ink">文字颜色</label><select id="clicker-ink" name="keyInk"></select></div>
+              <summary><span>字色</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
+              <div class="nameplate-field clicker-colour-menu"><label for="clicker-ink">字色</label><select id="clicker-ink" name="keyInk"></select></div>
             </details>
           </div>
           <section class="clicker-colors">
             <details class="keyring-colour-section">
-              <summary><span>底座颜色</span><span class="clicker-colour-current" data-clicker-current="base"><i aria-hidden="true"></i><span></span></span></summary>
-              <div class="nameplate-field"><label for="clicker-base">底座颜色</label><select id="clicker-base" name="base"></select></div>
+              <summary><span>底座色</span><span class="clicker-colour-current" data-clicker-current="base"><i aria-hidden="true"></i><span></span></span></summary>
+              <div class="nameplate-field"><label for="clicker-base">底座色</label><select id="clicker-base" name="base"></select></div>
             </details>
           </section>
         </div>
         <div class="clicker-style-settings" id="clicker-name-settings" hidden>
-          <div class="nameplate-field" id="clicker-name-font-field"><label for="clicker-name-font">整组字型</label></div>
+          <div class="nameplate-field" id="clicker-name-font-field"><label for="clicker-name-font">字体</label></div>
           <section class="clicker-colors" aria-labelledby="clicker-name-colors-heading">
             <h3 id="clicker-name-colors-heading">配色</h3>
             <div class="clicker-key-colours">
               <details class="clicker-colour-picker" data-compact-colour>
-                <summary><span>文字颜色</span><span class="clicker-colour-current" data-clicker-current="nameInk"><i aria-hidden="true"></i><span></span></span></summary>
-                <div class="nameplate-field clicker-colour-menu"><label for="clicker-name-ink">文字颜色</label><select id="clicker-name-ink" name="nameInk"></select></div>
+                <summary><span>字色</span><span class="clicker-colour-current" data-clicker-current="nameInk"><i aria-hidden="true"></i><span></span></span></summary>
+                <div class="nameplate-field clicker-colour-menu"><label for="clicker-name-ink">字色</label><select id="clicker-name-ink" name="nameInk"></select></div>
               </details>
               <details class="clicker-colour-picker" data-compact-colour>
-                <summary><span>内底颜色</span><span class="clicker-colour-current" data-clicker-current="nameFill"><i aria-hidden="true"></i><span></span></span></summary>
-                <div class="nameplate-field clicker-colour-menu"><label for="clicker-name-fill">内底颜色</label><select id="clicker-name-fill" name="nameFill"></select></div>
+                <summary><span>内底色</span><span class="clicker-colour-current" data-clicker-current="nameFill"><i aria-hidden="true"></i><span></span></span></summary>
+                <div class="nameplate-field clicker-colour-menu"><label for="clicker-name-fill">内底色</label><select id="clicker-name-fill" name="nameFill"></select></div>
               </details>
             </div>
             <details class="keyring-colour-section">
-              <summary><span>外框颜色</span><span class="clicker-colour-current" data-clicker-current="nameBorder"><i aria-hidden="true"></i><span></span></span></summary>
-              <div class="nameplate-field"><label for="clicker-name-border">外框颜色</label><select id="clicker-name-border" name="nameBorder"></select></div>
+              <summary><span>外框色</span><span class="clicker-colour-current" data-clicker-current="nameBorder"><i aria-hidden="true"></i><span></span></span></summary>
+              <div class="nameplate-field"><label for="clicker-name-border">外框色</label><select id="clicker-name-border" name="nameBorder"></select></div>
             </details>
           </section>
         </div>
-        <details class="r2-order-review"><summary>订单摘要</summary><dl data-r2-summary></dl></details><label class="r2-spelling"><input type="checkbox" data-r2-spelling> 名字会照你输入的内容制作，请确认拼写。</label>
-      </div><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>3 天内出货</span><p class="r2-press-start">按压款 NT$80 起</p><p id="connected-order" hidden>商品金额 <strong><output id="connected-order-price" aria-live="polite"></output></strong></p></div><div class="r2-press-actions"><button class="btn-primary" id="connected-order-start" type="button" disabled>前往下单</button><div class="design-contact" id="design-contact" hidden><button type="button" class="btn-primary" id="clicker-contact-design">提交确认</button><p id="design-contact-status" role="status"></p></div></div></div>
+        <details class="r2-order-review"><summary>摘要</summary><dl data-r2-summary></dl></details><label class="r2-spelling"><input type="checkbox" data-r2-spelling> 拼写我确认过了</label>
+      </div><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>3 天内出货</span><p class="r2-press-start" data-keyboard="按压款 NT$80 起" data-joined="连字款 NT$80 起">按压款 NT$80 起</p><p id="connected-order" hidden>价格 <strong><output id="connected-order-price" aria-live="polite"></output></strong></p></div><div class="r2-press-actions"><button class="btn-primary" id="connected-order-start" type="button" disabled>购买</button><div class="design-contact" id="design-contact" hidden><button type="button" class="btn-primary" id="clicker-contact-design">提交</button><p id="design-contact-status" role="status"></p></div></div></div>
     </form>
   </div>
 </main>
-<footer class="site-footer r2-footer"><div class="footer-brand"><div class="r2-footer-lockup"><img src="assets/icon.png" class="r2-footer-symbol" width="42" height="42" alt=""><img src="assets/ogs-wordmark-header.png" class="r2-footer-wordmark" width="879" height="299" alt="One Goods Studio"></div><span>解压、有趣，自成一格。</span></div><div><a href="products.html">好物</a><a href="custom.html">客制</a><a href="about.html">关于 OGS</a><a href="purchase-policy.html">購買與售後說明</a><a href="privacy.html">隱私權說明</a></div><section class="footer-contact" aria-label="联系我们"><h2>联系我们</h2><p class="footer-store-name">One Goods Studio</p><p>商品、客制或订单问题，欢迎与我们联系。</p><address><a href="mailto:aka051118@gmail.com"><span>客服信箱</span><strong>aka051118@gmail.com</strong></a><a href="tel:0916662580"><span>客服电话</span><strong>0916662580</strong></a><a href="https://onegoods.studio"><span>官方网站</span><strong>https://onegoods.studio</strong></a></address><div class="footer-policy-links"><a href="purchase-policy.html">購買與售後說明</a><a href="privacy.html">隱私權說明</a></div><a class="footer-instagram" href="https://www.instagram.com/one.goods.studio/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="18" cy="6" r=".8" fill="currentColor" stroke="none"/></svg>Instagram</a></section><small>© 2026 One Goods Studio</small></footer>
+<footer class="site-footer r2-footer"><div class="footer-brand"><div class="r2-footer-lockup"><img src="assets/icon.png" class="r2-footer-symbol" width="42" height="42" alt=""><img src="assets/ogs-wordmark-header.png" class="r2-footer-wordmark" width="879" height="299" alt="One Goods Studio"></div><span>解压、有趣，自成一格。</span></div><div><a href="products.html">好物</a><a href="custom.html">客制</a><a href="about.html">关于 OGS</a><a href="purchase-policy.html">售后说明</a><a href="privacy.html">隱私權說明</a></div><section class="footer-contact" aria-label="联络"><h2>联络</h2><p class="footer-store-name">One Goods Studio</p><p>有问题就找我们。</p><address><a href="mailto:aka051118@gmail.com"><span>信箱</span><strong>aka051118@gmail.com</strong></a><a href="tel:0916662580"><span>电话</span><strong>0916662580</strong></a></address><a class="footer-instagram" href="https://www.instagram.com/one.goods.studio/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="18" cy="6" r=".8" fill="currentColor" stroke="none"/></svg>Instagram</a></section><small>© 2026 One Goods Studio</small></footer>
 </body>
 </html>

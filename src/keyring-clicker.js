@@ -197,6 +197,7 @@ export function setupClicker({ active = true, updateSummary = () => {} } = {}) {
   let orderEnabled = false;
   function showOrderPrice() {
     const quote = quoteConnectedClicker(clickerName.value);
+    startingPrice.textContent = clickerStyle.value === 'name' ? startingPrice.dataset.joined : startingPrice.dataset.keyboard;
     orderPanel.hidden = !orderEnabled || clickerStyle.value !== 'name';
     startingPrice.hidden = !orderPanel.hidden && Boolean(quote);
     orderStart.hidden = orderPanel.hidden;
@@ -227,10 +228,10 @@ export function setupClicker({ active = true, updateSummary = () => {} } = {}) {
   });
   contactDesign.addEventListener('click', () => {
     const content = JSON.stringify(readContactDesign(), null, 2);
-    location.href = 'mailto:aka051118@gmail.com?subject=' + encodeURIComponent('OGS 客製設計確認') + '&body=' + encodeURIComponent(content);
+    location.href = 'mailto:aka051118@gmail.com?subject=' + encodeURIComponent(({ en: 'OGS custom design', 'zh-Hans': 'OGS 客制设计', 'zh-Hant': 'OGS 客製設計' })[document.documentElement.lang]) + '&body=' + encodeURIComponent(content);
     document.querySelector('#design-contact-status').textContent = document.documentElement.lang === 'en'
-      ? 'Send the draft from your email app to contact us.'
-      : document.documentElement.lang === 'zh-Hans' ? '请在邮件程序中发送设计资料给我们。' : '請在郵件程式中寄出設計資料給我們。';
+      ? "Hit send in your email app and you're done."
+      : document.documentElement.lang === 'zh-Hans' ? '在邮件 App 按发送就完成了。' : '在郵件 App 按寄出就完成了。';
   });
   render();
   return {

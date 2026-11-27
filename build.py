@@ -47,6 +47,8 @@ for lang, folder, column in locales:
                 options.append(f'<a href="{url}" lang="{alternate}" hreflang="{alternate}" data-language="{alternate}"{current}>{label}</a>')
             current_label = {'zh-Hant': '繁', 'zh-Hans': '简', 'en': 'en'}[lang]
             switch_label = {'zh-Hant': '切換語言，目前：繁體中文', 'zh-Hans': '切换语言，当前：简体中文', 'en': 'Change language. Current: English'}[lang]
+            if page.name not in {'checkout.html', 'internal-checkout.html'}:
+                switch_label = {'zh-Hant': '語言：繁體中文', 'zh-Hans': '语言：简体中文', 'en': 'Language: English'}[lang]
             chevron = '<span class="language-chevron" aria-hidden="true"></span>'
             if '<header class="r2-header">' in text:
                 chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'

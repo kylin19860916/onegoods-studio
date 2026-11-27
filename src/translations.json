@@ -1,4 +1,8 @@
 {
+  "连字款 NT$80 起": [
+    "連字款 NT$80 起",
+    "Joined from NT$80"
+  ],
   "每个字一个键帽，最多 6 个。": [
     "每個字一個鍵帽，最多 6 個。",
     "One character per key, up to 6 keys."
@@ -2257,11 +2261,11 @@
   ],
   "客制 3 天内出货": [
     "客製 3 天內出貨",
-    "Custom orders ship within 3 days"
+    "Custom: ships in 3 days"
   ],
   "客制商品 3 天内出货。": [
     "客製商品 3 天內出貨。",
-    "Custom orders ship within 3 days."
+    "Custom items ship within 3 days."
   ],
   "先输入名字": [
     "先輸入名字",
@@ -2285,7 +2289,7 @@
   ],
   "官网刷卡，或到賣貨便、蝦皮购买。": [
     "官網刷卡，或到賣貨便、蝦皮購買。",
-    "Pay by card here or shop on MyShip or Shopee."
+    "Pay by card here, or buy on MyShip or Shopee."
   ],
   "7-ELEVEN 超商取货，或黑猫宅配到府。": [
     "7-ELEVEN 超商取貨，或黑貓宅配到府。",
@@ -2405,7 +2409,7 @@
   ],
   "三款怎么选": [
     "三款怎麼選",
-    "Compare styles"
+    "Which one?"
   ],
   "选款式": [
     "選款式",
@@ -2529,10 +2533,482 @@
   ],
   "示意合成": [
     "示意合成",
-    "Illustrative composite"
+    "Composite"
   ],
   "窗光下带有列印层纹的雾面 PLA 纾压小物（生成情境图）": [
     "窗光下帶有列印層紋的霧面 PLA 紓壓小物（生成情境圖）",
     "Layered matte PLA fidget objects in soft window light (generated scene)"
+  ],
+  "aria-label=\"联络\"": [
+    "aria-label=\"聯絡\"",
+    "aria-label=\"Contact\""
+  ],
+  ">联络<": [
+    ">聯絡<",
+    ">Contact<"
+  ],
+  ">有问题就找我们。<": [
+    ">有問題就找我們。<",
+    ">Questions? Get in touch.<"
+  ],
+  ">信箱<": [
+    ">信箱<",
+    ">Email<"
+  ],
+  ">电话<": [
+    ">電話<",
+    ">Phone<"
+  ],
+  ">售后说明<": [
+    ">售後說明<",
+    ">Returns &amp; policy<"
+  ],
+  ">购买说明<": [
+    ">購買說明<",
+    ">Buying info<"
+  ],
+  "aria-label=\"关闭\"": [
+    "aria-label=\"關閉\"",
+    "aria-label=\"Close\""
+  ],
+  "数字文件不含实体商品，购买前看清格式、配件、打印需求和授权。": [
+    "數位檔案不含實體商品，購買前看清格式、配件、列印需求和授權。",
+    "Digital files don't include a physical item. Check format, parts, printing needs and license first."
+  ],
+  "平台订单的付款与配送由该平台处理。": [
+    "平台訂單的付款與配送由該平台處理。",
+    "Platform orders are paid and shipped by that platform."
+  ],
+  ">官网刷卡<": [
+    ">官網刷卡<",
+    ">Pay by card<"
+  ],
+  "賣貨便、蝦皮也买得到": [
+    "賣貨便、蝦皮也買得到",
+    "Also on MyShip &amp; Shopee"
+  ],
+  "名牌、按压、关节字块": [
+    "名牌、按壓、關節字塊",
+    "Name tags, clickers, letters"
+  ],
+  "看全部": [
+    "看全部",
+    "View all"
+  ],
+  "客制": [
+    "客製",
+    "Customize"
+  ],
+  "3D 预览图": [
+    "3D 預覽圖",
+    "3D preview"
+  ],
+  ">名字<": [
+    ">名字<",
+    ">Name<"
+  ],
+  "Mia、小飞": [
+    "Mia、小飛",
+    "Mia"
+  ],
+  ">购买<": [
+    ">購買<",
+    ">Buy<"
+  ],
+  "逛好物": [
+    "逛好物",
+    "Shop"
+  ],
+  "原创 3D 打印解压小物，可客制名字，台湾出货。": [
+    "原創 3D 列印紓壓小物，可客製名字，台灣出貨。",
+    "Original 3D-printed fidgets. Custom names. Ships from Taiwan."
+  ],
+  "三款任选，换上你的名字和配色，3D 直接看。": [
+    "三款任選，換上你的名字和配色，3D 直接看。",
+    "Pick one of three, add your name and colors, see it in 3D."
+  ],
+  "<dd>客制 3 天内出货。</dd>": [
+    "<dd>客製 3 天內出貨。</dd>",
+    "<dd>Custom orders ship in 3 days.</dd>"
+  ],
+  ">3 天内出货。<": [
+    ">3 天內出貨。<",
+    ">Within 3 days.<"
+  ],
+  ">收货<": [
+    ">收貨<",
+    ">Delivery<"
+  ],
+  "7-ELEVEN 取货 <span data-shipping=\"pickup\"></span>、黑猫宅配 <span data-shipping=\"home\"></span>，结账时选。": [
+    "7-ELEVEN 取貨 <span data-shipping=\"pickup\"></span>、黑貓宅配 <span data-shipping=\"home\"></span>，結帳時選。",
+    "7-ELEVEN pickup <span data-shipping=\"pickup\"></span>, Black Cat delivery <span data-shipping=\"home\"></span>. Choose at checkout."
+  ],
+  "一般商品收到 7 天内可申请退货；客制品若不适用，下单前会先说明。": [
+    "一般商品收到 7 天內可申請退貨；客製品若不適用，下單前會先說明。",
+    "Standard items: request a return within 7 days of delivery. If a custom item is an exception, we'll tell you before you order."
+  ],
+  "原创按压玩具和随身吊饰。": [
+    "原創按壓玩具和隨身吊飾。",
+    "Original clickers and charms."
+  ],
+  ">全部<": [
+    ">全部<",
+    ">All<"
+  ],
+  "其他平台": [
+    "其他平臺",
+    "Also on"
+  ],
+  "需 uniopen 账号": [
+    "需 uniopen 帳號",
+    "uniopen account needed"
+  ],
+  "这里还没有商品。": [
+    "這裡還沒有商品。",
+    "Nothing here yet."
+  ],
+  "找不到这件商品。": [
+    "找不到這件商品。",
+    "Product not found."
+  ],
+  ">返回好物<": [
+    ">返回好物<",
+    ">Back to shop<"
+  ],
+  "机械键轴": [
+    "機械鍵軸",
+    "Mechanical switches"
+  ],
+  "附珠链": [
+    "附珠鏈",
+    "Chain included"
+  ],
+  "12 个大面板都是独立的机械按键。顶部插销可拔出插回，纯装饰。": [
+    "12 個大面板都是獨立的機械按鍵。頂部插銷可拔出插回，純裝飾。",
+    "All 12 large panels are independent mechanical keys. The top pin pulls out and back in — just for fun."
+  ],
+  "表面保留 3D 打印层纹和金色闪点；声音与手感依轴体而定。": [
+    "表面保留 3D 列印層紋和金色閃點；聲音與手感依軸體而定。",
+    "Print layers and gold sparkle stay visible. Sound and feel depend on the switches."
+  ],
+  "实拍中的道具不含在内。": [
+    "實拍中的道具不含在內。",
+    "Props in the photos are not included."
+  ],
+  "实拍照，背景经统一处理。": [
+    "實拍照，背景經統一處理。",
+    "Real photos, background retouched."
+  ],
+  "收到 7 天内可申请退货": [
+    "收到 7 天內可申請退貨",
+    "Returns within 7 days of delivery"
+  ],
+  ">介绍<": [
+    ">介紹<",
+    ">About<"
+  ],
+  ">规格<": [
+    ">規格<",
+    ">Specs<"
+  ],
+  "在蝦皮、賣貨便下单的，运费以该平台结账为准。": [
+    "在蝦皮、賣貨便下單的，運費以該平臺結帳為準。",
+    "For Shopee or MyShip orders, shipping is set at their checkout."
+  ],
+  "商品载入失败，重新整理再试一次。": [
+    "商品載入失敗，重新整理再試一次。",
+    "Could not load the product. Refresh to try again."
+  ],
+  "label:'賣貨便'": [
+    "label:'賣貨便'",
+    "label:'MyShip'"
+  ],
+  "label:'蝦皮'": [
+    "label:'蝦皮'",
+    "label:'Shopee'"
+  ],
+  "选款式、打名字、配颜色，3D 马上看。": [
+    "選款式、打名字、配顏色，3D 馬上看。",
+    "Pick a style, add your name and colors, see it in 3D."
+  ],
+  "会，预览长什么样就做什么样，送出前看一下拼写。": [
+    "會，預覽長什麼樣就做什麼樣，送出前看一下拼寫。",
+    "Yes — what you see in the preview is what we make. Check the spelling first."
+  ],
+  ">返回<": [
+    ">返回<",
+    ">Back<"
+  ],
+  "选造型和尺寸，再配颜色。": [
+    "選造型和尺寸，再配顏色。",
+    "Pick a shape and size, then the colors."
+  ],
+  "客制你的按压款。": [
+    "客製你的按壓款。",
+    "Make your clicker."
+  ],
+  "选键帽、打名字、配颜色，在 3D 里按按看。": [
+    "選鍵帽、打名字、配顏色，在 3D 裡按按看。",
+    "Pick keycaps, add your name and colors, and press it in 3D."
+  ],
+  "打名字、配颜色，转一圈看卡扣。": [
+    "打名字、配顏色，轉一圈看卡扣。",
+    "Add your name and colors, then spin to see the joints."
+  ],
+  "重置": [
+    "重置",
+    "Reset"
+  ],
+  "看键轴": [
+    "看鍵軸",
+    "Switches"
+  ],
+  "看键帽": [
+    "看鍵帽",
+    "Keycaps"
+  ],
+  "拖动旋转 · 双指缩放 · 点键帽": [
+    "拖曳旋轉 · 雙指縮放 · 點鍵帽",
+    "Drag to rotate · Pinch to zoom · Tap a key"
+  ],
+  "拖动旋转 · 双指缩放 · 点名字": [
+    "拖曳旋轉 · 雙指縮放 · 點名字",
+    "Drag to rotate · Pinch to zoom · Tap the name"
+  ],
+  "拖动旋转 · 双指缩放": [
+    "拖曳旋轉 · 雙指縮放",
+    "Drag to rotate · Pinch to zoom"
+  ],
+  "3D 预览，可拖动或用方向键旋转": [
+    "3D 預覽，可拖曳或用方向鍵旋轉",
+    "3D preview. Drag or use arrow keys to rotate."
+  ],
+  "示意图，实际颜色和尺寸以成品为准。": [
+    "示意圖，實際顏色和尺寸以成品為準。",
+    "Preview only. Final colors and size may vary."
+  ],
+  "生成中…": [
+    "生成中…",
+    "Generating…"
+  ],
+  "这个字体打不出这些字，换个字体试试。": [
+    "這個字型打不出這些字，換個字型試試。",
+    "This font can't show these characters. Try another font."
+  ],
+  "底板做不出来，缩短名字或换个字体。": [
+    "底板做不出來，縮短名字或換個字型。",
+    "The base won't fit. Shorten the name or try another font."
+  ],
+  "最多 8 字，空格不算。": [
+    "最多 8 字，空格不算。",
+    "Up to 8 characters, spaces not counted."
+  ],
+  "3D 载入失败，再试一次。": [
+    "3D 載入失敗，再試一次。",
+    "3D failed to load. Try again."
+  ],
+  "这个浏览器不支持 3D（WebGL），换一个试试。": [
+    "這個瀏覽器不支援 3D（WebGL），換一個試試。",
+    "This browser doesn't support 3D (WebGL). Try another."
+  ],
+  "预览图生成失败，再试一次。": [
+    "預覽圖生成失敗，再試一次。",
+    "Couldn't create the preview. Try again."
+  ],
+  ">名字与字体<": [
+    ">名字與字型<",
+    ">Name &amp; font<"
+  ],
+  "长度随字数和字形变化。": [
+    "長度隨字數和字形變化。",
+    "Length varies with the letters."
+  ],
+  ">字体<": [
+    ">字型<",
+    ">Font<"
+  ],
+  ">配色<": [
+    ">配色<",
+    ">Colors<"
+  ],
+  ">字块颜色<": [
+    ">字塊顏色<",
+    ">Letter color<"
+  ],
+  ">字色<": [
+    ">字色<",
+    ">Text color<"
+  ],
+  ">摘要<": [
+    ">摘要<",
+    ">Summary<"
+  ],
+  "拼写我确认过了": [
+    "拼寫我確認過了",
+    "I've checked the spelling"
+  ],
+  "预估 ": [
+    "預估 ",
+    "Est. "
+  ],
+  ">提交<": [
+    ">提交<",
+    ">Submit<"
+  ],
+  ">付款<": [
+    ">付款<",
+    ">Pay<"
+  ],
+  "已确认，可下载 PNG；付款还没开放。": [
+    "已確認，可下載 PNG；付款還沒開放。",
+    "Confirmed. Download the PNG — payment isn't open yet."
+  ],
+  ">款式<": [
+    ">款式<",
+    ">Style<"
+  ],
+  "键盘款</label>": [
+    "鍵盤款</label>",
+    "Keyboard</label>"
+  ],
+  "连字款</label>": [
+    "連字款</label>",
+    "Joined</label>"
+  ],
+  ">键帽色<": [
+    ">鍵帽色<",
+    ">Keycap<"
+  ],
+  ">底座色<": [
+    ">底座色<",
+    ">Base<"
+  ],
+  "中文 5 字、英文 8 字母以内。": [
+    "中文 5 字、英文 8 字母以內。",
+    "Up to 5 Chinese or 8 English characters."
+  ],
+  "太长了，缩短一点。": [
+    "太長了，縮短一點。",
+    "Too long — shorten it."
+  ],
+  ">内底色<": [
+    ">內底色<",
+    ">Inner<"
+  ],
+  ">外框色<": [
+    ">外框色<",
+    ">Border<"
+  ],
+  "价格 <strong>": [
+    "價格 <strong>",
+    "Price <strong>"
+  ],
+  "3 天内出货</span>": [
+    "3 天內出貨</span>",
+    "Ships in 3 days</span>"
+  ],
+  "One Goods Studio：原创 3D 打印小物的独立品牌。": [
+    "One Goods Studio：原創 3D 列印小物的獨立品牌。",
+    "One Goods Studio: an independent brand for original 3D-printed things."
+  ],
+  "One Goods Studio 是做原创 3D 打印小物的独立品牌。": [
+    "One Goods Studio 是做原創 3D 列印小物的獨立品牌。",
+    "One Goods Studio is an independent brand making original 3D-printed little things."
+  ],
+  "原创设计，自己画、自己印。": [
+    "原創設計，自己畫、自己印。",
+    "We design and print our own."
+  ],
+  "按下去、转起来的那一下。": [
+    "按下去、轉起來的那一下。",
+    "That little press, that little spin."
+  ],
+  "放桌上、挂包上、握在手里。": [
+    "放桌上、掛包上、握在手裡。",
+    "On your desk, your bag, in your hand."
+  ],
+  "对。按压系列玩按键手感，旋转系列玩指尖转动；细节看各商品页。": [
+    "對。按壓系列玩按鍵手感，旋轉系列玩指尖轉動；細節看各商品頁。",
+    "Yes. Press is about key feel; spin is about fingertip spinning. See each product for details."
+  ],
+  "购买方式、运费、出货与退换货说明。": [
+    "購買方式、運費、出貨與退換貨說明。",
+    "How to buy, shipping, dispatch and returns."
+  ],
+  ">怎么买<": [
+    ">怎麼買<",
+    ">How to buy<"
+  ],
+  ">运费<": [
+    ">運費<",
+    ">Shipping<"
+  ],
+  ">出货<": [
+    ">出貨<",
+    ">Dispatch<"
+  ],
+  ">客制商品<": [
+    ">客製商品<",
+    ">Custom items<"
+  ],
+  ">退货退款<": [
+    ">退貨退款<",
+    ">Returns<"
+  ],
+  ">数字文件<": [
+    ">數位檔案<",
+    ">Digital files<"
+  ],
+  ">地址搜索<": [
+    ">地址搜尋<",
+    ">Address search<"
+  ],
+  "客制商品照你送出的设计制作，送出前看清拼写、字体和颜色。": [
+    "客製商品照你送出的設計製作，送出前看清拼寫、字型和顏色。",
+    "Custom items are made exactly as submitted. Check spelling, font and colors first."
+  ],
+  "用途与商用范围以各设计的授权为准；购买前看清格式、配件和打印设备。": [
+    "用途與商用範圍以各設計的授權為準；購買前看清格式、配件和列印設備。",
+    "Use and commercial rights follow each design's license. Check format, parts and printer first."
+  ],
+  "寄信或打电话都可以。": [
+    "寄信或打電話都可以。",
+    "Email or call us."
+  ],
+  "我们如何使用你的资料。": [
+    "我們如何使用你的資料。",
+    "How we use your information."
+  ],
+  ">常见问题<": [
+    ">常見問題<",
+    ">FAQ<"
+  ],
+  "alt=\"名牌款\"": [
+    "alt=\"名牌款\"",
+    "alt=\"Name tag\""
+  ],
+  "原创 3D 列印纾压小物<br>可客制名字｜台湾出货": [
+    "原創 3D 列印紓壓小物<br>可客製名字｜台灣出貨",
+    "Original 3D-printed fidgets<br>Custom names · Ships from Taiwan"
+  ],
+  "7-ELEVEN 超商取貨 <span data-shipping=\"pickup\"></span>": [
+    "7-ELEVEN 超商取貨 <span data-shipping=\"pickup\"></span>",
+    "7-ELEVEN pickup <span data-shipping=\"pickup\"></span>"
+  ],
+  "黑貓宅配 <span data-shipping=\"home\"></span>": [
+    "黑貓宅配 <span data-shipping=\"home\"></span>",
+    "Black Cat delivery <span data-shipping=\"home\"></span>"
+  ],
+  "一般通訊交易商品依台灣消費者保護法辦理，原則上可於收受商品後七日內以退回商品或書面通知方式解除契約。": [
+    "一般通訊交易商品依台灣消費者保護法辦理，原則上可於收受商品後七日內以退回商品或書面通知方式解除契約。",
+    "Standard distance purchases are governed by Taiwan’s Consumer Protection Act. In general, you may cancel within seven days of receipt by returning the goods or giving written notice."
+  ],
+  "`NT$${item.startingPrice} 起`": [
+    "`NT$${item.startingPrice} 起`",
+    "`NT$${item.startingPrice}+`"
+  ],
+  "独立按键</span>": [
+    "獨立按鍵</span>",
+    "Independent keys</span>"
   ]
 }

@@ -381,11 +381,11 @@ if (customTabs) {
   headings.append(document.createElement('th'));
   const body = comparison.createTBody();
   const play = body.insertRow();
-  play.insertCell().textContent = ['玩法','玩法','How to use'][localeIndex];
+  play.insertCell().textContent = ['玩法','玩法','Play'][localeIndex];
   const row = body.insertRow();
-  row.insertCell().textContent = ['可選設定','可选设置','Options'][localeIndex];
+  row.insertCell().textContent = ['可改','可改','Options'][localeIndex];
   const dispatch = comparison.tBodies[0].insertRow();
-  dispatch.insertCell().textContent = ['出貨','出货','Dispatch'][localeIndex];
+  dispatch.insertCell().textContent = ['出貨','出货','Ships'][localeIndex];
   const prices = body.insertRow();
   prices.insertCell().textContent = ['價格','价格','Price'][localeIndex];
   customTypes.forEach(type => {
@@ -400,7 +400,7 @@ if (customTabs) {
     play.insertCell().textContent = type.play[localeIndex];
     prices.insertCell().textContent = type.priceLabel?.[localeIndex] ?? (type.startingPrice ? ('NT$' + type.startingPrice + (localeIndex === 2 ? '+' : ' 起')) : '—');
     row.insertCell().textContent = type.description[localeIndex];
-    dispatch.insertCell().textContent = localeIndex === 2 ? `Within ${type.dispatchDays} days` : `${type.dispatchDays} 天內`;
+    dispatch.insertCell().textContent = localeIndex === 2 ? `${type.dispatchDays} days` : `${type.dispatchDays} 天內`;
   });
   // Existing links that land directly on a named clicker still open that ordering mode.
   if (params.get('type') === 'press' && shared.value.trim()) clicker.showNamedStyle();

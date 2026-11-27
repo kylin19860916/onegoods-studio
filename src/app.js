@@ -21,17 +21,17 @@ function priceLabel(p){return p.price!==null&&p.price!==undefined&&!(typeof p.pr
 function art(p){if(p.image)return `<img class="real-product-image" src="${escapeHtml(assetUrl(p.image))}" alt="${escapeHtml(p.images?.[0]?.alt||p.name)}" loading="lazy" decoding="async">`;return '<span class="photo-slot" aria-hidden="true"></span>';}
 let filter='all';
 let categories=[];
-function renderCategoryFilters(){if(qs('.r2-listing'))return;const group=qs('.shop-tools .filters');if(!group||document.body.dataset.catalog==='digital')return;group.innerHTML='<button data-filter="all" class="active" aria-pressed="true">全部好物</button>'+categories.filter(c=>products.some(p=>p.kind==='physical'&&!p.isPlaceholder&&p.type===c.id)).map(c=>`<button data-filter="${escapeHtml(c.id)}" aria-pressed="false">${escapeHtml(locale==='en'?(c.nameEn||c.name):locale==='zh-Hans'?(c.nameZhHans||c.name):c.name)}</button>`).join('');if(filter!=='all'&&!categories.some(c=>c.id===filter))filter='all';setFilter(filter);}
+function renderCategoryFilters(){if(qs('.r2-listing'))return;const group=qs('.shop-tools .filters');if(!group||document.body.dataset.catalog==='digital')return;group.innerHTML='<button data-filter="all" class="active" aria-pressed="true">全部</button>'+categories.filter(c=>products.some(p=>p.kind==='physical'&&!p.isPlaceholder&&p.type===c.id)).map(c=>`<button data-filter="${escapeHtml(c.id)}" aria-pressed="false">${escapeHtml(locale==='en'?(c.nameEn||c.name):locale==='zh-Hans'?(c.nameZhHans||c.name):c.name)}</button>`).join('');if(filter!=='all'&&!categories.some(c=>c.id===filter))filter='all';setFilter(filter);}
 
 function canOrder(p){
  return p?.kind==='physical'&&!p.isPlaceholder&&p.saleStatus==='available'&&Number.isSafeInteger(Number(p.price))&&Number(p.price)>0;
 }
 function buyAction(p){
- const official=canOrder(p)?`<div class="store-order-entry"><a class="button yellow" href="checkout.html?product=${encodeURIComponent(p.id)}">官网下单</a></div>`:'';
+ const official=canOrder(p)?`<div class="store-order-entry"><a class="button yellow" href="checkout.html?product=${encodeURIComponent(p.id)}">购买</a></div>`:'';
  if(p.saleStatus!=='available')return '<span class="sale-status">尚未开售</span>';
- const channels=[p.purchaseUrl?{id:'myship',url:p.purchaseUrl,logo:'platforms/seven-eleven.svg',label:'前往賣貨便賣场',note:'需登入 uniopen 会员'}:null,p.shopeeUrl?{id:'shopee',url:p.shopeeUrl,logo:'platforms/shopee-transparent.png',label:'蝦皮购买',note:'前往 Shopee 商品页'}:null].filter(Boolean);
+ const channels=[p.purchaseUrl?{id:'myship',url:p.purchaseUrl,logo:'platforms/seven-eleven.svg',label:'賣貨便',note:'需 uniopen 账号'}:null,p.shopeeUrl?{id:'shopee',url:p.shopeeUrl,logo:'platforms/shopee-transparent.png',label:'蝦皮'}:null].filter(Boolean);
  if(!channels.length)return official;
- return `<div class="purchase-platforms" role="group" aria-label="其他购买平台"><div class="purchase-platforms-heading"><p class="purchase-platforms-title">其他购买平台</p><p class="purchase-platforms-note">订单、付款与配送由各平台处理。</p></div><div class="purchase-platforms-grid">${channels.map(c=>`<a class="btn-secondary platform-purchase ${c.id}" href="${escapeHtml(c.url)}" target="_blank" rel="noopener noreferrer" title="${c.note}"><span class="platform-logo"><img src="${assetUrl(c.logo)}" alt="" width="96" height="48"></span><span class="platform-copy">${c.label}</span></a>`).join('')}</div></div>`+official;
+ return `<div class="purchase-platforms" role="group" aria-label="其他平台"><div class="purchase-platforms-heading"><p class="purchase-platforms-title">其他平台</p></div><div class="purchase-platforms-grid">${channels.map(c=>`<a class="btn-secondary platform-purchase ${c.id}" href="${escapeHtml(c.url)}" target="_blank" rel="noopener noreferrer"${c.note ? ` title="${c.note}"` : ''}><span class="platform-logo"><img src="${assetUrl(c.logo)}" alt="" width="96" height="48"></span><span class="platform-copy">${c.label}</span></a>`).join('')}</div></div>`+official;
 }
 const studioSources = {
   "keynade-mx": "assets/keynade/01-front-retouched-v2.jpg",
@@ -69,13 +69,13 @@ function customImage(item, { sizes = '(max-width:767px) 100vw, 420px', alt = ite
 }
 function customStartingPrice(item) {
   if (!item.startingPrice) return '';
-  const label = item.priceLabel?.[customLocaleIndex] ?? `NT$${item.startingPrice}${locale==='en'?'+':' 起'}`;
+  const label = item.priceLabel?.[customLocaleIndex] ?? `NT$${item.startingPrice} 起`;
   return `<span class="r2-dispatch">${label}</span>`;
 }
 function customCatalogCard(item) {
   return `<a class="r2-product-card" href="custom?type=${item.id}">
     <div class="r2-product-art">${customImage(item)}</div>
-    <h3>${item.text[customLocaleIndex]}</h3><div><span class="r2-dispatch">3 天内出货</span>${customStartingPrice(item)}</div><span class="btn-secondary">开始客制</span></a>`;
+    <h3>${item.text[customLocaleIndex]}</h3><div><span class="r2-dispatch">3 天内出货</span>${customStartingPrice(item)}</div><span class="btn-secondary">客制</span></a>`;
 }
 const customCards=qs('[data-custom-cards]');
 if(customCards)customCards.innerHTML=customCardItems.map(item=>`<article>
@@ -94,8 +94,8 @@ function renderProducts(){
  if(isHome)list=list.slice(0,4);
  if(count)count.value=count.dataset.format.replace('{count}',String(filter==='custom'?customCardItems.length:list.length));
  grid.classList.add('r2-product-grid');
- grid.innerHTML=filter==='custom'?customCardItems.map(customCatalogCard).join('')+'<p class="r2-image-note r2-grid-note">商品图为 3D 预览渲染</p>':
-   list.length?list.map(product=>productCard(product,isHome)).join(''):'<p class="catalog-note">目前没有符合条件的商品。</p>';
+ grid.innerHTML=filter==='custom'?customCardItems.map(customCatalogCard).join('')+'<p class="r2-image-note r2-grid-note">3D 预览图</p>':
+   list.length?list.map(product=>productCard(product,isHome)).join(''):'<p class="catalog-note">这里还没有商品。</p>';
 }
 qs('#product-sort')?.addEventListener('change',renderProducts);
 function setFilter(value){filter=value;document.querySelectorAll('[data-filter]').forEach(b=>{const active=b.dataset.filter===value;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active)});renderProducts();}
@@ -111,7 +111,7 @@ function renderFullProduct(){
  if(!target)return;
  const id=new URLSearchParams(location.search).get('id');
  const product=products.find(p=>p.id===(id==='good-key'?'keynade-mx':id)&&p.kind==='physical');
- if(!product){target.innerHTML='<h1>没有找到这件商品。</h1><a class="btn-secondary" href="products.html">浏览实体产品</a>';return;}
+ if(!product){target.innerHTML='<h1>找不到这件商品。</h1><a class="btn-secondary" href="products.html">返回好物</a>';return;}
  const name=escapeHtml(product.name);
  document.title=product.name+' — One Goods Studio';
  const meta=document.querySelector('meta[name="description"]');
@@ -130,30 +130,30 @@ function renderFullProduct(){
    <button type="button" data-quantity="-1" aria-label="减少数量">${stepIcon(false)}</button>
    <input id="r2-quantity" type="number" min="1" max="10" value="1" aria-label="数量">
    <button type="button" data-quantity="1" aria-label="增加数量">${stepIcon(true)}</button></div>
-   <a class="btn-primary" id="r2-official-order" href="${checkout}&amp;qty=1">官网下单</a></div>`:'';
- const mobileBuy=canOrder(product) ? `<div class="r2-mobile-buy" hidden><strong>${priceLabel(product)}</strong><a class="btn-primary" href="${checkout}&amp;qty=1">官网下单</a></div>` : '';
- const facts=product.keynadeFacts?'<div class="keynade-facts"><span><b>12</b>独立按键</span><span><b>MX</b>机械键轴结构</span><span><b>1</b>金属珠链随附</span></div>':'';
- const detail=product.keynadeFacts?'<p>几何外壳上的 12 个大面板，都是可独立按压的机械按键。顶部插销可以拔出、插回，是造型与把玩的装饰细节。</p><p>3D 打印的层纹与金色闪点，保留在真实物件的表面。按压声音与手感依搭配的轴体而定。</p>':'';
- const notes=product.keynadeFacts?'<p>顶部插销为装饰零件；小面板为固定造型件，12 个大面板可按压。实拍中的场景物件不属于商品内容。</p>':'';
+   <a class="btn-primary" id="r2-official-order" href="${checkout}&amp;qty=1">购买</a></div>`:'';
+ const mobileBuy=canOrder(product) ? `<div class="r2-mobile-buy" hidden><strong>${priceLabel(product)}</strong><a class="btn-primary" href="${checkout}&amp;qty=1">购买</a></div>` : '';
+ const facts=product.keynadeFacts?'<div class="keynade-facts"><span><b>12</b>独立按键</span><span><b>MX</b>机械键轴</span><span><b>1</b>附珠链</span></div>':'';
+ const detail=product.keynadeFacts?'<p>12 个大面板都是独立的机械按键。顶部插销可拔出插回，纯装饰。</p><p>表面保留 3D 打印层纹和金色闪点；声音与手感依轴体而定。</p>':'';
+ const notes=product.keynadeFacts?'<p>实拍中的道具不含在内。</p>':'';
  const specs=product.specs.length?`<dl>${product.specs.map(s=>`<div><dt>${escapeHtml(s.label)}</dt><dd>${escapeHtml(s.value)}</dd></div>`).join('')}</dl>`:'';
  const other=products.filter(p=>p.kind==='physical'&&!p.isPlaceholder&&p.id!==product.id).slice(0,3);
  target.innerHTML=`<nav class="r2-breadcrumb" aria-label="面包屑"><a href="products.html">好物</a><span aria-hidden="true">/</span><span>${name}</span></nav>
-   <div class="keynade-intro r2-product-layout"><div class="keynade-gallery">${gallery}${photo?'<p class="r2-photo-caption">商品照片為實拍，背景經統一處理。</p>':''}</div>
+   <div class="keynade-intro r2-product-layout"><div class="keynade-gallery">${gallery}${photo?'<p class="r2-photo-caption">实拍照，背景经统一处理。</p>':''}</div>
    <div class="keynade-summary"><h1>${name}</h1>${product.keynadeFacts?'<p class="keynade-subtitle">12 键机械按压手雷</p>':''}
    ${priceLabel(product)?`<p class="keynade-price">${priceLabel(product)}</p>`:''}
    ${paragraphs(product.detail||product.desc)}${facts}${buying}
-   <div class="r2-product-shipping"><p>7-ELEVEN 超商取货 <span data-shipping="pickup"></span> · 黑猫宅配 <span data-shipping="home"></span></p><p>收到商品 7 天内可申请退货 <a href="purchase-policy.html">售后说明</a></p></div>
+   <div class="r2-product-shipping"><p>7-ELEVEN 超商取货 <span data-shipping="pickup"></span> · 黑猫宅配 <span data-shipping="home"></span></p><p>收到 7 天内可申请退货 <a href="purchase-policy.html">售后说明</a></p></div>
    ${platformLinks}
    <div class="r2-product-details">
-     <details><summary>商品介绍</summary>${detail||paragraphs(product.desc)}${notes}</details>
-     ${specs||product.included?`<details><summary>规格与随附内容</summary>${specs}${paragraphs(product.included)}</details>`:''}
-     <details><summary>配送与退换</summary><p>平台订单的配送方式与运费，请在蝦皮或賣貨便结账时确认。</p><a class="btn-text" href="purchase-policy.html">購買與售後說明</a></details>
+     <details><summary>介绍</summary>${detail||paragraphs(product.desc)}${notes}</details>
+     ${specs||product.included?`<details><summary>规格</summary>${specs}${paragraphs(product.included)}</details>`:''}
+     <details><summary>配送与退换</summary><p>在蝦皮、賣貨便下单的，运费以该平台结账为准。</p><a class="btn-text" href="purchase-policy.html">售后说明</a></details>
    </div></div></div>
    <section class="r2-product-custom"><div><h2>也想要一个有你名字的？</h2>
-   <label for="r2-product-name">先输入名字</label><input id="r2-product-name" data-custom-name autocomplete="off">
-   <a class="btn-secondary" href="custom.html" data-custom-link>开始客制</a></div>
-   <figure>${customImage(customCardItems.find(item => item.id === 'press'), { alt: '客制按压款' })}<figcaption>商品图为 3D 预览渲染</figcaption></figure></section>
-   ${other.length?`<section class="r2-block r2-related"><div class="r2-section-head"><h2>其他好物</h2><a href="products.html" class="btn-text">看全部好物</a></div><div class="r2-product-grid">${other.map(product=>productCard(product)).join('')}</div></section>`:''}`;
+   <label for="r2-product-name">名字</label><input id="r2-product-name" data-custom-name autocomplete="off">
+   <a class="btn-secondary" href="custom.html" data-custom-link>客制</a></div>
+   <figure>${customImage(customCardItems.find(item => item.id === 'press'), { alt: '客制按压款' })}<figcaption>3D 预览图</figcaption></figure></section>
+   ${other.length?`<section class="r2-block r2-related"><div class="r2-section-head"><h2>其他好物</h2><a href="products.html" class="btn-text">看全部</a></div><div class="r2-product-grid">${other.map(product=>productCard(product)).join('')}</div></section>`:''}`;
  target.insertAdjacentHTML('beforeend', mobileBuy);
  renderShippingFees();
  const quantity=qs('#r2-quantity');
@@ -184,7 +184,26 @@ if(qs('#open-info'))qs('#open-info').onclick=()=>qs('#info-dialog').showModal();
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}}));
 if(qs('#year'))qs('#year').textContent=new Date().getFullYear();
 const pages={home:'index.html',products:'products.html',designs:'design-files.html',about:'about.html',product:'products.html'};document.querySelectorAll('header nav:not(.language-switch) a,.catalog-nav a').forEach(a=>{if(a.getAttribute('href')===pages[document.body.dataset.page])a.setAttribute('aria-current','page');});
-async function loadCatalog(){try{const [r,payment]=await Promise.all([fetch('/api/catalog',{cache:'no-store'}),paymentConfig()]);storePayment=payment;renderShippingFees();if(!r.ok)throw Error('catalog');const data=await r.json();categories=data.categories||[];products=data.items.map(localize);renderCategoryFilters();renderProducts();renderFullProduct();renderStoreCheckout();}catch{const target=qs('#products')||qs('#full-product')||qs('#store-checkout');if(target)target.innerHTML='<p role="alert">商品资料暂时无法载入，请稍后重新整理页面。</p>';}}
+async function loadCatalog(){
+ try {
+   const [r,payment]=await Promise.all([fetch('/api/catalog',{cache:'no-store'}),paymentConfig()]);
+   storePayment=payment;
+   renderShippingFees();
+   if(!r.ok)throw Error('catalog');
+   const data=await r.json();
+   categories=data.categories||[];
+   products=data.items.map(localize);
+   renderCategoryFilters();
+   renderProducts();
+   renderFullProduct();
+   renderStoreCheckout();
+ } catch {
+   const target=qs('#products')||qs('#full-product');
+   const checkout=qs('#store-checkout');
+   if(target)target.innerHTML='<p role="alert">商品载入失败，重新整理再试一次。</p>';
+   else if(checkout)checkout.innerHTML='<p role="alert">商品资料暂时无法载入，请稍后重新整理页面。</p>';
+ }
+}
 function renderShippingFees(){
   document.querySelectorAll('[data-shipping]').forEach(node=>{
     const fee=node.dataset.shipping==='pickup'?storePayment.pickupShipping:storePayment.shipping;

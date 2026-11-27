@@ -1228,39 +1228,6 @@ body[data-page="product"] > main.section { padding-block-start: 0; min-height: 1
 body[data-page="home"] > main.r2-home { width: 100%; }
 
 
-.r2-custom-steps { margin-block: var(--sp-7); }
-.r2-custom-steps ol {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--sp-3);
-  padding: 0;
-  counter-reset: custom-step;
-  list-style: none;
-}
-.r2-custom-steps li {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  min-height: 64px;
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: 12px;
-  background: var(--tint);
-  counter-increment: custom-step;
-}
-.r2-custom-steps li::before {
-  content: counter(custom-step);
-  display: grid;
-  place-items: center;
-  flex: 0 0 32px;
-  height: 32px;
-  border: 1px solid var(--line-strong);
-  border-radius: 50%;
-  color: var(--brand-ink);
-  font-weight: 700;
-}
-@media (max-width:767px) {
-  .r2-custom-steps ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
 
 /* Compact storefront customizer. The guide starts below the editing workspace. */
 .r2-custom-guide { padding-block-start: var(--sp-7); }
