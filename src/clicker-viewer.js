@@ -90,7 +90,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
   function setCapVisibility(visible) {
     showCaps = visible;
     capGroups.forEach(group => { group.visible = visible; });
-    inspect.textContent = visible ? inspect.dataset.inspect : inspect.dataset.assemble;
+    (inspect.querySelector('span') || inspect).textContent = visible ? inspect.dataset.inspect : inspect.dataset.assemble;
     inspect.setAttribute('aria-pressed', String(!visible));
   }
   inspect.addEventListener('click', () => {

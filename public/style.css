@@ -1064,3 +1064,37 @@ body[data-page="custom"] > main.r2-custom { width: 100%; }
 }
 .r2-custom-editor :is(#name-tag, #name-clicker, #design-contact)[hidden] { display: none !important; }
 .r2-custom-editor > .custom-back { display: none; }
+
+/* Customizer review and controls */
+.r2-custom-editor .nameplate-workspace { grid-template-columns: minmax(0,7fr) minmax(0,5fr); gap: 48px; }
+.r2-custom-editor .keyring-preview { position: sticky; top: 24px; margin: 0; }
+.r2-custom-editor .keyring-preview-frame { border-radius: 16px; background: linear-gradient(135deg,var(--photo-1),var(--photo-2)); }
+.r2-custom-editor .plate-view-header { justify-content: flex-end; min-height: 44px; }
+.r2-custom-editor .plate-view-header button { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: 44px; }
+.r2-custom-editor .keyring-preview-meta { font-size: 13px; }
+.r2-custom-editor .keyring-preview-meta :is(p,figcaption) { font-size: 13px; }
+.r2-custom-editor .nameplate-form { background: var(--tint); padding: 24px; border-radius: 16px; }
+.r2-custom-editor :is(.keyring-step-panel,.keyring-shared) { border: 0; background: none; padding: 0; gap: 24px; }
+.r2-custom-editor .nameplate-form :is(h2,h3,legend) { font-size: 14px; font-weight: 700; }
+.r2-custom-editor .keyring-steps button { min-height: 44px; border-radius: 999px; }
+.r2-custom-editor .clicker-inline-controls { flex-basis: 44px; }
+.r2-custom-editor .clicker-inline-controls button { width: 44px; height: 44px; display: grid; place-items: center; }
+.r2-custom-editor .r2-order-review { background: var(--ground); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.r2-order-review h3 { margin-top: 0; }
+.r2-order-review dl { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 4px 12px; margin: 0; font-size: 14px; }
+.r2-order-review dd { margin: 0; overflow-wrap: anywhere; }
+.r2-spelling { min-height: 44px; display: flex; align-items: center; gap: var(--sp-2); font-size: 14px; }
+.r2-spelling input { flex: none; }
+.r2-order-bar { position: sticky; bottom: 0; z-index: 2; background: var(--ground); border-top: 1px solid var(--line); padding: 10px; display: flex; align-items: center; gap: var(--sp-3); justify-content: space-between; }
+.r2-order-bar p { font-size: 13px; margin: 4px 0 0; }
+.r2-dispatch { display: inline-flex; align-items: center; gap: 6px; color: var(--brand-ink); background: var(--tint); border-radius: 999px; font-size: 13px; padding: 3px 8px; }
+.r2-order-bar .btn-primary { flex: none; font-size: 14px; min-height: 44px; }
+.r2-order-bar :is(.r2-press-start, #connected-order-start)[hidden] { display: none !important; }
+.r2-order-bar .design-contact { padding: 0; margin: 0; background: none; border: 0; }
+.r2-order-bar .design-contact p:empty { display: none; }
+@media (max-width:767px) {
+  .r2-custom-editor .nameplate-workspace { grid-template-columns: minmax(0,1fr); gap: 24px; }
+  .r2-custom-editor .keyring-preview { position: static; }
+  .r2-custom-editor .plate-view { height: min(80vw,340px); min-height: 0; }
+  .r2-custom-editor .nameplate-form { padding: 16px; }
+}

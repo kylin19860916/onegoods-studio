@@ -2410,5 +2410,37 @@
   "哇塞，这是我的！": [
     "哇塞，這是我的！",
     "Wow, that’s mine!"
+  ],
+  "订单摘要": [
+    "訂單摘要",
+    "Order summary"
+  ],
+  "名字会照你输入的内容制作，请确认拼写。": [
+    "名字會照你輸入的內容製作，請確認拼寫。",
+    "We’ll make the name as entered. Please check the spelling."
+  ],
+  "连字按压款 NT$80 起": [
+    "連字按壓款 NT$80 起",
+    "Connected-name clicker from NT$80"
+  ],
+  "3 天内出货": [
+    "3 天內出貨",
+    "Dispatch within 3 days"
+  ],
+  "颜色": [
+    "颜色",
+    "Colors"
+  ],
+  "名字": [
+    "名字",
+    "Name"
+  ],
+  "尺寸": [
+    "尺寸",
+    "Size"
+  ],
+  "款式": [
+    "款式",
+    "Style"
   ]
 }

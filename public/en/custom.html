@@ -7,9 +7,9 @@
   <title>Customize — One Goods Studio</title>
   <meta name="description" content="Choose a style, add your name and colours, and preview your design in 3D.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=aa0c45035bfc">
-  <script src="/custom-types.js?v=aa0c45035bfc" defer></script>
-  <script src="../locale.js?v=aa0c45035bfc" defer></script><script src="../nameplate.js?v=aa0c45035bfc" defer></script>
+  <link rel="stylesheet" href="../style.css?v=1964c15dfcb4">
+  <script src="/custom-types.js?v=1964c15dfcb4" defer></script>
+  <script src="../locale.js?v=1964c15dfcb4" defer></script><script src="../nameplate.js?v=1964c15dfcb4" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/custom.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/custom.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/custom.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/custom.html"><meta property="og:type" content="website"><meta property="og:title" content="Customize — One Goods Studio"><meta property="og:description" content="Choose a style, add your name and colours, and preview your design in 3D."><meta property="og:url" content="https://onegoods.studio/en/custom.html"><meta property="og:image" content="https://onegoods.studio/assets/ogs-sharing.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"></head>
 <body data-page="custom">
 <header class="r2-header on-stage"><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/icon.png" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../custom.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/custom.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/custom.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header>
@@ -23,17 +23,17 @@
     <input id="r2-shared-name" autocomplete="off" placeholder="For example, Mia">
     <a class="custom-back" href="custom.html">Back to custom styles</a>
   <div class="nameplate-heading" data-keyring-intro="name-tag">
-    <span class="eyebrow">OGS / KEYRING STUDIO</span>
+
     <h1>Make it yours.</h1>
     <p>Pick a shape and size, then colour your name keyring.</p>
   </div>
   <div class="nameplate-heading" data-keyring-intro="name-clicker" hidden>
-    <span class="eyebrow">OGS / PRESS &amp; PLAY</span>
+
     <h1>Customize your name clicker.</h1>
     <p>Pick a keycap style, add your name and colours, and press the keys in the 3D preview.</p>
   </div>
   <div class="nameplate-heading" data-keyring-intro="name-articulated" hidden>
-    <span class="eyebrow">OGS / KEYRING STUDIO</span>
+
     <h1>Customize your articulated letters.</h1>
     <p>Enter a name and choose colours to preview the letters and snap joints in 3D.</p>
   </div>
@@ -41,8 +41,8 @@
     <figure class="keyring-preview">
       <div class="nameplate-stage keyring-preview-frame">
       <div class="plate-view-header">
-        <span class="eyebrow">LIVE 3D PREVIEW</span>
-        <button class="text-button" id="plate-reset-view" type="button" hidden>Reset view</button>
+
+        <button class="text-button" id="plate-reset-view" type="button" hidden><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 3 7M3 5v6h6"/></svg>Reset view</button>
       </div>
       <div class="plate-view" id="plate-view" tabindex="0" aria-label="3D keyring preview. Drag or use the arrow keys to rotate.">
         <canvas id="plate-canvas" hidden></canvas>
@@ -70,7 +70,6 @@
           <label for="plate-name">Name text</label>
           <input id="plate-name" name="nameText" maxlength="20" placeholder="Your name" required pattern=".*\S.*" autocomplete="off">
           <p class="nameplate-order-note" data-articulated-only hidden>One standard size. Overall length varies with the number and shape of the letters.</p>
-          <p class="nameplate-order-note" id="articulated-price" hidden>Estimated price <strong><output for="plate-name" data-start="From NT$%s"></output></strong></p>
         </div>
         <div class="nameplate-field">
           <label for="plate-style">Letter style</label>
@@ -104,8 +103,8 @@
       </section>
       <div class="keyring-step-panel">
       <ol class="keyring-steps" aria-label="Customisation steps" data-name-tag-only>
-        <li aria-current="step"><button type="button" data-keyring-step="0" aria-controls="keyring-design"><span>01</span> Style and size</button></li>
-        <li><button type="button" data-keyring-step="1" aria-controls="keyring-colors"><span>02</span> Choose colours</button></li>
+        <li aria-current="step"><button type="button" data-keyring-step="0" aria-controls="keyring-design">Style and size</button></li>
+        <li><button type="button" data-keyring-step="1" aria-controls="keyring-colors">Choose colours</button></li>
       </ol>
       <section class="keyring-step" id="keyring-design">
         <h2 tabindex="-1">Style and size</h2>
@@ -153,20 +152,20 @@
           <option value="#efb39e">Peach</option>
         </template>
       </section>
+<section class="r2-order-review"><h3>Order summary</h3><dl data-r2-summary></dl></section><label class="r2-spelling"><input type="checkbox" data-r2-spelling> We’ll make the name as entered. Please check the spelling.</label><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>Dispatch within 3 days</span><p class="nameplate-order-note" id="articulated-price" hidden>Estimated price <strong><output for="plate-name" data-start="From NT$%s"></output></strong></p></div><button class="btn-primary" id="keyring-generate" type="submit" disabled>Confirm design</button></div>
         <div class="nameplate-actions">
-          <button class="button yellow" id="keyring-generate" type="submit" disabled>Confirm design</button>
           <a class="button cream" id="plate-download" download="OGS-keyring-preview.png" hidden>Download PNG</a>
           <button class="button yellow" id="plate-payment" type="button" disabled hidden>Proceed to payment</button>
           <p id="plate-status" role="status" data-error="Could not generate the preview. Try again." data-ready="Design confirmed. Download your PNG; payment is not open yet."></p>
         </div>
-<div class="design-contact" id="design-contact" hidden><button type="button" class="button yellow" id="clicker-contact-design">Send your design for confirmation</button><p id="design-contact-status" role="status"></p></div>
+
       </div>
     </form>
   </div>
   <div class="nameplate-workspace" id="name-clicker" data-keyring-panel hidden>
     <figure class="keyring-preview">
       <div class="nameplate-stage keyring-preview-frame">
-        <div class="plate-view-header"><span class="eyebrow">LIVE 3D PREVIEW</span><div class="plate-view-tools"><button class="text-button" type="button" id="clicker-inspect" aria-pressed="false" data-inspect="View switches" data-assemble="Show keycaps">View switches</button><button class="text-button" type="button" id="clicker-reset">Reset view</button></div></div>
+        <div class="plate-view-header"><div class="plate-view-tools"><button class="text-button" type="button" id="clicker-inspect" aria-pressed="false" data-inspect="View switches" data-assemble="Show keycaps"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8v8l9 5 9-5V8zM3 8l9 5 9-5m-9 5v8"/></svg><span>View switches</span></button><button class="text-button" type="button" id="clicker-reset"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 3 7M3 5v6h6"/></svg>Reset view</button></div></div>
         <div class="plate-view" id="clicker-view" tabindex="0" aria-label="3D clicker preview. Drag to rotate and zoom."><canvas id="clicker-canvas"></canvas></div>
       </div>
       <div class="keyring-preview-meta">
@@ -178,7 +177,7 @@
     </figure>
     <form class="nameplate-form" id="clicker-form">
       <div class="keyring-step-panel">
-        <div><span class="eyebrow">OGS / PRESS &amp; PLAY</span><h2>Name clicker</h2></div>
+        <div><h2>Name clicker</h2></div>
         <fieldset class="clicker-style-picker">
           <legend>Clicker style</legend>
           <label><input type="radio" name="clickerStyle" value="mechanical" checked> Keyboard keys</label>
@@ -195,8 +194,8 @@
                 </label>
               </template>
               <div class="clicker-inline-controls">
-                <button type="button" id="clicker-add" aria-label="Add one key">+</button>
-                <button type="button" id="clicker-remove" aria-label="Remove one key">−</button>
+                <button type="button" id="clicker-add" aria-label="Add one key"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg></button>
+                <button type="button" id="clicker-remove" aria-label="Remove one key"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
               </div>
             </div>
           </fieldset>
@@ -254,9 +253,9 @@
         <section class="keyring-config-card clicker-order-test" id="connected-order" hidden>
           <h3>Item price</h3>
           <output id="connected-order-price" aria-live="polite"></output>
-          <button class="button yellow" id="connected-order-start" type="button" disabled>Continue to checkout</button>
-        </section>
-      </div>
+
+        </section><section class="r2-order-review"><h3>Order summary</h3><dl data-r2-summary></dl></section><label class="r2-spelling"><input type="checkbox" data-r2-spelling> We’ll make the name as entered. Please check the spelling.</label>
+      </div><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>Dispatch within 3 days</span><p class="r2-press-start" hidden>Connected-name clicker from NT$80</p></div><div class="r2-press-actions"><button class="btn-primary" id="connected-order-start" type="button" disabled>Continue to checkout</button><div class="design-contact" id="design-contact" hidden><button type="button" class="btn-primary" id="clicker-contact-design">Confirm design</button><p id="design-contact-status" role="status"></p></div></div></div>
     </form>
   </div>
   </section>

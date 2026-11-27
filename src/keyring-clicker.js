@@ -22,7 +22,7 @@ function loadFont(key) {
   return fontCache.get(key);
 }
 
-export function setupClicker({ active = true } = {}) {
+export function setupClicker({ active = true, updateSummary = () => {} } = {}) {
   const form = document.querySelector('#clicker-form');
   const labels = document.querySelector('#clicker-labels');
   const template = document.querySelector('#clicker-label-template');
@@ -175,7 +175,19 @@ export function setupClicker({ active = true } = {}) {
       key.cap.sync();
       key.ink.sync();
     }
+    const activeKeys = keys.slice(0, count);
+    const hasEnteredKey = activeKeys.some(key => key.input.value.trim());
+    const previewDimensions = document.querySelector('#clicker-dimensions');
+    const updateReview = () => updateSummary(form, [
+      form.querySelector('[name="clickerStyle"]:checked')?.closest('label').textContent.trim(),
+      wholeName ? clickerName.value.trim() : activeKeys.map(key => key.input.value.trim()).join(' ').trim(),
+      wholeName ? nameFont.selectedOptions[0].textContent : [...new Set(activeKeys.map(key => key.font.selectedOptions[0].textContent))].join(' · '),
+      wholeName ? [nameBorder, nameFill, nameInk].map(color => color.label()).join(' · ') : [base.label(), ...new Set(activeKeys.flatMap(key => [key.cap.label(), key.ink.label()]))].join(' · '),
+      previewDimensions.textContent.split(' · ')[1],
+    ]);
+    keys.forEach((key,index) => { key.input.placeholder = hasEnteredKey ? '' : String.fromCharCode(65 + index); });
     showKeySettings();
+    updateReview();
     const tooLong = wholeName && exceedsClickerTextLimit(clickerName.value);
     textLimit.hidden = !tooLong;
     clickerName.setAttribute('aria-invalid', String(tooLong));
@@ -187,7 +199,7 @@ export function setupClicker({ active = true } = {}) {
       const sources = wholeName
         ? [{ text: clickerName.value.trim() || nameFont.selectedOptions[0].dataset.sample || clickerName.placeholder, font: nameFont.value }]
         : keys.slice(0, count).map(key => ({
-          text: key.input.value.trim(), font: key.font.value, cap: key.cap.value, ink: key.ink.value,
+          text: key.input.value.trim() || (hasEnteredKey ? '' : key.input.placeholder), font: key.font.value, cap: key.cap.value, ink: key.ink.value,
         }));
       const entries = await Promise.all(sources.map(async entry => ({
         ...entry, text: entry.text.normalize('NFC'), font: await loadFont(entry.font),
@@ -206,6 +218,7 @@ export function setupClicker({ active = true } = {}) {
       const size = viewer.update({ keys: entries, style, ...palette });
       const dimensions = document.querySelector('#clicker-dimensions');
       dimensions.textContent = dimensions.dataset.label + ' · ' + size.map(n => Number(n.toFixed(1))).join(' × ') + ' mm';
+      updateReview();
       status.textContent = unsupported ? status.dataset.unsupported : '';
     } catch {
       if (currentVersion === version) status.textContent = status.dataset.error;
@@ -237,15 +250,20 @@ export function setupClicker({ active = true } = {}) {
   };
   setupClickerOrderTest(form, readContactDesign);
   const orderPanel = document.querySelector('#connected-order');
+  const startingPrice = form.querySelector('.r2-press-start');
   const orderPrice = document.querySelector('#connected-order-price');
   const orderStart = document.querySelector('#connected-order-start');
   let orderEnabled = false;
   function showOrderPrice() {
     const quote = quoteConnectedClicker(clickerName.value);
     orderPanel.hidden = !orderEnabled || clickerStyle.value !== 'name';
+    startingPrice.hidden = orderPanel.hidden || Boolean(quote);
+    orderStart.hidden = orderPanel.hidden;
+    contactPanel.hidden = !orderPanel.hidden;
     orderPrice.textContent = quote ? 'NT$' + quote.amount : '';
     orderStart.disabled = !quote;
   }
+  const contactPanel = document.querySelector('#design-contact');
   form.addEventListener('input', showOrderPrice);
   form.addEventListener('change', showOrderPrice);
   form.addEventListener('compositionend', showOrderPrice);

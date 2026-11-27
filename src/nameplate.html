@@ -17,17 +17,17 @@
 <main class="section nameplate-page">
   <a class="custom-back" href="custom.html">返回客制款式</a>
   <div class="nameplate-heading" data-keyring-intro="name-tag">
-    <span class="eyebrow">OGS / KEYRING STUDIO</span>
+
     <h1>客制你的名牌。</h1>
     <p>选一款造型和尺寸，为你的名字配上喜欢的颜色。</p>
   </div>
   <div class="nameplate-heading" data-keyring-intro="name-clicker" hidden>
-    <span class="eyebrow">OGS / PRESS &amp; PLAY</span>
+
     <h1>客制你的姓名按压款。</h1>
     <p>选键帽款式，加入姓名和配色，试按你的 3D 预览。</p>
   </div>
   <div class="nameplate-heading" data-keyring-intro="name-articulated" hidden>
-    <span class="eyebrow">OGS / KEYRING STUDIO</span>
+
     <h1>客制你的关节字块。</h1>
     <p>输入名字、选好配色，查看字块和卡扣的 3D 结构。</p>
   </div>
@@ -35,8 +35,8 @@
     <figure class="keyring-preview">
       <div class="nameplate-stage keyring-preview-frame">
       <div class="plate-view-header">
-        <span class="eyebrow">LIVE 3D PREVIEW</span>
-        <button class="text-button" id="plate-reset-view" type="button" hidden>重置视角</button>
+
+        <button class="text-button" id="plate-reset-view" type="button" hidden><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 3 7M3 5v6h6"/></svg>重置视角</button>
       </div>
       <div class="plate-view" id="plate-view" tabindex="0" aria-label="3D 预览，拖动或使用方向键旋转">
         <canvas id="plate-canvas" hidden></canvas>
@@ -64,7 +64,6 @@
           <label for="plate-name">姓名文字</label>
           <input id="plate-name" name="nameText" maxlength="20" placeholder="你的名字" required pattern=".*\S.*" autocomplete="off">
           <p class="nameplate-order-note" data-articulated-only hidden>单一字块规格，整串长度随字数与字形变化。</p>
-          <p class="nameplate-order-note" id="articulated-price" hidden>预估价格 <strong><output for="plate-name" data-start="NT$%s 起"></output></strong></p>
         </div>
         <div class="nameplate-field">
           <label for="plate-style">字形风格</label>
@@ -98,8 +97,8 @@
       </section>
       <div class="keyring-step-panel">
       <ol class="keyring-steps" aria-label="客制步骤" data-name-tag-only>
-        <li aria-current="step"><button type="button" data-keyring-step="0" aria-controls="keyring-design"><span>01</span> 款式与尺寸</button></li>
-        <li><button type="button" data-keyring-step="1" aria-controls="keyring-colors"><span>02</span> 选颜色</button></li>
+        <li aria-current="step"><button type="button" data-keyring-step="0" aria-controls="keyring-design">款式与尺寸</button></li>
+        <li><button type="button" data-keyring-step="1" aria-controls="keyring-colors">选颜色</button></li>
       </ol>
       <section class="keyring-step" id="keyring-design">
         <h2 tabindex="-1">款式与尺寸</h2>
@@ -147,20 +146,20 @@
           <option value="#efb39e">蜜桃粉</option>
         </template>
       </section>
+<section class="r2-order-review"><h3>订单摘要</h3><dl data-r2-summary></dl></section><label class="r2-spelling"><input type="checkbox" data-r2-spelling> 名字会照你输入的内容制作，请确认拼写。</label><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>3 天内出货</span><p class="nameplate-order-note" id="articulated-price" hidden>预估价格 <strong><output for="plate-name" data-start="NT$%s 起"></output></strong></p></div><button class="btn-primary" id="keyring-generate" type="submit" disabled>提交确认</button></div>
         <div class="nameplate-actions">
-          <button class="button yellow" id="keyring-generate" type="submit" disabled>提交确认</button>
           <a class="button cream" id="plate-download" download="OGS-keyring-preview.png" hidden>下载 PNG</a>
           <button class="button yellow" id="plate-payment" type="button" disabled hidden>前往付款</button>
           <p id="plate-status" role="status" data-error="预览图生成失败，请再试一次。" data-ready="已确认。可下载 PNG，付款暂未开放。"></p>
         </div>
-<div class="design-contact" id="design-contact" hidden><button type="button" class="button yellow" id="clicker-contact-design">送出设计，我们会与你联络确认</button><p id="design-contact-status" role="status"></p></div>
+
       </div>
     </form>
   </div>
   <div class="nameplate-workspace" id="name-clicker" data-keyring-panel hidden>
     <figure class="keyring-preview">
       <div class="nameplate-stage keyring-preview-frame">
-        <div class="plate-view-header"><span class="eyebrow">LIVE 3D PREVIEW</span><div class="plate-view-tools"><button class="text-button" type="button" id="clicker-inspect" aria-pressed="false" data-inspect="检视键轴" data-assemble="显示键帽">检视键轴</button><button class="text-button" type="button" id="clicker-reset">重置视角</button></div></div>
+        <div class="plate-view-header"><div class="plate-view-tools"><button class="text-button" type="button" id="clicker-inspect" aria-pressed="false" data-inspect="检视键轴" data-assemble="显示键帽"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8v8l9 5 9-5V8zM3 8l9 5 9-5m-9 5v8"/></svg><span>检视键轴</span></button><button class="text-button" type="button" id="clicker-reset"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 3 7M3 5v6h6"/></svg>重置视角</button></div></div>
         <div class="plate-view" id="clicker-view" tabindex="0" aria-label="3D 按压款预览，可拖动旋转与缩放"><canvas id="clicker-canvas"></canvas></div>
       </div>
       <div class="keyring-preview-meta">
@@ -172,7 +171,7 @@
     </figure>
     <form class="nameplate-form" id="clicker-form">
       <div class="keyring-step-panel">
-        <div><span class="eyebrow">OGS / PRESS &amp; PLAY</span><h2>姓名按压款</h2></div>
+        <div><h2>姓名按压款</h2></div>
         <fieldset class="clicker-style-picker">
           <legend>按压款式</legend>
           <label><input type="radio" name="clickerStyle" value="mechanical" checked> 机械键盘款</label>
@@ -189,8 +188,8 @@
                 </label>
               </template>
               <div class="clicker-inline-controls">
-                <button type="button" id="clicker-add" aria-label="增加一格">+</button>
-                <button type="button" id="clicker-remove" aria-label="减少一格">−</button>
+                <button type="button" id="clicker-add" aria-label="增加一格"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg></button>
+                <button type="button" id="clicker-remove" aria-label="减少一格"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
               </div>
             </div>
           </fieldset>
@@ -248,9 +247,9 @@
         <section class="keyring-config-card clicker-order-test" id="connected-order" hidden>
           <h3>商品金额</h3>
           <output id="connected-order-price" aria-live="polite"></output>
-          <button class="button yellow" id="connected-order-start" type="button" disabled>前往下单</button>
-        </section>
-      </div>
+
+        </section><section class="r2-order-review"><h3>订单摘要</h3><dl data-r2-summary></dl></section><label class="r2-spelling"><input type="checkbox" data-r2-spelling> 名字会照你输入的内容制作，请确认拼写。</label>
+      </div><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>3 天内出货</span><p class="r2-press-start" hidden>连字按压款 NT$80 起</p></div><div class="r2-press-actions"><button class="btn-primary" id="connected-order-start" type="button" disabled>前往下单</button><div class="design-contact" id="design-contact" hidden><button type="button" class="btn-primary" id="clicker-contact-design">提交确认</button><p id="design-contact-status" role="status"></p></div></div></div>
     </form>
   </div>
 </main>

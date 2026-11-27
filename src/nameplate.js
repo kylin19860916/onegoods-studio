@@ -19,6 +19,25 @@ if (!customTabs && customTypes.length) {
   params.set('type', customTypes.find(type => type.style === oldStyle)?.id || 'nameplate');
   location.replace('custom?' + params.toString());
 }
+const language = document.documentElement.lang;
+const summaryLabels = ({
+  'zh-Hant': ['款式', '名字', '字型', '顏色', '尺寸'],
+  'zh-Hans': ['款式', '名字', '字型', '颜色', '尺寸'],
+  en: ['Style', 'Name', 'Typeface', 'Colors', 'Size'],
+})[language];
+
+function updateSummary(form, values) {
+  const rows = values.flatMap((value, index) => {
+    if (!value) return [];
+    const term = document.createElement('dt');
+    const detail = document.createElement('dd');
+    term.textContent = summaryLabels[index];
+    detail.textContent = value;
+    return [term, detail];
+  });
+  form.querySelector('[data-r2-summary]').replaceChildren(...rows);
+}
+
 let viewer = null;
 function showKeyringViewer() {
   if (viewer) return;
@@ -53,6 +72,9 @@ const download = document.querySelector('#plate-download');
 const payment = document.querySelector('#plate-payment');
 const articulatedPrice = document.querySelector('#articulated-price');
 const articulatedAmount = articulatedPrice.querySelector('output');
+const spelling = form.querySelector('[data-r2-spelling]');
+let nameReady = false;
+spelling.addEventListener('change', () => { generate.disabled = !nameReady || !spelling.checked; });
 const articulatedFirstPrice = 80;
 const articulatedExtraPrice = 40;
 
@@ -131,29 +153,36 @@ async function render(version) {
     const numbers = model.dimensions.map(value => Number(value.toFixed(1)));
     dimensions.textContent = dimensions.dataset.label + ' · ' + numbers.join(' × ') + ' mm';
     previewStatus.textContent = '';
-    generate.disabled = !enteredName;
-    if (articulated) {
-      const count = articulatedNameCharacters(enteredName).length;
-      articulatedAmount.value = count
-        ? 'NT$' + (articulatedFirstPrice + (count - 1) * articulatedExtraPrice)
-        : articulatedAmount.dataset.start.replace('%s', articulatedFirstPrice);
-      articulatedPrice.hidden = false;
-    }
+    nameReady = Boolean(enteredName);
+    generate.disabled = !nameReady || !spelling.checked;
+    updateKeyringSummary();
   } catch (error) {
     if (version !== previewVersion) return;
     viewer?.setMeshes([]);
-    articulatedPrice.hidden = true;
     dimensions.textContent = '';
+    updateKeyringSummary();
     preview.querySelectorAll('[data-outline]').forEach(path => path.removeAttribute('d'));
     if (error.message === '有字元不在此款支援的字型中。') previewStatus.textContent = previewStatus.dataset.unsupported;
     else previewStatus.textContent = previewStatus.dataset.error;
   }
 }
 
+function updateKeyringSummary() {
+  const shapeName = form.querySelector('[name="shape"]:checked')?.closest('label').innerText.trim();
+  const colors = [...form.querySelectorAll('[data-keyring-current]')].filter(node => node.dataset.keyringCurrent !== 'accentColor' || useAccent.checked);
+  updateSummary(form, [
+    articulated ? customTypes.find(type => type.id === 'articulated')?.text[language === 'en' ? 2 : language === 'zh-Hans' ? 1 : 0] : shapeName,
+    nameText.value.trim(), style.selectedOptions[0]?.textContent,
+    colors.map(node => node.querySelector('span').textContent).join(' · '),
+    dimensions.textContent.split(' · ')[1],
+  ]);
+}
+
 function queuePreview() {
   if (keyringPanel.hidden) return;
   const version = ++previewVersion;
   generate.disabled = true;
+  nameReady = false;
   accent.hidden = !useAccent.checked;
   const tooLong = articulated
     && articulatedNameCharacters(nameText.value.trim()).length > articulatedNameLimit;
@@ -170,8 +199,13 @@ function queuePreview() {
   download.removeAttribute('href');
   exportStatus.textContent = '';
   clearTimeout(timer);
+  const count = articulatedNameCharacters(nameText.value.trim()).length;
+  articulatedPrice.hidden = !articulated || tooLong;
+  articulatedAmount.value = count
+    ? 'NT$' + (articulatedFirstPrice + (count - 1) * articulatedExtraPrice)
+    : articulatedAmount.dataset.start.replace('%s', articulatedFirstPrice);
+  updateKeyringSummary();
   if (tooLong) {
-    articulatedPrice.hidden = true;
     viewer?.setMeshes([]);
     dimensions.textContent = '';
     preview.querySelectorAll('[data-outline]').forEach(path => path.removeAttribute('d'));
@@ -229,7 +263,7 @@ function exportImage() {
   image.src = url;
 }
 
-form.addEventListener('input', queuePreview);
+form.addEventListener('input', event => { if (event.target !== spelling) queuePreview(); });
 document.querySelectorAll('[data-keyring-step]').forEach(button => {
   button.addEventListener('click', () => showStep(Number(button.dataset.keyringStep)));
 });
@@ -254,7 +288,6 @@ function showProduct() {
   articulatedPrice.hidden = true;
   keyringPanel.hidden = selected === 'name-clicker';
   clickerPanel.hidden = !keyringPanel.hidden;
-  document.querySelector('#design-contact').hidden = selected !== 'name-clicker';
   for (const heading of headings) heading.hidden = heading.dataset.keyringIntro !== selected;
   for (const option of nameTagOptions) option.hidden = articulated;
   for (const option of articulatedOptions) option.hidden = !articulated;
@@ -274,7 +307,7 @@ function showProduct() {
   }
 }
 
-const clicker = setupClicker({ active: requestedProduct() === 'name-clicker' });
+const clicker = setupClicker({ active: requestedProduct() === 'name-clicker', updateSummary });
 showProduct();
 if (customTabs) {
   const panel = document.querySelector('#r2-custom-panel');
@@ -308,7 +341,7 @@ if (customTabs) {
     history.replaceState(null,'',url);
     showProduct();
     clicker.setActive(type.id === 'press');
-    if (type.id === 'press') clicker.showNamedStyle();
+    if (type.id === 'press' && shared.value.trim()) clicker.showNamedStyle();
     tabs.forEach((button,index) => {
       const selected = customTypes[index] === type;
       button.tabIndex = selected ? 0 : -1;
@@ -331,8 +364,13 @@ if (customTabs) {
     event.preventDefault();
     choose(customTypes[next],{focus:true});
   });
-  shared.addEventListener('input',event => { if (!event.isComposing) mirrorName(); });
-  shared.addEventListener('compositionend',mirrorName);
+  function updateSharedName() {
+    spelling.checked = false;
+    if (shared.value.trim()) clicker.showNamedStyle();
+    mirrorName();
+  }
+  shared.addEventListener('input',event => { if (!event.isComposing) updateSharedName(); });
+  shared.addEventListener('compositionend',updateSharedName);
   const comparison = document.querySelector('#r2-custom-comparison');
   const headings = comparison.createTHead().insertRow();
   headings.append(document.createElement('th'));
