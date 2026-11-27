@@ -74,7 +74,7 @@ export function buildClickerAssembly({ keys, base, cap, ink, style }, {
     hole.absarc(holeX, 0, MX_CHAIN_EYELET.holeDiameter / 2, 0, 2 * Math.PI, true);
     ear.holes.push(hole);
     const bottom = mxPrintableEyelet(outline, rootLeft).bottom;
-    add(extrude(ear, MX_CHAIN_EYELET.thickness), colour, bottom);
+    add(extrude(ear, MX_CHAIN_EYELET.thickness), colour, bottom).name = 'Chain eyelet';
   }
   function cross(width, arm, armY = arm) {
     const shape = new Shape(), h = width / 2, a = arm / 2, b = armY / 2;

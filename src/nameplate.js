@@ -304,7 +304,7 @@ if (customTabs) {
   const shared = document.querySelector('#r2-shared-name');
   const sharedField = shared.closest('.r2-shared-field');
   const keyringOptions = form.querySelector('.keyring-shared');
-  const clickerNameOptions = clickerPanel.querySelector('#clicker-name-settings');
+  const clickerNameOptions = clickerPanel.querySelector('.keyring-step-panel');
   const localeIndex = document.documentElement.lang === 'en' ? 2 : document.documentElement.lang === 'zh-Hans' ? 1 : 0;
   shared.value = params.get('name')?.trim() || (params.has('custom-order') ? clicker.getName() : '');
   const tabs = customTypes.map(type => {
@@ -338,10 +338,10 @@ if (customTabs) {
     else url.searchParams.delete('name');
     history.replaceState(null,'',url);
     (type.id === 'press' ? clickerNameOptions : keyringOptions).prepend(sharedField);
-    shared.setAttribute('aria-describedby', type.id === 'press' ? 'clicker-name-limit clicker-name-limit-error' : 'plate-preview-status');
+    shared.setAttribute('aria-describedby', type.id === 'press' ? 'clicker-key-limit clicker-name-limit clicker-name-limit-error' : 'plate-preview-status');
+    shared.removeAttribute('aria-invalid');
     showProduct();
     clicker.setActive(type.id === 'press');
-    if (type.id === 'press' && shared.value.trim()) clicker.showNamedStyle();
     tabs.forEach((button,index) => {
       const selected = customTypes[index] === type;
       button.tabIndex = selected ? 0 : -1;
@@ -366,7 +366,6 @@ if (customTabs) {
   });
   function updateSharedName() {
     spelling.checked = false;
-    if (shared.value.trim()) clicker.showNamedStyle();
     mirrorName();
   }
   shared.addEventListener('input', event => {
@@ -403,6 +402,8 @@ if (customTabs) {
     row.insertCell().textContent = type.description[localeIndex];
     dispatch.insertCell().textContent = localeIndex === 2 ? `Within ${type.dispatchDays} days` : `${type.dispatchDays} 天內`;
   });
+  // Existing links that land directly on a named clicker still open that ordering mode.
+  if (params.get('type') === 'press' && shared.value.trim()) clicker.showNamedStyle();
   choose(customTypes.find(type => type.id === params.get('type')) || customTypes[0]);
 } else {
   window.addEventListener('hashchange', showProduct);

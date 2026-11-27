@@ -4,6 +4,7 @@ import math
 import sys
 from pathlib import Path
 import bpy
+import bmesh
 from bpy_extras.object_utils import world_to_camera_view
 from mathutils import Vector
 
@@ -142,6 +143,17 @@ for name, sample in samples.items():
     for index, part in enumerate(sample['meshes']):
         mesh = bpy.data.meshes.new(f'{name}-{index}')
         mesh.from_pydata([Vector(p)-sample['offset'] for p in part['vertices']], [], part['triangles'])
+        if tab_view and 'trim_left' in sample and part.get('name') == 'Base':
+            # The nameplate ring shares its mesh with the pad. This cut is artwork-only.
+            edit = bmesh.new()
+            edit.from_mesh(mesh)
+            bmesh.ops.bisect_plane(
+                edit, geom=[*edit.verts, *edit.edges, *edit.faces], dist=.0001,
+                plane_co=(sample['trim_left'] - sample['offset'].x, 0, 0),
+                plane_no=(1, 0, 0), clear_inner=True,
+            )
+            edit.to_mesh(mesh)
+            edit.free()
         mesh.update()
         obj = bpy.data.objects.new(mesh.name, mesh)
         scene.collection.objects.link(obj)

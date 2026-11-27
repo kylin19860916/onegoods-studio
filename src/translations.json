@@ -1,4 +1,8 @@
 {
+  "每个字一个键帽，最多 6 个。": [
+    "每個字一個鍵帽，最多 6 個。",
+    "One character per key, up to 6 keys."
+  ],
   "这组文字无法生成完整底板，请缩短姓名或更换字体。": [
     "這組文字無法生成完整底板，請縮短姓名或更換字型。",
     "These letters cannot form a connected base. Shorten the name or choose a different typeface."

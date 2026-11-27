@@ -7,9 +7,9 @@
   <title>Custom nameplate — One Goods Studio</title>
   <meta name="description" content="Pick a shape and size, then colour your name keyring.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=4586fb99f340">
-  <script src="/custom-types.js?v=4586fb99f340" defer></script>
-  <script src="../locale.js?v=4586fb99f340" defer></script><script src="../nameplate.js?v=4586fb99f340" defer></script>
+  <link rel="stylesheet" href="../style.css?v=775239470950">
+  <script src="/custom-types.js?v=775239470950" defer></script>
+  <script src="../locale.js?v=775239470950" defer></script><script src="../nameplate.js?v=775239470950" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/nameplate.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/nameplate.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/nameplate.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/nameplate.html"><meta property="og:type" content="website"><meta property="og:title" content="Custom nameplate — One Goods Studio"><meta property="og:description" content="Pick a shape and size, then colour your name keyring."><meta property="og:url" content="https://onegoods.studio/en/nameplate.html"><meta property="og:image" content="https://onegoods.studio/assets/ogs-sharing.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"></head>
 <body data-page="nameplate">
 <header class="r2-header"><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/ogs-symbol-header.png" width="337" height="330" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="language-options"><a href="../nameplate.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/nameplate.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/nameplate.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header>
@@ -141,44 +141,29 @@
     </figure>
     <form class="nameplate-form" id="clicker-form">
       <div class="keyring-step-panel">
+        <div class="nameplate-field">
+          <label for="clicker-name-text">Name or text</label>
+          <input id="clicker-name-text" name="clickerName" maxlength="16" placeholder="OGS" autocomplete="off" spellcheck="false" aria-describedby="clicker-name-limit clicker-name-limit-error">
+          <small class="nameplate-order-note" id="clicker-name-limit" hidden>Up to 5 Chinese characters or 8 English letters.</small>
+          <small class="nameplate-order-note" id="clicker-key-limit">One character per key, up to 6 keys.</small>
+          <small class="clicker-name-limit-error" id="clicker-name-limit-error" role="status" hidden>This text is too long. Shorten it to continue.</small>
+        </div>
         <fieldset class="clicker-style-picker">
           <legend>Clicker style</legend>
           <label><input type="radio" name="clickerStyle" value="mechanical" checked> Keyboard keys</label>
           <label><input type="radio" name="clickerStyle" value="name"> Joined name clicker</label>
         </fieldset>
-        <div class="clicker-style-settings" id="clicker-per-key-settings">
-          <fieldset class="clicker-key-editor">
-            <legend>Keys and letters</legend>
-            <div id="clicker-labels" class="clicker-labels" data-key-label="Key">
-              <template id="clicker-label-template">
-                <label class="nameplate-field clicker-letter-slot">
-                  <input class="clicker-slot-key" placeholder="_" autocomplete="off" autocapitalize="off" spellcheck="false">
-                  <span class="clicker-slot-number" aria-hidden="true"></span>
-                </label>
-              </template>
-              <div class="clicker-inline-controls">
-                <button type="button" id="clicker-add" aria-label="Add one key"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg></button>
-                <button type="button" id="clicker-remove" aria-label="Remove one key"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
-              </div>
-            </div>
-          </fieldset>
-          <div id="clicker-key-settings">
-            <template id="clicker-key-settings-template">
-              <section class="clicker-key-settings" hidden>
-                <h3 data-key-settings-title data-label="Customize key"></h3>
-                <div class="nameplate-field" data-key-font-field><label>Font</label></div>
-                <div class="clicker-key-colours">
-                  <details class="clicker-colour-picker" data-compact-colour>
-                    <summary><span>Keycap colour</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
-                    <div class="nameplate-field clicker-colour-menu"><label>Keycap colour</label><select data-key-cap></select></div>
-                  </details>
-                  <details class="clicker-colour-picker" data-compact-colour>
-                    <summary><span>Text colour</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
-                    <div class="nameplate-field clicker-colour-menu"><label>Text colour</label><select data-key-ink></select></div>
-                  </details>
-                </div>
-              </section>
-            </template>
+        <div class="clicker-style-settings" id="clicker-mechanical-settings">
+          <div class="nameplate-field" id="clicker-key-font-field"><label for="clicker-key-font">Name font</label></div>
+          <div class="clicker-key-colours">
+            <details class="clicker-colour-picker" data-compact-colour>
+              <summary><span>Keycap colour</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
+              <div class="nameplate-field clicker-colour-menu"><label for="clicker-cap">Keycap colour</label><select id="clicker-cap" name="keyCap"></select></div>
+            </details>
+            <details class="clicker-colour-picker" data-compact-colour>
+              <summary><span>Text colour</span><span class="clicker-colour-current" data-clicker-current><i aria-hidden="true"></i><span></span></span></summary>
+              <div class="nameplate-field clicker-colour-menu"><label for="clicker-ink">Text colour</label><select id="clicker-ink" name="keyInk"></select></div>
+            </details>
           </div>
           <section class="clicker-colors">
             <details class="keyring-colour-section">
@@ -188,12 +173,6 @@
           </section>
         </div>
         <div class="clicker-style-settings" id="clicker-name-settings" hidden>
-          <div class="nameplate-field">
-            <label for="clicker-name-text">Name or text</label>
-            <input id="clicker-name-text" name="clickerName" maxlength="16" placeholder="OGS" autocomplete="off" spellcheck="false" aria-describedby="clicker-name-limit clicker-name-limit-error">
-            <small class="nameplate-order-note" id="clicker-name-limit">Up to 5 Chinese characters or 8 English letters.</small>
-            <small class="clicker-name-limit-error" id="clicker-name-limit-error" role="status" hidden>This text is too long. Shorten it to continue.</small>
-          </div>
           <div class="nameplate-field" id="clicker-name-font-field"><label for="clicker-name-font">Name font</label></div>
           <section class="clicker-colors" aria-labelledby="clicker-name-colors-heading">
             <h3 id="clicker-name-colors-heading">Finish</h3>

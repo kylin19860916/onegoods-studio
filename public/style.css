@@ -1041,7 +1041,8 @@ body[data-page="custom"] .r2-custom-intro h1 { font-size: 36px; line-height: 1.1
 }
 .r2-custom-tabbar [role="tab"][aria-selected=true] { color: var(--on-stage); border-bottom-color: var(--brand); }
 .r2-custom-tabbar img { object-fit: contain; width: 104px; height: 36px; }
-html[lang="en"] .r2-custom-tabbar img { width: 54px; }
+.r2-custom-tabbar #r2-tab-articulated img { width: 134px; }
+html[lang="en"] .r2-custom-tabbar [role="tab"] img { width: 54px; }
 .r2-custom-editor { padding-block: var(--sp-5) var(--sp-7); }
 .r2-custom-editor > .nameplate-heading { display: none; }
 .r2-custom-editor :is(label[for="plate-name"], #plate-name, label[for="clicker-name-text"], #clicker-name-text) { display: none; }
@@ -1058,7 +1059,7 @@ html[lang="en"] .r2-custom-tabbar img { width: 54px; }
 .r2-custom-editor > .custom-back { display: none; }
 
 /* Customizer review and controls */
-.r2-custom-editor .nameplate-workspace { grid-template-columns: minmax(0,7fr) minmax(0,5fr); gap: 48px; }
+.r2-custom-editor .nameplate-workspace { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 48px; }
 .r2-custom-editor .keyring-preview { position: sticky; top: 24px; margin: 0; }
 .r2-custom-editor .keyring-preview-frame { border-radius: 16px; background: linear-gradient(135deg,var(--photo-1),var(--photo-2)); }
 .r2-custom-editor .plate-view-header { justify-content: flex-end; min-height: 44px; }
@@ -1069,8 +1070,6 @@ html[lang="en"] .r2-custom-tabbar img { width: 54px; }
 .r2-custom-editor :is(.keyring-step-panel,.keyring-shared) { border: 0; background: none; padding: 0; gap: 24px; }
 .r2-custom-editor .nameplate-form :is(h2,h3,legend) { font-size: 14px; font-weight: 700; }
 .r2-custom-editor .keyring-steps button { min-height: 44px; border-radius: 999px; }
-.r2-custom-editor .clicker-inline-controls { flex-basis: 44px; }
-.r2-custom-editor .clicker-inline-controls button { width: 44px; height: 44px; display: grid; place-items: center; }
 .r2-custom-editor .r2-order-review { background: var(--ground); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
 .r2-order-review h3 { margin-top: 0; }
 .r2-order-review dl { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 4px 12px; margin: 0; font-size: 14px; }
@@ -1297,9 +1296,6 @@ body[data-page="home"] > main.r2-home { width: 100%; }
 .r2-custom-editor .clicker-style-picker { display: flex; gap: 8px; padding: 0; }
 .r2-custom-editor .clicker-style-picker label { flex: 1 0 max-content; min-height: 44px; }
 .r2-custom-editor .clicker-style-picker legend { margin-bottom: 4px; }
-.r2-custom-editor .clicker-letter-slot { flex: 0 0 46px; width: 46px; gap: 3px; }
-.r2-custom-editor .clicker-slot-key { min-height: 44px; height: 44px; }
-.r2-custom-editor .clicker-key-settings { padding: 8px; gap: 6px; }
 .r2-custom-editor .r2-order-review { padding: 0; }
 .r2-order-review[open] > dl { margin: 0 10px 10px; }
 .r2-custom-editor .keyring-colour-section { min-width: 0; padding: 0; }
@@ -1349,16 +1345,17 @@ body[data-page="home"] > main.r2-home { width: 100%; }
 @media (max-width:767px) {
   body[data-page="custom"] .r2-custom-intro h1 { font-size: 28px; }
   .r2-custom-tabbar [role="tab"] { min-height: 50px; }
-  .r2-custom-tabbar img { width: 88px; height: 32px; }
-  html[lang="en"] .r2-custom-tabbar img { width: 44px; }
+  .r2-custom-tabbar [role="tablist"] { gap: 8px; }
+  .r2-custom-tabbar [role="tab"] { padding-inline: 6px; }
+  .r2-custom-tabbar img { width: 84px; height: 32px; }
+  .r2-custom-tabbar #r2-tab-articulated img { width: 111px; }
+  html[lang="en"] .r2-custom-tabbar [role="tab"] img { width: 44px; }
   .r2-custom-editor { padding-block-start: 12px; }
   .r2-custom-editor .nameplate-workspace { gap: 10px; }
   .r2-custom-editor .plate-view { height: 38svh; }
   .r2-custom-editor .keyring-preview-meta :is(figcaption, .plate-view-hint) { display: none; }
   .r2-custom-editor .nameplate-form { padding: 10px; }
-  .r2-custom-editor .clicker-key-editor > legend { margin-bottom: 2px; }
   .r2-custom-editor .clicker-style-picker,
-  .r2-custom-editor .clicker-labels,
   .r2-custom-editor .keyring-colour-options { flex-wrap: nowrap; overflow-x: auto; padding: 4px; }
   .r2-custom-editor .r2-order-bar {
     position: fixed; inset: auto 0 0; z-index: 6;
