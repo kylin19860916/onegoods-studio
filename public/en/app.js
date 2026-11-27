@@ -41,16 +41,24 @@ function productCard(product) {
 }
 const customCardItems = window.OGSCustomTypes || [];
 const customLocaleIndex=locale==='en'?2:locale==='zh-Hans'?1:0;
+function customImage(item, lazy=true) {
+  const small=assetUrl(item.image);
+  const large=small.replace('-1024.webp','.webp');
+  return `<img src="${small}" srcset="${small} 1024w, ${large} 2048w" sizes="(max-width:767px) 100vw, 420px" alt="${item.text[customLocaleIndex]}" width="1024" height="1024" ${lazy?'loading="lazy"':''} decoding="async">`;
+}
+function customStartingPrice(item) {
+  return item.startingPrice ? `<span class="r2-dispatch">NT$${item.startingPrice}${locale==='en'?'+':' 起'}</span>` : '';
+}
 function customCatalogCard(item) {
   return `<a class="r2-product-card" href="custom?type=${item.id}">
-    <div class="r2-product-art"><img src="${assetUrl(item.image)}" alt="${item.text[customLocaleIndex]}（Illustration）" loading="lazy"></div>
-    <h3>${item.text[customLocaleIndex]}</h3><p>Custom orders ship within 3 days</p><strong>Start customizing</strong></a>`;
+    <div class="r2-product-art">${customImage(item)}</div>
+    <h3>${item.text[customLocaleIndex]}</h3><div><span class="r2-dispatch">Dispatch within 3 days</span>${customStartingPrice(item)}</div><span class="btn-secondary">Start customizing</span></a>`;
 }
 const customCards=qs('[data-custom-cards]');
 if(customCards)customCards.innerHTML=customCardItems.map(item=>`<article>
-  <img src="${assetUrl(item.image)}" width="720" height="540" alt="${item.text[customLocaleIndex]}（Illustration）" loading="lazy">
+  ${customImage(item)}
   <div><h3>${item.text[customLocaleIndex]}</h3><p>${item.description[customLocaleIndex]}</p>
-  <p>Custom orders ship within 3 days</p><a href="custom?type=${item.id}" class="btn-secondary" data-custom-link>Start customizing</a></div></article>`).join('');
+  <p><span class="r2-dispatch">Dispatch within 3 days</span> ${customStartingPrice(item)}</p><a href="custom?type=${item.id}" class="btn-secondary" data-custom-link>${item.action[customLocaleIndex]}</a></div></article>`).join('');
 function renderProducts(){
  const grid=qs('#products');
  if(!grid)return;
@@ -62,7 +70,7 @@ function renderProducts(){
  if(document.body.dataset.page==='home')list=list.slice(0,4);
  if(count)count.value=count.dataset.format.replace('{count}',String(filter==='custom'?customCardItems.length:list.length));
  grid.classList.add('r2-product-grid');
- grid.innerHTML=filter==='custom'?customCardItems.map(customCatalogCard).join(''):
+ grid.innerHTML=filter==='custom'?customCardItems.map(customCatalogCard).join('')+'<p class="r2-image-note r2-grid-note">Product images are 3D previews</p>':
    list.length?list.map(productCard).join(''):'<p class="catalog-note">No items match this selection.</p>';
 }
 qs('#product-sort')?.addEventListener('change',renderProducts);
@@ -118,7 +126,7 @@ function renderFullProduct(){
    <section class="r2-product-custom"><div><h2>Want one with your name on it?</h2>
    <label for="r2-product-name">Enter a name first</label><input id="r2-product-name" data-custom-name autocomplete="off">
    <a class="btn-secondary" href="custom.html" data-custom-link>Start customizing</a></div>
-   <figure><img src="${assetUrl('custom-name-clicker-studio.webp')}" alt="Customize a clicker（Illustration）" loading="lazy"><figcaption>Illustration</figcaption></figure></section>
+   <figure><img src="${assetUrl('custom/render/press_front34-1024.webp')}" alt="Customize a clicker" loading="lazy"><figcaption>Product images are 3D previews</figcaption></figure></section>
    ${other.length?`<section class="r2-block r2-related"><div class="r2-section-head"><h2>More goods</h2><a href="products.html" class="btn-text">View all goods</a></div><div class="r2-product-grid">${other.map(productCard).join('')}</div></section>`:''}`;
  renderShippingFees();
  const quantity=qs('#r2-quantity');

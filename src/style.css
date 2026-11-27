@@ -1106,3 +1106,18 @@ body[data-page="about"] main.r2-policy { width: min(720px,calc(100% - 2 * var(--
 .r2-policy nav ul { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 0 var(--sp-4); list-style: none; margin: 0; padding: 0; }
 .r2-policy :is(nav,address) a { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: 44px; color: var(--brand-ink); }
 .r2-policy address { display: grid; justify-items: start; font-style: normal; }
+
+.r2-custom-cards img { object-position: 50% 60%; }
+.r2-custom-cards .r2-dispatch { border: 1px solid var(--brand); background: transparent; color: var(--on-stage); }
+.r2-product-card:has(.r2-dispatch) .r2-product-art { aspect-ratio: 4/3; }
+.r2-product-card:has(.r2-dispatch) img { object-fit: contain; }
+.r2-product-card:has(.r2-dispatch) .btn-secondary { margin-top: 8px; }
+.r2-grid-note { grid-column: 1/-1; }
+.r2-custom-intro-grid { display: grid; grid-template-columns: 5fr 7fr; align-items: center; gap: 20px; }
+.r2-custom-intro-grid figure { position: relative; margin: 0; }
+.r2-custom-intro-grid img { display: block; width: 100%; height: auto; }
+.r2-custom-intro-grid figcaption { text-align: end; color: var(--on-stage-2); font-size: 13px; }
+@media (max-width:767px) {
+  .r2-custom-intro-grid { grid-template-columns: 1fr; }
+  .r2-custom-intro-grid figure { display: none; }
+}

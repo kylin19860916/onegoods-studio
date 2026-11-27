@@ -1,0 +1,60 @@
+{
+  "name": "LEO",
+  "font": "lucky",
+  "source": "server/keyring-geometry.mjs#generateKeyring",
+  "palette": {
+    "baseColor": "#b8d6bd",
+    "textColor": "#fffcf5",
+    "accentColor": "#fffcf5"
+  },
+  "renderer": "Blender 5.2.2 LTS Cycles",
+  "resolution": [
+    2048,
+    2048
+  ],
+  "dimensions_mm": [
+    46.367000579833984,
+    15.300000190734863,
+    10.0
+  ],
+  "camera": {
+    "lens_mm": 85,
+    "sensor_mm": 36,
+    "azimuth": 30,
+    "elevation": 18,
+    "distance_mm": 155.078,
+    "product_span": 0.6397,
+    "product_baseline": 0.78
+  },
+  "lamps": [
+    [
+      "Key",
+      -45,
+      45,
+      5200,
+      1.0,
+      240
+    ],
+    [
+      "Rim",
+      150,
+      35,
+      6500,
+      0.6,
+      105
+    ],
+    [
+      "Fill",
+      52,
+      29,
+      5800,
+      0.25,
+      230
+    ]
+  ],
+  "samples": 256,
+  "denoise": true,
+  "layer_period_mm": 0.2,
+  "roughness": 0.6,
+  "bevel_mm": 0.3
+}
