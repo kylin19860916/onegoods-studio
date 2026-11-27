@@ -4,6 +4,7 @@ import wasm from 'manifold-3d/manifold.wasm?module';
 import { mechanicalKeyContours, nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
 import { keyringFonts } from '../src/keyring-font-picker.js';
 import { MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_EYELET_BLEND, MX_NAME_FACE, mxChainEyelet, mxPrintableEyelet, mxStack } from '../src/cherry-mx-spec.js';
+import { MECHANICAL_BASE, mechanicalBaseGrooves } from '../src/mechanical-base.js';
 import { MECHANICAL_KEYCAP, mechanicalKeycapShell } from '../src/mechanical-keycap.js';
 import { HttpError } from './catalog';
 import p2sTrialProfile from './clicker-p2s-profile.json';
@@ -224,7 +225,7 @@ export async function generateMechanical3mf(design: MechanicalDesign, readFont: 
     wipe_tower_y: ['180'],
   };
   type PrintMesh = { name: string; color: string; filament: number; vertices: number[][]; triangles: number[][]; subtype?: 'support_blocker' };
-  const parts: PrintMesh[] = [{ ...base, name: 'V3 Mechanical Base', color: design.base, filament: 1 }];
+  const parts: PrintMesh[] = [];
   const blockers: PrintMesh[] = [];
   const { CrossSection: Section, Manifold: Solid, Mesh } = await getKernel();
   const allocated: Array<{ delete(): void }> = [];
@@ -238,7 +239,7 @@ export async function generateMechanical3mf(design: MechanicalDesign, readFont: 
   const { crossSpan, crossArm, outerDiameter } = MX_CAP_SOCKET;
   const capY = 39;
   function exportPart(name: string, color: string, solid: Manifold, subtype?: 'support_blocker') {
-    if (solid.isEmpty() || solid.status() !== 'NoError') throw new HttpError(400, '無法生成完整的鍵帽。');
+    if (solid.isEmpty() || solid.status() !== 'NoError') throw new HttpError(400, '無法生成完整的機械鍵盤模型。');
     const { numProp, vertProperties, triVerts } = solid.getMesh();
     const vertices = Array.from({length: vertProperties.length / numProp}, (_, i) =>
       Array.from(vertProperties.subarray(i*numProp, i*numProp + 3), v => Number(v.toFixed(6))));
@@ -246,6 +247,26 @@ export async function generateMechanical3mf(design: MechanicalDesign, readFont: 
     (subtype ? blockers : parts).push({ name, vertices, triangles, color, filament: colors.indexOf(color)+1, subtype });
   }
   try {
+    const grooves = mechanicalBaseGrooves(design.keys.length);
+    if (grooves.length) {
+      const stock = own(new Solid(new Mesh({
+        numProp: 3,
+        vertProperties: Float32Array.from(base.vertices.flat()),
+        triVerts: Uint32Array.from(base.triangles.flat()),
+      })));
+      const outside = MECHANICAL_BASE.halfDepth + 1;
+      const cutouts = grooves.flatMap(groove => [-1, 1].map(side => [
+        ...groove.map(([x, y]): [number, number] => [x, side * y]),
+        [groove.at(-1)![0], side * outside] as [number, number],
+        [groove[0][0], side * outside] as [number, number],
+      ]));
+      const cut = own(new Section(cutouts, 'EvenOdd'));
+      const height = stock.boundingBox().max[2] + 2;
+      const cutter = own(own(cut.extrude(height)).translate([0, 0, -1]));
+      exportPart('Mechanical Base', design.base, own(Solid.difference(stock, cutter)));
+    } else {
+      parts.push({ ...base, name: 'V3 Mechanical Base', color: design.base, filament: 1 });
+    }
     const skirt = own(new Solid(new Mesh(mechanicalKeycapShell(capHeight, cavityHeight))));
     const cross = own(Section.union(box(crossSpan, crossArm), box(crossArm, crossSpan)));
     const boss = own(Section.difference(own(Section.circle(outerDiameter / 2, 64)), cross));
@@ -253,7 +274,7 @@ export async function generateMechanical3mf(design: MechanicalDesign, readFont: 
     const cap = own(Solid.union(skirt, socket));
     const socketClearance = own(cross.offset(0.45, 'Round', 2, 32));
     for (const [index, key] of design.keys.entries()) {
-      const x = (index - (design.keys.length - 1)/2) * 22;
+      const x = (index - (design.keys.length - 1)/2) * MECHANICAL_BASE.pitch;
       const number = index + 1;
       exportPart(`Keycap ${number}`, key.cap, own(cap.translate([x, capY, 0])));
       if (key.text) {

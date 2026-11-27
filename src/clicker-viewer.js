@@ -5,18 +5,25 @@ import {
 } from 'three';
 import { NAME_MX, nameMxStack } from './name-clicker-mechanism.js';
 import { MX, MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_FACE, MX_RECESS, mxChainEyelet, mxPrintableEyelet, mxStack } from './cherry-mx-spec.js';
+import { MECHANICAL_BASE, mechanicalBaseGrooves } from './mechanical-base.js';
 import { MECHANICAL_KEYCAP, mechanicalKeycapShell } from './mechanical-keycap.js';
 import { nameClickerOutline } from './name-clicker-outline.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-function rounded(width, height, radius, offsetX = 0, offsetY = 0) {
+function rounded(width, height, radius, offsetX = 0, offsetY = 0, grooves = []) {
   const path = new Shape();
   const x = -width / 2 + offsetX, y = -height / 2 + offsetY;
   path.moveTo(x + radius, y);
+  for (const groove of grooves) {
+    for (const [gx, gy] of groove) path.lineTo(gx, -gy);
+  }
   path.lineTo(x + width - radius, y);
   path.quadraticCurveTo(x + width, y, x + width, y + radius);
   path.lineTo(x + width, y + height - radius);
   path.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  for (const groove of [...grooves].reverse()) {
+    for (const [gx, gy] of [...groove].reverse()) path.lineTo(gx, gy);
+  }
   path.lineTo(x + radius, y + height);
   path.quadraticCurveTo(x, y + height, x, y + height - radius);
   path.lineTo(x, y + radius);
@@ -323,11 +330,12 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       resize();
       return [width, height, bounds.max.z];
     }
-    const pitch = 22;
+    const { pitch, halfDepth } = MECHANICAL_BASE;
     const centers = keys.map((_, index) => (index - (keys.length - 1) / 2) * pitch);
     const mechanical = style === 'mechanical';
+    const grooves = mechanical ? mechanicalBaseGrooves(centers.length) : [];
     const body = () => mechanical
-      ? rounded((centers.length - 1) * pitch + 24.8, 24.8, 3.8)
+      ? rounded((centers.length - 1) * pitch + 2 * halfDepth, 2 * halfDepth, 3.8, 0, 0, grooves)
       : basicClickerBody(centers);
     // The longer keyboard skirt overlaps the rim through the full key travel.
     const skirtBottom = mechanical ? stack.skirtBottom - MECHANICAL_KEYCAP.skirtDrop : stack.skirtBottom;

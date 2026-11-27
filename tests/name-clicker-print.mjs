@@ -8,6 +8,8 @@ import { unzipSync, strFromU8 } from 'fflate';
 import { mxChainEyelet, mxPrintableEyelet, MX_NAME_FACE } from '../src/cherry-mx-spec.js';
 import { nameClickerContours, parseKeyringFont } from '../server/keyring-geometry.mjs';
 import { keyringFonts } from '../src/keyring-font-picker.js';
+import createManifold from 'manifold-3d';
+import { MECHANICAL_BASE, mechanicalBaseGrooves } from '../src/mechanical-base.js';
 import { NAME_MX, nameMxStack } from '../src/name-clicker-mechanism.js';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const dir = process.argv[2] ? resolve(process.argv[2]) : mkdtempSync(join(tmpdir(), 'ogs-mx-'));
@@ -21,7 +23,7 @@ await build({ absWorkingDir: root, entryPoints: ['server/clicker-print.ts'], out
     onLoad({ filter: /.*/, namespace: 'local' }, () => ({ contents: `export default new WebAssembly.Module(Buffer.from("${readFileSync(join(root,'node_modules/manifold-3d/manifold.wasm')).toString('base64')}","base64"))` }));
   } }],
 });
-const { generateClicker3mf } = await import(pathToFileURL(bundle));
+const { generateClicker3mf, generateMechanical3mf } = await import(pathToFileURL(bundle));
 const huninn = readFileSync(join(root, 'public/assets/fonts/keyring/Huninn-Regular.woff'));
 const kuaile = readFileSync(join(root, 'public/assets/fonts/keyring/kuaile.woff'));
 const stack = nameMxStack();
@@ -83,4 +85,46 @@ for (const [i,{text,fontKey,font,expectedSwitches = text === '林予曦' ? 2 : 1
   writeFileSync(join(dir,`sample-${i+1}.3mf`),file);
   console.log(fontKey, text, 'generated with P2S supports; full-press collision check passed');
 }
+const templates = JSON.parse(readFileSync(join(root, 'server/mechanical-base-templates.json')));
+const kernel = await createManifold();
+kernel.setup();
+const { Manifold: Solid, Mesh } = kernel;
+for (const [index, template] of templates.entries()) {
+  const count = index + 1;
+  const keys = Array.from({ length: count }, () => ({ text: '', font: 'sans-tc', cap: '#a087c1', ink: '#fffcf5' }));
+  const file = await generateMechanical3mf({ style: 'mechanical', text: '', base: '#393142', keys }, async () => {
+    throw new Error('A blank key does not need a font');
+  });
+  const xml = strFromU8(unzipSync(file)['3D/3dmodel.model']);
+  const base = xml.match(/name="(?:V3 )?Mechanical Base"[^>]*><mesh>(.*?)<\/mesh>/)[1];
+  const vertices = Array.from(base.matchAll(/<vertex x="([^"]+)" y="([^"]+)" z="([^"]+)"/g), m => m.slice(1).map(Number));
+  const triangles = Array.from(base.matchAll(/<triangle v1="(\d+)" v2="(\d+)" v3="(\d+)"/g), m => m.slice(1).map(Number));
+  if (count === 1) assert.deepEqual({ vertices, triangles }, template);
+  const mesh = (positions, faces) => new Solid(new Mesh({
+    numProp: 3, vertProperties: Float32Array.from(positions.flat()), triVerts: Uint32Array.from(faces.flat()),
+  }));
+  const stock = mesh(template.vertices, template.triangles);
+  const changed = mesh(vertices, triangles);
+  const components = changed.decompose();
+  const innerSlab = Solid.cube([180, 2 * (MECHANICAL_BASE.halfDepth - MECHANICAL_BASE.grooveDepth), 40], true);
+  const removed = Solid.difference(stock, changed);
+  const added = Solid.difference(changed, stock);
+  const inside = Solid.intersection(innerSlab, removed);
+  try {
+    assert.equal(changed.status(), 'NoError');
+    assert.equal(components.length, 1);
+    assert.deepEqual(changed.boundingBox(), stock.boundingBox());
+    assert(Math.abs(added.volume()) < 0.001);
+    assert(Math.abs(inside.volume()) < 0.001, 'Grooves must only remove material outside the switch wells');
+    const grooves = mechanicalBaseGrooves(count);
+    assert.equal(grooves.length, count - 1);
+    const expectedVolume = count === 1 ? 0 : grooves.length * MECHANICAL_BASE.grooveWidth
+      * MECHANICAL_BASE.grooveDepth * stock.boundingBox().max[2];
+    assert(Math.abs(removed.volume() - expectedVolume) < 0.02, count + ' key base groove volume');
+    writeFileSync(join(dir, `mechanical-${count}.3mf`), file);
+  } finally {
+    for (const part of [inside, added, removed, innerSlab, ...components, changed, stock]) part.delete();
+  }
+}
+console.log('Verified mechanical base grooves and unchanged interior for 1–6 keys.');
 console.log('Output:', dir);
