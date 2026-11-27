@@ -338,6 +338,8 @@ if (customTabs) {
     const url = new URL(location.href);
     const switched = url.searchParams.get('type') !== type.id;
     url.searchParams.set('type',type.id);
+    if (shared.value.trim()) url.searchParams.set('name',shared.value.trim());
+    else url.searchParams.delete('name');
     history.replaceState(null,'',url);
     showProduct();
     clicker.setActive(type.id === 'press');

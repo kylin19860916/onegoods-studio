@@ -121,7 +121,8 @@ distance = round(far, 3)
 for name, sample in samples.items():
     if all((output / f'{name}_front34{suffix}').is_file() for suffix in ('.png','_shadow-raw.png','.json')):
         continue
-    span = frame(sample, distance)
+    sample_distance = round(distance * 1.65, 3) if name == 'press-abc' else distance
+    span = frame(sample, sample_distance)
     objects = []
     for index, part in enumerate(sample['meshes']):
         mesh = bpy.data.meshes.new(f'{name}-{index}')
@@ -160,7 +161,7 @@ for name, sample in samples.items():
     metadata.update(
         renderer=f'Blender {bpy.app.version_string} Cycles', resolution=[2048,2048],
         dimensions_mm=list(sample['dimensions']),
-        camera={'lens_mm':85,'sensor_mm':36,'azimuth':30,'elevation':18,'distance_mm':distance,
+        camera={'lens_mm':85,'sensor_mm':36,'azimuth':30,'elevation':18,'distance_mm':sample_distance,
                 'product_span':round(span,4),'product_baseline':.78},
         lamps=lamps, samples=256, denoise=True, layer_period_mm=.2, roughness=.60, bevel_mm=.3,
     )

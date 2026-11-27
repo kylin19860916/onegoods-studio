@@ -27,7 +27,7 @@ function canOrder(p){
  return p?.kind==='physical'&&!p.isPlaceholder&&p.saleStatus==='available'&&Number.isSafeInteger(Number(p.price))&&Number(p.price)>0;
 }
 function buyAction(p){
- const official=canOrder(p)?`<div class="store-order-entry"><a class="button yellow" href="checkout.html?product=${encodeURIComponent(p.id)}">Order on OGS</a>${storePayment.enabled?'':'<small>Online card payments coming soon</small>'}</div>`:'';
+ const official=canOrder(p)?`<div class="store-order-entry"><a class="button yellow" href="checkout.html?product=${encodeURIComponent(p.id)}">Order on OGS</a></div>`:'';
  if(p.saleStatus!=='available')return '<span class="sale-status">Not yet on sale</span>';
  const channels=[p.purchaseUrl?{id:'myship',url:p.purchaseUrl,logo:'platforms/seven-eleven.svg',label:'Visit our MyShip store',note:'uniopen sign-in required'}:null,p.shopeeUrl?{id:'shopee',url:p.shopeeUrl,logo:'platforms/shopee.png',label:'Buy on Shopee',note:'View on Shopee'}:null].filter(Boolean);
  if(!channels.length)return official;
@@ -122,6 +122,7 @@ function renderFullProduct(){
    <input id="r2-quantity" type="number" min="1" max="10" value="1" aria-label="Quantity">
    <button type="button" data-quantity="1" aria-label="Increase quantity">${stepIcon(true)}</button></div>
    <a class="btn-primary" id="r2-official-order" href="${checkout}&amp;qty=1">Order on OGS</a></div>`:'';
+ const mobileBuy=canOrder(product) ? `<div class="r2-mobile-buy" hidden><strong>${priceLabel(product)}</strong><a class="btn-primary" href="${checkout}&amp;qty=1">Order on OGS</a></div>` : '';
  const facts=product.keynadeFacts?'<div class="keynade-facts"><span><b>12</b>Independent keys</span><span><b>MX</b>Switch format</span><span><b>1</b>Ball chain included</span></div>':'';
  const detail=product.keynadeFacts?'<p>The twelve large geometric panels are independent mechanical keys. The top pin pulls out and slides back in as a decorative, hands-on detail.</p><p>Visible 3D print layers and gold sparkle are part of the real object. Sound and feel depend on the installed switches.</p>':'';
  const notes=product.keynadeFacts?'<p>顶部插销为装饰零件；小面板为固定造型件，12 个大面板可Clickers。实拍中的场景物件不属于商品内容。</p>':'';
@@ -144,14 +145,28 @@ function renderFullProduct(){
    <a class="btn-secondary" href="custom.html" data-custom-link>Start customizing</a></div>
    <figure><img src="${assetUrl('custom/render/press_front34-1024.webp')}" alt="Customize a clicker" loading="lazy"><figcaption>Product images are 3D previews</figcaption></figure></section>
    ${other.length?`<section class="r2-block r2-related"><div class="r2-section-head"><h2>More goods</h2><a href="products.html" class="btn-text">View all goods</a></div><div class="r2-product-grid">${other.map(productCard).join('')}</div></section>`:''}`;
+ target.insertAdjacentHTML('beforeend', mobileBuy);
  renderShippingFees();
  const quantity=qs('#r2-quantity');
  const order=qs('#r2-official-order');
  if(quantity&&order){
    const clamp=value=>Number.isFinite(value)?Math.max(1,Math.min(10,Math.trunc(value))):1;
-   const sync=value=>{quantity.value=String(clamp(value));order.href=checkout+'&qty='+quantity.value;};
+   const mobile=qs('.r2-mobile-buy');
+   const mobileOrder=mobile.querySelector('a');
+   const sync=value=>{
+     quantity.value=String(clamp(value));
+     const href=checkout+'&qty='+quantity.value;
+     order.setAttribute('href',href);
+     mobileOrder.setAttribute('href',href);
+   };
+   document.body.classList.add('r2-has-mobile-buy');
+   if ('IntersectionObserver' in window) {
+     const watcher=new IntersectionObserver(([entry])=>{mobile.hidden=entry.isIntersecting;});
+     watcher.observe(order.closest('.r2-buy-row'));
+   } else mobile.hidden=false;
    quantity.addEventListener('change',()=>sync(quantity.valueAsNumber));
    order.addEventListener('click',()=>sync(quantity.valueAsNumber));
+   mobileOrder.addEventListener('click',()=>sync(quantity.valueAsNumber));
    target.querySelectorAll('[data-quantity]').forEach(button=>button.addEventListener('click',()=>sync((quantity.valueAsNumber||1)+Number(button.dataset.quantity))));
  }
 }

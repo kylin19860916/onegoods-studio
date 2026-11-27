@@ -1,4 +1,3 @@
-@import url('/assets/fonts/chiron-web/css/vf.css');
 :root {
   --brand: #a087c1;
   --brand-ink: #5e4382;
@@ -21,7 +20,7 @@
   --r-card: 16px;
   --r-img: 12px;
   --r-input: 12px;
-  --font-head: "Chiron GoRound TC WS", "PingFang TC", sans-serif;
+  --font-head: "OGS Heading Rounded", "PingFang TC", sans-serif;
   --font-body: "PingFang TC", "Noto Sans TC", sans-serif;
   --container: 1200px;
   --gutter: clamp(20px, 4vw, 40px);
@@ -117,7 +116,7 @@ html[lang="en"] .product-meta{letter-spacing:.03em;flex-wrap:wrap}
 @media(max-width:650px){.shop .products{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 @font-face{font-family:"OGS Site Heading";src:url("assets/fonts/keyring/NotoSansTC-Bold.woff") format("woff");font-style:normal;font-weight:700;font-display:swap}
-@font-face{font-family:"OGS Heading Rounded";src:url("assets/fonts/ogs-heading-rounded-v2.woff2") format("woff2");font-style:normal;font-weight:200 900;font-display:swap}
+@font-face{font-family:"OGS Heading Rounded";src:url("assets/fonts/ogs-heading-rounded-v2.woff2") format("woff2");font-style:normal;font-weight:200 900;font-display:optional}
 html :is(h1,h2){font-family:"OGS Site Heading","PingFang TC",sans-serif;font-weight:700;font-synthesis:none}
 html[lang="zh-Hant"] :is(h1,h2){letter-spacing:-.025em}
 html[lang="zh-Hant"] h2{line-height:1.35}
@@ -1128,3 +1127,69 @@ body[data-page="about"] main.r2-policy { width: min(720px,calc(100% - 2 * var(--
 @media (min-width:768px) {
   .r2-hero figure { margin-inline-end: min(0px, calc((1200px - 100vw) / 2)); }
 }
+
+.r2-header .language-switch :is(summary, a),
+.r2-footer.site-footer > small,
+.r2-footer.site-footer > small span { font-size: 13px; }
+.r2-header > nav:not(.language-switch) a { min-width: 44px; }
+.r2-footer .footer-contact :is(address a, .footer-policy-links a, .footer-instagram) { min-height: 44px; }
+.r2-footer .footer-policy-links a { display: inline-flex; align-items: center; }
+.r2-product-layout .keynade-facts span,
+.r2-product-layout :is(.purchase-platforms-note, .platform-copy span) { font-size: 13px; }
+.r2-product-layout .keynade-facts b { font-size: 26px; }
+.r2-quantity input { width: 44px; min-height: 44px; }
+.r2-product-shipping { display: flow-root; }
+.r2-product-layout .platform-purchase { min-height: 52px; border: 1px solid var(--line-strong); border-radius: var(--r-btn); gap: 10px; }
+.r2-product-layout .platform-logo { width: 22px; height: 22px; flex: 0 0 22px; }
+.r2-product-layout .platform-logo img { width: 100%; height: 100%; }
+.r2-policy section a { min-height: 44px; display: inline-flex; align-items: center; }
+.r2-custom-editor :is(.keyring-sizes small,.keyring-shapes span,.clicker-slot-number,.keyring-font-menu label,.plate-view-header button,.clicker-colour-picker summary,.keyring-colour-section summary,.clicker-colour-options label) { font-size: max(13px,1em); }
+.r2-custom-editor :is(.keyring-font-picker summary,.keyring-colour-section summary,.clicker-colour-picker summary,.keyring-steps button) { min-height: 44px; }
+.r2-custom-editor :is(.keyring-font-menu legend,.keyring-colour-options legend,.clicker-colour-menu legend) { font-size: 13px; }
+.r2-mobile-buy { display: none; }
+@media (max-width:767px) {
+  .r2-product-layout.keynade-intro { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
+  .r2-product-layout .keynade-summary { display: contents; }
+  .r2-product-layout .keynade-summary h1 { order: -4; font-size: 34px !important; }
+  .r2-product-layout .keynade-subtitle { order: -3; margin-block: 0; }
+  .r2-product-layout .keynade-summary .keynade-price { order: -2; font-size: 26px; line-height: 1.2; margin: 0 0 8px; }
+  .r2-product-layout .keynade-gallery { order: -1; }
+  .r2-product-layout .gallery-thumbs { flex-wrap: nowrap; overflow-x: auto; padding: 4px; }
+  .r2-product-layout .gallery-thumbs button { flex: 0 0 72px; }
+  .r2-has-mobile-buy .r2-footer { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .r2-mobile-buy:not([hidden]) {
+    position: fixed; inset: auto 0 0; z-index: 6; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; min-height: calc(72px + env(safe-area-inset-bottom)); padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom));
+    background: var(--ground); border-top: 1px solid var(--line); box-shadow: var(--shadow-1);
+  }
+  .r2-mobile-buy strong { color: var(--brand-ink); font: 800 20px var(--font-head); }
+  .r2-mobile-buy .btn-primary { width: min(62%,220px); }
+  .r2-custom-editor #name-clicker:has(#clicker-per-key-settings:not([hidden])) { display: flex; flex-direction: column; align-items: stretch; }
+  .r2-custom-editor #name-clicker:has(#clicker-per-key-settings:not([hidden])) :is(#clicker-form, .keyring-step-panel, #clicker-per-key-settings) { display: contents; }
+  .r2-custom-editor .clicker-key-editor { order: -1; margin: 0; }
+}
+
+body[data-page="product"] > main.section { padding-block-start: 0; min-height: 100vh; }
+.r2-footer > div:nth-child(2) a,
+.r2-header > nav[aria-label] > a { min-inline-size: 44px; }
+.r2-custom-editor .clicker-colour-current,
+.r2-custom-editor .keyring-colour-options .keyring-choice { font-size: 13px; }
+
+@media (max-width:767px) {
+  .r2-product-layout.keynade-intro { gap: 8px; }
+  .r2-product-layout .keynade-summary h1 { line-height: 1.15; }
+  .r2-product-layout .keynade-summary .keynade-subtitle { font-size: 19px !important; line-height: 1.35; }
+}
+
+.r2-breadcrumb a { min-inline-size: 44px; }
+
+.r2-service > div { grid-template-columns: 44px minmax(0,1fr); column-gap: 12px; align-content: center; }
+.r2-service-icon { display: grid; place-items: center; width: 44px; height: 44px; background: var(--tint); color: var(--brand-ink); border-radius: 50%; }
+.r2-service > div > .r2-service-icon { grid-row: span 2; align-self: center; color: var(--brand-ink); }
+.r2-buy-info dl { display: grid; grid-template-columns: 44px 1fr; column-gap: 12px; }
+.r2-buy-info dt, .r2-buy-info dd { grid-column: 2; position: relative; }
+.r2-buy-info dt .r2-service-icon { position: absolute; top: 0; inset-inline-start: -56px; }
+.r2-buy-info summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; list-style: none; }
+.r2-buy-info summary::-webkit-details-marker { display: none; }
+.r2-buy-info summary svg { flex: none; }
+.r2-buy-info details[open] summary svg { transform: rotate(45deg); }

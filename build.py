@@ -11,6 +11,7 @@ build_id = hashlib.sha256(b''.join(p.read_bytes() for p in sorted(src.glob('*'))
 locales = [('zh-Hant', '', 0), ('zh-Hans', 'zh-cn', None), ('en', 'en', 1)]
 
 workspace_source = (src / 'nameplate.html').read_text()
+service_markup = (src / 'service-strip.inc').read_text().strip()
 workspace_markup = re.search(r'<main[^>]*>(.*?)</main>', workspace_source, flags=re.S)[1].strip()
 
 for lang, folder, column in locales:
@@ -21,7 +22,7 @@ for lang, folder, column in locales:
     for page in src.glob('*.html'):
         if page.name == 'internal-checkout.html' and folder:
             continue
-        raw = page.read_text()
+        raw = page.read_text().replace('<!-- storefront-service-strip -->', service_markup)
         if page.name == 'custom.html':
             raw = raw.replace('<!-- customization-workspace -->', workspace_markup)
         text = translate(raw).replace('lang="zh-Hans"', f'lang="{lang}"')

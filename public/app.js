@@ -27,7 +27,7 @@ function canOrder(p){
  return p?.kind==='physical'&&!p.isPlaceholder&&p.saleStatus==='available'&&Number.isSafeInteger(Number(p.price))&&Number(p.price)>0;
 }
 function buyAction(p){
- const official=canOrder(p)?`<div class="store-order-entry"><a class="button yellow" href="checkout.html?product=${encodeURIComponent(p.id)}">官網下單</a>${storePayment.enabled?'':'<small>線上刷卡付款開通中</small>'}</div>`:'';
+ const official=canOrder(p)?`<div class="store-order-entry"><a class="button yellow" href="checkout.html?product=${encodeURIComponent(p.id)}">官網下單</a></div>`:'';
  if(p.saleStatus!=='available')return '<span class="sale-status">尚未開賣</span>';
  const channels=[p.purchaseUrl?{id:'myship',url:p.purchaseUrl,logo:'platforms/seven-eleven.svg',label:'前往賣貨便賣場',note:'需登入 uniopen 會員'}:null,p.shopeeUrl?{id:'shopee',url:p.shopeeUrl,logo:'platforms/shopee.png',label:'蝦皮購買',note:'前往 Shopee 商品頁'}:null].filter(Boolean);
  if(!channels.length)return official;
@@ -122,6 +122,7 @@ function renderFullProduct(){
    <input id="r2-quantity" type="number" min="1" max="10" value="1" aria-label="數量">
    <button type="button" data-quantity="1" aria-label="增加數量">${stepIcon(true)}</button></div>
    <a class="btn-primary" id="r2-official-order" href="${checkout}&amp;qty=1">官網下單</a></div>`:'';
+ const mobileBuy=canOrder(product) ? `<div class="r2-mobile-buy" hidden><strong>${priceLabel(product)}</strong><a class="btn-primary" href="${checkout}&amp;qty=1">官網下單</a></div>` : '';
  const facts=product.keynadeFacts?'<div class="keynade-facts"><span><b>12</b>獨立按鍵</span><span><b>MX</b>機械鍵軸結構</span><span><b>1</b>金屬珠鏈隨附</span></div>':'';
  const detail=product.keynadeFacts?'<p>幾何外殼上的 12 個大面板，都是可獨立按壓的機械按鍵。頂部插銷可以拔出、插回，是造型與把玩的裝飾細節。</p><p>3D 列印的層紋與金色閃點，保留在真實物件的表面。按壓聲音與手感依搭配的軸體而定。</p>':'';
  const notes=product.keynadeFacts?'<p>顶部插销为装饰零件；小面板为固定造型件，12 个大面板可按壓。实拍中的场景物件不属于商品内容。</p>':'';
@@ -144,14 +145,28 @@ function renderFullProduct(){
    <a class="btn-secondary" href="custom.html" data-custom-link>開始客製</a></div>
    <figure><img src="${assetUrl('custom/render/press_front34-1024.webp')}" alt="客製按壓款" loading="lazy"><figcaption>商品圖為 3D 預覽渲染</figcaption></figure></section>
    ${other.length?`<section class="r2-block r2-related"><div class="r2-section-head"><h2>其他好物</h2><a href="products.html" class="btn-text">看全部好物</a></div><div class="r2-product-grid">${other.map(productCard).join('')}</div></section>`:''}`;
+ target.insertAdjacentHTML('beforeend', mobileBuy);
  renderShippingFees();
  const quantity=qs('#r2-quantity');
  const order=qs('#r2-official-order');
  if(quantity&&order){
    const clamp=value=>Number.isFinite(value)?Math.max(1,Math.min(10,Math.trunc(value))):1;
-   const sync=value=>{quantity.value=String(clamp(value));order.href=checkout+'&qty='+quantity.value;};
+   const mobile=qs('.r2-mobile-buy');
+   const mobileOrder=mobile.querySelector('a');
+   const sync=value=>{
+     quantity.value=String(clamp(value));
+     const href=checkout+'&qty='+quantity.value;
+     order.setAttribute('href',href);
+     mobileOrder.setAttribute('href',href);
+   };
+   document.body.classList.add('r2-has-mobile-buy');
+   if ('IntersectionObserver' in window) {
+     const watcher=new IntersectionObserver(([entry])=>{mobile.hidden=entry.isIntersecting;});
+     watcher.observe(order.closest('.r2-buy-row'));
+   } else mobile.hidden=false;
    quantity.addEventListener('change',()=>sync(quantity.valueAsNumber));
    order.addEventListener('click',()=>sync(quantity.valueAsNumber));
+   mobileOrder.addEventListener('click',()=>sync(quantity.valueAsNumber));
    target.querySelectorAll('[data-quantity]').forEach(button=>button.addEventListener('click',()=>sync((quantity.valueAsNumber||1)+Number(button.dataset.quantity))));
  }
 }

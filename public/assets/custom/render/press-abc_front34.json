@@ -22,8 +22,8 @@
     "sensor_mm": 36,
     "azimuth": 30,
     "elevation": 18,
-    "distance_mm": 155.078,
-    "product_span": 1.0918,
+    "distance_mm": 255.879,
+    "product_span": 0.656,
     "product_baseline": 0.78
   },
   "lamps": [
