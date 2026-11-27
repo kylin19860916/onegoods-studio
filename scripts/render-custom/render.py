@@ -7,9 +7,15 @@ import bpy
 from bpy_extras.object_utils import world_to_camera_view
 from mathutils import Vector
 
-source, output = map(Path, sys.argv[sys.argv.index('--') + 1:])
+arguments = sys.argv[sys.argv.index('--') + 1:]
+source, output = map(Path, arguments[:2])
+face_view = '--face' in arguments[2:]
+view = 'face' if face_view else 'front34'
+camera_azimuth, camera_elevation = (0, 86) if face_view else (30, 18)
 output.mkdir(parents=True, exist_ok=True)
 samples = json.loads(source.read_text())
+if face_view:
+    samples.pop('press-abc', None)
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
 scene.render.engine = 'CYCLES'
@@ -17,7 +23,7 @@ scene.cycles.samples = 256
 scene.cycles.adaptive_threshold = 0.10
 scene.cycles.use_denoising = True
 scene.cycles.seed = 27
-scene.render.resolution_x = scene.render.resolution_y = 2048
+scene.render.resolution_x = scene.render.resolution_y = 1024 if face_view else 2048
 scene.render.resolution_percentage = 100
 scene.render.film_transparent = True
 scene.render.image_settings.color_mode = 'RGBA'
@@ -99,7 +105,7 @@ for sample in samples.values():
 
 def frame(sample, distance):
     target = Vector((0, 0, sample['dimensions'].z / 2))
-    camera.location = target + unit(30, 18) * distance
+    camera.location = target + unit(camera_azimuth, camera_elevation) * distance
     aim(camera, target)
     lens.shift_x = lens.shift_y = 0
     bpy.context.view_layer.update()
@@ -107,19 +113,20 @@ def frame(sample, distance):
     x0, x1 = min(p.x for p in projected), max(p.x for p in projected)
     y0, y1 = min(p.y for p in projected), max(p.y for p in projected)
     lens.shift_x = (x0 + x1) / 2 - .5
-    lens.shift_y = y0 - .22
+    lens.shift_y = (y0 + y1) / 2 - .5 if face_view else y0 - .22
     return max(x1-x0,y1-y0)
 
 near, far = 100, 900
 for _ in range(13):
     middle = (near+far)/2
     largest = max(frame(samples[name], middle) for name in ('nameplate','press','articulated'))
-    if largest > .64: near = middle
+    if largest > (.76 if face_view else .64): near = middle
     else: far = middle
 distance = round(far, 3)
 
 for name, sample in samples.items():
-    if all((output / f'{name}_front34{suffix}').is_file() for suffix in ('.png','_shadow-raw.png','.json')):
+    required = ('.png','.json') if face_view else ('.png','_shadow-raw.png','.json')
+    if all((output / f'{name}_{view}{suffix}').is_file() for suffix in required):
         continue
     sample_distance = round(distance * 1.65, 3) if name == 'press-abc' else distance
     span = frame(sample, sample_distance)
@@ -143,28 +150,29 @@ for name, sample in samples.items():
             bevel = obj.modifiers.new('Highlight hard edges', 'BEVEL')
             bevel.width, bevel.segments, bevel.angle_limit = .3, 2, .6
         objects.append(obj)
-    scene.render.filepath = str(output / f'{name}_front34.png')
+    scene.render.filepath = str(output / f'{name}_{view}.png')
     floor.hide_render = True
     scene.render.resolution_percentage = 100
-    scene.cycles.samples = 256
+    scene.cycles.samples = 96 if face_view else 256
     if not Path(scene.render.filepath).is_file():
         bpy.ops.render.render(write_still=True)
-    floor.hide_render = False
-    for obj in objects:
-        obj.visible_camera = False
-    scene.render.filepath = str(output / f'{name}_front34_shadow-raw.png')
-    scene.render.resolution_percentage = 50
-    scene.cycles.samples = 24
-    bpy.ops.render.render(write_still=True)
-    scene.render.resolution_percentage = 100
+    if not face_view:
+        floor.hide_render = False
+        for obj in objects:
+            obj.visible_camera = False
+        scene.render.filepath = str(output / f'{name}_front34_shadow-raw.png')
+        scene.render.resolution_percentage = 50
+        scene.cycles.samples = 24
+        bpy.ops.render.render(write_still=True)
+        scene.render.resolution_percentage = 100
     metadata = {k: sample[k] for k in ('name','font','source','palette')}
     metadata.update(
-        renderer=f'Blender {bpy.app.version_string} Cycles', resolution=[2048,2048],
+        renderer=f'Blender {bpy.app.version_string} Cycles', resolution=[scene.render.resolution_x,scene.render.resolution_y],
         dimensions_mm=list(sample['dimensions']),
-        camera={'lens_mm':85,'sensor_mm':36,'azimuth':30,'elevation':18,'distance_mm':sample_distance,
-                'product_span':round(span,4),'product_baseline':.78},
-        lamps=lamps, samples=256, denoise=True, layer_period_mm=.2, roughness=.60, bevel_mm=.3,
+        camera={'lens_mm':85,'sensor_mm':36,'azimuth':camera_azimuth,'elevation':camera_elevation,'distance_mm':sample_distance,
+                'product_span':round(span,4),'product_baseline':None if face_view else .78},
+        lamps=lamps, samples=96 if face_view else 256, denoise=True, layer_period_mm=.2, roughness=.60, bevel_mm=.3,
     )
-    (output / f'{name}_front34.json').write_text(json.dumps(metadata,ensure_ascii=False,indent=2)+'\n')
+    (output / f'{name}_{view}.json').write_text(json.dumps(metadata,ensure_ascii=False,indent=2)+'\n')
     for obj in objects:
         bpy.data.objects.remove(obj,do_unlink=True)

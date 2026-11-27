@@ -47,19 +47,26 @@ function studioPhoto(productId, source) {
 function studioImage(photo, alt, extra) {
   return `<img src="${photo.url}" srcset="${photo.srcset}" alt="${alt}" width="800" height="800" ${extra}>`;
 }
-function productCard(product) {
+function productCard(product, compact = false) {
   const photo=studioPhoto(product.id,product.image);
-  const image=photo ? studioImage(photo,escapeHtml(product.name)+' product photograph','sizes="(max-width:767px) 50vw, 300px" loading="lazy" decoding="async"') : product.image ? art(product) : '';
+  const name=escapeHtml(product.name);
+  const image=photo ? studioImage(photo,name+' product photograph','sizes="(max-width:767px) 50vw, 300px" loading="lazy" decoding="async"') : product.image ? art(product) : '';
+  const heading=`<h3 title="${name}">${name}</h3>`;
+  const price=priceLabel(product);
+  const amount=price ? `<strong>${price}</strong>` : '';
+  const details=compact
+    ? `<div class="r2-product-name-price">${heading}${amount}</div>`
+    : ` ${heading}<p>${escapeHtml(product.desc)}</p>${amount}`;
   return `<a class="r2-product-card" href="product.html?id=${encodeURIComponent(product.id)}">
-    <div class="r2-product-art">${image}</div><h3>${escapeHtml(product.name)}</h3>
-    <p>${escapeHtml(product.desc)}</p>${priceLabel(product)?`<strong>${priceLabel(product)}</strong>`:''}</a>`;
+    <div class="r2-product-art">${image}</div>${details}</a>`;
 }
 const customCardItems = window.OGSCustomTypes || [];
 const customLocaleIndex=locale==='en'?2:locale==='zh-Hans'?1:0;
-function customImage(item, lazy=true) {
-  const small=assetUrl(item.image);
+function customImage(item, face = false) {
+  const small=assetUrl(face ? item.face : item.image);
   const large=small.replace('-1024.webp','.webp');
-  return `<img src="${small}" srcset="${small} 1024w, ${large} 2048w" sizes="(max-width:767px) 100vw, 420px" alt="${item.text[customLocaleIndex]}" width="1024" height="1024" ${lazy?'loading="lazy"':''} decoding="async">`;
+  const sources=face ? '' : ` srcset="${small} 1024w, ${large} 2048w" sizes="(max-width:767px) 100vw, 420px"`;
+  return `<img src="${small}"${sources} alt="${item.text[customLocaleIndex]}" width="1024" height="${face ? 768 : 1024}" loading="lazy" decoding="async">`;
 }
 function customStartingPrice(item) {
   return item.startingPrice ? `<span class="r2-dispatch">NT$${item.startingPrice}${locale==='en'?'+':' 起'}</span>` : '';
@@ -71,7 +78,7 @@ function customCatalogCard(item) {
 }
 const customCards=qs('[data-custom-cards]');
 if(customCards)customCards.innerHTML=customCardItems.map(item=>`<article>
-  ${customImage(item)}
+  <figure>${customImage(item, true)}</figure>
   <div><h3>${item.text[customLocaleIndex]}</h3><p>${item.description[customLocaleIndex]}</p>
   <p><span class="r2-dispatch">Dispatch within 3 days</span> ${customStartingPrice(item)}</p><a href="custom?type=${item.id}" class="btn-secondary" data-custom-link>${item.action[customLocaleIndex]}</a></div></article>`).join('');
 function renderProducts(){
@@ -82,11 +89,12 @@ function renderProducts(){
  const sort=qs('#product-sort');
  const count=qs('#product-count');
  if(sort?.value==='price') list.sort((a,b)=>(priceLabel(a)?Number(a.price):Infinity)-(priceLabel(b)?Number(b.price):Infinity));
- if(document.body.dataset.page==='home')list=list.slice(0,4);
+ const isHome=document.body.dataset.page==='home';
+ if(isHome)list=list.slice(0,4);
  if(count)count.value=count.dataset.format.replace('{count}',String(filter==='custom'?customCardItems.length:list.length));
  grid.classList.add('r2-product-grid');
  grid.innerHTML=filter==='custom'?customCardItems.map(customCatalogCard).join('')+'<p class="r2-image-note r2-grid-note">Product images are 3D previews</p>':
-   list.length?list.map(productCard).join(''):'<p class="catalog-note">No items match this selection.</p>';
+   list.length?list.map(product=>productCard(product,isHome)).join(''):'<p class="catalog-note">No items match this selection.</p>';
 }
 qs('#product-sort')?.addEventListener('change',renderProducts);
 function setFilter(value){filter=value;document.querySelectorAll('[data-filter]').forEach(b=>{const active=b.dataset.filter===value;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active)});renderProducts();}
@@ -144,7 +152,7 @@ function renderFullProduct(){
    <label for="r2-product-name">Enter a name first</label><input id="r2-product-name" data-custom-name autocomplete="off">
    <a class="btn-secondary" href="custom.html" data-custom-link>Start customizing</a></div>
    <figure><img src="${assetUrl('custom/render/press_front34-1024.webp')}" alt="Customize a clicker" loading="lazy"><figcaption>Product images are 3D previews</figcaption></figure></section>
-   ${other.length?`<section class="r2-block r2-related"><div class="r2-section-head"><h2>More goods</h2><a href="products.html" class="btn-text">View all goods</a></div><div class="r2-product-grid">${other.map(productCard).join('')}</div></section>`:''}`;
+   ${other.length?`<section class="r2-block r2-related"><div class="r2-section-head"><h2>More goods</h2><a href="products.html" class="btn-text">View all goods</a></div><div class="r2-product-grid">${other.map(product=>productCard(product)).join('')}</div></section>`:''}`;
  target.insertAdjacentHTML('beforeend', mobileBuy);
  renderShippingFees();
  const quantity=qs('#r2-quantity');
