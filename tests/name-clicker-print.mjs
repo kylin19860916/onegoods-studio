@@ -32,20 +32,29 @@ assert(Math.abs(stack.roofBottom - stack.socketStart - NAME_MX.socketDepth) < 1e
 assert(stack.skirtBottom - NAME_MX.travel > NAME_MX.deck);
 assert.equal(NAME_MX.capDepth, 4.993);
 assert.equal(NAME_MX.socketDepth, 4.993);
+assert.equal(NAME_MX.crossSpan, 4.000);
 assert.equal(NAME_MX.bossDiameter, 5.65);
 assert.equal(NAME_MX.mountTop, 10.517);
 assert.equal(NAME_MX.rimTop, 19.5);
 assert(Math.abs(stack.rimTop - stack.skirtBottom - 2.976) < 1e-8);
-const fixtures = ['濤','飛','Max','III','ONEGOODS','玩物工作室','林予曦'].map(text => ({ text, fontKey:'huninn', font:huninn }));
-fixtures.push({text:'林予曦',fontKey:'kuaile',font:kuaile}, {text:'林予',fontKey:'kuaile',font:kuaile});
+assert.equal(NAME_MX.dualSwitchCapLength, 60);
+const fixtures = [
+  ['濤', 1], ['飛', 1], ['Ken', 1], ['III', 1],
+  ['Max', 2], ['ONEGOODS', 2], ['玩物工作室', 2], ['林予曦', 2], ['Olivia', 2],
+].map(([text, expectedSwitches]) => ({ text, expectedSwitches, fontKey: 'huninn', font: huninn }));
+fixtures.push(
+  { text: '林予曦', fontKey: 'kuaile', font: kuaile, expectedSwitches: 2 },
+  { text: '林予', fontKey: 'kuaile', font: kuaile, expectedSwitches: 1 },
+);
 for (const fontKey of ['chiron-round', 'gensen-tw', 'tw-kai', 'genwan-tw']) {
   const font = readFileSync(join(root, 'public/assets/fonts/keyring', keyringFonts[fontKey]));
   for (const text of ['邱珼恩', '邱悅恩', '林予曦']) {
     fixtures.push({ text, fontKey, font, expectedSwitches: 2 });
   }
 }
-for (const [i,{text,fontKey,font,expectedSwitches = text === '林予曦' ? 2 : 1}] of fixtures.entries()) {
+for (const [i,{text,fontKey,font,expectedSwitches}] of fixtures.entries()) {
   const contour = nameClickerContours(parseKeyringFont(font), text);
+  assert.equal(contour.mounts.length, expectedSwitches, fontKey + ' / ' + text);
   const eyelet = mxChainEyelet(contour.profile(MX_NAME_FACE.shellMargin));
   const ramp = mxPrintableEyelet(eyelet.outline, eyelet.rootLeft);
   assert(ramp.bottom > 3.7);

@@ -85,7 +85,7 @@ export function nameClickerContours(font, text) {
   const glyphs = text ? font.getPaths(text, 0, 0, 100, { kerning: true }).map(path => flatten(path.commands)) : [];
   const points = glyphs.flat(2);
   let letters = [];
-  let switchXs = [0];
+  let outerGlyphSwitchXs;
   function offsetPaths(paths, distance, end = EndType.etClosedPolygon) {
     if (!paths.length) return [];
     const offset = new ClipperOffset(2, 35);
@@ -103,7 +103,7 @@ export function nameClickerContours(font, text) {
     const centerX = (minX + maxX) / 2;
     const characters = [...text.normalize('NFC')];
     const visible = characters.flatMap((character, index) => /\s/u.test(character) ? [] : [index]);
-    // A three-character cap is carried under the outer glyphs.
+    // Preserve the outer-glyph alignment for three Han characters when the cap needs two switches.
     if (visible.length === 3 && visible.every(index => /\p{Script=Han}/u.test(characters[index]))) {
       const outerCenters = [visible[0], visible[2]].map(index => {
         const xs = glyphs[index]?.flat().map(([x]) => x) ?? [];
@@ -112,7 +112,7 @@ export function nameClickerContours(font, text) {
       const [left, right] = outerCenters;
       const midpoint = left !== null && right !== null ? (left + right) / 2 : 0;
       const halfPitch = Math.max(left !== null && right !== null ? (right - left) / 2 : 0, NAME_MX.switchPitch / 2);
-      switchXs = [midpoint - halfPitch, midpoint + halfPitch];
+      outerGlyphSwitchXs = [midpoint - halfPitch, midpoint + halfPitch];
     }
     const holeAreas = shapes => shapes.flatMap(([, ...holes]) => holes.map(hole => Math.abs(Clipper.Area(hole)))).sort((a, b) => a - b);
     letters = glyphs.flatMap(glyph => {
@@ -147,6 +147,16 @@ export function nameClickerContours(font, text) {
 
   const glyphContour = connectedOutline(letterOutlines);
   const face = offsetPaths(glyphContour, MX_NAME_FACE.faceMargin);
+  // Measure the moving lid along the name, excluding the case and keyring.
+  const faceXs = face.flat().map(({ X }) => X);
+  const faceLeft = Math.min(...faceXs);
+  const faceRight = Math.max(...faceXs);
+  const faceLength = faceRight - faceLeft;
+  const midpoint = (faceRight + faceLeft) / (2 * units);
+  const halfPitch = Math.max(faceLength / (4 * units), NAME_MX.switchPitch / 2);
+  const switchXs = faceLength >= NAME_MX.dualSwitchCapLength * units
+    ? outerGlyphSwitchXs ?? [midpoint - halfPitch, midpoint + halfPitch]
+    : [0];
   const shell = offsetPaths(glyphContour, MX_NAME_FACE.shellMargin);
   function squareAt(width, x, y) {
     const h = Math.round(width * units / 2);
@@ -186,7 +196,12 @@ export function nameClickerContours(font, text) {
     return [{ X: left, Y: -30000 }, { X: right, Y: -30000 },
       { X: right, Y: 30000 }, { X: left, Y: 30000 }];
   });
-  const dividers = polygons(dividerStrips, capFace, ClipType.ctIntersection);
+  // Keep the divider through the central bridge when side lobes also cross the strip.
+  const dividers = dividerStrips.flatMap(strip => {
+    const anchor = { X: Math.round((strip[0].X + strip[1].X) / 2), Y: 0 };
+    return polygons([strip], capFace, ClipType.ctIntersection)
+      .filter(([outer]) => Clipper.PointInPolygon(anchor, outer) !== 0);
+  });
   if (dividers.length !== dividerStrips.length) throw new Error('字形無法保留底座隔板，請調整文字。');
   function housingRing(outerMargin, innerMargin) {
     return polygons(exteriorAt(outerMargin), exteriorAt(innerMargin), ClipType.ctDifference)

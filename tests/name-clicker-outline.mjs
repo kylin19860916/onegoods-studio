@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { nameClickerContours, parseKeyringFont } from '../server/keyring-geometry.mjs';
 import { nameClickerOutline } from '../src/name-clicker-outline.js';
 import { MX_CHAIN_EYELET, MX_NAME_FACE, mxChainEyelet } from '../src/cherry-mx-spec.js';
+import { NAME_MX } from '../src/name-clicker-mechanism.js';
 import { keyringFonts } from '../src/keyring-font-picker.js';
 
 function contains(points, x, y) {
@@ -15,11 +16,26 @@ function contains(points, x, y) {
 let checked = 0;
 for (const key of Object.keys(keyringFonts)) {
   const font = parseKeyringFont(readFileSync(new URL('../public/assets/fonts/keyring/' + keyringFonts[key], import.meta.url)));
-  for (const text of ['Max', 'III', 'WIDE', 'A B', '玩好物', '飛', '林予', '林予曦']) {
+  for (const text of ['Max', 'III', 'WIDE', 'Olivia', 'Ken', 'Maya', 'A B', '玩好物', '飛', '林予', '林予曦']) {
     if ([...text].some(char => char !== ' ' && !font.charToGlyphIndex(char))) continue;
-    const model = nameClickerContours(font, text);
+    const model = (() => {
+      try {
+        return nameClickerContours(font, text);
+      } catch (error) {
+        throw new Error(`Outline generation failed for ${key} / ${text}`, { cause: error });
+      }
+    })();
     const preview = nameClickerOutline(font, text);
-    const expected = /^\p{Script=Han}{3}$/u.test(text) ? 2 : 1;
+    const xs = model.profile(MX_NAME_FACE.faceMargin).map(([x]) => x);
+    const capLength = Math.max(...xs) - Math.min(...xs);
+    const expected = capLength >= NAME_MX.dualSwitchCapLength - 1e-9 ? 2 : 1;
+    if (key === 'chewy' && text === 'Max') assert.equal(model.mounts.length, 1);
+    if (key === 'huninn' && text === 'Ken') assert.equal(model.mounts.length, 1);
+    if (key === 'huninn' && text === 'Maya') assert.equal(model.mounts.length, 2);
+    if (key === 'huninn' && text === 'Olivia') {
+      assert(capLength >= 80 && capLength < 82);
+      assert.equal(model.mounts.length, 2);
+    }
     assert.equal(model.mounts.length, expected);
     assert.equal(model.dividers.length, expected - 1);
     if (expected === 2) {
@@ -63,7 +79,7 @@ for (const key of Object.keys(keyringFonts)) {
       // The old prototype's outer mounting pads filled these points above a and x.
       const inset = model.profile(0.35); // Keep the original anti-pad probe independent of colour-border width.
       const shell = model.profile(MX_NAME_FACE.shellMargin);
-      assert.deepEqual(model.mounts, [{ x: 0, y: -0.5 }]);
+      assert.equal(model.mounts.length, 2);
       assert(!contains(inset, 0, 7.5));
       assert(!contains(inset, 4, 8));
       assert(contains(inset, 0, 4));

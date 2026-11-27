@@ -6,10 +6,10 @@ export const NAME_MX = Object.freeze({
   opening: 14.06, exteriorX: 18.844, exteriorY: 18.814,
   latchX: 16.065, latchY: 16.117, latchBottom: 8.207, latchTop: 9.713,
   capDepth: 4.993, socketDepth: 4.993,
-  bossDiameter: 5.65, crossSpan: 4.199, crossArmX: 1.554, crossArmY: 1.562,
+  bossDiameter: 5.65, crossSpan: 4.000, crossArmX: 1.554, crossArmY: 1.562,
   rootHeight: 1, rootDiameter: 6.88,
   capPocket: 15.4, capWall: 1, stopOverlap: 0.8, stopGap: 0.2,
-  roof: 1.4, travel: 4, switchPitch: 21, dividerWidth: 1.4,
+  roof: 1.4, travel: 4, switchPitch: 21, dualSwitchCapLength: 60, dividerWidth: 1.4,
 });
 export function nameMxStack() {
   const mountTop = NAME_MX.mountTop;
