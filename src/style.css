@@ -874,8 +874,9 @@ body[data-page] .eyebrow { display: none; }
 
 /* Storefront navigation and footer */
 .r2-header { height: 72px; position: relative; border: 0; background: var(--ground); padding-block: 0; }
-.r2-header .brand { min-height: 44px; }
-.r2-header .brand .brand-icon, .r2-header .brand .brand-wordmark { height: 30px; width: auto; }
+.r2-header .brand { min-height: 44px; gap: 10px; }
+.r2-header .brand .brand-icon { height: 31px; width: auto; }
+.r2-header .brand .brand-wordmark { height: 30px; width: auto; }
 .r2-header > nav:not(.language-switch) { display: flex; gap: var(--sp-2); }
 .r2-header > nav:not(.language-switch) a {
   min-height: 44px;
