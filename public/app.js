@@ -1,7 +1,7 @@
 let products=[];
 let storePayment = { enabled: false };
 async function paymentConfig() {
- if (!qs('#full-product') && !qs('#store-checkout')) return storePayment;
+ if (!qs('#full-product') && !qs('#store-checkout') && !qs('[data-shipping]')) return storePayment;
  try {
    const testRequested = new URLSearchParams(location.search).get('shipping-test')==='1';
    const response = await fetch(testRequested?'/api/checkout-preview/config':'/api/store-payment/config', { cache: 'no-store' });
@@ -50,7 +50,23 @@ if(qs('#open-info'))qs('#open-info').onclick=()=>qs('#info-dialog').showModal();
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}}));
 if(qs('#year'))qs('#year').textContent=new Date().getFullYear();
 const pages={home:'index.html',products:'products.html',designs:'design-files.html',about:'about.html',product:'products.html'};document.querySelectorAll('header nav:not(.language-switch) a,.catalog-nav a').forEach(a=>{if(a.getAttribute('href')===pages[document.body.dataset.page])a.setAttribute('aria-current','page');});
-async function loadCatalog(){try{const [r,payment]=await Promise.all([fetch('/api/catalog',{cache:'no-store'}),paymentConfig()]);storePayment=payment;if(!r.ok)throw Error('catalog');const data=await r.json();categories=data.categories||[];products=data.items.map(localize);renderCategoryFilters();renderProducts();renderFullProduct();renderStoreCheckout();}catch{const target=qs('#products')||qs('#full-product')||qs('#store-checkout');if(target)target.innerHTML='<p role="alert">商品資料暫時無法載入，請稍後重新整理頁面。</p>';}}
+async function loadCatalog(){try{const [r,payment]=await Promise.all([fetch('/api/catalog',{cache:'no-store'}),paymentConfig()]);storePayment=payment;renderShippingFees();if(!r.ok)throw Error('catalog');const data=await r.json();categories=data.categories||[];products=data.items.map(localize);renderCategoryFilters();renderProducts();renderFullProduct();renderStoreCheckout();}catch{const target=qs('#products')||qs('#full-product')||qs('#store-checkout');if(target)target.innerHTML='<p role="alert">商品資料暫時無法載入，請稍後重新整理頁面。</p>';}}
+function renderShippingFees(){
+  document.querySelectorAll('[data-shipping]').forEach(node=>{
+    const fee=node.dataset.shipping==='pickup'?storePayment.pickupShipping:storePayment.shipping;
+    node.textContent=Number.isSafeInteger(fee)?'NT$'+fee:'';
+  });
+}
+document.addEventListener('click',event=>{
+  const link=event.target.closest('[data-custom-link]');
+  const field=link?.closest('section')?.querySelector('[data-custom-name]');
+  if(!field)return;
+  const url=new URL(link.href);
+  const name=field.value.trim();
+  if(name)url.searchParams.set('name',name);
+  else url.searchParams.delete('name');
+  link.href=url.href;
+});
 function renderStoreCheckout(){
  const checkout=qs('#store-checkout');
  if(!checkout)return;

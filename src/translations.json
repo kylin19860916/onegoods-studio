@@ -263,11 +263,26 @@
     "中文字型",
     "Chinese fonts"
   ],
-  "昭源环方": ["昭源環方", "Chiron GoRound TC"],
-  "源泉圆体": ["源泉圓體", "GenSen Rounded TW"],
-  "台灣正楷": ["台灣正楷", "CNS Traditional Kai"],
-  "源云明体": ["源雲明體", "GenWan Mincho TW"],
-  "旧版字型": ["舊版字型", "Legacy fonts"],
+  "昭源环方": [
+    "昭源環方",
+    "Chiron GoRound TC"
+  ],
+  "源泉圆体": [
+    "源泉圓體",
+    "GenSen Rounded TW"
+  ],
+  "台灣正楷": [
+    "台灣正楷",
+    "CNS Traditional Kai"
+  ],
+  "源云明体": [
+    "源雲明體",
+    "GenWan Mincho TW"
+  ],
+  "旧版字型": [
+    "舊版字型",
+    "Legacy fonts"
+  ],
   "英文字型": [
     "英文字型",
     "English fonts"
@@ -2204,6 +2219,96 @@
     "商品或運費已變更，請重新整理後確認。",
     "The item price or shipping fee changed. Refresh and review your order."
   ],
-  "商品金额": ["商品金額", "Item price"],
-  "前往下单": ["前往下單", "Continue to checkout"]
+  "商品金额": [
+    "商品金額",
+    "Item price"
+  ],
+  "前往下单": [
+    "前往下單",
+    "Continue to checkout"
+  ],
+  "官网刷卡付款": [
+    "官網刷卡付款",
+    "Pay by card on our site"
+  ],
+  "也可在賣貨便、蝦皮购买": [
+    "也可在賣貨便、蝦皮購買",
+    "Also available on MyShip and Shopee"
+  ],
+  "客制 3 天内出货": [
+    "客製 3 天內出貨",
+    "Custom orders ship within 3 days"
+  ],
+  "客制商品 3 天内出货。": [
+    "客製商品 3 天內出貨。",
+    "Custom orders ship within 3 days."
+  ],
+  "先输入名字": [
+    "先輸入名字",
+    "Enter a name first"
+  ],
+  "例如 Mia、小飞": [
+    "例如 Mia、小飛",
+    "For example, Mia"
+  ],
+  "商品图为示意合成": [
+    "商品圖為示意合成",
+    "Composite images for illustration"
+  ],
+  "怎么买": [
+    "怎麼買",
+    "How to order"
+  ],
+  "看全部好物": [
+    "看全部好物",
+    "View all goods"
+  ],
+  "官网刷卡，或到賣貨便、蝦皮购买。": [
+    "官網刷卡，或到賣貨便、蝦皮購買。",
+    "Pay by card here or shop on MyShip or Shopee."
+  ],
+  "7-ELEVEN 超商取货，或黑猫宅配到府。": [
+    "7-ELEVEN 超商取貨，或黑貓宅配到府。",
+    "Pick up at 7-ELEVEN or have it delivered by Black Cat."
+  ],
+  "运费怎么算？": [
+    "運費怎麼算？",
+    "How much is shipping?"
+  ],
+  "客制多久出货？": [
+    "客製多久出貨？",
+    "When do custom orders ship?"
+  ],
+  "可以退换吗？": [
+    "可以退換嗎？",
+    "Can I return an item?"
+  ],
+  "一般商品收到后七日内可申请退货；客制商品如涉及例外，会在下单前告知。": [
+    "一般商品收到後七日內可申請退貨；客製商品如涉及例外，會在下單前告知。",
+    "You may request a return within seven days of receiving a standard item. We disclose any applicable custom-order exceptions before purchase."
+  ],
+  "在结帐时选择。": [
+    "在結帳時選擇。",
+    "Choose at checkout."
+  ],
+  "购买服务": [
+    "購買服務",
+    "Order services"
+  ],
+  "示意": [
+    "示意",
+    "Illustration"
+  ],
+  "收货": [
+    "收貨",
+    "Receive your order"
+  ],
+  "出货": [
+    "出貨",
+    "Dispatch"
+  ],
+  "下单": [
+    "下單",
+    "Order"
+  ]
 }
