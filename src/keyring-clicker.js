@@ -1,3 +1,4 @@
+import { quoteConnectedClicker } from './clicker-test-pricing.js';
 import { exceedsClickerTextLimit } from './clicker-test-pricing.js';
 import { setupClickerOrderTest } from './clicker-order-test.js';
 import { expandChoices } from './keyring-choices.js';
@@ -61,6 +62,7 @@ export function setupClicker() {
     const selected = () => field.querySelector('input:checked');
     return {
       get value() { return selected().value; },
+      label() { return selected().closest('label').querySelector('span').textContent; },
       sync() {
         const radio = selected();
         current.querySelector('i').style.backgroundColor = radio.value;
@@ -68,14 +70,19 @@ export function setupClicker() {
       },
     };
   }
-  const previewDraft = new URLSearchParams(location.search).get('order-preview') === '1'
-    ? JSON.parse(sessionStorage.getItem('ogs-order-preview') || 'null') : null;
+  const params = new URLSearchParams(location.search);
+  let previewDraft;
+  try {
+    if (params.get('order-preview') === '1') previewDraft = JSON.parse(sessionStorage.getItem('ogs-order-preview') || 'null');
+    if (params.get('custom-order') === '1') previewDraft = JSON.parse(sessionStorage.getItem('ogs-connected-checkout') || 'null');
+  } catch {}
   const saved = previewDraft?.kind === 'custom' && !previewDraft.submitted ? previewDraft.design : null;
   const base = setupColour(form.elements.base, '#393142');
   const nameInk = setupColour(form.elements.nameInk, saved?.colors.ink ?? '#fffcf5');
   const nameFill = setupColour(form.elements.nameFill, saved?.colors.fill ?? '#efb39e');
   const nameBorder = setupColour(form.elements.nameBorder, saved?.colors.border ?? '#f2c879');
   const { clickerStyle, clickerName } = form.elements;
+  if (params.get('custom-order') === '1') clickerStyle.value = 'name';
   const perKeySettings = document.querySelector('#clicker-per-key-settings');
   const nameSettings = document.querySelector('#clicker-name-settings');
   const hint = document.querySelector('#clicker-hint');
@@ -227,6 +234,36 @@ export function setupClicker() {
     keys: keys.slice(0, count).map(key => ({ text: key.input.value.trim(), font: key.font.value, cap: key.cap.value, ink: key.ink.value })),
   };
   setupClickerOrderTest(form, readContactDesign);
+  const orderPanel = document.querySelector('#connected-order');
+  const orderPrice = document.querySelector('#connected-order-price');
+  const orderStart = document.querySelector('#connected-order-start');
+  let orderEnabled = false;
+  function showOrderPrice() {
+    const quote = quoteConnectedClicker(clickerName.value);
+    orderPanel.hidden = !orderEnabled || clickerStyle.value !== 'name';
+    orderPrice.textContent = quote ? 'NT$' + quote.amount : '';
+    orderStart.disabled = !quote;
+  }
+  form.addEventListener('input', showOrderPrice);
+  form.addEventListener('change', showOrderPrice);
+  form.addEventListener('compositionend', showOrderPrice);
+  fetch('/api/store-payment/config', { cache: 'no-store' }).then(response =>
+    response.ok ? response.json() : null
+  ).then(config => {
+    orderEnabled = config?.customClickerEnabled === true;
+    showOrderPrice();
+  }).catch(() => {});
+  orderStart.addEventListener('click', () => {
+    const design = readContactDesign();
+    const quote = quoteConnectedClicker(design.text);
+    if (orderPanel.hidden || !quote) return;
+    sessionStorage.setItem('ogs-connected-checkout', JSON.stringify({
+      kind: 'custom', design: { ...design, text: quote.text }, price: quote.amount,
+      fontName: nameFont.selectedOptions[0].textContent.trim(),
+      paletteNames: [nameBorder, nameFill, nameInk].map(color => color.label()),
+    }));
+    location.assign('checkout.html?custom=connected-name-clicker');
+  });
   const contactDesign = document.querySelector('#clicker-contact-design');
   contactDesign?.addEventListener('click', () => {
     const content = JSON.stringify(readContactDesign(), null, 2);

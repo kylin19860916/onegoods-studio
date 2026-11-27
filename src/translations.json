@@ -2203,5 +2203,7 @@
   "商品或运费已变更，请重新整理后确认。": [
     "商品或運費已變更，請重新整理後確認。",
     "The item price or shipping fee changed. Refresh and review your order."
-  ]
+  ],
+  "商品金额": ["商品金額", "Item price"],
+  "前往下单": ["前往下單", "Continue to checkout"]
 }

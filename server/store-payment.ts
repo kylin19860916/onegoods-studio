@@ -2,6 +2,9 @@ import { validPickupName } from './pickup-names';
 import { validHomeAddress } from './taiwan-address';
 import { timingSafeEqual } from 'node:crypto';
 import { HttpError, json } from './catalog';
+import { quoteConnectedClicker } from '../src/clicker-test-pricing.js';
+import { keyringFonts } from '../src/keyring-font-picker.js';
+import { nameClickerContours, parseKeyringFont } from './keyring-geometry.mjs';
 import { livePickupReady, readLivePickupStore } from './checkout-delivery-preview';
 
 type Env = Cloudflare.Env & {
@@ -11,6 +14,7 @@ type Env = Cloudflare.Env & {
   OGS_ECPAY_PAYMENT_HASH_IV?: string;
   OGS_STORE_HOME_SHIPPING_FEE?: string;
   OGS_PUBLIC_PICKUP_ENABLED?: string;
+  ASSETS?: Fetcher;
 };
 type Fields = Record<string, string>;
 type Order = {
@@ -68,6 +72,35 @@ async function priceOrder(db: D1Database, productId: string, quantity: number, s
   return { name: item.name, quantity, subtotal, shipping, amount };
 }
 
+const clickerColors = new Set(['#a087c1', '#fffcf5', '#f2c879', '#393142', '#b8d6bd', '#efb39e']);
+function priceClicker(input: unknown, shipping: number) {
+  const design = input as { text?: string; font?: string; colors?: { border?: string; fill?: string; ink?: string } } | null;
+  const quote = quoteConnectedClicker(design?.text);
+  const font = design?.font;
+  const { border, fill, ink } = design?.colors ?? {};
+  if (!quote || typeof font !== 'string' || !Object.hasOwn(keyringFonts, font) ||
+      ![border, fill, ink].every(color => typeof color === 'string' && clickerColors.has(color))) {
+    throw new HttpError(400, '請確認客製文字、字型及配色。');
+  }
+  return {
+    name: '連字按壓款', quantity: 1, subtotal: quote.amount, shipping, amount: quote.amount + shipping,
+    design: { text: quote.text, font: font as keyof typeof keyringFonts, colors: { border, fill, ink } },
+  };
+}
+
+async function verifyClickerDesign(env: Env, url: URL, design: ReturnType<typeof priceClicker>['design']) {
+  const asset = await env.ASSETS?.fetch(new Request(new URL('/assets/fonts/keyring/' + keyringFonts[design.font], url)));
+  if (!asset?.ok) throw new HttpError(503, '目前無法驗證客製字型，請稍後再試。');
+  const font = parseKeyringFont(new Uint8Array(await asset.arrayBuffer()));
+  if ([...design.text].some(character => character !== ' ' && !font.charToGlyphIndex(character))) {
+    throw new HttpError(400, '目前字型缺少這些文字，請更換字型或調整文字。');
+  }
+  try { nameClickerContours(font, design.text); }
+  catch (error) {
+    throw new HttpError(400, error instanceof Error ? error.message : '無法生成完整上蓋，請調整文字或字型。');
+  }
+}
+
 export async function storePayment(request: Request, env: Env) {
   const url = new URL(request.url);
   const local = import.meta.env.DEV && ['localhost', '127.0.0.1'].includes(url.hostname);
@@ -81,7 +114,7 @@ export async function storePayment(request: Request, env: Env) {
   const enabled = url.origin === origin && env.OGS_ECPAY_PAYMENT_ENABLED === 'true' && Boolean(config && db && fee !== null);
   const pickupEnabled = enabled && env.OGS_PUBLIC_PICKUP_ENABLED === 'true' && livePickupReady(env);
   if (action === '/config' && request.method === 'GET') {
-    return json({ enabled, shipping: fee, pickupEnabled, pickupShipping: pickupEnabled ? pickupShipping : null });
+    return json({ enabled, customClickerEnabled: enabled && Boolean(env.ASSETS), shipping: fee, pickupEnabled, pickupShipping: pickupEnabled ? pickupShipping : null });
   }
   if (!db) return json({}, 503);
   try {
@@ -129,13 +162,22 @@ export async function storePayment(request: Request, env: Env) {
     const requestId = cap(body.requestId, 36);
     const productId = cap(body.productId, 80);
     const quantity = body.quantity;
-    if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(productId) || !Number.isInteger(quantity) || quantity < 1 || quantity > 99 ||
+    const custom = body.kind === 'custom';
+    if ((custom ? quantity !== 1 || productId !== 'connected-name-clicker' : !/^[a-z0-9][a-z0-9-]{0,79}$/.test(productId)) ||
+        !Number.isInteger(quantity) || quantity < 1 || quantity > 99 ||
         ![undefined, 'home', 'pickup'].includes(body.method)) throw new HttpError(400, '請確認商品、數量及配送方式。');
     const isPickup = body.method === 'pickup';
     const store = isPickup && pickupEnabled ? await readLivePickupStore(db, request, body.storeToken) : null;
     if (isPickup && !store) throw new HttpError(400, '請重新選擇 7-ELEVEN 取貨門市。');
     const shipping = store ? pickupShipping : fee;
-    if (action === '/quote') return json(await priceOrder(db, productId, quantity, shipping, isPickup));
+    const clicker = custom ? priceClicker(body.design, shipping) : null;
+    if (action === '/quote') {
+      if (clicker) {
+        await verifyClickerDesign(env, url, clicker.design);
+        return json({ name: clicker.name, quantity, subtotal: clicker.subtotal, shipping, amount: clicker.amount });
+      }
+      return json(await priceOrder(db, productId, quantity, shipping, isPickup));
+    }
     const address = { city: cap(body.city, 12), district: cap(body.district, 16), postalCode: cap(body.postalCode, 6), street: cap(body.street, 100), unit: cap(body.unit, 35) };
     const contact = cap(body.contact, 40);
     const phone = cap(body.phone, 20);
@@ -145,14 +187,15 @@ export async function storePayment(request: Request, env: Env) {
         (store ? !validPickupName(contact) || !/^09\d{8}$/.test(phone) : !address.street || !validHomeAddress(address.city, address.district, address.postalCode))) {
       throw new HttpError(400, store ? '請填寫與證件相符的收件姓名（中文 2–5 字或英文 4–10 字元）、台灣手機號碼及電子郵件。' : '請確認聯絡資料與台灣本島配送地址。');
     }
-    const details = { productId, quantity, delivery: store
+    const details = { productId, quantity, ...(clicker ? { kind: 'custom', design: clicker.design } : {}), delivery: store
       ? { method: 'store', contact, phone, email, store }
       : { contact, phone, email, address } };
     const requestSnapshot = JSON.stringify(details);
     const lookup = db.prepare('SELECT * FROM store_orders WHERE request_id=?').bind(requestId);
     let order = await lookup.first<Order>();
     if (!order) {
-      const { name, subtotal, amount } = await priceOrder(db, productId, quantity, shipping, isPickup);
+      const { name, subtotal, amount } = clicker ?? await priceOrder(db, productId, quantity, shipping, isPickup);
+      if (clicker) await verifyClickerDesign(env, url, clicker.design);
       if (body.total !== amount) throw new HttpError(409, '商品或運費金額已變更，請重新整理後確認。');
       const snapshot = JSON.stringify({ ...details, name, subtotal, shipping, requestSnapshot });
       const id = 'OGS-P-' + crypto.randomUUID().replaceAll('-', '').slice(0, 12).toUpperCase();

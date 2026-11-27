@@ -178,5 +178,18 @@ try{
  const joined=(await (await clickerOrderApi(get('/api/admin/clicker-orders'),liveCfg,admin)).json()).physicalItems.find(row=>row.id===id);
  assert.equal(joined.shipment.id,'70000012');
  assert.equal(joined.shipment.notice,'300');
+ const design = { text: 'Olivia', font: 'chiron-round', colors: { border: '#f2c879', fill: '#efb39e', ink: '#fffcf5' } };
+ const customConfig = { ...liveCfg, ASSETS: {
+   fetch: async () => new Response(readFileSync('public/assets/fonts/keyring/ChironGoRoundTC-700B.woff')),
+ } };
+ const customCart = { ...cart, requestId: randomUUID(), productId: 'connected-name-clicker', kind: 'custom', design, total: 390 };
+ const customForm = await (await pay('checkout', customCart, session, customConfig)).json();
+ assert.equal(customForm.fields.TotalAmount, '390');
+ const customOrders = await (await clickerOrderApi(get('/api/admin/clicker-orders?q=Olivia'), customConfig, admin)).json();
+ const customOrder = customOrders.physicalItems.find(row => row.id === customForm.fields.CustomField1);
+ assert.equal(customOrder.kind, 'custom');
+ assert.equal(customOrder.delivery.store.id, '294278');
+ assert.deepEqual(customOrder.design, design);
+ assert.equal(customOrder.matchedReference, null);
  console.log('PASS: sandbox reconciliation sheet; live paid-order store mapping, signed early notification, duplicate prevention, print request and admin isolation. Provider calls simulated.');
 } finally {globalThis.fetch=originalFetch;await mf.dispose();}

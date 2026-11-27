@@ -225,12 +225,12 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
             FROM store_pickup_shipments s WHERE s.order_id=store_orders.id) AS pickup_shipment
         FROM store_orders
         WHERE id LIKE ? OR payment_reference LIKE ? OR json_extract(snapshot, '$.name') LIKE ?
-          OR json_extract(snapshot, '$.delivery.contact') LIKE ?
+          OR json_extract(snapshot, '$.delivery.contact') LIKE ? OR json_extract(snapshot, '$.design.text') LIKE ?
         ORDER BY created_at DESC LIMIT 100
-      `).bind(pattern, pattern, pattern, pattern).all<{ id: string; snapshot: string; amount: number; created_at: string; payment_reference: string | null; paid_at: string | null; pickup_shipment: string | null }>();
+      `).bind(pattern, pattern, pattern, pattern, pattern).all<{ id: string; snapshot: string; amount: number; created_at: string; payment_reference: string | null; paid_at: string | null; pickup_shipment: string | null }>();
       const liveItems = liveOrders.results.map(row => {
         const details = JSON.parse(row.snapshot);
-        return { id: row.id, kind: 'physical', live: true, name: details.name, quantity: details.quantity,
+        return { id: row.id, kind: details.kind === 'custom' ? 'custom' : 'physical', design: details.design, live: true, name: details.name, quantity: details.quantity,
           amount: row.amount, subtotal: details.subtotal, shipping: details.shipping, delivery: details.delivery,
           createdAt: row.created_at, matchedReference: row.payment_reference, matchedAt: row.paid_at,
           canCreatePickup: canCreateLivePickup(env, row.id), shipment: row.pickup_shipment ? JSON.parse(row.pickup_shipment) : undefined };
@@ -251,6 +251,21 @@ export async function clickerOrderApi(request: Request, env: Cloudflare.Env, use
         shipment: row.preview_shipment ? JSON.parse(row.preview_shipment) : undefined,
         checkoutCreated: !!row.mock_reference, matchedReference: row.matched_reference, matchedAt: row.matched_at,
       })) });
+    }
+    const paidClicker = /^\/api\/admin\/clicker-orders\/(OGS-P-[A-F0-9]{12})\/3mf$/.exec(path);
+    if (paidClicker && request.method === 'GET') {
+      const id = paidClicker[1];
+      const row = await store.DB.prepare('SELECT snapshot FROM store_orders WHERE id=? AND payment_reference IS NOT NULL')
+        .bind(id).first<{ snapshot: string }>();
+      const snapshot = row && JSON.parse(row.snapshot);
+      if (snapshot?.kind !== 'custom' || !snapshot.design) return fail('找不到已付款的客製訂單。', 404);
+      const design = snapshot.design as ClickerDesign;
+      const asset = await store.ASSETS.fetch(new Request(new URL('/assets/fonts/keyring/' + keyringFonts[design.font], url)));
+      const file = await generateClicker3mf(design, asset);
+      return new Response(new Uint8Array(file), { headers: {
+        'Content-Type': 'model/3mf', 'Content-Disposition': `attachment; filename="${id}.3mf"`,
+        'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff',
+      } });
     }
     const checkout = orderRoute.exec(path);
     const ecpayCheckout = ecpayRoute.exec(path);

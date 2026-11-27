@@ -66,8 +66,16 @@ function renderStoreCheckout(){
    if(mapToken && saved?.token===mapToken) draft=saved;
  } catch {}
  const id=checkoutUrl.searchParams.get('product') || draft?.product;
- const product=products.find(p=>p.id===id);
- if(!canOrder(product)){
+ let custom;
+ if(checkoutUrl.searchParams.get('custom')==='connected-name-clicker'&&!test&&storePayment.customClickerEnabled){
+   try {
+     const candidate=JSON.parse(sessionStorage.getItem('ogs-connected-checkout')||'null');
+     if(candidate?.kind==='custom'&&candidate.design&&Number.isSafeInteger(candidate.price)&&candidate.price>0)custom=candidate;
+   } catch {}
+ }
+ const customNames={en:'Connected name clicker','zh-Hans':'连字按压款','zh-Hant':'連字按壓款'};
+ const product=custom?{id:'connected-name-clicker',name:customNames[locale]||customNames['zh-Hant'],price:custom.price}:products.find(p=>p.id===id);
+ if(!custom&&!canOrder(product)){
    checkout.innerHTML='<p role="status">这件商品目前无法在官网下单。</p><a class="button cream" href="products.html">返回好物</a>';
    return;
  }
@@ -116,7 +124,14 @@ function renderStoreCheckout(){
  const shippingFee=()=>delivery.value==='pickup'?storePayment.pickupShipping:(storePayment.shipping??100);
  const money=amount=>'NT$'+amount.toLocaleString('en-TW');
 
- qs('#store-back').href='product.html?id='+encodeURIComponent(product.id);
+ qs('#store-back').href=custom?'nameplate.html?style=name-clicker&custom-order=1':'product.html?id='+encodeURIComponent(product.id);
+ if(custom){
+   quantity.readOnly=true;
+   const item=qs('#store-custom-design');
+   item.textContent=[custom.design.text,custom.fontName,...(Array.isArray(custom.paletteNames)?custom.paletteNames:[])].filter(Boolean).join(' · ');
+   item.hidden=false;
+ }
+ const itemDetails=()=>({productId:product.id,quantity:quantity.valueAsNumber,...(custom?{kind:'custom',design:custom.design}:{})});
  qs('#store-name').textContent=product.name;
  qs('#store-unit-price').textContent=money(price);
  if(product.image){
@@ -146,7 +161,7 @@ function renderStoreCheckout(){
    qs('#store-subtotal').textContent=money(subtotal);
    qs('#store-fee').textContent=money(fee);
    qs('#store-total').textContent=money(subtotal+fee);
-   qs('#store-review-item').textContent=product.name+' × '+quantity.value;
+   qs('#store-review-item').textContent=product.name+' × '+quantity.value+(custom?' · '+qs('#store-custom-design').textContent:'');
    qs('#store-review-shipping').textContent=isPickup?delivery.selectedOptions[0].text.split(' · ')[0]+(branch?' · '+branchLabel:''):delivery.selectedOptions[0].text.split(' · ')[0];
  }
  function showStep(step){
@@ -303,7 +318,7 @@ function renderStoreCheckout(){
        try {
          const response=await fetch('/api/store-payment/quote',{
            method:'POST',headers:{'Content-Type':'application/json'},
-           body:JSON.stringify({productId:product.id,quantity:count,method,storeToken}),
+           body:JSON.stringify({...itemDetails(),method,storeToken}),
          });
          const quote=await response.json();
          if(!response.ok)throw new Error(quote.error||'暂时无法核对运费，请重试。');
@@ -326,7 +341,7 @@ function renderStoreCheckout(){
      error.replaceChildren(document.createTextNode(error.textContent),channels);
      return;
    }
-   const payload = { ...Object.fromEntries(new FormData(form)), productId: product.id, quantity: quantity.valueAsNumber,method:delivery.value,storeToken:delivery.value==='pickup'?mapToken:null,
+   const payload = { ...Object.fromEntries(new FormData(form)), ...itemDetails(),method:delivery.value,storeToken:delivery.value==='pickup'?mapToken:null,
      total: price * quantity.valueAsNumber + shippingFee() };
    const snapshot = JSON.stringify(payload);
    if (submission?.snapshot !== snapshot) submission = { snapshot, requestId: crypto.randomUUID() };

@@ -25,6 +25,27 @@ assert.equal((await config(env)).enabled,true);
 for(const invalid of [{OGS_ECPAY_PAYMENT_ENABLED:undefined},{OGS_ECPAY_PAYMENT_ENABLED:'false'},{OGS_ECPAY_PAYMENT_ENABLED:'TRUE'},{OGS_ECPAY_PAYMENT_HASH_KEY:undefined},{OGS_STORE_HOME_SHIPPING_FEE:undefined},{OGS_ECPAY_PAYMENT_MERCHANT_ID:'3002607'}]) assert.equal((await config({...env,...invalid})).enabled,false);
 assert.equal((await (await storePayment(new Request('http://localhost:5173/api/store-payment/config'),env)).json()).enabled,undefined); // Production bundle rejects local routes.
 const payload={requestId:randomUUID(),productId:'keynade-mx',quantity:1,total:599,city:'臺北市',district:'南港區',postalCode:'115',street:'測試路1號',unit:'3樓之2',contact:'測試收件人',phone:'0900000000',email:'test@example.com'};
+const customDesign = { text: 'Olivia', font: 'chiron-round', colors: { border: '#f2c879', fill: '#efb39e', ink: '#fffcf5' } };
+const customEnv = { ...env, ASSETS: { fetch: async asset => {
+  assert.equal(new URL(asset.url).pathname, '/assets/fonts/keyring/ChironGoRoundTC-700B.woff');
+  return new Response(readFileSync('public/assets/fonts/keyring/ChironGoRoundTC-700B.woff'));
+} } };
+const customPayload = { ...payload, requestId: randomUUID(), productId: 'connected-name-clicker', kind: 'custom', design: customDesign, total: 430 };
+assert.equal((await config(customEnv)).customClickerEnabled, true);
+assert.deepEqual(await (await request('quote', customPayload, customEnv)).json(), {
+  name: '連字按壓款', quantity: 1, subtotal: 330, shipping: 100, amount: 430,
+});
+assert.equal((await request('quote', { ...customPayload, quantity: 2 }, customEnv)).status, 400);
+assert.equal((await request('checkout', { ...customPayload, total: 1 }, customEnv)).status, 409);
+const customPayment = await (await request('checkout', customPayload, customEnv)).json();
+assert.equal(customPayment.fields.TotalAmount, '430');
+const customId = customPayment.fields.CustomField1;
+const savedCustom = await DB.prepare('SELECT snapshot, payment_reference FROM store_orders WHERE id=?').bind(customId).first();
+assert.deepEqual(JSON.parse(savedCustom.snapshot).design, customDesign);
+assert.equal(savedCustom.payment_reference, null);
+assert.deepEqual(await (await request('checkout', customPayload, customEnv)).json(), customPayment);
+assert.equal((await request('checkout', { ...customPayload, design: { ...customDesign, text: 'Aurelia' } }, customEnv)).status, 409);
+
 for (const invalid of [
  {city:'不存在縣'}, {city:'臺北市',district:'板橋區'}, {district:'__proto__'},
  {postalCode:'100'}, {postalCode:'100000'}, {city:'澎湖縣',district:'馬公市',postalCode:'880'},
@@ -69,6 +90,11 @@ assert.equal((await request('status?id='+orderId+'&token='+randomUUID())).status
 const saved=await DB.prepare('SELECT snapshot,payment_reference FROM store_orders WHERE id=?').bind(orderId).first();
 assert.equal(JSON.parse(saved.snapshot).delivery.address.unit,'3樓之2');
 assert.equal(saved.payment_reference,'20261123000001');
-assert.equal((await DB.prepare('SELECT COUNT(*) AS n FROM store_orders').first()).n,1);
+assert.equal((await DB.prepare('SELECT COUNT(*) AS n FROM store_orders').first()).n,2);
+assert.equal(await (await callback({ MerchantTradeNo: customPayment.fields.MerchantTradeNo, CustomField1: customId,
+  TradeAmt: '430', TradeNo: '20261123000003' })).text(), '1|OK');
+const paidCustom = await DB.prepare('SELECT snapshot,payment_reference FROM store_orders WHERE id=?').bind(customId).first();
+assert.equal(paidCustom.payment_reference, '20261123000003');
+assert.deepEqual(JSON.parse(paidCustom.snapshot).design, customDesign);
 console.log('PASS: official checksum; explicit enable gate; server pricing; idempotent order; signed callbacks; replay/conflict rejection; paused-checkout notifications; receipt access; preserved floor/unit. No real ECPay transaction or production database used.');
 } finally {await mf.dispose();}

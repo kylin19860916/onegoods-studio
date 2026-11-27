@@ -63,7 +63,7 @@ const orderSearch = $('#clicker-order-search');
 const orderView = $('#clicker-orders-view');
 const orderNav = $('#manage-clicker-orders');
 const orderColors = {'#a087c1':'薰衣草紫','#fffcf5':'奶油白','#f2c879':'蜂蜜金','#393142':'炭灰','#b8d6bd':'薄荷綠','#efb39e':'蜜桃粉'};
-const orderFonts = {huninn:'粉圓','sans-tc':'繁體黑體','serif-tc':'繁體宋體','sans-sc':'簡體黑體','serif-sc':'簡體宋體',wenkai:'文楷',kuaile:'快樂體',lucky:'Luckiest Guy',nunito:'Nunito',lobster:'Lobster',lilita:'Lilita One',chewy:'Chewy',yellowtail:'Yellowtail',blackops:'Black Ops One'};
+const orderFonts = {huninn:'粉圓','sans-tc':'繁體黑體','serif-tc':'繁體宋體','chiron-round':'昭源環方','gensen-tw':'源泉圓體','tw-kai':'臺灣正楷','genwan-tw':'源雲明體','sans-sc':'簡體黑體','serif-sc':'簡體宋體',wenkai:'文楷',kuaile:'快樂體',lucky:'Luckiest Guy',nunito:'Nunito',lobster:'Lobster',lilita:'Lilita One',chewy:'Chewy',yellowtail:'Yellowtail',blackops:'Black Ops One'};
 const orderDate = new Intl.DateTimeFormat('zh-TW', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Taipei' });
 let orderSearchVersion = 0;
 let orders = [];
@@ -196,11 +196,15 @@ function renderPhysicalOrder(order) {
   const destination = store
     ? [store.carrier, store.name, store.id, store.address].filter(Boolean).join(' · ')
     : address ? [address.postalCode, address.city + address.district + address.street, address.unit].filter(Boolean).join(' ') : '';
-  return `<article class="panel clicker-order-item"><div class="panel-title"><h2>${esc(order.name)}</h2><span class="badge">${orderStatuses[orderStatus(order)]}</span></div>
-    <p><strong>${esc(order.id)}</strong> · ${order.live?'商品訂單':'商品訂單（綠界測試）'} · ${formatOrderDate(order.createdAt)}</p>
+  const design = order.design;
+  return `<article class="panel clicker-order-item"><div class="panel-title"><h2>${esc(design?.text || order.name)}</h2><span class="badge">${orderStatuses[orderStatus(order)]}</span></div>
+    <p><strong>${esc(order.id)}</strong> · ${design ? '客製訂單 · 連字按壓款' : order.live ? '商品訂單' : '商品訂單（綠界測試）'} · ${formatOrderDate(order.createdAt)}</p>
     <p>數量 ${esc(order.quantity)} · 商品小計 ${money(order.subtotal)} · 運費 ${money(order.shipping)} · 合計 ${money(order.amount)}</p>
+    ${design ? `<p>字型 ${esc(orderFonts[design.font] || design.font)}</p>
+      <div class="order-swatches">${orderSwatch('外框', design.colors.border)}${orderSwatch('內底', design.colors.fill)}${orderSwatch('凸字', design.colors.ink)}</div>` : ''}
     ${order.matchedReference ? `<p>綠界交易編號 ${esc(order.matchedReference)} · ${formatOrderDate(order.matchedAt)}</p>` : ''}
     ${destination ? `<fieldset><legend>${order.live ? (store ? '7-ELEVEN 超商取貨' : '黑貓宅配') : '配送資料（測試）'}</legend><p>${esc(delivery.contact)} · ${esc(delivery.phone)}</p><p>${esc(destination)}</p>${order.live ? `<p>${esc(delivery.email)}</p>` : ''}</fieldset>` : ''}
+    ${design && order.matchedReference ? `<div class="order-toolbar"><a class="text-action" href="/api/admin/clicker-orders/${esc(order.id)}/3mf" download>下載 3MF</a></div>` : ''}
     ${physicalLogisticsTools(order)}
     </article>`;
 }
@@ -241,7 +245,7 @@ function renderOrderView() {
   $('#page-description').textContent = detailId || '管理客製訂單和商品訂單。';
   if (detailId) {
     const order = orders.find(item => item.id === detailId);
-    detailContent.innerHTML = order ? (order.kind === 'physical' ? renderPhysicalOrder(order) : renderClickerOrder(order))
+    detailContent.innerHTML = order ? ((order.live || order.kind === 'physical') ? renderPhysicalOrder(order) : renderClickerOrder(order))
       : '<p>目前找不到這筆訂單。</p>';
     return;
   }
