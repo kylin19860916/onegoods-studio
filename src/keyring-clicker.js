@@ -95,7 +95,6 @@ export function setupClicker() {
   let activeKey = 0;
   let version = 0;
   const maximum = 6;
-  const maxKeys = () => clickerStyle.value === 'mechanical' ? maximum : 4;
   const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
   const keys = Array.from({ length: maximum }, (_, index) => {
     const row = template.content.cloneNode(true).firstElementChild;
@@ -155,15 +154,11 @@ export function setupClicker() {
     const currentVersion = ++version;
     const style = clickerStyle.value;
     const wholeName = style === 'name';
-    if (!wholeName && count > maxKeys()) {
-      count = maxKeys();
-      activeKey = Math.min(activeKey, count - 1);
-    }
     perKeySettings.hidden = wholeName;
     nameSettings.hidden = !wholeName;
     hint.textContent = wholeName ? hint.dataset.name : hint.dataset.keys;
     remove.disabled = count === 1;
-    add.disabled = count === maxKeys();
+    add.disabled = count === maximum;
     for (const colour of [base, nameInk, nameFill, nameBorder]) colour.sync();
     for (const key of keys) {
       key.input.style.fontFamily = '"OGS Full ' + key.font.value + '"';
@@ -214,7 +209,7 @@ export function setupClicker() {
     form.dispatchEvent(new Event('clicker-key-count'));
   });
   add.addEventListener('click', () => {
-    count = Math.min(maxKeys(), count + 1);
+    count = Math.min(maximum, count + 1);
     activeKey = count - 1;
     render();
     form.dispatchEvent(new Event('clicker-key-count'));
@@ -227,12 +222,9 @@ export function setupClicker() {
     text: clickerName.value.trim(),
     font: nameFont.value,
     colors: { border: nameBorder.value, fill: nameFill.value, ink: nameInk.value },
-  } : clickerStyle.value === 'mechanical' ? {
+  } : {
     style: 'mechanical', base: base.value,
     keys: keys.slice(0, count).map(key => ({ text: key.input.value.trim(), font: key.font.value, cap: key.cap.value, ink: key.ink.value })),
-  } : {
-    style: 'individual', base: base.value,
-    keys: keys.slice(0, count).map(key => ({text:key.input.value.trim(),font:key.font.value,cap:key.cap.value,ink:key.ink.value})),
   };
   setupClickerOrderTest(form, readContactDesign);
   const contactDesign = document.querySelector('#clicker-contact-design');

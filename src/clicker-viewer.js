@@ -5,7 +5,8 @@ import {
 } from 'three';
 import { NAME_MX, nameMxStack } from './name-clicker-mechanism.js';
 import { MX, MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_NAME_FACE, MX_RECESS, mxChainEyelet, mxPrintableEyelet, mxStack } from './cherry-mx-spec.js';
-import { MECHANICAL_BASE, mechanicalBaseGrooves } from './mechanical-base.js';
+import { MECHANICAL_BASE, mechanicalBaseGrooves, mechanicalBaseLeft } from './mechanical-base.js';
+import mechanicalEyelet from './mechanical-eyelet-mesh.json';
 import { MECHANICAL_KEYCAP, mechanicalKeycapShell } from './mechanical-keycap.js';
 import { nameClickerOutline } from './name-clicker-outline.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -29,48 +30,6 @@ function rounded(width, height, radius, offsetX = 0, offsetY = 0, grooves = []) 
   path.lineTo(x, y + radius);
   path.quadraticCurveTo(x, y, x + radius, y);
   return path;
-}
-
-function basicClickerBody(centers) {
-  const half = 12.4;
-  const corner = 5;
-  const waist = half - 3.2;
-  const left = centers[0] - half;
-  const right = centers.at(-1) + half;
-  const shape = new Shape();
-
-  function drawSide(sideCenters, direction) {
-    for (let index = 1; index < sideCenters.length; index++) {
-      const middle = (sideCenters[index - 1] + sideCenters[index]) / 2;
-      const start = middle - direction * 5.5;
-      const end = middle + direction * 5.5;
-      shape.lineTo(start, direction * half);
-      shape.bezierCurveTo(
-        start + direction * 2.7, direction * half,
-        middle - direction * 1.4, direction * waist,
-        middle, direction * waist,
-      );
-      shape.bezierCurveTo(
-        middle + direction * 1.4, direction * waist,
-        end - direction * 2.7, direction * half,
-        end, direction * half,
-      );
-    }
-  }
-
-  shape.moveTo(left + corner, half);
-  drawSide(centers, 1);
-  shape.lineTo(right - corner, half);
-  shape.quadraticCurveTo(right, half, right, half - corner);
-  shape.lineTo(right, -half + corner);
-  shape.quadraticCurveTo(right, -half, right - corner, -half);
-  drawSide([...centers].reverse(), -1);
-  shape.lineTo(left + corner, -half);
-  shape.quadraticCurveTo(left, -half, left, -half + corner);
-  shape.lineTo(left, half - corner);
-  shape.quadraticCurveTo(left, half, left + corner, half);
-  shape.closePath();
-  return shape;
 }
 
 function lettering(font, text) {
@@ -208,7 +167,7 @@ export function createClickerViewer(canvas, host, reset, inspect) {
       const hole = new Path();
       hole.absarc(holeX, 0, MX_CHAIN_EYELET.holeDiameter / 2, 0, 2 * Math.PI, true);
       ear.holes.push(hole);
-      const bottom = style === 'name' ? mxPrintableEyelet(outline, rootLeft).bottom : MX_CHAIN_EYELET.bottom;
+      const bottom = mxPrintableEyelet(outline, rootLeft).bottom;
       add(extrude(ear, MX_CHAIN_EYELET.thickness), colour, bottom);
     }
     function cross(width, arm, armY = arm) {
@@ -332,19 +291,14 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     }
     const { pitch, halfDepth } = MECHANICAL_BASE;
     const centers = keys.map((_, index) => (index - (keys.length - 1) / 2) * pitch);
-    const mechanical = style === 'mechanical';
-    const grooves = mechanical ? mechanicalBaseGrooves(centers.length) : [];
-    const body = () => mechanical
-      ? rounded((centers.length - 1) * pitch + 2 * halfDepth, 2 * halfDepth, 3.8, 0, 0, grooves)
-      : basicClickerBody(centers);
-    // The longer keyboard skirt overlaps the rim through the full key travel.
-    const skirtBottom = mechanical ? stack.skirtBottom - MECHANICAL_KEYCAP.skirtDrop : stack.skirtBottom;
-    const rimTop = mechanical ? skirtBottom + 1.0 : stack.rimTop;
-    const skirtWidth = mechanical ? MECHANICAL_KEYCAP.width : MX_CASE.capWidth;
+    const grooves = mechanicalBaseGrooves(centers.length);
+    const body = () => rounded((centers.length - 1) * pitch + 2 * halfDepth, 2 * halfDepth, 3.8, 0, 0, grooves);
+    const skirtBottom = stack.skirtBottom - MECHANICAL_KEYCAP.skirtDrop;
+    const rimTop = skirtBottom + 1.0;
     const walls = body();
     const plate = body();
     const rim = body();
-    const wellWidth = mechanical ? 20.3 : skirtWidth + 2 * MX_RECESS.sideClearance;
+    const wellWidth = 20.3;
     for (const x of centers) {
       walls.holes.push(rounded(18, 18, 2, x));
       plate.holes.push(rounded(MX_CASE.opening, MX_CASE.opening, 0.3, x));
@@ -355,30 +309,24 @@ export function createClickerViewer(canvas, host, reset, inspect) {
     add(extrude(plate, MX_CASE.plate), base, stack.plateBottom);
     add(extrude(rim, rimTop - stack.mountTop), base, stack.mountTop);
 
-    addChainEyelet(body(), base);
+    // The reference mesh includes the curved root and the tapered chain entry.
+    const eyelet = new BufferGeometry();
+    eyelet.setAttribute('position', new BufferAttribute(Float32Array.from(mechanicalEyelet.positions), 3));
+    eyelet.setIndex(new BufferAttribute(Uint32Array.from(mechanicalEyelet.triangles), 1));
+    eyelet.computeVertexNormals();
+    add(eyelet, base, 0).position.x = mechanicalBaseLeft(centers.length);
     for (const [index, entry] of keys.entries()) {
       const { cap: keycapColour, ink: letteringColour } = entry;
       const capGroup = mountSwitch(centers[index], index);
-      if (mechanical) {
-        const shell = mechanicalKeycapShell(stack.capTop - skirtBottom, stack.roofBottom - skirtBottom);
-        const geometry = new BufferGeometry();
-        geometry.setAttribute('position', new BufferAttribute(shell.vertProperties, 3));
-        geometry.setIndex(new BufferAttribute(shell.triVerts, 1));
-        geometry.computeVertexNormals();
-        add(geometry, keycapColour, skirtBottom, capGroup).userData.keyIndex = index;
-      } else {
-        const skirt = rounded(skirtWidth, skirtWidth, 2.7);
-        skirt.holes.push(rounded(16, 16, 1.4));
-        add(extrude(skirt, stack.roofBottom - skirtBottom), keycapColour, skirtBottom, capGroup).userData.keyIndex = index;
-        const roof = new ExtrudeGeometry(rounded(skirtWidth - 0.8, skirtWidth - 0.8, 2.3), {
-          depth: MX_CASE.roof - 0.4, bevelEnabled: true, bevelThickness: 0.2, bevelSize: 0.4,
-          bevelSegments: 3, curveSegments: 12,
-        });
-        add(roof, keycapColour, stack.roofBottom + 0.2, capGroup).userData.keyIndex = index;
-      }
+      const shell = mechanicalKeycapShell(stack.capTop - skirtBottom, stack.roofBottom - skirtBottom);
+      const geometry = new BufferGeometry();
+      geometry.setAttribute('position', new BufferAttribute(shell.vertProperties, 3));
+      geometry.setIndex(new BufferAttribute(shell.triVerts, 1));
+      geometry.computeVertexNormals();
+      add(geometry, keycapColour, skirtBottom, capGroup).userData.keyIndex = index;
       addCapSocket(keycapColour, capGroup, index);
-      const glyph=lettering(entry.font,entry.text);
-      if(glyph) add(glyph,letteringColour,stack.capTop,capGroup).userData.keyIndex=index;
+      const glyph = lettering(entry.font, entry.text);
+      if (glyph) add(glyph, letteringColour, stack.capTop, capGroup).userData.keyIndex = index;
     }
     const bounds = new Box3().setFromObject(assembly);
     const width = bounds.max.x - bounds.min.x;

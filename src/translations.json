@@ -19,10 +19,6 @@
     "機械鍵盤款",
     "Keyboard keys"
   ],
-  "独立字键款": [
-    "獨立字鍵款",
-    "Individual letter keys"
-  ],
   "连字按压款": [
     "連字按壓款",
     "Joined name clicker"
@@ -171,9 +167,9 @@
     "輸入名字，選字型、造型和尺寸，搭配喜歡的顏色。",
     "Enter a name, pick a font, shape and size, and choose your colours."
   ],
-  "为机械键盘款、独立字键款或连字按压款加上名字，在 3D 预览里试按。": [
-    "為機械鍵盤款、獨立字鍵款或連字按壓款加上名字，在 3D 預覽裡試按。",
-    "Add a name to keyboard keys, individual letter keys or a joined name clicker, then try pressing it in 3D."
+  "为机械键盘款或连字按压款加上名字，在 3D 预览里试按。": [
+    "為機械鍵盤款或連字按壓款加上名字，在 3D 預覽裡試按。",
+    "Add a name to keyboard keys or a joined name clicker, then try pressing it in 3D."
   ],
   "客制钥匙圈": [
     "客製鑰匙圈",
@@ -1672,9 +1668,9 @@
     "飛字連字按壓款的三色立體樣品",
     "Three-colour clicker sample with the raised character 飛"
   ],
-  "叩叩，试按一下你的名字。可选机械键盘款、独立字键款或连字按压款。": [
-    "叩叩，試按一下你的名字。可選機械鍵盤款、獨立字鍵款或連字按壓款。",
-    "Click, click. Try pressing your name in keyboard keys, individual letter keys or a joined name clicker."
+  "叩叩，试按一下你的名字。可选机械键盘款或连字按压款。": [
+    "叩叩，試按一下你的名字。可選機械鍵盤款或連字按壓款。",
+    "Click, click. Try pressing your name in keyboard keys or a joined name clicker."
   ],
   "LEO 字样的绿色关节字块，字母之间可见接头": [
     "LEO 字樣的綠色關節字塊，字母之間可見接頭",

@@ -5,6 +5,10 @@ export const MECHANICAL_BASE = Object.freeze({
   grooveDepth: 1.2,
 });
 
+export function mechanicalBaseLeft(keyCount) {
+  return -MECHANICAL_BASE.halfDepth - (keyCount - 1) * MECHANICAL_BASE.pitch / 2;
+}
+
 // Each polyline runs left to right on the positive-Y side, tangent to the rim
 // at both ends. Reflect it for the other side of the same divider.
 export function mechanicalBaseGrooves(keyCount) {

@@ -4,13 +4,14 @@ import wasm from 'manifold-3d/manifold.wasm?module';
 import { mechanicalKeyContours, nameClickerContours, parseKeyringFont, writeKeyring3mf } from './keyring-geometry.mjs';
 import { keyringFonts } from '../src/keyring-font-picker.js';
 import { MX_CAP_SOCKET, MX_CASE, MX_CHAIN_EYELET, MX_EYELET_BLEND, MX_NAME_FACE, mxChainEyelet, mxPrintableEyelet, mxStack } from '../src/cherry-mx-spec.js';
-import { MECHANICAL_BASE, mechanicalBaseGrooves } from '../src/mechanical-base.js';
+import { MECHANICAL_BASE, mechanicalBaseGrooves, mechanicalBaseLeft } from '../src/mechanical-base.js';
 import { MECHANICAL_KEYCAP, mechanicalKeycapShell } from '../src/mechanical-keycap.js';
 import { HttpError } from './catalog';
 import p2sTrialProfile from './clicker-p2s-profile.json';
 import connectedNameProcess from './name-clicker-p2s-process.json';
 import threeHanPrintSettings from './name-clicker-p2s-three-han.json';
 import mechanicalBases from './mechanical-base-templates.json';
+import mechanicalEyelet from '../src/mechanical-eyelet-mesh.json';
 import filamentVectors from './mechanical-filament-vectors.json';
 
 export type MechanicalDesign = {
@@ -265,8 +266,13 @@ export async function generateMechanical3mf(design: MechanicalDesign, readFont: 
       const cutter = own(own(cut.extrude(height)).translate([0, 0, -1]));
       exportPart('Mechanical Base', design.base, own(Solid.difference(stock, cutter)));
     } else {
-      parts.push({ ...base, name: 'V3 Mechanical Base', color: design.base, filament: 1 });
+      parts.push({ ...base, name: 'Mechanical Base', color: design.base, filament: 1 });
     }
+    const eyeletLeft = Math.min(...base.vertices.map(([x]) => x)) - 0.8;
+    const eyeletRight = mechanicalBaseLeft(design.keys.length) + 0.3;
+    const eyeletBlocker = own(own(Solid.cube([eyeletRight - eyeletLeft, 9.6, mechanicalEyelet.top + 0.2]))
+      .translate([eyeletLeft, -4.8, 0]));
+    exportPart('Exclude support under curved eyelet', design.base, eyeletBlocker, 'support_blocker');
     const skirt = own(new Solid(new Mesh(mechanicalKeycapShell(capHeight, cavityHeight))));
     const cross = own(Section.union(box(crossSpan, crossArm), box(crossArm, crossSpan)));
     const boss = own(Section.difference(own(Section.circle(outerDiameter / 2, 64)), cross));
