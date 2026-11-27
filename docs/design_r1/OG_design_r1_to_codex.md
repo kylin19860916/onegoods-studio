@@ -1,3 +1,5 @@
+> ⚠️ 已被 docs/design_r2 取代（2026-11-27）：请改读 `docs/design_r2/OG_design_r2_to_codex.md`。
+
 # OG-design-r1：OneGoods Studio 品牌化重新设计（给 MacBook 上的 Codex）
 
 > 由 Alpha 2026-11-27 整理，同日按 Ken 的决定改版（旧版备份 `OG_design_r1_to_codex.md.bak-20261127`）。依据：同目录 `DESIGN_AUDIT.md`（逐页量测，截图在 `audit/`）、`brand_directions/`（两个品牌方向稿）、`PHOTO_BRIEF.md`（Ken 的拍摄规范与全站氛围图清单）、`../PLAN_draft.md`、`../OG1_to_codex.md`（上一轮）。
