@@ -1226,7 +1226,7 @@ body[data-page="product"] > main.section { padding-block-start: 0; min-height: 1
 }
 
 .r2-hero-scene { overflow: hidden; }
-.r2-hero-backdrop { object-position: center 58%; }
+.r2-hero-backdrop { object-position: 82% 58%; }
 .r2-footer-lockup { display: flex; align-items: center; gap: 5px; }
 .r2-footer-symbol { width: 42px; height: 42px; object-fit: contain; }
 .r2-footer-wordmark { width: auto; height: 26px; }
