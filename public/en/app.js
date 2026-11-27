@@ -72,9 +72,63 @@ function detail(id){
   }
 }
 let galleryPhotos=[];
-function renderFullProduct(){if(!qs('#full-product'))return;const id=new URLSearchParams(location.search).get('id');const p=products.find(p=>p.id===(id==='good-key'?'keynade-mx':id)&&p.kind==='physical');if(!p){qs('#full-product').innerHTML='<h1>Product not found.</h1><p>Please return to physical goods and choose another item.</p><a class="button yellow" href="products.html">Browse physical goods</a>';return;}
- document.title=p.name+' — One Goods Studio';const meta=document.querySelector('meta[name="description"]');if(meta)meta.content=p.desc||p.name;
- galleryPhotos=p.images||[];const photo=galleryPhotos[0];qs('#full-product').innerHTML=`<div class="keynade-intro"><div class="keynade-gallery">${photo?`<figure><img id="keynade-main-photo" src="${escapeHtml(assetUrl(photo.url))}" alt="${escapeHtml(p.name)} Product photo"></figure><div class="gallery-thumbs" role="group" aria-label="Product photo views">${galleryPhotos.map((im,i)=>`<button data-gallery-index="${i}" aria-label="${escapeHtml(p.name)} Product view ${i+1}" aria-pressed="${i===0}"><img src="${escapeHtml(assetUrl(im.url))}" alt="" loading="lazy"></button>`).join('')}</div>`:`<div class="product-art" style="background:${escapeHtml(p.color)}">${art(p)}</div>`}</div><div class="keynade-summary">${p.en?`<span class="eyebrow">${escapeHtml(p.en)}</span>`:''}<h1>${escapeHtml(p.name)}</h1>${p.keynadeFacts?'<p class="keynade-subtitle">12-Key Mechanical Fidget Grenade</p>':''}${paragraphs(p.detail)}${p.keynadeFacts?'<div class="keynade-facts"><span><b>12</b>Independent keys</span><span><b>MX</b>Switch format</span><span><b>1</b>Ball chain included</span></div>':''}${priceLabel(p)?`<p class="keynade-price">${priceLabel(p)}</p>`:''}${p.included ? paragraphs(p.included) : ''}${buyAction(p)}<p class="product-contact">Customer service <a href="mailto:aka051118@gmail.com">aka051118@gmail.com</a> · <a href="tel:0916662580">0916662580</a></p><a class="text-button" href="purchase-policy.html">Buying and licensing</a><p class="product-delivery">Check delivery options and shipping fees at checkout on Shopee or MyShip.</p></div></div>${p.keynadeFacts||p.desc||p.specs.length?`<section class="keynade-details">${p.keynadeFacts||p.desc?`<div><span class="eyebrow">THE LITTLE DETAILS</span><h2>${p.keynadeFacts?'A little more feel in every press.':'About this product'}</h2>${p.keynadeFacts?'<p>The twelve large geometric panels are independent mechanical keys. The top pin pulls out and slides back in as a decorative, hands-on detail.</p><p>Visible 3D print layers and gold sparkle are part of the real object. Sound and feel depend on the installed switches.</p>':paragraphs(p.desc)}</div>`:''}${p.specs.length?`<div class="keynade-specs"><h2>Specifications and included items</h2><dl>${(p.specs||[]).map(s=>`<div><dt>${escapeHtml(s.label)}</dt><dd>${escapeHtml(s.value)}</dd></div>`).join('')}</dl></div>`:''}</section>`:''}${p.keynadeFacts?'<section class="keynade-notes"><h2>About this little object</h2><p>The top pin is decorative. Small panels are fixed; twelve large panels can be pressed. Scene props in the photographs are not included.</p><p>Product photos are AI-assisted to harmonize color, lighting and backgrounds.</p></section>':''}`;}
+function renderFullProduct(){
+ const target=qs('#full-product');
+ if(!target)return;
+ const id=new URLSearchParams(location.search).get('id');
+ const product=products.find(p=>p.id===(id==='good-key'?'keynade-mx':id)&&p.kind==='physical');
+ if(!product){target.innerHTML='<h1>Product not found.</h1><a class="btn-secondary" href="products.html">Browse physical goods</a>';return;}
+ const name=escapeHtml(product.name);
+ document.title=product.name+' — One Goods Studio';
+ const meta=document.querySelector('meta[name="description"]');
+ if(meta)meta.content=product.desc||product.name;
+ galleryPhotos=product.images||[];
+ const photo=galleryPhotos[0];
+ const stepIcon=plus=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M5 12h14 ${plus?'M12 5v14':''}"/></svg>`;
+ const gallery=photo?`<figure><img id="keynade-main-photo" src="${escapeHtml(assetUrl(photo.url))}" alt="${name} Product photo"></figure>
+   <div class="gallery-thumbs" role="group" aria-label="Product photo views">${galleryPhotos.map((im,i)=>`<button type="button" data-gallery-index="${i}" aria-label="${name} Product view ${i+1}" aria-pressed="${i===0}"><img src="${escapeHtml(assetUrl(im.url))}" alt="" loading="lazy"></button>`).join('')}</div>`:
+   `<div class="r2-product-art">${art(product)}</div>`;
+ const purchase=buyAction(product);
+ const platformLinks=purchase.replace(/<div class="store-order-entry">[\s\S]*?<\/div>/,'');
+ const checkout=`checkout.html?product=${encodeURIComponent(product.id)}`;
+ const buying=canOrder(product)?`<div class="r2-buy-row"><div class="r2-quantity">
+   <button type="button" data-quantity="-1" aria-label="Decrease quantity">${stepIcon(false)}</button>
+   <input id="r2-quantity" type="number" min="1" max="10" value="1" aria-label="Quantity">
+   <button type="button" data-quantity="1" aria-label="Increase quantity">${stepIcon(true)}</button></div>
+   <a class="btn-primary" id="r2-official-order" href="${checkout}&amp;qty=1">Order on OGS</a></div>`:'';
+ const facts=product.keynadeFacts?'<div class="keynade-facts"><span><b>12</b>Independent keys</span><span><b>MX</b>Switch format</span><span><b>1</b>Ball chain included</span></div>':'';
+ const detail=product.keynadeFacts?'<p>The twelve large geometric panels are independent mechanical keys. The top pin pulls out and slides back in as a decorative, hands-on detail.</p><p>Visible 3D print layers and gold sparkle are part of the real object. Sound and feel depend on the installed switches.</p>':'';
+ const notes=product.keynadeFacts?'<p>顶部插销为装饰零件；小面板为固定造型件，12 个大面板可Clickers。实拍中的场景物件不属于商品内容。</p>':'';
+ const specs=product.specs.length?`<dl>${product.specs.map(s=>`<div><dt>${escapeHtml(s.label)}</dt><dd>${escapeHtml(s.value)}</dd></div>`).join('')}</dl>`:'';
+ const other=products.filter(p=>p.kind==='physical'&&!p.isPlaceholder&&p.id!==product.id).slice(0,3);
+ target.innerHTML=`<nav class="r2-breadcrumb" aria-label="Breadcrumb"><a href="products.html">Goods</a><span aria-hidden="true">/</span><span>${name}</span></nav>
+   <div class="keynade-intro r2-product-layout"><div class="keynade-gallery">${gallery}${photo?'<p class="r2-photo-caption">Product photos are real. Backgrounds have been standardized.</p>':''}</div>
+   <div class="keynade-summary"><h1>${name}</h1>${product.keynadeFacts?'<p class="keynade-subtitle">12-Key Mechanical Fidget Grenade</p>':''}
+   ${priceLabel(product)?`<p class="keynade-price">${priceLabel(product)}</p>`:''}
+   ${paragraphs(product.detail||product.desc)}${facts}${buying}
+   <div class="r2-product-shipping"><p>7-ELEVEN Convenience-store pickup <span data-shipping="pickup"></span> · Black Cat home delivery <span data-shipping="home"></span></p><p>Request a return within 7 days of receipt <a href="purchase-policy.html">Returns policy</a></p></div>
+   ${platformLinks}
+   <div class="r2-product-details">
+     <details><summary>About this product</summary>${detail||paragraphs(product.desc)}${notes}</details>
+     ${specs||product.included?`<details><summary>Specifications and included items</summary>${specs}${paragraphs(product.included)}</details>`:''}
+     <details><summary>Shipping and returns</summary><p>Check delivery options and shipping fees at checkout on Shopee or MyShip.</p><a class="btn-text" href="purchase-policy.html">Purchasing and after-sales</a></details>
+   </div></div></div>
+   <section class="r2-product-custom"><div><h2>Want one with your name on it?</h2>
+   <label for="r2-product-name">Enter a name first</label><input id="r2-product-name" data-custom-name autocomplete="off">
+   <a class="btn-secondary" href="custom.html" data-custom-link>Start customizing</a></div>
+   <figure><img src="${assetUrl('custom-name-clicker-studio.webp')}" alt="Customize a clicker（Illustration）" loading="lazy"><figcaption>Illustration</figcaption></figure></section>
+   ${other.length?`<section class="r2-block r2-related"><div class="r2-section-head"><h2>More goods</h2><a href="products.html" class="btn-text">View all goods</a></div><div class="r2-product-grid">${other.map(productCard).join('')}</div></section>`:''}`;
+ renderShippingFees();
+ const quantity=qs('#r2-quantity');
+ const order=qs('#r2-official-order');
+ if(quantity&&order){
+   const clamp=value=>Number.isFinite(value)?Math.max(1,Math.min(10,Math.trunc(value))):1;
+   const sync=value=>{quantity.value=String(clamp(value));order.href=checkout+'&qty='+quantity.value;};
+   quantity.addEventListener('change',()=>sync(quantity.valueAsNumber));
+   order.addEventListener('click',()=>sync(quantity.valueAsNumber));
+   target.querySelectorAll('[data-quantity]').forEach(button=>button.addEventListener('click',()=>sync((quantity.valueAsNumber||1)+Number(button.dataset.quantity))));
+ }
+}
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-open-policy'))qs('#info-dialog')?.showModal();if(b.dataset.filter)setFilter(b.dataset.filter);if(b.dataset.detail)detail(b.dataset.detail);if(b.hasAttribute('data-close'))b.closest('dialog').close();if(b.dataset.galleryIndex!==undefined){const i=Number(b.dataset.galleryIndex),p=galleryPhotos[i];if(!p)return;qs('#keynade-main-photo').src=assetUrl(p.url);qs('#keynade-main-photo').alt=document.title.split(' — ')[0];document.querySelectorAll('[data-gallery-index]').forEach(x=>x.setAttribute('aria-pressed',x===b));}});
 if(qs('#open-info'))qs('#open-info').onclick=()=>qs('#info-dialog').showModal();
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}}));
@@ -128,6 +182,8 @@ function renderStoreCheckout(){
  const price=Number(product.price);
  const form=qs('#store-order-form');
  const quantity=qs('#store-quantity');
+ const initialQuantity=checkoutUrl.searchParams.get('qty')||'';
+ if(!custom&&!test&&/^(?:[1-9]|10)$/.test(initialQuantity))quantity.value=initialQuantity;
  const delivery=qs('#store-delivery');
  const pickupCarrier='UNIMARTC2C';
  const store=qs('#store-pickup-fields');

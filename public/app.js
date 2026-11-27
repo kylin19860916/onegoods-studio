@@ -72,9 +72,63 @@ function detail(id){
   }
 }
 let galleryPhotos=[];
-function renderFullProduct(){if(!qs('#full-product'))return;const id=new URLSearchParams(location.search).get('id');const p=products.find(p=>p.id===(id==='good-key'?'keynade-mx':id)&&p.kind==='physical');if(!p){qs('#full-product').innerHTML='<h1>找不到這件商品。</h1><p>請返回實體商品頁，重新選擇。</p><a class="button yellow" href="products.html">瀏覽實體商品</a>';return;}
- document.title=p.name+' — One Goods Studio';const meta=document.querySelector('meta[name="description"]');if(meta)meta.content=p.desc||p.name;
- galleryPhotos=p.images||[];const photo=galleryPhotos[0];qs('#full-product').innerHTML=`<div class="keynade-intro"><div class="keynade-gallery">${photo?`<figure><img id="keynade-main-photo" src="${escapeHtml(assetUrl(photo.url))}" alt="${escapeHtml(p.name)} 商品實拍"></figure><div class="gallery-thumbs" role="group" aria-label="商品實拍視角">${galleryPhotos.map((im,i)=>`<button data-gallery-index="${i}" aria-label="${escapeHtml(p.name)} 商品視角 ${i+1}" aria-pressed="${i===0}"><img src="${escapeHtml(assetUrl(im.url))}" alt="" loading="lazy"></button>`).join('')}</div>`:`<div class="product-art" style="background:${escapeHtml(p.color)}">${art(p)}</div>`}</div><div class="keynade-summary">${p.en?`<span class="eyebrow">${escapeHtml(p.en)}</span>`:''}<h1>${escapeHtml(p.name)}</h1>${p.keynadeFacts?'<p class="keynade-subtitle">12 鍵機械按壓手雷</p>':''}${paragraphs(p.detail)}${p.keynadeFacts?'<div class="keynade-facts"><span><b>12</b>獨立按鍵</span><span><b>MX</b>機械鍵軸結構</span><span><b>1</b>金屬珠鏈隨附</span></div>':''}${priceLabel(p)?`<p class="keynade-price">${priceLabel(p)}</p>`:''}${p.included ? paragraphs(p.included) : ''}${buyAction(p)}<p class="product-contact">客服聯絡 <a href="mailto:aka051118@gmail.com">aka051118@gmail.com</a> · <a href="tel:0916662580">0916662580</a></p><a class="text-button" href="purchase-policy.html">購買與授權說明</a><p class="product-delivery">平台訂單的配送方式與運費，請在蝦皮或賣貨便結帳時確認。</p></div></div>${p.keynadeFacts||p.desc||p.specs.length?`<section class="keynade-details">${p.keynadeFacts||p.desc?`<div><span class="eyebrow">THE LITTLE DETAILS</span><h2>${p.keynadeFacts?'讓每一次按壓，都有手感。':'商品介紹'}</h2>${p.keynadeFacts?'<p>幾何外殼上的 12 個大面板，都是可獨立按壓的機械按鍵。頂部插銷可以拔出、插回，是造型與把玩的裝飾細節。</p><p>3D 列印的層紋與金色閃點，保留在真實物件的表面。按壓聲音與手感依搭配的軸體而定。</p>':paragraphs(p.desc)}</div>`:''}${p.specs.length?`<div class="keynade-specs"><h2>規格與隨附內容</h2><dl>${(p.specs||[]).map(s=>`<div><dt>${escapeHtml(s.label)}</dt><dd>${escapeHtml(s.value)}</dd></div>`).join('')}</dl></div>`:''}</section>`:''}${p.keynadeFacts?'<section class="keynade-notes"><h2>關於這件小物</h2><p>頂部插銷為裝飾零件；小面板為固定造型件，12 個大面板可按壓。實拍中的場景物件不屬於隨附內容。</p><p>商品照片經過 AI 輔助統一色調、光線與背景。</p></section>':''}`;}
+function renderFullProduct(){
+ const target=qs('#full-product');
+ if(!target)return;
+ const id=new URLSearchParams(location.search).get('id');
+ const product=products.find(p=>p.id===(id==='good-key'?'keynade-mx':id)&&p.kind==='physical');
+ if(!product){target.innerHTML='<h1>找不到這件商品。</h1><a class="btn-secondary" href="products.html">瀏覽實體商品</a>';return;}
+ const name=escapeHtml(product.name);
+ document.title=product.name+' — One Goods Studio';
+ const meta=document.querySelector('meta[name="description"]');
+ if(meta)meta.content=product.desc||product.name;
+ galleryPhotos=product.images||[];
+ const photo=galleryPhotos[0];
+ const stepIcon=plus=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M5 12h14 ${plus?'M12 5v14':''}"/></svg>`;
+ const gallery=photo?`<figure><img id="keynade-main-photo" src="${escapeHtml(assetUrl(photo.url))}" alt="${name} 商品實拍"></figure>
+   <div class="gallery-thumbs" role="group" aria-label="商品實拍視角">${galleryPhotos.map((im,i)=>`<button type="button" data-gallery-index="${i}" aria-label="${name} 商品視角 ${i+1}" aria-pressed="${i===0}"><img src="${escapeHtml(assetUrl(im.url))}" alt="" loading="lazy"></button>`).join('')}</div>`:
+   `<div class="r2-product-art">${art(product)}</div>`;
+ const purchase=buyAction(product);
+ const platformLinks=purchase.replace(/<div class="store-order-entry">[\s\S]*?<\/div>/,'');
+ const checkout=`checkout.html?product=${encodeURIComponent(product.id)}`;
+ const buying=canOrder(product)?`<div class="r2-buy-row"><div class="r2-quantity">
+   <button type="button" data-quantity="-1" aria-label="減少數量">${stepIcon(false)}</button>
+   <input id="r2-quantity" type="number" min="1" max="10" value="1" aria-label="數量">
+   <button type="button" data-quantity="1" aria-label="增加數量">${stepIcon(true)}</button></div>
+   <a class="btn-primary" id="r2-official-order" href="${checkout}&amp;qty=1">官網下單</a></div>`:'';
+ const facts=product.keynadeFacts?'<div class="keynade-facts"><span><b>12</b>獨立按鍵</span><span><b>MX</b>機械鍵軸結構</span><span><b>1</b>金屬珠鏈隨附</span></div>':'';
+ const detail=product.keynadeFacts?'<p>幾何外殼上的 12 個大面板，都是可獨立按壓的機械按鍵。頂部插銷可以拔出、插回，是造型與把玩的裝飾細節。</p><p>3D 列印的層紋與金色閃點，保留在真實物件的表面。按壓聲音與手感依搭配的軸體而定。</p>':'';
+ const notes=product.keynadeFacts?'<p>顶部插销为装饰零件；小面板为固定造型件，12 个大面板可按壓。实拍中的场景物件不属于商品内容。</p>':'';
+ const specs=product.specs.length?`<dl>${product.specs.map(s=>`<div><dt>${escapeHtml(s.label)}</dt><dd>${escapeHtml(s.value)}</dd></div>`).join('')}</dl>`:'';
+ const other=products.filter(p=>p.kind==='physical'&&!p.isPlaceholder&&p.id!==product.id).slice(0,3);
+ target.innerHTML=`<nav class="r2-breadcrumb" aria-label="麵包屑"><a href="products.html">好物</a><span aria-hidden="true">/</span><span>${name}</span></nav>
+   <div class="keynade-intro r2-product-layout"><div class="keynade-gallery">${gallery}${photo?'<p class="r2-photo-caption">商品照片為實拍，背景經統一處理。</p>':''}</div>
+   <div class="keynade-summary"><h1>${name}</h1>${product.keynadeFacts?'<p class="keynade-subtitle">12 鍵機械按壓手雷</p>':''}
+   ${priceLabel(product)?`<p class="keynade-price">${priceLabel(product)}</p>`:''}
+   ${paragraphs(product.detail||product.desc)}${facts}${buying}
+   <div class="r2-product-shipping"><p>7-ELEVEN 超商取貨 <span data-shipping="pickup"></span> · 黑貓宅配 <span data-shipping="home"></span></p><p>收到商品 7 天內可申請退貨 <a href="purchase-policy.html">售後說明</a></p></div>
+   ${platformLinks}
+   <div class="r2-product-details">
+     <details><summary>商品介紹</summary>${detail||paragraphs(product.desc)}${notes}</details>
+     ${specs||product.included?`<details><summary>規格與隨附內容</summary>${specs}${paragraphs(product.included)}</details>`:''}
+     <details><summary>配送與退換</summary><p>平台訂單的配送方式與運費，請在蝦皮或賣貨便結帳時確認。</p><a class="btn-text" href="purchase-policy.html">購買與售後說明</a></details>
+   </div></div></div>
+   <section class="r2-product-custom"><div><h2>也想要一個有你名字的？</h2>
+   <label for="r2-product-name">先輸入名字</label><input id="r2-product-name" data-custom-name autocomplete="off">
+   <a class="btn-secondary" href="custom.html" data-custom-link>開始客製</a></div>
+   <figure><img src="${assetUrl('custom-name-clicker-studio.webp')}" alt="客製按壓款（示意）" loading="lazy"><figcaption>示意</figcaption></figure></section>
+   ${other.length?`<section class="r2-block r2-related"><div class="r2-section-head"><h2>其他好物</h2><a href="products.html" class="btn-text">看全部好物</a></div><div class="r2-product-grid">${other.map(productCard).join('')}</div></section>`:''}`;
+ renderShippingFees();
+ const quantity=qs('#r2-quantity');
+ const order=qs('#r2-official-order');
+ if(quantity&&order){
+   const clamp=value=>Number.isFinite(value)?Math.max(1,Math.min(10,Math.trunc(value))):1;
+   const sync=value=>{quantity.value=String(clamp(value));order.href=checkout+'&qty='+quantity.value;};
+   quantity.addEventListener('change',()=>sync(quantity.valueAsNumber));
+   order.addEventListener('click',()=>sync(quantity.valueAsNumber));
+   target.querySelectorAll('[data-quantity]').forEach(button=>button.addEventListener('click',()=>sync((quantity.valueAsNumber||1)+Number(button.dataset.quantity))));
+ }
+}
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-open-policy'))qs('#info-dialog')?.showModal();if(b.dataset.filter)setFilter(b.dataset.filter);if(b.dataset.detail)detail(b.dataset.detail);if(b.hasAttribute('data-close'))b.closest('dialog').close();if(b.dataset.galleryIndex!==undefined){const i=Number(b.dataset.galleryIndex),p=galleryPhotos[i];if(!p)return;qs('#keynade-main-photo').src=assetUrl(p.url);qs('#keynade-main-photo').alt=document.title.split(' — ')[0];document.querySelectorAll('[data-gallery-index]').forEach(x=>x.setAttribute('aria-pressed',x===b));}});
 if(qs('#open-info'))qs('#open-info').onclick=()=>qs('#info-dialog').showModal();
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}}));
@@ -128,6 +182,8 @@ function renderStoreCheckout(){
  const price=Number(product.price);
  const form=qs('#store-order-form');
  const quantity=qs('#store-quantity');
+ const initialQuantity=checkoutUrl.searchParams.get('qty')||'';
+ if(!custom&&!test&&/^(?:[1-9]|10)$/.test(initialQuantity))quantity.value=initialQuantity;
  const delivery=qs('#store-delivery');
  const pickupCarrier='UNIMARTC2C';
  const store=qs('#store-pickup-fields');
