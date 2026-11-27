@@ -36,34 +36,42 @@ export function setupFontPicker(select) {
     selected.replaceChildren(sample(option));
     radios.forEach(input => { input.checked = input.value === select.value; });
   }
-  for (const group of select.querySelectorAll('optgroup:not([hidden])')) {
-    const field = document.createElement('fieldset');
-    const legend = document.createElement('legend');
-    legend.textContent = group.label;
-    field.append(legend);
-    for (const option of group.children) {
-      const label = document.createElement('label');
-      const input = document.createElement('input');
-      input.type = 'radio';
-      input.name = select.name + 'PreviewChoice';
-      input.value = option.value;
-      input.setAttribute('aria-label', option.textContent);
-      radios.push(input);
-      const badge = document.createElement('span');
-      badge.className = 'keyring-font-language';
-      badge.textContent = option.dataset.sample ? 'English' : '中文';
-      label.append(input, sample(option), badge);
-      field.append(label);
-      input.addEventListener('input', event => {
-        event.stopPropagation();
-        select.value = input.value;
-        update();
-        picker.open = false;
-        summary.focus();
-        select.dispatchEvent(new Event('input', { bubbles: true }));
-      });
+  function refresh(allowed) {
+    menu.replaceChildren();
+    radios.length = 0;
+    picker.open = false;
+    for (const group of select.querySelectorAll('optgroup:not([hidden])')) {
+      const options = [...group.children].filter(option => allowed ? allowed.has(option.value) : !option.hidden);
+      if (!options.length) continue;
+      const field = document.createElement('fieldset');
+      const legend = document.createElement('legend');
+      legend.textContent = group.label;
+      field.append(legend);
+      for (const option of options) {
+        const label = document.createElement('label');
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = select.name + 'PreviewChoice';
+        input.value = option.value;
+        input.setAttribute('aria-label', option.textContent);
+        radios.push(input);
+        const badge = document.createElement('span');
+        badge.className = 'keyring-font-language';
+        badge.textContent = option.dataset.sample ? 'English' : '中文';
+        label.append(input, sample(option), badge);
+        field.append(label);
+        input.addEventListener('input', event => {
+          event.stopPropagation();
+          select.value = input.value;
+          update();
+          picker.open = false;
+          summary.focus();
+          select.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+      }
+      menu.append(field);
     }
-    menu.append(field);
+    update();
   }
   picker.addEventListener('keydown', event => {
     if (event.key === 'Escape') { picker.open = false; summary.focus(); }
@@ -81,5 +89,6 @@ export function setupFontPicker(select) {
   summary.setAttribute('aria-labelledby', caption.id + ' ' + selected.id);
   select.hidden = true;
   select.after(picker);
-  update();
+  refresh();
+  return refresh;
 }

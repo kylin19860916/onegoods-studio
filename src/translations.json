@@ -1,4 +1,20 @@
 {
+  "这组文字无法生成完整底板，请缩短姓名或更换字体。": [
+    "這組文字無法生成完整底板，請縮短姓名或更換字型。",
+    "These letters cannot form a connected base. Shorten the name or choose a different typeface."
+  ],
+  "粉圆": [
+    "粉圓",
+    "Huninn"
+  ],
+  "轮廓颜色": [
+    "輪廓色",
+    "Outline color"
+  ],
+  "data-approximate=\"约\"": [
+    "data-approximate=\"約\"",
+    "data-approximate=\"Approx.\""
+  ],
   "建立 3MF 测试单": [
     "建立 3MF 測試單",
     "Create 3MF test order"

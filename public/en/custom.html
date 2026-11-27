@@ -7,20 +7,22 @@
   <title>Customize — One Goods Studio</title>
   <meta name="description" content="Choose a style, add your name and colours, and preview your design in 3D.">
   <link rel="icon" href="../assets/icon.png">
-  <link rel="stylesheet" href="../style.css?v=5f6ff91cf922">
-  <script src="/custom-types.js?v=5f6ff91cf922" defer></script>
-  <script src="../locale.js?v=5f6ff91cf922" defer></script><script src="../nameplate.js?v=5f6ff91cf922" defer></script>
+  <link rel="stylesheet" href="../style.css?v=50d1bf3db770">
+  <script src="/custom-types.js?v=50d1bf3db770" defer></script>
+  <script src="../locale.js?v=50d1bf3db770" defer></script><script src="../nameplate.js?v=50d1bf3db770" defer></script>
 <link rel="canonical" href="https://onegoods.studio/en/custom.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/custom.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/custom.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/custom.html"><meta property="og:type" content="website"><meta property="og:title" content="Customize — One Goods Studio"><meta property="og:description" content="Choose a style, add your name and colours, and preview your design in 3D."><meta property="og:url" content="https://onegoods.studio/en/custom.html"><meta property="og:image" content="https://onegoods.studio/assets/ogs-sharing.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"></head>
 <body data-page="custom">
 <header class="r2-header on-stage"><a class="brand" href="index.html" aria-label="One Goods Studio home"><img class="brand-icon" src="../assets/ogs-symbol-header.png" width="337" height="330" alt=""><img class="brand-wordmark" src="../assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="Main navigation"><a href="products.html">Goods</a><a href="custom.html" aria-current="page">Customize</a><a href="about.html">About OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="Change language. Current: English">en<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="../custom.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant">繁體中文</a><a href="../zh-cn/custom.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">简体中文</a><a href="../en/custom.html" lang="en" hreflang="en" data-language="en" aria-current="true">English</a></div></details></nav></header>
 <main class="r2-custom">
   <section class="r2-stage on-stage r2-custom-intro">
-    <div class="wrap r2-custom-intro-grid"><div><h1>Wow, that’s mine!</h1><p>Choose a style, add your name and colours, and preview your design in 3D.</p></div><figure><div class="r2-custom-intro-photos"><img src="../assets/custom/render/nameplate_face-1024.webp" alt="名牌款" width="1024" height="1024"><img src="../assets/custom/render/press_face-1024.webp" alt="Clicker" width="1024" height="1024"><img src="../assets/custom/render/articulated_face-1024.webp" alt="Articulated letters" width="1024" height="1024"></div><figcaption>Product images are 3D previews</figcaption></figure></div>
+    <div class="wrap"><h1>Wow, that’s mine!</h1></div>
   </section>
   <div class="r2-custom-tabbar on-stage"><div class="wrap" role="tablist" aria-label="Custom product type" id="r2-type-tabs"></div></div>
   <section class="wrap r2-custom-editor nameplate-page" role="tabpanel" id="r2-custom-panel">
-    <label for="r2-shared-name">Enter a name first</label>
-    <input id="r2-shared-name" autocomplete="off" placeholder="For example, Mia">
+    <div class="r2-shared-field">
+      <label for="r2-shared-name">Enter a name first</label>
+      <input id="r2-shared-name" autocomplete="off" placeholder="For example, Mia">
+    </div>
     <a class="custom-back" href="custom.html">Back to custom styles</a>
   <div class="nameplate-heading" data-keyring-intro="name-tag">
 
@@ -58,14 +60,15 @@
       </div>
       <div class="keyring-preview-meta">
       <p class="plate-view-hint" id="plate-view-hint" hidden>Drag to rotate · Pinch to zoom</p>
-      <p id="plate-preview-status" role="status" data-loading="Generating outlines…" data-error="This text cannot form a complete base. Try a shorter name or a different shape." data-unsupported="This font does not support these characters. Choose another font or name." data-articulated-length="Articulated letters support up to 8 characters, excluding spaces."></p>
+      <p id="plate-preview-status" role="status" data-loading="Generating outlines…" data-error="These letters cannot form a connected base. Shorten the name or choose a different typeface." data-unsupported="This font does not support these characters. Choose another font or name." data-articulated-length="Articulated letters support up to 8 characters, excluding spaces." data-approximate="Approx." data-nameplate-length="This text is too long. Shorten it to continue."></p>
       <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="Model dimensions"></p>
       <figcaption>Design preview. Final colours and dimensions depend on production specifications.</figcaption>
       </div>
     </figure>
     <form id="nameplate-form" class="nameplate-form">
       <section class="keyring-shared" aria-labelledby="keyring-shared-title">
-        <h2 id="keyring-shared-title">Name and font</h2>
+        <p class="r2-shape-label" data-name-tag-only>Letter contour</p>
+        <h2 id="keyring-shared-title" class="r2-editor-heading">Name and font</h2>
         <div class="nameplate-field">
           <label for="plate-name">Name text</label>
           <input id="plate-name" name="nameText" maxlength="20" placeholder="Your name" required pattern=".*\S.*" autocomplete="off">
@@ -79,6 +82,7 @@
               <option value="serif-tc">Noto Serif TC</option>
               <option value="chiron-round">Chiron GoRound TC</option>
               <option value="gensen-tw">GenSen Rounded TW</option>
+              <option value="huninn" hidden>Huninn</option>
               <option value="tw-kai">CNS Traditional Kai</option>
               <option value="genwan-tw">GenWan Mincho TW</option>
             </optgroup>
@@ -92,7 +96,6 @@
               <option value="blackops" data-sample="One Goods">Black Ops One</option>
             </optgroup>
             <optgroup label="Legacy fonts" hidden>
-              <option value="huninn">Huninn</option>
               <option value="sans-sc">Noto Sans SC</option>
               <option value="serif-sc">Noto Serif SC</option>
               <option value="wenkai">LXGW WenKai</option>
@@ -102,46 +105,15 @@
         </div>
       </section>
       <div class="keyring-step-panel">
-      <ol class="keyring-steps" aria-label="Customisation steps" data-name-tag-only>
-        <li aria-current="step"><button type="button" data-keyring-step="0" aria-controls="keyring-design">Style and size</button></li>
-        <li><button type="button" data-keyring-step="1" aria-controls="keyring-colors">Choose colours</button></li>
-      </ol>
-      <section class="keyring-step" id="keyring-design">
-        <h2 tabindex="-1">Style and size</h2>
-        <fieldset class="keyring-shapes">
-          <legend>Shape</legend>
-          <label><input type="radio" name="shape" value="contour" checked>
-            <img class="keyring-template" src="../assets/keyring/contour.svg" alt=""><span>Letter contour</span>
-          </label>
-          <label><input type="radio" name="shape" value="capsule">
-            <img class="keyring-template" src="../assets/keyring/capsule.svg" alt=""><span>Capsule</span>
-          </label>
-          <label><input type="radio" name="shape" value="rounded">
-            <img class="keyring-template" src="../assets/keyring/rounded.svg" alt=""><span>Rounded rectangle</span>
-          </label>
-        </fieldset>
-        <fieldset class="keyring-sizes">
-          <legend>Size</legend>
-          <label><input type="radio" name="size" value="small"><strong>Small</strong><small>50 × 20.8 mm</small></label>
-          <label><input type="radio" name="size" value="medium" checked><strong>Medium</strong><small>65 × 27 mm</small></label>
-          <label><input type="radio" name="size" value="large"><strong>Large</strong><small>80 × 33.2 mm</small></label>
-        </fieldset>
-        <p class="nameplate-order-note">These are maximum dimensions. The contour shape adapts to the lettering.</p>
-      </section>
-      <section class="keyring-step" id="keyring-colors" hidden>
+      <section class="keyring-step" id="keyring-colors">
         <h2 tabindex="-1">Choose colours</h2>
-        <details class="keyring-colour-section" open>
-          <summary><span data-name-tag-only>Outline Color</span><span data-articulated-only hidden>Letter body colour</span><span class="clicker-colour-current" data-keyring-current="baseColor"><i aria-hidden="true"></i><span></span></span></summary>
-          <div class="nameplate-field"><label for="plate-base-color">Outline Color</label><select id="plate-base-color" name="baseColor" data-swatch data-default="#a087c1"></select></div>
+        <details class="keyring-colour-section">
+          <summary><span data-name-tag-only>Outline color</span><span data-articulated-only hidden>Letter body colour</span><span class="clicker-colour-current" data-keyring-current="baseColor"><i aria-hidden="true"></i><span></span></span></summary>
+          <div class="nameplate-field"><label for="plate-base-color">Outline color</label><select id="plate-base-color" name="baseColor" data-swatch data-default="#a087c1"></select></div>
         </details>
-        <details class="keyring-colour-section" open>
-          <summary><span data-name-tag-only>Lettering colour</span><span data-articulated-only hidden>Letter face colour</span><span class="clicker-colour-current" data-keyring-current="textColor"><i aria-hidden="true"></i><span></span></span></summary>
-          <div class="nameplate-field"><label for="plate-text-color">Lettering colour</label><select id="plate-text-color" name="textColor" data-swatch data-default="#fffcf5"></select></div>
-        </details>
-        <label class="keyring-add-color"><input type="checkbox" name="useAccent"> <span data-name-tag-only>Add base colour</span><span data-articulated-only hidden>Add a bottom layer colour</span></label>
-        <details class="keyring-colour-section" id="keyring-accent" open hidden>
-          <summary><span data-name-tag-only>Base colour</span><span data-articulated-only hidden>Bottom layer colour</span><span class="clicker-colour-current" data-keyring-current="accentColor"><i aria-hidden="true"></i><span></span></span></summary>
-          <div class="nameplate-field"><label for="plate-accent-color">Base colour</label><select id="plate-accent-color" name="accentColor" data-swatch data-default="#f2c879"></select></div>
+        <details class="keyring-colour-section">
+          <summary><span data-name-tag-only>Letter face colour</span><span data-articulated-only hidden>Letter face colour</span><span class="clicker-colour-current" data-keyring-current="textColor"><i aria-hidden="true"></i><span></span></span></summary>
+          <div class="nameplate-field"><label for="plate-text-color">Letter face colour</label><select id="plate-text-color" name="textColor" data-swatch data-default="#fffcf5"></select></div>
         </details>
         <template id="plate-swatch-options">
           <option value="#a087c1">Lavender</option>
@@ -152,7 +124,7 @@
           <option value="#efb39e">Peach</option>
         </template>
       </section>
-<section class="r2-order-review"><h3>Order summary</h3><dl data-r2-summary></dl></section><label class="r2-spelling"><input type="checkbox" data-r2-spelling> We’ll make the name as entered. Please check the spelling.</label><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>Dispatch within 3 days</span><p class="nameplate-order-note" id="articulated-price" hidden>Estimated price <strong><output for="plate-name" data-start="From NT$%s"></output></strong></p></div><button class="btn-primary" id="keyring-generate" type="submit" disabled>Confirm design</button></div>
+<details class="r2-order-review"><summary>Order summary</summary><dl data-r2-summary></dl></details><label class="r2-spelling"><input type="checkbox" data-r2-spelling> We’ll make the name as entered. Please check the spelling.</label><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>Dispatch within 3 days</span><p class="nameplate-order-note" id="articulated-price" hidden>Estimated price <strong><output for="plate-name" data-start="From NT$%s"></output></strong></p></div><button class="btn-primary" id="keyring-generate" type="submit" disabled>Confirm design</button></div>
         <div class="nameplate-actions">
           <a class="button cream" id="plate-download" download="OGS-keyring-preview.png" hidden>Download PNG</a>
           <button class="button yellow" id="plate-payment" type="button" disabled hidden>Proceed to payment</button>
@@ -177,7 +149,6 @@
     </figure>
     <form class="nameplate-form" id="clicker-form">
       <div class="keyring-step-panel">
-        <div><h2>Name clicker</h2></div>
         <fieldset class="clicker-style-picker">
           <legend>Clicker style</legend>
           <label><input type="radio" name="clickerStyle" value="mechanical" checked> Keyboard keys</label>
@@ -218,7 +189,7 @@
             </template>
           </div>
           <section class="clicker-colors">
-            <details class="keyring-colour-section" open>
+            <details class="keyring-colour-section">
               <summary><span>Base colour</span><span class="clicker-colour-current" data-clicker-current="base"><i aria-hidden="true"></i><span></span></span></summary>
               <div class="nameplate-field"><label for="clicker-base">Base colour</label><select id="clicker-base" name="base"></select></div>
             </details>
@@ -244,23 +215,19 @@
                 <div class="nameplate-field clicker-colour-menu"><label for="clicker-name-fill">Inner colour</label><select id="clicker-name-fill" name="nameFill"></select></div>
               </details>
             </div>
-            <details class="keyring-colour-section" open>
+            <details class="keyring-colour-section">
               <summary><span>Border colour</span><span class="clicker-colour-current" data-clicker-current="nameBorder"><i aria-hidden="true"></i><span></span></span></summary>
               <div class="nameplate-field"><label for="clicker-name-border">Border colour</label><select id="clicker-name-border" name="nameBorder"></select></div>
             </details>
           </section>
         </div>
-        <section class="keyring-config-card clicker-order-test" id="connected-order" hidden>
-          <h3>Item price</h3>
-          <output id="connected-order-price" aria-live="polite"></output>
-
-        </section><section class="r2-order-review"><h3>Order summary</h3><dl data-r2-summary></dl></section><label class="r2-spelling"><input type="checkbox" data-r2-spelling> We’ll make the name as entered. Please check the spelling.</label>
-      </div><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>Dispatch within 3 days</span><p class="r2-press-start">From NT$80</p></div><div class="r2-press-actions"><button class="btn-primary" id="connected-order-start" type="button" disabled>Continue to checkout</button><div class="design-contact" id="design-contact" hidden><button type="button" class="btn-primary" id="clicker-contact-design">Confirm design</button><p id="design-contact-status" role="status"></p></div></div></div>
+        <details class="r2-order-review"><summary>Order summary</summary><dl data-r2-summary></dl></details><label class="r2-spelling"><input type="checkbox" data-r2-spelling> We’ll make the name as entered. Please check the spelling.</label>
+      </div><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>Dispatch within 3 days</span><p class="r2-press-start">From NT$80</p><p id="connected-order" hidden>Item price <strong><output id="connected-order-price" aria-live="polite"></output></strong></p></div><div class="r2-press-actions"><button class="btn-primary" id="connected-order-start" type="button" disabled>Continue to checkout</button><div class="design-contact" id="design-contact" hidden><button type="button" class="btn-primary" id="clicker-contact-design">Confirm design</button><p id="design-contact-status" role="status"></p></div></div></div>
     </form>
   </div>
   </section>
   <section class="wrap r2-block r2-custom-guide">
-    <h2>Compare styles</h2><table id="r2-custom-comparison"></table>
+    <h2>Compare styles</h2><figure><div class="r2-custom-guide-photos"><img src="../assets/custom/render/nameplate_face-1024.webp" alt="名牌款" width="1024" height="1024"><img src="../assets/custom/render/press_face-1024.webp" alt="Clicker" width="1024" height="1024"><img src="../assets/custom/render/articulated_face-1024.webp" alt="Articulated letters" width="1024" height="1024"></div><figcaption>Product images are 3D previews</figcaption></figure><table id="r2-custom-comparison"></table>
     <div class="r2-custom-steps"><h2>Start with a name</h2><ol><li>Choose a style</li><li>Enter a name</li><li>Choose typeface and colors</li><li>Review the 3D preview</li></ol></div>
     <h2>常见问题</h2>
     <details><summary>When do custom orders ship?</summary><p>Custom orders ship within 3 days.</p></details>

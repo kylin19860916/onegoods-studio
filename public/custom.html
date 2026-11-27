@@ -7,20 +7,22 @@
   <title>客製 — One Goods Studio</title>
   <meta name="description" content="選擇想客製的款式，加入名字和配色，即時預覽你的 3D 作品。">
   <link rel="icon" href="assets/icon.png">
-  <link rel="stylesheet" href="style.css?v=5f6ff91cf922">
-  <script src="/custom-types.js?v=5f6ff91cf922" defer></script>
-  <script src="locale.js?v=5f6ff91cf922" defer></script><script src="nameplate.js?v=5f6ff91cf922" defer></script>
+  <link rel="stylesheet" href="style.css?v=50d1bf3db770">
+  <script src="/custom-types.js?v=50d1bf3db770" defer></script>
+  <script src="locale.js?v=50d1bf3db770" defer></script><script src="nameplate.js?v=50d1bf3db770" defer></script>
 <link rel="canonical" href="https://onegoods.studio/custom.html"><link rel="alternate" hreflang="zh-Hant" href="https://onegoods.studio/custom.html"><link rel="alternate" hreflang="zh-Hans" href="https://onegoods.studio/zh-cn/custom.html"><link rel="alternate" hreflang="en" href="https://onegoods.studio/en/custom.html"><meta property="og:type" content="website"><meta property="og:title" content="客製 — One Goods Studio"><meta property="og:description" content="選擇想客製的款式，加入名字和配色，即時預覽你的 3D 作品。"><meta property="og:url" content="https://onegoods.studio/custom.html"><meta property="og:image" content="https://onegoods.studio/assets/ogs-sharing.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"></head>
 <body data-page="custom">
 <header class="r2-header on-stage"><a class="brand" href="index.html" aria-label="One Goods Studio 首頁"><img class="brand-icon" src="assets/ogs-symbol-header.png" width="337" height="330" alt=""><img class="brand-wordmark" src="assets/ogs-wordmark-header.png" alt="OGS"></a><nav aria-label="主要導覽"><a href="products.html">好物</a><a href="custom.html" aria-current="page">客製</a><a href="about.html">關於 OGS</a></nav><nav class="language-switch" aria-label="Language"><details class="language-menu"><summary aria-label="切換語言，目前：繁體中文">繁<span class="language-chevron" aria-hidden="true"></span></summary><div class="language-options"><a href="custom.html" lang="zh-Hant" hreflang="zh-Hant" data-language="zh-Hant" aria-current="true">繁體中文</a><a href="zh-cn/custom.html" lang="zh-Hans" hreflang="zh-Hans" data-language="zh-Hans">簡體中文</a><a href="en/custom.html" lang="en" hreflang="en" data-language="en">English</a></div></details></nav></header>
 <main class="r2-custom">
   <section class="r2-stage on-stage r2-custom-intro">
-    <div class="wrap r2-custom-intro-grid"><div><h1>哇塞，這是我的！</h1><p>選擇想客製的款式，加入名字和配色，即時預覽你的 3D 作品。</p></div><figure><div class="r2-custom-intro-photos"><img src="assets/custom/render/nameplate_face-1024.webp" alt="名牌款" width="1024" height="1024"><img src="assets/custom/render/press_face-1024.webp" alt="按壓款" width="1024" height="1024"><img src="assets/custom/render/articulated_face-1024.webp" alt="關節字塊" width="1024" height="1024"></div><figcaption>商品圖為 3D 預覽渲染</figcaption></figure></div>
+    <div class="wrap"><h1>哇塞，這是我的！</h1></div>
   </section>
   <div class="r2-custom-tabbar on-stage"><div class="wrap" role="tablist" aria-label="客製型別" id="r2-type-tabs"></div></div>
   <section class="wrap r2-custom-editor nameplate-page" role="tabpanel" id="r2-custom-panel">
-    <label for="r2-shared-name">先輸入名字</label>
-    <input id="r2-shared-name" autocomplete="off" placeholder="例如 Mia、小飛">
+    <div class="r2-shared-field">
+      <label for="r2-shared-name">先輸入名字</label>
+      <input id="r2-shared-name" autocomplete="off" placeholder="例如 Mia、小飛">
+    </div>
     <a class="custom-back" href="custom.html">返回客製款式</a>
   <div class="nameplate-heading" data-keyring-intro="name-tag">
 
@@ -58,14 +60,15 @@
       </div>
       <div class="keyring-preview-meta">
       <p class="plate-view-hint" id="plate-view-hint" hidden>拖曳旋轉 · 捏合縮放</p>
-      <p id="plate-preview-status" role="status" data-loading="正在生成輪廓…" data-error="這組文字無法生成完整底板，請縮短姓名或換一種造型。" data-unsupported="所選字型不支援這些文字，請更換字型或姓名。" data-articulated-length="關節字塊最多 8 字，空格不計。"></p>
+      <p id="plate-preview-status" role="status" data-loading="正在生成輪廓…" data-error="這組文字無法生成完整底板，請縮短姓名或更換字型。" data-unsupported="所選字型不支援這些文字，請更換字型或姓名。" data-articulated-length="關節字塊最多 8 字，空格不計。" data-approximate="約" data-nameplate-length="文字超過長度上限，請縮短後再試。"></p>
       <p class="keyring-dimensions" id="keyring-dimensions" aria-live="polite" data-label="模型尺寸"></p>
       <figcaption>畫面為設計示意，實際成品顏色與尺寸依製作確認為準。</figcaption>
       </div>
     </figure>
     <form id="nameplate-form" class="nameplate-form">
       <section class="keyring-shared" aria-labelledby="keyring-shared-title">
-        <h2 id="keyring-shared-title">姓名與字型</h2>
+        <p class="r2-shape-label" data-name-tag-only>隨字輪廓</p>
+        <h2 id="keyring-shared-title" class="r2-editor-heading">姓名與字型</h2>
         <div class="nameplate-field">
           <label for="plate-name">姓名文字</label>
           <input id="plate-name" name="nameText" maxlength="20" placeholder="你的名字" required pattern=".*\S.*" autocomplete="off">
@@ -79,6 +82,7 @@
               <option value="serif-tc">繁體宋體</option>
               <option value="chiron-round">昭源環方</option>
               <option value="gensen-tw">源泉圓體</option>
+              <option value="huninn" hidden>粉圓</option>
               <option value="tw-kai">臺灣正楷</option>
               <option value="genwan-tw">源雲明體</option>
             </optgroup>
@@ -92,7 +96,6 @@
               <option value="blackops" data-sample="One Goods">Black Ops One</option>
             </optgroup>
             <optgroup label="舊版字型" hidden>
-              <option value="huninn">粉圓</option>
               <option value="sans-sc">簡體黑體</option>
               <option value="serif-sc">簡體宋體</option>
               <option value="wenkai">霞鶩文楷</option>
@@ -102,46 +105,15 @@
         </div>
       </section>
       <div class="keyring-step-panel">
-      <ol class="keyring-steps" aria-label="客製步驟" data-name-tag-only>
-        <li aria-current="step"><button type="button" data-keyring-step="0" aria-controls="keyring-design">款式與尺寸</button></li>
-        <li><button type="button" data-keyring-step="1" aria-controls="keyring-colors">選顏色</button></li>
-      </ol>
-      <section class="keyring-step" id="keyring-design">
-        <h2 tabindex="-1">款式與尺寸</h2>
-        <fieldset class="keyring-shapes">
-          <legend>造型</legend>
-          <label><input type="radio" name="shape" value="contour" checked>
-            <img class="keyring-template" src="assets/keyring/contour.svg" alt=""><span>隨字輪廓</span>
-          </label>
-          <label><input type="radio" name="shape" value="capsule">
-            <img class="keyring-template" src="assets/keyring/capsule.svg" alt=""><span>膠囊底板</span>
-          </label>
-          <label><input type="radio" name="shape" value="rounded">
-            <img class="keyring-template" src="assets/keyring/rounded.svg" alt=""><span>圓角底板</span>
-          </label>
-        </fieldset>
-        <fieldset class="keyring-sizes">
-          <legend>尺寸規格</legend>
-          <label><input type="radio" name="size" value="small"><strong>小型</strong><small>50 × 20.8 mm</small></label>
-          <label><input type="radio" name="size" value="medium" checked><strong>中型</strong><small>65 × 27 mm</small></label>
-          <label><input type="radio" name="size" value="large"><strong>大型</strong><small>80 × 33.2 mm</small></label>
-        </fieldset>
-        <p class="nameplate-order-note">以上為長寬上限。隨字輪廓的實際尺寸會依字形調整。</p>
-      </section>
-      <section class="keyring-step" id="keyring-colors" hidden>
+      <section class="keyring-step" id="keyring-colors">
         <h2 tabindex="-1">選顏色</h2>
-        <details class="keyring-colour-section" open>
-          <summary><span data-name-tag-only>Outline Color</span><span data-articulated-only hidden>字塊顏色</span><span class="clicker-colour-current" data-keyring-current="baseColor"><i aria-hidden="true"></i><span></span></span></summary>
-          <div class="nameplate-field"><label for="plate-base-color">Outline Color</label><select id="plate-base-color" name="baseColor" data-swatch data-default="#a087c1"></select></div>
+        <details class="keyring-colour-section">
+          <summary><span data-name-tag-only>輪廓色</span><span data-articulated-only hidden>字塊顏色</span><span class="clicker-colour-current" data-keyring-current="baseColor"><i aria-hidden="true"></i><span></span></span></summary>
+          <div class="nameplate-field"><label for="plate-base-color">輪廓色</label><select id="plate-base-color" name="baseColor" data-swatch data-default="#a087c1"></select></div>
         </details>
-        <details class="keyring-colour-section" open>
-          <summary><span data-name-tag-only>凸字顏色</span><span data-articulated-only hidden>字面顏色</span><span class="clicker-colour-current" data-keyring-current="textColor"><i aria-hidden="true"></i><span></span></span></summary>
-          <div class="nameplate-field"><label for="plate-text-color">凸字顏色</label><select id="plate-text-color" name="textColor" data-swatch data-default="#fffcf5"></select></div>
-        </details>
-        <label class="keyring-add-color"><input type="checkbox" name="useAccent"> <span data-name-tag-only>增加底板顏色</span><span data-articulated-only hidden>增加底層顏色</span></label>
-        <details class="keyring-colour-section" id="keyring-accent" open hidden>
-          <summary><span data-name-tag-only>底板顏色</span><span data-articulated-only hidden>底層顏色</span><span class="clicker-colour-current" data-keyring-current="accentColor"><i aria-hidden="true"></i><span></span></span></summary>
-          <div class="nameplate-field"><label for="plate-accent-color">底板顏色</label><select id="plate-accent-color" name="accentColor" data-swatch data-default="#f2c879"></select></div>
+        <details class="keyring-colour-section">
+          <summary><span data-name-tag-only>字面顏色</span><span data-articulated-only hidden>字面顏色</span><span class="clicker-colour-current" data-keyring-current="textColor"><i aria-hidden="true"></i><span></span></span></summary>
+          <div class="nameplate-field"><label for="plate-text-color">字面顏色</label><select id="plate-text-color" name="textColor" data-swatch data-default="#fffcf5"></select></div>
         </details>
         <template id="plate-swatch-options">
           <option value="#a087c1">薰衣草紫</option>
@@ -152,7 +124,7 @@
           <option value="#efb39e">蜜桃粉</option>
         </template>
       </section>
-<section class="r2-order-review"><h3>訂單摘要</h3><dl data-r2-summary></dl></section><label class="r2-spelling"><input type="checkbox" data-r2-spelling> 名字會照你輸入的內容製作，請確認拼寫。</label><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>3 天內出貨</span><p class="nameplate-order-note" id="articulated-price" hidden>預估價格 <strong><output for="plate-name" data-start="NT$%s 起"></output></strong></p></div><button class="btn-primary" id="keyring-generate" type="submit" disabled>提交確認</button></div>
+<details class="r2-order-review"><summary>訂單摘要</summary><dl data-r2-summary></dl></details><label class="r2-spelling"><input type="checkbox" data-r2-spelling> 名字會照你輸入的內容製作，請確認拼寫。</label><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>3 天內出貨</span><p class="nameplate-order-note" id="articulated-price" hidden>預估價格 <strong><output for="plate-name" data-start="NT$%s 起"></output></strong></p></div><button class="btn-primary" id="keyring-generate" type="submit" disabled>提交確認</button></div>
         <div class="nameplate-actions">
           <a class="button cream" id="plate-download" download="OGS-keyring-preview.png" hidden>下載 PNG</a>
           <button class="button yellow" id="plate-payment" type="button" disabled hidden>前往付款</button>
@@ -177,7 +149,6 @@
     </figure>
     <form class="nameplate-form" id="clicker-form">
       <div class="keyring-step-panel">
-        <div><h2>姓名按壓款</h2></div>
         <fieldset class="clicker-style-picker">
           <legend>按壓款式</legend>
           <label><input type="radio" name="clickerStyle" value="mechanical" checked> 機械鍵盤款</label>
@@ -218,7 +189,7 @@
             </template>
           </div>
           <section class="clicker-colors">
-            <details class="keyring-colour-section" open>
+            <details class="keyring-colour-section">
               <summary><span>底座顏色</span><span class="clicker-colour-current" data-clicker-current="base"><i aria-hidden="true"></i><span></span></span></summary>
               <div class="nameplate-field"><label for="clicker-base">底座顏色</label><select id="clicker-base" name="base"></select></div>
             </details>
@@ -244,23 +215,19 @@
                 <div class="nameplate-field clicker-colour-menu"><label for="clicker-name-fill">內底顏色</label><select id="clicker-name-fill" name="nameFill"></select></div>
               </details>
             </div>
-            <details class="keyring-colour-section" open>
+            <details class="keyring-colour-section">
               <summary><span>外框顏色</span><span class="clicker-colour-current" data-clicker-current="nameBorder"><i aria-hidden="true"></i><span></span></span></summary>
               <div class="nameplate-field"><label for="clicker-name-border">外框顏色</label><select id="clicker-name-border" name="nameBorder"></select></div>
             </details>
           </section>
         </div>
-        <section class="keyring-config-card clicker-order-test" id="connected-order" hidden>
-          <h3>商品金額</h3>
-          <output id="connected-order-price" aria-live="polite"></output>
-
-        </section><section class="r2-order-review"><h3>訂單摘要</h3><dl data-r2-summary></dl></section><label class="r2-spelling"><input type="checkbox" data-r2-spelling> 名字會照你輸入的內容製作，請確認拼寫。</label>
-      </div><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>3 天內出貨</span><p class="r2-press-start">按壓款 NT$80 起</p></div><div class="r2-press-actions"><button class="btn-primary" id="connected-order-start" type="button" disabled>前往下單</button><div class="design-contact" id="design-contact" hidden><button type="button" class="btn-primary" id="clicker-contact-design">提交確認</button><p id="design-contact-status" role="status"></p></div></div></div>
+        <details class="r2-order-review"><summary>訂單摘要</summary><dl data-r2-summary></dl></details><label class="r2-spelling"><input type="checkbox" data-r2-spelling> 名字會照你輸入的內容製作，請確認拼寫。</label>
+      </div><div class="r2-order-bar" ><div><span class="r2-dispatch"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h12v11H3zM15 10h4l3 4v3h-7M6 19a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0m11 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0"/></svg>3 天內出貨</span><p class="r2-press-start">按壓款 NT$80 起</p><p id="connected-order" hidden>商品金額 <strong><output id="connected-order-price" aria-live="polite"></output></strong></p></div><div class="r2-press-actions"><button class="btn-primary" id="connected-order-start" type="button" disabled>前往下單</button><div class="design-contact" id="design-contact" hidden><button type="button" class="btn-primary" id="clicker-contact-design">提交確認</button><p id="design-contact-status" role="status"></p></div></div></div>
     </form>
   </div>
   </section>
   <section class="wrap r2-block r2-custom-guide">
-    <h2>三款怎麼選</h2><table id="r2-custom-comparison"></table>
+    <h2>三款怎麼選</h2><figure><div class="r2-custom-guide-photos"><img src="assets/custom/render/nameplate_face-1024.webp" alt="名牌款" width="1024" height="1024"><img src="assets/custom/render/press_face-1024.webp" alt="按壓款" width="1024" height="1024"><img src="assets/custom/render/articulated_face-1024.webp" alt="關節字塊" width="1024" height="1024"></div><figcaption>商品圖為 3D 預覽渲染</figcaption></figure><table id="r2-custom-comparison"></table>
     <div class="r2-custom-steps"><h2>從名字開始</h2><ol><li>選款式</li><li>輸入名字</li><li>選字型與配色</li><li>確認 3D 預覽</li></ol></div>
     <h2>常見問題</h2>
     <details><summary>客製多久出貨？</summary><p>客製商品 3 天內出貨。</p></details>

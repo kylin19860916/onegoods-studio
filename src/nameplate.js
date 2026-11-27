@@ -6,7 +6,6 @@ import { keyringFonts, setupFontPicker } from './keyring-font-picker.js';
 
 const form = document.querySelector('#nameplate-form');
 const preview = document.querySelector('#plate-preview');
-const position = document.querySelector('#plate-position');
 const canvas = document.querySelector('#plate-canvas');
 const host = document.querySelector('#plate-view');
 const reset = document.querySelector('#plate-reset-view');
@@ -52,22 +51,18 @@ const previewStatus = document.querySelector('#plate-preview-status');
 const dimensions = document.querySelector('#keyring-dimensions');
 const exportStatus = document.querySelector('#plate-status');
 const generate = document.querySelector('#keyring-generate');
-const designStep = document.querySelector('#keyring-design');
-const colorsStep = document.querySelector('#keyring-colors');
-const accent = document.querySelector('#keyring-accent');
 const headings = document.querySelectorAll('[data-keyring-intro]');
 const keyringPanel = document.querySelector('#name-tag');
 const clickerPanel = document.querySelector('#name-clicker');
 const nameTagOptions = form.querySelectorAll('[data-name-tag-only]');
 const articulatedOptions = form.querySelectorAll('[data-articulated-only]');
-const progress = document.querySelectorAll('.keyring-steps li');
 const swatches = document.querySelector('#plate-swatch-options');
 for (const select of form.querySelectorAll('[data-swatch]')) {
   select.append(swatches.content.cloneNode(true));
   select.value = select.dataset.default;
   expandChoices(select, { colours: true });
 }
-const { nameText, style, shape, size, baseColor, textColor, useAccent, accentColor } = form.elements;
+const { nameText, style, baseColor, textColor } = form.elements;
 const download = document.querySelector('#plate-download');
 const payment = document.querySelector('#plate-payment');
 const articulatedPrice = document.querySelector('#articulated-price');
@@ -79,16 +74,19 @@ const articulatedFirstPrice = 80;
 const articulatedExtraPrice = 40;
 
 const fonts = keyringFonts;
-if (requestedProduct() === 'name-articulated') style.value = 'sans-tc';
-setupFontPicker(style);
-const sizes = { small: [50, 20.8], medium: [65, 27], large: [80, 33.2] };
+const refreshFontPicker = setupFontPicker(style);
+const nameplateFonts = new Set(['gensen-tw', 'huninn', 'tw-kai', 'lilita', 'nunito', 'chewy']);
+const defaultNameplateFont = language === 'en' ? 'lilita' : 'gensen-tw';
+const selectedFonts = { 'name-tag': defaultNameplateFont, 'name-articulated': 'sans-tc' };
+const nameplateHeightMm = 27; // Existing medium template height, including the outline allowance.
+const nameplateMaxWidthMm = 80; // Existing largest nameplate width.
+let fontMode;
 const spec = { baseMm: 3, letteringMm: 1, holeMm: 4, rimMm: 1.8 };
 let currentFont;
 let fontPromise;
 let previewVersion = 0;
 let timer;
 let articulated = false;
-let currentStep = 0;
 
 function loadFont(key) {
   if (key === currentFont && fontPromise) return fontPromise;
@@ -112,18 +110,6 @@ function shade(color) {
   return '#' + parts.map(part => Math.round(parseInt(part, 16) * 0.72).toString(16).padStart(2, '0')).join('');
 }
 
-function showStep(step, focus = true) {
-  currentStep = step;
-  const editingColors = articulated || step === 1;
-  designStep.hidden = editingColors;
-  colorsStep.hidden = !editingColors;
-  progress.forEach((item, index) => {
-    if (index === step) item.setAttribute('aria-current', 'step');
-    else item.removeAttribute('aria-current');
-  });
-  if (focus) (editingColors ? colorsStep : designStep).querySelector('h2').focus();
-}
-
 async function render(version) {
   previewStatus.textContent = previewStatus.dataset.loading;
   try {
@@ -131,27 +117,29 @@ async function render(version) {
     if (version !== previewVersion) return;
     const base = baseColor.value;
     const ink = textColor.value;
-    const third = useAccent.checked ? accentColor.value : undefined;
-    const [widthMm, heightMm] = sizes[size.value];
     const enteredName = nameText.value.trim();
-    const name = enteredName || (articulated ? 'OGS' : nameText.placeholder);
+    const sample = style.selectedOptions[0].dataset.sample ? 'Mia' : '小飛';
+    const name = enteredName || (articulated ? 'OGS' : sample);
     const model = generateKeyring(font, name, {
-      ...spec, widthMm, heightMm, shape: articulated ? 'articulated' : shape.value, baseColor: base, textColor: ink, accentColor: third,
+      ...spec, widthMm: Infinity, heightMm: nameplateHeightMm,
+      shape: articulated ? 'articulated' : 'contour', baseColor: base, textColor: ink,
     });
-    const colors = { base, side: third || shade(base), ink, shadow: shade(ink) };
+    if (!articulated && model.dimensions[0] > nameplateMaxWidthMm) {
+      throw new RangeError(previewStatus.dataset.nameplateLength);
+    }
+    const colors = { base, side: shade(base), ink, shadow: shade(ink) };
     for (const [part, color] of Object.entries(colors)) {
       preview.style.setProperty('--plate-' + part, color);
     }
-    const [x, y, width, height] = model.preview.viewBox;
-    preview.setAttribute('viewBox', articulated ? model.preview.viewBox.join(' ') : '0 0 90 43');
-    if (articulated) position.removeAttribute('transform');
-    else position.setAttribute('transform', `translate(${45 - x - width / 2} ${20 - y - height / 2})`);
+    preview.setAttribute('viewBox', model.preview.viewBox.join(' '));
     preview.querySelectorAll('[data-outline]').forEach(path => {
       path.setAttribute('d', model.preview[path.dataset.outline]);
     });
-    viewer?.setMeshes(model.meshes, { fit: articulated });
+    viewer?.setMeshes(model.meshes, { fit: true });
     const numbers = model.dimensions.map(value => Number(value.toFixed(1)));
-    dimensions.textContent = dimensions.dataset.label + ' · ' + numbers.join(' × ') + ' mm';
+    dimensions.textContent = articulated
+      ? dimensions.dataset.label + ' · ' + numbers.join(' × ') + ' mm'
+      : previewStatus.dataset.approximate + ' ' + numbers.slice(0, 2).join(' × ') + ' mm';
     previewStatus.textContent = '';
     nameReady = Boolean(enteredName);
     generate.disabled = !nameReady || !spelling.checked;
@@ -163,18 +151,19 @@ async function render(version) {
     updateKeyringSummary();
     preview.querySelectorAll('[data-outline]').forEach(path => path.removeAttribute('d'));
     if (error.message === '有字元不在此款支援的字型中。') previewStatus.textContent = previewStatus.dataset.unsupported;
-    else previewStatus.textContent = previewStatus.dataset.error;
+    else previewStatus.textContent = error.message === previewStatus.dataset.nameplateLength
+      ? previewStatus.dataset.nameplateLength : previewStatus.dataset.error;
   }
 }
 
 function updateKeyringSummary() {
-  const shapeName = form.querySelector('[name="shape"]:checked')?.closest('label').innerText.trim();
-  const colors = [...form.querySelectorAll('[data-keyring-current]')].filter(node => node.dataset.keyringCurrent !== 'accentColor' || useAccent.checked);
+  const type = customTypes.find(item => item.id === (articulated ? 'articulated' : 'nameplate'));
+  const colors = [...form.querySelectorAll('[data-keyring-current]')];
   updateSummary(form, [
-    articulated ? customTypes.find(type => type.id === 'articulated')?.text[language === 'en' ? 2 : language === 'zh-Hans' ? 1 : 0] : shapeName,
+    type?.text[language === 'en' ? 2 : language === 'zh-Hans' ? 1 : 0],
     nameText.value.trim(), style.selectedOptions[0]?.textContent,
     colors.map(node => node.querySelector('span').textContent).join(' · '),
-    dimensions.textContent.split(' · ')[1],
+    dimensions.textContent.split(' · ').at(-1),
   ]);
 }
 
@@ -183,11 +172,10 @@ function queuePreview() {
   const version = ++previewVersion;
   generate.disabled = true;
   nameReady = false;
-  accent.hidden = !useAccent.checked;
   const tooLong = articulated
     && articulatedNameCharacters(nameText.value.trim()).length > articulatedNameLimit;
   nameText.setCustomValidity(tooLong ? previewStatus.dataset.articulatedLength : '');
-  for (const [name, field] of Object.entries({ baseColor, textColor, accentColor })) {
+  for (const [name, field] of Object.entries({ baseColor, textColor })) {
     const current = form.querySelector('[data-keyring-current="' + name + '"]');
     const selected = form.querySelector('input[name="' + name + '"]:checked');
     current.querySelector('i').style.backgroundColor = field.value;
@@ -264,9 +252,6 @@ function exportImage() {
 }
 
 form.addEventListener('input', event => { if (event.target !== spelling) queuePreview(); });
-document.querySelectorAll('[data-keyring-step]').forEach(button => {
-  button.addEventListener('click', () => showStep(Number(button.dataset.keyringStep)));
-});
 form.addEventListener('submit', event => {
   event.preventDefault();
   if (!generate.disabled) exportImage();
@@ -302,7 +287,12 @@ function showProduct() {
     viewer = null;
   } else {
     showKeyringViewer();
-    showStep(currentStep, false);
+    if (fontMode !== selected) {
+      if (fontMode) selectedFonts[fontMode] = style.value;
+      fontMode = selected;
+      style.value = selectedFonts[selected];
+      refreshFontPicker(articulated ? null : nameplateFonts);
+    }
     queuePreview();
   }
 }
@@ -312,6 +302,9 @@ showProduct();
 if (customTabs) {
   const panel = document.querySelector('#r2-custom-panel');
   const shared = document.querySelector('#r2-shared-name');
+  const sharedField = shared.closest('.r2-shared-field');
+  const keyringOptions = form.querySelector('.keyring-shared');
+  const clickerNameOptions = clickerPanel.querySelector('#clicker-name-settings');
   const localeIndex = document.documentElement.lang === 'en' ? 2 : document.documentElement.lang === 'zh-Hans' ? 1 : 0;
   shared.value = params.get('name')?.trim() || (params.has('custom-order') ? clicker.getName() : '');
   const tabs = customTypes.map(type => {
@@ -341,6 +334,8 @@ if (customTabs) {
     if (shared.value.trim()) url.searchParams.set('name',shared.value.trim());
     else url.searchParams.delete('name');
     history.replaceState(null,'',url);
+    (type.id === 'press' ? clickerNameOptions : keyringOptions).prepend(sharedField);
+    shared.setAttribute('aria-describedby', type.id === 'press' ? 'clicker-name-limit clicker-name-limit-error' : 'plate-preview-status');
     showProduct();
     clicker.setActive(type.id === 'press');
     if (type.id === 'press' && shared.value.trim()) clicker.showNamedStyle();
@@ -371,8 +366,14 @@ if (customTabs) {
     if (shared.value.trim()) clicker.showNamedStyle();
     mirrorName();
   }
-  shared.addEventListener('input',event => { if (!event.isComposing) updateSharedName(); });
-  shared.addEventListener('compositionend',updateSharedName);
+  shared.addEventListener('input', event => {
+    event.stopPropagation();
+    if (!event.isComposing) updateSharedName();
+  });
+  shared.addEventListener('compositionend', event => {
+    event.stopPropagation();
+    updateSharedName();
+  });
   const comparison = document.querySelector('#r2-custom-comparison');
   const headings = comparison.createTHead().insertRow();
   headings.append(document.createElement('th'));

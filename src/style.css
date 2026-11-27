@@ -1034,9 +1034,8 @@ body[data-page] .eyebrow { display: none; }
 }
 
 body[data-page="custom"] > main.r2-custom { width: 100%; }
-.r2-custom-intro { padding-block: var(--sp-7) var(--sp-5); }
-.r2-custom-intro h1 { font-size: clamp(36px, 6vw, 56px); margin: 0; color: var(--on-stage); }
-.r2-custom-intro p { margin: var(--sp-3) 0 0; }
+.r2-custom-intro { padding-block: 12px; }
+body[data-page="custom"] .r2-custom-intro h1 { font-size: 36px; line-height: 1.15; margin: 0; color: var(--on-stage); }
 .r2-custom-tabbar { background: var(--stage); z-index: 5; }
 .r2-custom-tabbar [role="tablist"] { display: flex; gap: var(--sp-3); overflow-x: auto; scroll-snap-type: x proximity; }
 .r2-custom-tabbar [role="tab"] {
@@ -1047,8 +1046,6 @@ body[data-page="custom"] > main.r2-custom { width: 100%; }
 .r2-custom-tabbar [role="tab"][aria-selected=true] { color: var(--on-stage); border-bottom-color: var(--brand); }
 .r2-custom-tabbar img { object-fit: contain; width: 56px; height: 56px; border-radius: 8px; }
 .r2-custom-editor { padding-block: var(--sp-5) var(--sp-7); }
-.r2-custom-editor > label { display: block; font-size: 14px; font-weight: 700; }
-.r2-custom-editor > input { display: block; width: min(100%,440px); height: 56px; margin: var(--sp-2) 0 var(--sp-5); padding-inline: var(--sp-4); font: inherit; border: 1px solid var(--line-strong); border-radius: var(--r-input); background: var(--ground); }
 .r2-custom-editor > .nameplate-heading { display: none; }
 .r2-custom-editor :is(label[for="plate-name"], #plate-name, label[for="clicker-name-text"], #clicker-name-text) { display: none; }
 .r2-custom-guide table { width: 100%; border-collapse: collapse; margin-block: var(--sp-4) var(--sp-7); }
@@ -1112,18 +1109,11 @@ body[data-page="about"] main.r2-policy { width: min(720px,calc(100% - 2 * var(--
 .r2-product-card:has(.r2-dispatch) img { object-fit: contain; }
 .r2-product-card:has(.r2-dispatch) .btn-secondary { margin-top: 8px; }
 .r2-grid-note { grid-column: 1/-1; }
-.r2-custom-intro-grid { display: grid; grid-template-columns: 5fr 7fr; align-items: center; gap: 20px; }
-.r2-custom-intro-grid figure { position: relative; margin: 0; }
-.r2-custom-intro-photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.r2-custom-intro-photos img { display: block; width: 100%; height: auto; }
-.r2-custom-intro-photos img,
+.r2-custom-guide-photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.r2-custom-guide-photos img { display: block; width: 100%; height: auto; }
+.r2-custom-guide-photos img,
 .r2-product-custom figure img,
 .r2-custom-cards img { object-position: 50% 60%; }
-.r2-custom-intro-grid figcaption { text-align: end; color: var(--on-stage-2); font-size: 13px; }
-@media (max-width:767px) {
-  .r2-custom-intro-grid { grid-template-columns: 1fr; }
-  .r2-custom-intro-grid figure { display: none; }
-}
 
 .r2-collection-photo { position: relative; margin-block: 0 var(--sp-5); }
 .r2-collection-photo img { display: block; width: 100%; height: auto; border-radius: 16px; }
@@ -1174,9 +1164,6 @@ body[data-page="about"] main.r2-policy { width: min(720px,calc(100% - 2 * var(--
   }
   .r2-mobile-buy strong { color: var(--brand-ink); font: 800 20px var(--font-head); }
   .r2-mobile-buy .btn-primary { width: min(62%,220px); }
-  .r2-custom-editor #name-clicker:has(#clicker-per-key-settings:not([hidden])) { display: flex; flex-direction: column; align-items: stretch; }
-  .r2-custom-editor #name-clicker:has(#clicker-per-key-settings:not([hidden])) :is(#clicker-form, .keyring-step-panel, #clicker-per-key-settings) { display: contents; }
-  .r2-custom-editor .clicker-key-editor { order: -1; margin: 0; }
 }
 
 body[data-page="product"] > main.section { padding-block-start: 0; min-height: 100vh; }
@@ -1278,4 +1265,69 @@ body[data-page="home"] > main.r2-home { width: 100%; }
 }
 @media (max-width:767px) {
   .r2-custom-steps ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Compact storefront customizer. The guide starts below the editing workspace. */
+.r2-custom-guide { padding-block-start: var(--sp-7); }
+.r2-custom-guide figure { margin: var(--sp-3) 0; }
+.r2-custom-guide figcaption { color: var(--ink-2); text-align: end; font-size: 13px; }
+.r2-custom-guide .r2-custom-guide-photos { border-radius: 16px; background: linear-gradient(var(--photo-1),var(--photo-2)); }
+.r2-custom-guide .r2-custom-guide-photos img { max-height: 180px; object-fit: contain; }
+
+.r2-custom-editor { min-height: calc(100svh - 190px); padding-block: 20px var(--sp-5); }
+.r2-custom-editor .nameplate-workspace { gap: clamp(18px,3vw,40px); }
+.r2-custom-editor .keyring-preview { position: static; }
+.r2-custom-editor .plate-view { height: clamp(310px, 50vh, 490px); min-height: 0; aspect-ratio: auto; }
+.r2-custom-editor .keyring-preview-meta { gap: 4px; padding-block-start: 8px; }
+.r2-custom-editor .keyring-preview-meta :is(p,figcaption) { margin: 0; }
+.r2-custom-editor .keyring-preview-meta p:empty { display: none; }
+.r2-custom-editor .nameplate-form { min-width: 0; gap: 8px; padding: 16px; }
+.r2-custom-editor :is(.keyring-step-panel,.keyring-shared,.keyring-step,.clicker-style-settings,.clicker-colors) { gap: 8px; }
+.r2-custom-editor .r2-editor-heading,
+.r2-custom-editor .keyring-shared > .nameplate-field:has(> #plate-name),
+.r2-custom-editor :is(#keyring-colors,#clicker-name-settings .clicker-colors) > h3,
+.r2-custom-editor #keyring-colors > h2 { display: none; }
+.r2-shared-field { display: grid; gap: 4px; min-width: 0; }
+.r2-shared-field label { font-size: 14px; font-weight: 700; }
+.r2-shared-field input {
+  width: 100%; min-height: 44px; padding: 0 12px;
+  border: 1px solid var(--line-strong); border-radius: 8px;
+  color: var(--ink); background: var(--ground); font: inherit;
+}
+.r2-custom-editor #keyring-colors { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-items: start; }
+.r2-custom-editor .keyring-colour-options { display: flex; flex-wrap: wrap; gap: 8px 4px; }
+.r2-custom-editor .keyring-colour-options .keyring-choice { flex: 0 0 56px; min-height: 44px; }
+.r2-custom-editor .keyring-colour-options .keyring-colour-chip { width: 28px; height: 28px; flex-basis: 28px; }
+.r2-custom-editor .clicker-style-picker { display: flex; gap: 8px; padding: 0; }
+.r2-custom-editor .clicker-style-picker label { flex: 1 0 max-content; min-height: 44px; }
+.r2-custom-editor .clicker-style-picker legend { margin-bottom: 4px; }
+.r2-custom-editor .clicker-letter-slot { flex: 0 0 46px; width: 46px; gap: 3px; }
+.r2-custom-editor .clicker-slot-key { min-height: 44px; height: 44px; }
+.r2-custom-editor .clicker-key-settings { padding: 8px; gap: 6px; }
+.r2-custom-editor .r2-order-review { padding: 0 10px; }
+.r2-order-review > summary { min-height: 44px; align-content: center; padding-block: 0; font-weight: 700; cursor: pointer; }
+.r2-order-review[open] > dl { margin-block-end: 10px; }
+.r2-custom-editor .r2-order-bar { position: static; min-height: 64px; padding: 6px 0 0; background: transparent; }
+.r2-shape-label { margin: 0; font-size: 13px; color: var(--ink-2); }
+.r2-custom-editor .nameplate-actions:not(:has(a:not([hidden]), p:not(:empty))) { display: none; }
+
+@media (max-width:767px) {
+  body[data-page="custom"] .r2-custom-intro h1 { font-size: 28px; }
+  .r2-custom-tabbar [role="tab"] { min-height: 50px; }
+  .r2-custom-tabbar img { width: 36px; height: 36px; }
+  .r2-custom-editor { padding-block-start: 12px; }
+  .r2-custom-editor .nameplate-workspace { gap: 10px; }
+  .r2-custom-editor .plate-view { height: 38svh; }
+  .r2-custom-editor .keyring-preview-meta :is(figcaption, .plate-view-hint) { display: none; }
+  .r2-custom-editor .nameplate-form { padding: 10px; }
+  .r2-custom-editor .clicker-key-editor > legend { margin-bottom: 2px; }
+  .r2-custom-editor .clicker-style-picker,
+  .r2-custom-editor .clicker-labels,
+  .r2-custom-editor .keyring-colour-options { flex-wrap: nowrap; overflow-x: auto; padding: 4px; }
+  .r2-custom-editor .r2-order-bar {
+    position: fixed; inset: auto 0 0; z-index: 6;
+    padding: 6px var(--gutter) calc(6px + env(safe-area-inset-bottom));
+    background: var(--ground); box-shadow: var(--shadow-1);
+  }
+  body[data-page="custom"] :is(.r2-footer, .r2-custom-guide) { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
 }
