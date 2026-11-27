@@ -2310,5 +2310,41 @@
   "下单": [
     "下單",
     "Order"
+  ],
+  "可客制": [
+    "可客製",
+    "Customizable"
+  ],
+  "吊饰": [
+    "吊飾",
+    "Keychains"
+  ],
+  "按压": [
+    "按壓",
+    "Clickers"
+  ],
+  "价格低到高": [
+    "價格低到高",
+    "Price: low to high"
+  ],
+  "推荐": [
+    "推薦",
+    "Recommended"
+  ],
+  "排序": [
+    "排序",
+    "Sort"
+  ],
+  "全部": [
+    "全部",
+    "All"
+  ],
+  "{count} 件": [
+    "{count} 件",
+    "{count} items"
+  ],
+  "拿在手里，才是小快乐。": [
+    "拿在手裡，才是小快樂。",
+    "Little joys you can hold."
   ]
 }

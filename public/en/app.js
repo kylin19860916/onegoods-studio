@@ -21,7 +21,7 @@ function priceLabel(p){return p.price!==null&&p.price!==undefined&&!(typeof p.pr
 function art(p){if(p.image)return `<img class="real-product-image" src="${escapeHtml(assetUrl(p.image))}" alt="${escapeHtml(p.images?.[0]?.alt||p.name)}" loading="lazy" decoding="async">`;return '<span class="photo-slot" aria-hidden="true"></span>';}
 let filter='all';
 let categories=[];
-function renderCategoryFilters(){const group=qs('.shop-tools .filters');if(!group||document.body.dataset.catalog==='digital')return;group.innerHTML='<button data-filter="all" class="active" aria-pressed="true">All goods</button>'+categories.filter(c=>products.some(p=>p.kind==='physical'&&!p.isPlaceholder&&p.type===c.id)).map(c=>`<button data-filter="${escapeHtml(c.id)}" aria-pressed="false">${escapeHtml(locale==='en'?(c.nameEn||c.name):locale==='zh-Hans'?(c.nameZhHans||c.name):c.name)}</button>`).join('');if(filter!=='all'&&!categories.some(c=>c.id===filter))filter='all';setFilter(filter);}
+function renderCategoryFilters(){if(qs('.r2-listing'))return;const group=qs('.shop-tools .filters');if(!group||document.body.dataset.catalog==='digital')return;group.innerHTML='<button data-filter="all" class="active" aria-pressed="true">All goods</button>'+categories.filter(c=>products.some(p=>p.kind==='physical'&&!p.isPlaceholder&&p.type===c.id)).map(c=>`<button data-filter="${escapeHtml(c.id)}" aria-pressed="false">${escapeHtml(locale==='en'?(c.nameEn||c.name):locale==='zh-Hans'?(c.nameZhHans||c.name):c.name)}</button>`).join('');if(filter!=='all'&&!categories.some(c=>c.id===filter))filter='all';setFilter(filter);}
 
 function canOrder(p){
  return p?.kind==='physical'&&!p.isPlaceholder&&p.saleStatus==='available'&&Number.isSafeInteger(Number(p.price))&&Number(p.price)>0;
@@ -33,7 +33,37 @@ function buyAction(p){
  if(!channels.length)return official;
  return `<div class="purchase-platforms" role="group" aria-label="Other ways to buy"><div class="purchase-platforms-heading"><p class="purchase-platforms-title">Other ways to buy</p><p class="purchase-platforms-note">Orders, payment and delivery are handled by the selected platform.</p></div><div class="purchase-platforms-grid">${channels.map(c=>`<a class="platform-purchase ${c.id}" href="${escapeHtml(c.url)}" target="_blank" rel="noopener noreferrer"><span class="platform-logo"><img src="${assetUrl(c.logo)}" alt="" width="96" height="48"></span><span class="platform-copy"><strong>${c.label}</strong><span>${c.note}</span></span></a>`).join('')}</div></div>`+official;
 }
-function renderProducts(){const grid=qs('#products');if(!grid)return;const list=products.filter(p=>!p.isPlaceholder).filter(p=>p.kind==='physical'&&(filter==='all'||p.type===filter));grid.innerHTML=list.length?list.map(p=>`<article class="product-card"><button class="product-art" style="background:${escapeHtml(p.color)}" data-detail="${escapeHtml(p.id)}" aria-label="View ${escapeHtml(p.name)} details">${art(p)}${p.type==='file'?`<span class="card-stamp">${p.format}</span>`:''}</button><div class="product-info"><h3><button class="title-link" data-detail="${escapeHtml(p.id)}">${escapeHtml(p.name)}</button></h3><div class="card-bottom">${priceLabel(p)?`<span>${priceLabel(p)}</span>`:''}<button class="text-button card-details" data-detail="${escapeHtml(p.id)}">View details</button></div></div></article>`).join(''):document.body.dataset.catalog==='digital'?'':'<p class="catalog-note">No items match this selection.</p>';}
+function productCard(product) {
+  const image=product.image?art(product):'';
+  return `<a class="r2-product-card" href="product.html?id=${encodeURIComponent(product.id)}">
+    <div class="r2-product-art">${image}</div><h3>${escapeHtml(product.name)}</h3>
+    <p>${escapeHtml(product.desc)}</p>${priceLabel(product)?`<strong>${priceLabel(product)}</strong>`:''}</a>`;
+}
+const customCardItems = [
+  { type: 'nameplate', name: '名牌款', photo: 'custom-name-tag-studio.webp' },
+  { type: 'press', name: 'Clicker', photo: 'custom-name-clicker-studio.webp' },
+  { type: 'articulated', name: 'Articulated letters', photo: 'custom-name-articulated-studio.webp' },
+];
+function customCatalogCard(item) {
+  return `<a class="r2-product-card" href="custom.html?type=${item.type}">
+    <div class="r2-product-art"><img src="${assetUrl(item.photo)}" alt="${item.name}（Illustration）" loading="lazy"></div>
+    <h3>${item.name}</h3><p>Custom orders ship within 3 days</p><strong>Start customizing</strong></a>`;
+}
+function renderProducts(){
+ const grid=qs('#products');
+ if(!grid)return;
+ if(document.body.dataset.catalog==='digital')return;
+ let list=products.filter(p=>!p.isPlaceholder&&p.kind==='physical'&&(filter==='all'||p.type===filter));
+ const sort=qs('#product-sort');
+ const count=qs('#product-count');
+ if(sort?.value==='price') list.sort((a,b)=>(priceLabel(a)?Number(a.price):Infinity)-(priceLabel(b)?Number(b.price):Infinity));
+ if(document.body.dataset.page==='home')list=list.slice(0,4);
+ if(count)count.value=count.dataset.format.replace('{count}',String(filter==='custom'?customCardItems.length:list.length));
+ grid.classList.add('r2-product-grid');
+ grid.innerHTML=filter==='custom'?customCardItems.map(customCatalogCard).join(''):
+   list.length?list.map(productCard).join(''):'<p class="catalog-note">No items match this selection.</p>';
+}
+qs('#product-sort')?.addEventListener('change',renderProducts);
 function setFilter(value){filter=value;document.querySelectorAll('[data-filter]').forEach(b=>{const active=b.dataset.filter===value;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active)});renderProducts();}
 function paragraphs(s){return String(s||'').split('\n').map(s=>s.trim()).filter(Boolean).map(s=>`<p>${escapeHtml(s)}</p>`).join('');}
 function detail(id){
