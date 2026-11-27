@@ -33,8 +33,23 @@ function buyAction(p){
  if(!channels.length)return official;
  return `<div class="purchase-platforms" role="group" aria-label="其他購買平台"><div class="purchase-platforms-heading"><p class="purchase-platforms-title">其他購買平台</p><p class="purchase-platforms-note">訂單、付款與配送由各平台處理。</p></div><div class="purchase-platforms-grid">${channels.map(c=>`<a class="platform-purchase ${c.id}" href="${escapeHtml(c.url)}" target="_blank" rel="noopener noreferrer"><span class="platform-logo"><img src="${assetUrl(c.logo)}" alt="" width="96" height="48"></span><span class="platform-copy"><strong>${c.label}</strong><span>${c.note}</span></span></a>`).join('')}</div></div>`+official;
 }
+const studioSources = {
+  "keynade-mx": "assets/keynade/01-front-retouched-v2.jpg",
+  "cai-shi-yun": "/media/33a9e528-53c9-4091-9c03-0e2264915a2c",
+  "enerkey-magnetic-keychain": "/media/2e1e80aa-ddac-4b22-bb49-871879854497",
+  "lucky-stir-stick": "/media/a4473e71-8e1f-4981-a0d9-467fb71662d9"
+};
+function studioPhoto(productId, source) {
+  if (!source || studioSources[productId] !== source) return null;
+  const path='/assets/r2-studio/'+productId;
+  return { url:path+'-800.webp', srcset:path+'-800.webp 800w, '+path+'-1600.webp 1600w' };
+}
+function studioImage(photo, alt, extra) {
+  return `<img src="${photo.url}" srcset="${photo.srcset}" alt="${alt}" width="800" height="800" ${extra}>`;
+}
 function productCard(product) {
-  const image=product.image?art(product):'';
+  const photo=studioPhoto(product.id,product.image);
+  const image=photo ? studioImage(photo,escapeHtml(product.name)+' 商品實拍','sizes="(max-width:767px) 50vw, 300px" loading="lazy" decoding="async"') : product.image ? art(product) : '';
   return `<a class="r2-product-card" href="product.html?id=${encodeURIComponent(product.id)}">
     <div class="r2-product-art">${image}</div><h3>${escapeHtml(product.name)}</h3>
     <p>${escapeHtml(product.desc)}</p>${priceLabel(product)?`<strong>${priceLabel(product)}</strong>`:''}</a>`;
@@ -94,8 +109,9 @@ function renderFullProduct(){
  if(meta)meta.content=product.desc||product.name;
  galleryPhotos=product.images||[];
  const photo=galleryPhotos[0];
+ const cover=photo&&studioPhoto(product.id,photo.url);
  const stepIcon=plus=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M5 12h14 ${plus?'M12 5v14':''}"/></svg>`;
- const gallery=photo?`<figure><img id="keynade-main-photo" src="${escapeHtml(assetUrl(photo.url))}" alt="${name} 商品實拍"></figure>
+ const gallery=photo?`<figure>${cover ? studioImage(cover,name+' 商品實拍','id="keynade-main-photo" sizes="(max-width:767px) 100vw, 630px"') : `<img id="keynade-main-photo" src="${escapeHtml(assetUrl(photo.url))}" alt="${name} 商品實拍">`}</figure>
    <div class="gallery-thumbs" role="group" aria-label="商品實拍視角">${galleryPhotos.map((im,i)=>`<button type="button" data-gallery-index="${i}" aria-label="${name} 商品視角 ${i+1}" aria-pressed="${i===0}"><img src="${escapeHtml(assetUrl(im.url))}" alt="" loading="lazy"></button>`).join('')}</div>`:
    `<div class="r2-product-art">${art(product)}</div>`;
  const purchase=buyAction(product);
@@ -139,7 +155,7 @@ function renderFullProduct(){
    target.querySelectorAll('[data-quantity]').forEach(button=>button.addEventListener('click',()=>sync((quantity.valueAsNumber||1)+Number(button.dataset.quantity))));
  }
 }
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-open-policy'))qs('#info-dialog')?.showModal();if(b.dataset.filter)setFilter(b.dataset.filter);if(b.dataset.detail)detail(b.dataset.detail);if(b.hasAttribute('data-close'))b.closest('dialog').close();if(b.dataset.galleryIndex!==undefined){const i=Number(b.dataset.galleryIndex),p=galleryPhotos[i];if(!p)return;qs('#keynade-main-photo').src=assetUrl(p.url);qs('#keynade-main-photo').alt=document.title.split(' — ')[0];document.querySelectorAll('[data-gallery-index]').forEach(x=>x.setAttribute('aria-pressed',x===b));}});
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-open-policy'))qs('#info-dialog')?.showModal();if(b.dataset.filter)setFilter(b.dataset.filter);if(b.dataset.detail)detail(b.dataset.detail);if(b.hasAttribute('data-close'))b.closest('dialog').close();if(b.dataset.galleryIndex!==undefined){const i=Number(b.dataset.galleryIndex),p=galleryPhotos[i];if(!p)return;const main=qs('#keynade-main-photo');const cover=i===0?studioPhoto(new URLSearchParams(location.search).get('id'),p.url):null;main.src=cover?.url||assetUrl(p.url);main.srcset=cover?.srcset||'';qs('#keynade-main-photo').alt=document.title.split(' — ')[0];document.querySelectorAll('[data-gallery-index]').forEach(x=>x.setAttribute('aria-pressed',x===b));}});
 if(qs('#open-info'))qs('#open-info').onclick=()=>qs('#info-dialog').showModal();
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}}));
 if(qs('#year'))qs('#year').textContent=new Date().getFullYear();
