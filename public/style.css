@@ -1098,3 +1098,11 @@ body[data-page="custom"] > main.r2-custom { width: 100%; }
   .r2-custom-editor .plate-view { height: min(80vw,340px); min-height: 0; }
   .r2-custom-editor .nameplate-form { padding: 16px; }
 }
+
+body[data-page="about"] main.r2-policy { width: min(720px,calc(100% - 2 * var(--gutter))); margin-inline: auto; background: var(--ground); font-size: 16px; line-height: 1.75; }
+.r2-policy section { margin-top: 48px; scroll-margin-top: 24px; }
+.r2-policy h2 { font-size: 28px; margin-block: 0 12px; }
+.r2-policy nav { padding: var(--sp-2) var(--sp-4); background: var(--tint); border-radius: var(--r-card); }
+.r2-policy nav ul { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 0 var(--sp-4); list-style: none; margin: 0; padding: 0; }
+.r2-policy :is(nav,address) a { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: 44px; color: var(--brand-ink); }
+.r2-policy address { display: grid; justify-items: start; font-style: normal; }
