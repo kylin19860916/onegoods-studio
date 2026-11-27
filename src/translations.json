@@ -267,6 +267,11 @@
     "中文字型",
     "Chinese fonts"
   ],
+  "昭源环方": ["昭源環方", "Chiron GoRound TC"],
+  "源泉圆体": ["源泉圓體", "GenSen Rounded TW"],
+  "台灣正楷": ["台灣正楷", "CNS Traditional Kai"],
+  "源云明体": ["源雲明體", "GenWan Mincho TW"],
+  "旧版字型": ["舊版字型", "Legacy fonts"],
   "英文字型": [
     "英文字型",
     "English fonts"

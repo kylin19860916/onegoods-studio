@@ -7,6 +7,7 @@ import { build } from 'esbuild';
 import { unzipSync, strFromU8 } from 'fflate';
 import { mxChainEyelet, mxPrintableEyelet, MX_NAME_FACE } from '../src/cherry-mx-spec.js';
 import { nameClickerContours, parseKeyringFont } from '../server/keyring-geometry.mjs';
+import { keyringFonts } from '../src/keyring-font-picker.js';
 import { NAME_MX, nameMxStack } from '../src/name-clicker-mechanism.js';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const dir = process.argv[2] ? resolve(process.argv[2]) : mkdtempSync(join(tmpdir(), 'ogs-mx-'));
@@ -35,7 +36,13 @@ assert.equal(NAME_MX.rimTop, 19.5);
 assert(Math.abs(stack.rimTop - stack.skirtBottom - 2.976) < 1e-8);
 const fixtures = ['濤','飛','Max','III','ONEGOODS','玩物工作室','林予曦'].map(text => ({ text, fontKey:'huninn', font:huninn }));
 fixtures.push({text:'林予曦',fontKey:'kuaile',font:kuaile}, {text:'林予',fontKey:'kuaile',font:kuaile});
-for (const [i,{text,fontKey,font}] of fixtures.entries()) {
+for (const fontKey of ['chiron-round', 'gensen-tw', 'tw-kai', 'genwan-tw']) {
+  const font = readFileSync(join(root, 'public/assets/fonts/keyring', keyringFonts[fontKey]));
+  for (const text of ['邱珼恩', '邱悅恩', '林予曦']) {
+    fixtures.push({ text, fontKey, font, expectedSwitches: 2 });
+  }
+}
+for (const [i,{text,fontKey,font,expectedSwitches = text === '林予曦' ? 2 : 1}] of fixtures.entries()) {
   const contour = nameClickerContours(parseKeyringFont(font), text);
   const eyelet = mxChainEyelet(contour.profile(MX_NAME_FACE.shellMargin));
   const ramp = mxPrintableEyelet(eyelet.outline, eyelet.rootLeft);
@@ -60,7 +67,6 @@ for (const [i,{text,fontKey,font}] of fixtures.entries()) {
   assert.equal(settings.brim_type,'no_brim');
   const xml = strFromU8(archive['3D/3dmodel.model']);
   assert(!xml.includes('REMOVE - local support below MX boss'));
-  const expectedSwitches = text === '林予曦' ? 2 : 1;
   if (expectedSwitches === 2) {
     assert.equal(settings.curr_bed_type, 'Textured PEI Plate');
     assert.deepEqual(settings.filament_settings_id, [
@@ -75,6 +81,6 @@ for (const [i,{text,fontKey,font}] of fixtures.entries()) {
   assert.equal((xml.match(/name="Exclude supports inside MX cap cross socket /g) ?? []).length, expectedSwitches);
   assert(xml.includes('Exclude supports under printable eyelet'));
   writeFileSync(join(dir,`sample-${i+1}.3mf`),file);
-  console.log(text, 'generated with P2S supports; full-press collision check passed');
+  console.log(fontKey, text, 'generated with P2S supports; full-press collision check passed');
 }
 console.log('Output:', dir);

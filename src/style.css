@@ -242,6 +242,10 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 @font-face{font-family:"OGS Preview serif-sc";src:url("assets/fonts/keyring/serif-sc-name-41d31a8caf.woff2") format("woff2");font-display:swap}
 @font-face{font-family:"OGS Preview wenkai";src:url("assets/fonts/keyring/wenkai-name-7fe84552ec.woff2") format("woff2");font-display:swap}
 @font-face{font-family:"OGS Preview kuaile";src:url("assets/fonts/keyring/kuaile-name-a69136131d.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview chiron-round";src:url("assets/fonts/keyring/chiron-round-name.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview gensen-tw";src:url("assets/fonts/keyring/gensen-tw-name.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview tw-kai";src:url("assets/fonts/keyring/tw-kai-name.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"OGS Preview genwan-tw";src:url("assets/fonts/keyring/genwan-tw-name.woff2") format("woff2");font-display:swap}
 @font-face{font-family:"OGS Preview lucky";src:url("assets/fonts/keyring/lucky-name-b3934711bd.woff2") format("woff2");font-display:swap}
 @font-face{font-family:"OGS Preview nunito";src:url("assets/fonts/keyring/nunito-name-96d6a3e19b.woff2") format("woff2");font-display:swap}
 @font-face{font-family:"OGS Preview lobster";src:url("assets/fonts/keyring/lobster-name-426ed224c3.woff2") format("woff2");font-display:swap}
@@ -293,6 +297,10 @@ header .language-switch{display:block;margin-left:14px;flex-shrink:0;position:re
 @font-face{font-family:"OGS Full serif-sc";src:url("assets/fonts/keyring/NotoSerifSC-Bold.woff") format("woff");font-display:swap}
 @font-face{font-family:"OGS Full wenkai";src:url("assets/fonts/keyring/wenkai.woff") format("woff");font-display:swap}
 @font-face{font-family:"OGS Full kuaile";src:url("assets/fonts/keyring/kuaile.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full chiron-round";src:url("assets/fonts/keyring/ChironGoRoundTC-700B.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full gensen-tw";src:url("assets/fonts/keyring/GenSenRounded2TW-B.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full tw-kai";src:url("assets/fonts/keyring/TW-Kai.woff") format("woff");font-display:swap}
+@font-face{font-family:"OGS Full genwan-tw";src:url("assets/fonts/keyring/GenWanMin2TW-SB.woff") format("woff");font-display:swap}
 @font-face{font-family:"OGS Full lucky";src:url("assets/fonts/keyring/lucky.woff") format("woff");font-display:swap}
 @font-face{font-family:"OGS Full nunito";src:url("assets/fonts/keyring/nunito.woff") format("woff");font-display:swap}
 @font-face{font-family:"OGS Full lobster";src:url("assets/fonts/keyring/lobster.woff") format("woff");font-display:swap}

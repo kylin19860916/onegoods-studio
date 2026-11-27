@@ -168,8 +168,10 @@ export function nameClickerContours(font, text) {
   const mounts = fittedMounts.map(({ x, y }) => ({ x, y: y ?? 0 }));
   const contour = mountingPads.length ? connectedOutline([...mountingPads, ...letterOutlines]) : glyphContour;
   const toMm = ring => ring.map(({ X, Y }) => /** @type {[number, number]} */ ([X / units, Y / units]));
-  // Cut only enclosed pockets; the validated outer contour is shared by both outputs.
-  const capFace = offsetPaths(contour, MX_NAME_FACE.faceMargin);
+  // Keep the lid and walls on the same exterior profile. Bridged glyphs may
+  // enclose small interior gaps, but only the switch pockets open in the lid.
+  const exteriorAt = margin => polygons(offsetPaths(contour, margin)).map(([outer]) => outer);
+  const capFace = exteriorAt(MX_NAME_FACE.faceMargin);
   const pockets = mounts.map(({ x, y }) => squareAt(NAME_MX.capPocket, x, y));
   const capBack = polygons(capFace, pockets, ClipType.ctDifference);
   if (mounts.some(({ x, y }) => !fits(squareAt(wallEnvelope, x, y), capFace))
@@ -187,9 +189,7 @@ export function nameClickerContours(font, text) {
   const dividers = polygons(dividerStrips, capFace, ClipType.ctIntersection);
   if (dividers.length !== dividerStrips.length) throw new Error('字形無法保留底座隔板，請調整文字。');
   function housingRing(outerMargin, innerMargin) {
-    const interior = offsetPaths(contour, innerMargin);
-    const clearance = polygons(interior).flat();
-    return polygons(offsetPaths(contour, outerMargin), clearance, ClipType.ctDifference)
+    return polygons(exteriorAt(outerMargin), exteriorAt(innerMargin), ClipType.ctDifference)
       .map(rings => rings.map(toMm));
   }
   return {
@@ -200,9 +200,9 @@ export function nameClickerContours(font, text) {
     dividers: dividers.map(rings => rings.map(toMm)),
     mounts,
     profile(margin) {
-      const rings = polygons(offsetPaths(contour, margin));
+      const rings = exteriorAt(margin);
       if (rings.length !== 1) throw new Error('Name clicker contour is disconnected');
-      return toMm(rings[0][0]);
+      return toMm(rings[0]);
     },
   };
 }

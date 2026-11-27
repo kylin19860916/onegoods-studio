@@ -2,6 +2,10 @@ export const keyringFonts = {
   huninn: 'Huninn-Regular.woff',
   'sans-tc': 'NotoSansTC-Bold.woff',
   'serif-tc': 'NotoSerifTC-Bold.woff',
+  'chiron-round': 'ChironGoRoundTC-700B.woff',
+  'gensen-tw': 'GenSenRounded2TW-B.woff',
+  'tw-kai': 'TW-Kai.woff',
+  'genwan-tw': 'GenWanMin2TW-SB.woff',
   'sans-sc': 'NotoSansSC-Bold.woff',
   'serif-sc': 'NotoSerifSC-Bold.woff',
   wenkai: 'wenkai.woff', kuaile: 'kuaile.woff',
@@ -32,7 +36,7 @@ export function setupFontPicker(select) {
     selected.replaceChildren(sample(option));
     radios.forEach(input => { input.checked = input.value === select.value; });
   }
-  for (const group of select.querySelectorAll('optgroup')) {
+  for (const group of select.querySelectorAll('optgroup:not([hidden])')) {
     const field = document.createElement('fieldset');
     const legend = document.createElement('legend');
     legend.textContent = group.label;

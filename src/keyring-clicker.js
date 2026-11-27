@@ -83,7 +83,7 @@ export function setupClicker() {
   const nameFont = document.querySelector('#plate-style').cloneNode(true);
   nameFont.id = 'clicker-name-font';
   nameFont.name = 'clickerNameFont';
-  nameFont.value = saved?.font ?? 'huninn';
+  if (saved && Array.from(nameFont.options).some(option => option.value === saved.font)) nameFont.value = saved.font;
   if (saved) clickerName.value = saved.text;
   document.querySelector('#clicker-name-font-field').append(nameFont);
   setupFontPicker(nameFont);
@@ -115,7 +115,6 @@ export function setupClicker() {
     const font = document.querySelector('#plate-style').cloneNode(true);
     font.id = 'clicker-font-' + number;
     font.name = 'keyFont' + index;
-    font.value = 'huninn';
     settings.querySelector('[data-key-font-field]').append(font);
     labels.insertBefore(row, controls);
     keySettings.append(settings);
