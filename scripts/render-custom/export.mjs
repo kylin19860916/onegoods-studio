@@ -4,15 +4,15 @@ import { parseKeyringFont, generateKeyring } from '../../server/keyring-geometry
 import { buildClickerAssembly } from '../../src/clicker-viewer.js';
 import { keyringFonts } from '../../src/keyring-font-picker.js';
 
-const swatches = { ivory: '#fffcf5', lilac: '#a087c1', honey: '#f2c879', mint: '#b8d6bd' };
+const swatches = { ivory: '#fffcf5', lilac: '#a087c1', honey: '#f2c879', mint: '#9fd3c0', darkMint: '#689587' };
 const font = key => parseKeyringFont(readFileSync('public/assets/fonts/keyring/' + keyringFonts[key]));
 const spec = { widthMm: 65, heightMm: 27, baseMm: 3, letteringMm: 1, holeMm: 4, rimMm: 1.8 };
 const samples = {};
 for (const [id, name, face, style, baseColor, accentColor] of [
   ['nameplate', 'Mia', 'lilita', 'contour', swatches.lilac, undefined],
-  ['articulated', 'LEO', 'lucky', 'articulated', swatches.mint, swatches.ivory],
+  ['articulated', 'LEO', 'lucky', 'articulated', swatches.darkMint, swatches.ivory],
 ]) {
-  const palette = { baseColor, textColor: swatches.ivory, accentColor };
+  const palette = { baseColor, textColor: id === 'articulated' ? swatches.mint : swatches.ivory, accentColor };
   const result = generateKeyring(font(face), name, { ...spec, shape: style, ...palette });
   samples[id] = { name, font: face, source: 'server/keyring-geometry.mjs#generateKeyring', palette, meshes: result.meshes };
 }

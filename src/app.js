@@ -29,9 +29,9 @@ function canOrder(p){
 function buyAction(p){
  const official=canOrder(p)?`<div class="store-order-entry"><a class="button yellow" href="checkout.html?product=${encodeURIComponent(p.id)}">官网下单</a></div>`:'';
  if(p.saleStatus!=='available')return '<span class="sale-status">尚未开售</span>';
- const channels=[p.purchaseUrl?{id:'myship',url:p.purchaseUrl,logo:'platforms/seven-eleven.svg',label:'前往賣貨便賣场',note:'需登入 uniopen 会员'}:null,p.shopeeUrl?{id:'shopee',url:p.shopeeUrl,logo:'platforms/shopee.png',label:'蝦皮购买',note:'前往 Shopee 商品页'}:null].filter(Boolean);
+ const channels=[p.purchaseUrl?{id:'myship',url:p.purchaseUrl,logo:'platforms/seven-eleven.svg',label:'前往賣貨便賣场',note:'需登入 uniopen 会员'}:null,p.shopeeUrl?{id:'shopee',url:p.shopeeUrl,logo:'platforms/shopee-transparent.png',label:'蝦皮购买',note:'前往 Shopee 商品页'}:null].filter(Boolean);
  if(!channels.length)return official;
- return `<div class="purchase-platforms" role="group" aria-label="其他购买平台"><div class="purchase-platforms-heading"><p class="purchase-platforms-title">其他购买平台</p><p class="purchase-platforms-note">订单、付款与配送由各平台处理。</p></div><div class="purchase-platforms-grid">${channels.map(c=>`<a class="platform-purchase ${c.id}" href="${escapeHtml(c.url)}" target="_blank" rel="noopener noreferrer"><span class="platform-logo"><img src="${assetUrl(c.logo)}" alt="" width="96" height="48"></span><span class="platform-copy"><strong>${c.label}</strong><span>${c.note}</span></span></a>`).join('')}</div></div>`+official;
+ return `<div class="purchase-platforms" role="group" aria-label="其他购买平台"><div class="purchase-platforms-heading"><p class="purchase-platforms-title">其他购买平台</p><p class="purchase-platforms-note">订单、付款与配送由各平台处理。</p></div><div class="purchase-platforms-grid">${channels.map(c=>`<a class="btn-secondary platform-purchase ${c.id}" href="${escapeHtml(c.url)}" target="_blank" rel="noopener noreferrer" title="${c.note}"><span class="platform-logo"><img src="${assetUrl(c.logo)}" alt="" width="96" height="48"></span><span class="platform-copy">${c.label}</span></a>`).join('')}</div></div>`+official;
 }
 const studioSources = {
   "keynade-mx": "assets/keynade/01-front-retouched-v2.jpg",
