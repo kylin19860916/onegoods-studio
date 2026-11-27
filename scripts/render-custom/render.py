@@ -27,7 +27,8 @@ scene.render.resolution_x = scene.render.resolution_y = 1024 if face_view else 2
 scene.render.resolution_percentage = 100
 scene.render.film_transparent = True
 scene.render.image_settings.color_mode = 'RGBA'
-scene.view_settings.view_transform = 'AgX'
+scene.view_settings.view_transform = 'Khronos PBR Neutral' if face_view else 'AgX'
+scene.view_settings.exposure = .1 if face_view else 0
 scene.world = bpy.data.worlds.new('Neutral fill')
 scene.world.use_nodes = True
 scene.world.node_tree.nodes['Background'].inputs[0].default_value = (.35, .35, .35, 1)
@@ -47,6 +48,8 @@ lamps = [
 ]
 for name, azimuth, elevation, temperature, energy, size in lamps:
     lamp = bpy.data.lights.new(name, 'AREA')
+    if face_view:
+        temperature = max(temperature, 5800)
     lamp.energy, lamp.shape, lamp.size = 580000 * energy, 'DISK', size
     lamp.use_shadow = name == 'Key'
     if hasattr(lamp, 'temperature'):
