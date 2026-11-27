@@ -9,8 +9,9 @@ from mathutils import Vector
 
 arguments = sys.argv[sys.argv.index('--') + 1:]
 source, output = map(Path, arguments[:2])
-face_view = '--face' in arguments[2:]
-view = 'face' if face_view else 'front34'
+tab_view = '--tabs' in arguments[2:]
+face_view = tab_view or '--face' in arguments[2:]
+view = 'tab' if tab_view else ('face' if face_view else 'front34')
 camera_azimuth, camera_elevation = (0, 86) if face_view else (30, 18)
 output.mkdir(parents=True, exist_ok=True)
 samples = json.loads(source.read_text())
@@ -23,7 +24,7 @@ scene.cycles.samples = 256
 scene.cycles.adaptive_threshold = 0.10
 scene.cycles.use_denoising = True
 scene.cycles.seed = 27
-scene.render.resolution_x = scene.render.resolution_y = 2048
+scene.render.resolution_x = scene.render.resolution_y = 480 if tab_view else 2048
 scene.render.resolution_percentage = 100
 scene.render.film_transparent = True
 scene.render.image_settings.color_mode = 'RGBA'
@@ -116,7 +117,7 @@ def frame(sample, distance):
     x0, x1 = min(p.x for p in projected), max(p.x for p in projected)
     y0, y1 = min(p.y for p in projected), max(p.y for p in projected)
     lens.shift_x = (x0 + x1) / 2 - .5
-    lens.shift_y = y0 - .22
+    lens.shift_y = (y0 + y1) / 2 - .5 if tab_view else y0 - .22
     return max(x1-x0,y1-y0)
 
 def fit(names):
@@ -129,10 +130,10 @@ def fit(names):
             far = middle
     return round(far, 3)
 
-distance = fit(('nameplate', 'press', 'articulated'))
+distance = None if face_view else fit(('nameplate', 'press', 'articulated'))
 
 for name, sample in samples.items():
-    required = ('.png', '_shadow-raw.png', '.json')
+    required = ('.png',) if tab_view else ('.png', '_shadow-raw.png', '.json')
     if all((output / f'{name}_{view}{suffix}').is_file() for suffix in required):
         continue
     sample_distance = fit((name,)) if face_view else (round(distance * 1.65, 3) if name == 'press-abc' else distance)
@@ -160,9 +161,13 @@ for name, sample in samples.items():
     scene.render.filepath = str(output / f'{name}_{view}.png')
     floor.hide_render = True
     scene.render.resolution_percentage = 100
-    scene.cycles.samples = 96 if face_view else 256
+    scene.cycles.samples = 32 if tab_view else (96 if face_view else 256)
     if not Path(scene.render.filepath).is_file():
         bpy.ops.render.render(write_still=True)
+    if tab_view:
+        for obj in objects:
+            bpy.data.objects.remove(obj, do_unlink=True)
+        continue
     floor.hide_render = False
     for obj in objects:
         obj.visible_camera = False

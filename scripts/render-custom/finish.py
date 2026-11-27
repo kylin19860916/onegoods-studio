@@ -6,6 +6,14 @@ from PIL import Image, ImageChops, ImageFilter, ImageOps
 source, output, evidence = map(Path, sys.argv[1:4])
 output.mkdir(parents=True,exist_ok=True)
 evidence.mkdir(parents=True,exist_ok=True)
+if '--tabs' in sys.argv[4:]:
+    for render in sorted(source.glob('*_tab.png')):
+        image = Image.open(render).convert('RGBA')
+        image = image.crop(image.getbbox())
+        image.thumbnail((320, 120), Image.Resampling.LANCZOS)
+        image.save(output / (render.stem.removesuffix('_tab') + '.webp'), quality=90)
+    sys.exit(0)
+
 face = '--face' in sys.argv[4:]
 variants = ['nameplate', 'press', 'articulated'] + ([] if face else ['press-abc'])
 for name in variants:

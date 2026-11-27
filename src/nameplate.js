@@ -314,10 +314,13 @@ if (customTabs) {
     button.setAttribute('role','tab');
     button.setAttribute('aria-controls',panel.id);
     const photo = document.createElement('img');
-    photo.src = '/assets/' + type.image;
+    photo.src = '/assets/custom/tabs/' + type.id + '-' + language.toLowerCase() + '.webp';
     photo.alt = '';
-    photo.width = photo.height = 56;
-    button.append(photo, type.text[localeIndex]);
+    photo.width = 104;
+    photo.height = 36;
+    button.setAttribute('aria-label', type.text[localeIndex]);
+    button.append(photo);
+    if (language === 'en') button.append(type.text[localeIndex]);
     customTabs.append(button);
     button.addEventListener('click',() => choose(type));
     return button;

@@ -10,3 +10,5 @@ Run from the repository root with the existing Node dependencies, Blender with C
 For a clean rerender, use a fresh output directory in step 3. The output directory also serves as a cache for long Cycles passes. The review folder contains the composited PNG masters and the two side-by-side proof sheets. The website serves the 1024 and 2048 pixel WebP files.
 
 All renders preserve millimeters, share one camera distance and align to the same ground line. The largest of the three primary products determines the 64% frame occupancy. The remaining samples keep their true relative sizes.
+
+For customizer tab artwork, pass `--tabs` in steps 2, 3, and 4, use a fresh render directory, and set the output in step 4 to `public/assets/custom/tabs`. This renders the localized labels with the same product geometry and crops the transparent artwork for the tab bar.
